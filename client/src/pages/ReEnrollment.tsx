@@ -391,10 +391,10 @@ export default function ReEnrollment() {
           </div>
         )}
 
-        <DataTableHeader 
-          title="Herinschrijvingen Overzicht"
-          subtitle={`${filteredStudents.length} studenten geschikt voor herinschrijving`}
-        />
+        <div className="px-6 py-4 border-b border-gray-200">
+          <h2 className="text-lg font-semibold text-gray-900">Herinschrijvingen Overzicht</h2>
+          <p className="text-sm text-gray-600">{filteredStudents.length} studenten geschikt voor herinschrijving</p>
+        </div>
 
         <TableContainer>
           <Tabs defaultValue="passed" className="w-full">
@@ -412,11 +412,13 @@ export default function ReEnrollment() {
               {studentsLoading ? (
                 <TableLoadingState />
               ) : passedStudents.length === 0 ? (
-                <EmptyTableState 
-                  icon={CheckCircle}
-                  title="Geen geslaagde studenten"
-                  description="Er zijn momenteel geen studenten die geslaagd zijn en geschikt zijn voor herinschrijving."
-                />
+                <div className="text-center py-12">
+                  <div className="flex justify-center mb-4">
+                    <CheckCircle className="h-12 w-12 text-gray-400" />
+                  </div>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">Geen geslaagde studenten</h3>
+                  <p className="text-gray-500">Er zijn momenteel geen studenten die geslaagd zijn en geschikt zijn voor herinschrijving.</p>
+                </div>
               ) : (
                 <Table>
                   <TableHeader>
@@ -478,11 +480,13 @@ export default function ReEnrollment() {
               {studentsLoading ? (
                 <TableLoadingState />
               ) : failedStudents.length === 0 ? (
-                <EmptyTableState 
-                  icon={XCircle}
-                  title="Geen gezakte studenten"
-                  description="Er zijn momenteel geen studenten die gezakt zijn en individuele behandeling nodig hebben."
-                />
+                <div className="text-center py-12">
+                  <div className="flex justify-center mb-4">
+                    <XCircle className="h-12 w-12 text-gray-400" />
+                  </div>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">Geen gezakte studenten</h3>
+                  <p className="text-gray-500">Er zijn momenteel geen studenten die gezakt zijn en individuele behandeling nodig hebben.</p>
+                </div>
               ) : (
                 <Table>
                   <TableHeader>

@@ -690,34 +690,48 @@ export default function Fees() {
         </div>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="current">Huidige Betalingen</TabsTrigger>
-          <TabsTrigger value="history">Betalingsgeschiedenis</TabsTrigger>
-          <TabsTrigger value="discounts">Kortingsbeheer</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="current" className="space-y-4">
+      {/* Main Dashboard Layout */}
+      <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+        
+        {/* Left Section - Primary Content (3 columns) */}
+        <div className="xl:col-span-3 space-y-6">
+          
+          {/* Current Payments Section */}
           <Card>
-            <CardHeader>
-              <CardTitle className="text-blue-700">Betalingsoverzicht</CardTitle>
-              <CardDescription>
-                Beheer alle openstaande en recente betalingen
-              </CardDescription>
+            <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100 border-b">
+              <div className="flex justify-between items-center">
+                <div>
+                  <CardTitle className="text-blue-700 flex items-center text-xl">
+                    <CreditCard className="h-6 w-6 mr-3" />
+                    Actieve Betalingen
+                  </CardTitle>
+                  <CardDescription className="mt-1">
+                    Overzicht van alle lopende en openstaande betalingen
+                  </CardDescription>
+                </div>
+                <div className="flex gap-2">
+                  <Badge variant="outline" className="bg-white">
+                    {filteredPayments.length} betalingen
+                  </Badge>
+                  <Badge variant="secondary" className="bg-orange-100 text-orange-800">
+                    €{outstandingAmount.toFixed(2)} openstaand
+                  </Badge>
+                </div>
+              </div>
             </CardHeader>
-            <CardContent className="p-8">
-              <div className="flex gap-4 mb-6">
-                <div className="flex-1">
+            <CardContent className="p-6">
+              <div className="flex flex-wrap gap-4 mb-6">
+                <div className="flex-1 min-w-64">
                   <Input
                     placeholder="Zoek op student, ouder of omschrijving..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="max-w-md"
+                    className="h-10"
                   />
                 </div>
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-48">
-                    <SelectValue placeholder="Status" />
+                  <SelectTrigger className="w-48 h-10">
+                    <SelectValue placeholder="Filter op status" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="alle">Alle statussen</SelectItem>
@@ -729,8 +743,8 @@ export default function Fees() {
                 </Select>
                 
                 <Select value={classFilter} onValueChange={setClassFilter}>
-                  <SelectTrigger className="w-48">
-                    <SelectValue placeholder="Klas" />
+                  <SelectTrigger className="w-48 h-10">
+                    <SelectValue placeholder="Filter op klas" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="alle">Alle klassen</SelectItem>
@@ -857,29 +871,38 @@ export default function Fees() {
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
-
-        <TabsContent value="history" className="space-y-4">
+          
+          {/* Payment History Section */}
           <Card>
-            <CardHeader>
-              <CardTitle className="text-blue-700">Betalingsgeschiedenis</CardTitle>
-              <CardDescription>
-                Volledige geschiedenis met filteropties
-              </CardDescription>
+            <CardHeader className="bg-gradient-to-r from-green-50 to-green-100 border-b">
+              <div className="flex justify-between items-center">
+                <div>
+                  <CardTitle className="text-green-700 flex items-center text-xl">
+                    <History className="h-6 w-6 mr-3" />
+                    Betalingsgeschiedenis
+                  </CardTitle>
+                  <CardDescription className="mt-1">
+                    Volledige geschiedenis van alle betalingen
+                  </CardDescription>
+                </div>
+                <Badge variant="outline" className="bg-white">
+                  {allPayments.length} totale betalingen
+                </Badge>
+              </div>
             </CardHeader>
-            <CardContent className="p-8">
-              <div className="flex gap-4 mb-6">
-                <div className="flex-1">
+            <CardContent className="p-6">
+              <div className="flex flex-wrap gap-4 mb-6">
+                <div className="flex-1 min-w-64">
                   <Input
                     placeholder="Zoek in geschiedenis..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="max-w-md"
+                    className="h-10"
                   />
                 </div>
                 <Select value={yearFilter} onValueChange={setYearFilter}>
-                  <SelectTrigger className="w-48">
-                    <SelectValue placeholder="Schooljaar" />
+                  <SelectTrigger className="w-48 h-10">
+                    <SelectValue placeholder="Filter op jaar" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="alle">Alle jaren</SelectItem>
@@ -943,17 +966,16 @@ export default function Fees() {
               </Table>
             </CardContent>
           </Card>
-        </TabsContent>
-
-        <TabsContent value="discounts" className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
+          
+          {/* Discount Management Section */}
+          <div className="grid gap-6 md:grid-cols-2">
             <Card>
-              <CardHeader>
-                <CardTitle className="text-green-700 flex items-center">
-                  <Gift className="h-5 w-5 mr-2" />
+              <CardHeader className="bg-gradient-to-r from-green-50 to-green-100 border-b">
+                <CardTitle className="text-green-700 flex items-center text-xl">
+                  <Gift className="h-6 w-6 mr-3" />
                   Automatische Kortingen
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="mt-1">
                   Systeem berekent automatisch familiekortingen voor gezinnen met meerdere kinderen
                 </CardDescription>
               </CardHeader>
@@ -1210,8 +1232,103 @@ export default function Fees() {
               </Table>
             </CardContent>
           </Card>
-        </TabsContent>
-      </Tabs>
+        </div>
+        
+        {/* Right Sidebar - Dashboard Info & Actions */}
+        <div className="xl:col-span-1 space-y-6">
+          
+          {/* Quick Stats Widget */}
+          <Card className="bg-gradient-to-br from-blue-50 to-indigo-100 border-blue-200">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-blue-700 text-lg flex items-center">
+                <TrendingUp className="h-5 w-5 mr-2" />
+                Snelle Statistieken
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 gap-3">
+                <div className="bg-white/70 p-3 rounded-lg">
+                  <div className="text-xs text-blue-600">Vandaag ontvangen</div>
+                  <div className="text-lg font-bold text-blue-800">€{monthlyRevenue.toFixed(2)}</div>
+                </div>
+                <div className="bg-white/70 p-3 rounded-lg">
+                  <div className="text-xs text-orange-600">Te innen deze week</div>
+                  <div className="text-lg font-bold text-orange-800">{pendingCount}</div>
+                </div>
+                <div className="bg-white/70 p-3 rounded-lg">
+                  <div className="text-xs text-green-600">Afgeronde betalingen</div>
+                  <div className="text-lg font-bold text-green-800">{allPayments.filter(p => p.status === 'betaald').length}</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          {/* Quick Actions Widget */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-gray-700 text-lg flex items-center">
+                <Zap className="h-5 w-5 mr-2" />
+                Snelle Acties
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <Button 
+                className="w-full h-11 bg-blue-600 hover:bg-blue-700"
+                onClick={handleNewPayment}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Nieuwe Betaling
+              </Button>
+              <Button 
+                variant="outline" 
+                className="w-full h-11"
+                onClick={handleExportData}
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Exporteer Data
+              </Button>
+              <Button 
+                variant="outline" 
+                className="w-full h-11"
+                onClick={() => setShowDiscountDialog(true)}
+              >
+                <Percent className="h-4 w-4 mr-2" />
+                Korting Beheren
+              </Button>
+            </CardContent>
+          </Card>
+          
+          {/* Recent Activity Widget */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-gray-700 text-lg flex items-center">
+                <Activity className="h-5 w-5 mr-2" />
+                Recente Activiteit
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {allPayments.slice(0, 5).map((payment: any) => (
+                <div key={payment.id} className="flex items-center justify-between text-sm p-2 bg-gray-50 rounded">
+                  <div>
+                    <div className="font-medium">{payment.student?.firstName} {payment.student?.lastName}</div>
+                    <div className="text-xs text-gray-500">{payment.description}</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="font-medium">€{payment.amount}</div>
+                    <Badge 
+                      variant={payment.status === 'betaald' ? 'default' : 'secondary'}
+                      className="text-xs"
+                    >
+                      {payment.status}
+                    </Badge>
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+          
+        </div>
+      </div>
 
       {/* Mark as Paid Dialog */}
       <Dialog open={showMarkPaidDialog} onOpenChange={setShowMarkPaidDialog}>

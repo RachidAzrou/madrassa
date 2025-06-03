@@ -228,7 +228,7 @@ export default function StudentDossier() {
           <div className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-[#3a5a99]">
+                <CardTitle className="flex items-center gap-2 text-[#1e41af]">
                   <Search className="h-5 w-5" />
                   Student selecteren
                 </CardTitle>
@@ -381,7 +381,7 @@ export default function StudentDossier() {
                   {/* Persoonlijke informatie */}
                   <Card>
                     <CardHeader>
-                      <CardTitle className="flex items-center gap-2 text-[#3a5a99]">
+                      <CardTitle className="flex items-center gap-2 text-[#1e41af]">
                         <User className="h-5 w-5" />
                         Persoonlijke informatie
                       </CardTitle>
@@ -450,7 +450,7 @@ export default function StudentDossier() {
                   {/* Inschrijving informatie */}
                   <Card>
                     <CardHeader>
-                      <CardTitle className="flex items-center gap-2 text-[#3a5a99]">
+                      <CardTitle className="flex items-center gap-2 text-[#1e41af]">
                         <GraduationCap className="h-5 w-5" />
                         Inschrijving
                       </CardTitle>
@@ -525,7 +525,7 @@ export default function StudentDossier() {
               <TabsContent value="guardians">
                 <Card>
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-[#3a5a99]">
+                    <CardTitle className="flex items-center gap-2 text-[#1e41af]">
                       <Users className="h-5 w-5" />
                       Voogden & Familie
                     </CardTitle>
@@ -588,7 +588,7 @@ export default function StudentDossier() {
               <TabsContent value="grades">
                 <Card>
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-[#3a5a99]">
+                    <CardTitle className="flex items-center gap-2 text-[#1e41af]">
                       <Calculator className="h-5 w-5" />
                       Cijfers overzicht
                     </CardTitle>
@@ -624,7 +624,7 @@ export default function StudentDossier() {
               <TabsContent value="attendance">
                 <Card>
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-[#3a5a99]">
+                    <CardTitle className="flex items-center gap-2 text-[#1e41af]">
                       <Clock className="h-5 w-5" />
                       Aanwezigheid
                     </CardTitle>
@@ -657,7 +657,7 @@ export default function StudentDossier() {
               <TabsContent value="payments">
                 <Card>
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-[#3a5a99]">
+                    <CardTitle className="flex items-center gap-2 text-[#1e41af]">
                       <CreditCard className="h-5 w-5" />
                       Betalingen
                     </CardTitle>
@@ -692,7 +692,7 @@ export default function StudentDossier() {
               <TabsContent value="notes">
                 <Card>
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-[#3a5a99]">
+                    <CardTitle className="flex items-center gap-2 text-[#1e41af]">
                       <MessageSquare className="h-5 w-5" />
                       Notities & Opmerkingen
                     </CardTitle>

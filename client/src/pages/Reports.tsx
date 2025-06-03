@@ -448,38 +448,7 @@ export default function Reports() {
                   </CardContent>
                 </Card>
 
-                {/* Comments Card */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <FileText className="h-5 w-5 text-purple-600" />
-                      Opmerkingen & Notities
-                    </CardTitle>
-                    <CardDescription>
-                      Voeg algemene opmerkingen toe voor het rapport
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="space-y-2">
-                      <Label>Algemene Opmerkingen</Label>
-                      <Textarea
-                        value={generalComments}
-                        onChange={(e) => setGeneralComments(e.target.value)}
-                        placeholder="Voeg algemene opmerkingen toe voor het rapport..."
-                        rows={3}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Aanwezigheid Opmerkingen</Label>
-                      <Textarea
-                        value={attendanceComments}
-                        onChange={(e) => setAttendanceComments(e.target.value)}
-                        placeholder="Voeg opmerkingen toe over aanwezigheid..."
-                        rows={2}
-                      />
-                    </div>
-                  </CardContent>
-                </Card>
+
               </div>
 
               {/* Actions Sidebar */}
@@ -532,29 +501,7 @@ export default function Reports() {
                   </CardContent>
                 </Card>
 
-                {/* Quick Stats */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <TrendingUp className="h-5 w-5 text-orange-600" />
-                      Overzicht
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Totaal klassen:</span>
-                      <Badge variant="secondary">{classes.length}</Badge>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Totaal studenten:</span>
-                      <Badge variant="secondary">{students.length}</Badge>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Vakken:</span>
-                      <Badge variant="secondary">{subjects.length}</Badge>
-                    </div>
-                  </CardContent>
-                </Card>
+
               </div>
             </div>
           </TabsContent>
@@ -615,21 +562,109 @@ export default function Reports() {
                           </div>
                         </div>
 
-                        {/* Vakken overzicht */}
+                        {/* Complete cijfersamenvatting */}
                         <div className="mb-6">
-                          <h5 className="font-semibold mb-3 flex items-center gap-2">
+                          <h5 className="font-semibold mb-4 flex items-center gap-2">
                             <Calculator className="h-4 w-4" />
-                            Vakken & Cijfers
+                            Complete Cijfersamenvatting
                           </h5>
-                          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                            {subjects.slice(0, 8).map((subject: any, subjectIndex: number) => (
-                              <div key={subjectIndex} className="flex justify-between items-center p-2 bg-gray-50 rounded">
-                                <span className="text-sm font-medium">{subject.name}</span>
-                                <Badge variant="outline" className="text-xs">
-                                  {(7.5 + Math.random() * 1.5).toFixed(1)}
-                                </Badge>
-                              </div>
-                            ))}
+                          <div className="overflow-x-auto">
+                            <table className="w-full border-collapse border border-gray-200">
+                              <thead>
+                                <tr className="bg-gray-50">
+                                  <th className="border border-gray-200 px-3 py-2 text-left font-semibold">Vak</th>
+                                  <th className="border border-gray-200 px-3 py-2 text-center font-semibold">Testen</th>
+                                  <th className="border border-gray-200 px-3 py-2 text-center font-semibold">Taken</th>
+                                  <th className="border border-gray-200 px-3 py-2 text-center font-semibold">Examen</th>
+                                  <th className="border border-gray-200 px-3 py-2 text-center font-semibold">Gemiddelde</th>
+                                  <th className="border border-gray-200 px-3 py-2 text-center font-semibold">Beoordeling</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {subjects.map((subject: any, subjectIndex: number) => {
+                                  // Simuleer echte cijfers voor elke student
+                                  const testGrades = [7.5, 8.2, 6.8, 7.9];
+                                  const taskGrades = [8.0, 7.5, 8.5, 7.2];
+                                  const examGrade = 7.8;
+                                  const average = (
+                                    (testGrades.reduce((a, b) => a + b, 0) / testGrades.length * 0.3) +
+                                    (taskGrades.reduce((a, b) => a + b, 0) / taskGrades.length * 0.3) +
+                                    (examGrade * 0.4)
+                                  );
+                                  
+                                  let assessment = '';
+                                  let assessmentColor = '';
+                                  if (average >= 8.5) {
+                                    assessment = 'Uitstekend';
+                                    assessmentColor = 'bg-green-100 text-green-800';
+                                  } else if (average >= 7.5) {
+                                    assessment = 'Goed';
+                                    assessmentColor = 'bg-blue-100 text-blue-800';
+                                  } else if (average >= 6.5) {
+                                    assessment = 'Voldoende';
+                                    assessmentColor = 'bg-yellow-100 text-yellow-800';
+                                  } else {
+                                    assessment = 'Aandacht nodig';
+                                    assessmentColor = 'bg-red-100 text-red-800';
+                                  }
+
+                                  return (
+                                    <tr key={subjectIndex} className="hover:bg-gray-50">
+                                      <td className="border border-gray-200 px-3 py-2 font-medium">{subject.name}</td>
+                                      <td className="border border-gray-200 px-3 py-2 text-center">
+                                        <div className="flex flex-wrap gap-1 justify-center">
+                                          {testGrades.map((grade, idx) => (
+                                            <span key={idx} className="bg-blue-50 text-blue-700 px-2 py-1 rounded text-xs">
+                                              {grade}
+                                            </span>
+                                          ))}
+                                        </div>
+                                      </td>
+                                      <td className="border border-gray-200 px-3 py-2 text-center">
+                                        <div className="flex flex-wrap gap-1 justify-center">
+                                          {taskGrades.map((grade, idx) => (
+                                            <span key={idx} className="bg-purple-50 text-purple-700 px-2 py-1 rounded text-xs">
+                                              {grade}
+                                            </span>
+                                          ))}
+                                        </div>
+                                      </td>
+                                      <td className="border border-gray-200 px-3 py-2 text-center">
+                                        <span className="bg-orange-50 text-orange-700 px-2 py-1 rounded text-sm font-semibold">
+                                          {examGrade}
+                                        </span>
+                                      </td>
+                                      <td className="border border-gray-200 px-3 py-2 text-center">
+                                        <span className="font-bold text-lg">
+                                          {average.toFixed(1)}
+                                        </span>
+                                      </td>
+                                      <td className="border border-gray-200 px-3 py-2 text-center">
+                                        <span className={`px-2 py-1 rounded text-xs font-medium ${assessmentColor}`}>
+                                          {assessment}
+                                        </span>
+                                      </td>
+                                    </tr>
+                                  );
+                                })}
+                              </tbody>
+                            </table>
+                          </div>
+                          
+                          {/* Legenda */}
+                          <div className="mt-3 flex flex-wrap gap-4 text-xs text-gray-600">
+                            <div className="flex items-center gap-1">
+                              <div className="w-3 h-3 bg-blue-50 border border-blue-200 rounded"></div>
+                              <span>Testen (30%)</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <div className="w-3 h-3 bg-purple-50 border border-purple-200 rounded"></div>
+                              <span>Taken (30%)</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <div className="w-3 h-3 bg-orange-50 border border-orange-200 rounded"></div>
+                              <span>Examen (40%)</span>
+                            </div>
                           </div>
                         </div>
 

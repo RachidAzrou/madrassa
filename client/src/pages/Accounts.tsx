@@ -604,6 +604,7 @@ export default function Accounts() {
                     <SelectItem value="teacher">Docenten</SelectItem>
                     <SelectItem value="guardian">Voogden</SelectItem>
                     <SelectItem value="secretariat">Secretariaat</SelectItem>
+                    <SelectItem value="admin">Administrator</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -806,6 +807,7 @@ export default function Accounts() {
                   <SelectItem value="teacher">Docent</SelectItem>
                   <SelectItem value="guardian">Voogd</SelectItem>
                   <SelectItem value="secretariat">Secretariaat</SelectItem>
+                  <SelectItem value="admin">Administrator</SelectItem>
                 </SelectContent>
               </Select>
             </div>

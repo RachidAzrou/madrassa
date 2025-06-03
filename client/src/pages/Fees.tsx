@@ -544,6 +544,18 @@ export default function Fees() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        {/* Export Dialog */}
+        <ExportDialog
+          open={isExportDialogOpen}
+          onOpenChange={setIsExportDialogOpen}
+          title="Betalingsgegevens Exporteren"
+          description="Kies een formaat om de betalingsgegevens te exporteren"
+          selectedCount={0}
+          totalCount={paymentsData.length}
+          entityName="betalingen"
+          onExport={handleExport}
+        />
       </div>
     </div>
   );

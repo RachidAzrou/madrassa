@@ -25,7 +25,8 @@ import {
   UserPlus,
   Heart,
   Home,
-  BookOpen
+  BookOpen,
+  Shield
 } from 'lucide-react';
 import { PremiumHeader } from '@/components/layout/premium-header';
 import { 
@@ -322,29 +323,29 @@ export default function StudentDossier() {
           // Student dossier
           <div className="space-y-6">
             {/* Student header */}
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <Avatar className="h-16 w-16">
-                      <AvatarImage src={selectedStudent.photoUrl || undefined} />
-                      <AvatarFallback className="text-lg">{getStudentInitials(selectedStudent)}</AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <h2 className="text-2xl font-bold">{selectedStudent.firstName} {selectedStudent.lastName}</h2>
-                      <p className="text-gray-600">Student ID: {selectedStudent.studentId}</p>
-                      <div className="flex items-center gap-2 mt-1">
-                        {getStatusBadge(selectedStudent.status)}
+            <div className="bg-white rounded-lg border p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <Avatar className="h-16 w-16">
+                    <AvatarImage src={selectedStudent.photoUrl || undefined} />
+                    <AvatarFallback className="text-lg">{getStudentInitials(selectedStudent)}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <h1 className="text-2xl font-bold text-gray-900">{selectedStudent.firstName} {selectedStudent.lastName}</h1>
+                    <p className="text-gray-600">Student ID: {selectedStudent.studentId}</p>
+                    <div className="flex items-center gap-2 mt-2">
+                      {getStatusBadge(selectedStudent.status)}
+                      {selectedStudent.academicYear && (
                         <Badge variant="outline">{selectedStudent.academicYear}</Badge>
-                      </div>
+                      )}
                     </div>
                   </div>
-                  <Button onClick={() => setSelectedStudent(null)} variant="outline">
-                    Andere student kiezen
-                  </Button>
                 </div>
-              </CardContent>
-            </Card>
+                <Button onClick={() => setSelectedStudent(null)} variant="outline" size="sm">
+                  ← Terug naar overzicht
+                </Button>
+              </div>
+            </div>
 
             {/* Tabs */}
             <Tabs value={activeTab} onValueChange={setActiveTab}>

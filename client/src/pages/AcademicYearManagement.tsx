@@ -260,334 +260,243 @@ export default function AcademicYearManagement() {
   });
 
   return (
-    <div className="bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20 min-h-screen">
-      <PremiumHeader 
-        title="Schooljaar Beheer" 
-        description="Beheer schooljaren, academische periodes en schoolvakanties met een intuïtieve interface"
-        icon={Calendar}
-        breadcrumbs={{
-          parent: "Beheer",
-          current: "Schooljaar Beheer"
-        }}
-      />
-
-      {/* Enhanced Statistics Dashboard */}
-      <div className="max-w-[1400px] mx-auto px-6 py-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-          <Card className="bg-gradient-to-br from-blue-500 to-blue-600 border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group overflow-hidden relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 to-transparent"></div>
-            <CardContent className="p-6 relative z-10">
-              <div className="flex items-center justify-between">
-                <div className="text-white">
-                  <p className="text-sm font-medium text-blue-100 mb-2">Totaal Schooljaren</p>
-                  <p className="text-3xl font-bold">{filteredYears.length}</p>
-                  <p className="text-xs text-blue-200 mt-1">Actief beheerd</p>
-                </div>
-                <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl group-hover:bg-white/30 transition-all duration-300">
-                  <Calendar className="h-7 w-7 text-white" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-emerald-500 to-emerald-600 border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group overflow-hidden relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/20 to-transparent"></div>
-            <CardContent className="p-6 relative z-10">
-              <div className="flex items-center justify-between">
-                <div className="text-white">
-                  <p className="text-sm font-medium text-emerald-100 mb-2">Actieve Schooljaren</p>
-                  <p className="text-3xl font-bold">
-                    {academicYearsData.filter((y: any) => y.isActive).length}
-                  </p>
-                  <p className="text-xs text-emerald-200 mt-1">Momenteel lopend</p>
-                </div>
-                <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl group-hover:bg-white/30 transition-all duration-300">
-                  <Settings className="h-7 w-7 text-white" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-purple-500 to-purple-600 border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group overflow-hidden relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-purple-400/20 to-transparent"></div>
-            <CardContent className="p-6 relative z-10">
-              <div className="flex items-center justify-between">
-                <div className="text-white">
-                  <p className="text-sm font-medium text-purple-100 mb-2">Schoolvakanties</p>
-                  <p className="text-3xl font-bold">{filteredHolidays.length}</p>
-                  <p className="text-xs text-purple-200 mt-1">Gepland dit jaar</p>
-                </div>
-                <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl group-hover:bg-white/30 transition-all duration-300">
-                  <Calendar className="h-7 w-7 text-white" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-amber-500 to-amber-600 border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group overflow-hidden relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-amber-400/20 to-transparent"></div>
-            <CardContent className="p-6 relative z-10">
-              <div className="flex items-center justify-between">
-                <div className="text-white">
-                  <p className="text-sm font-medium text-amber-100 mb-2">Komende Vakanties</p>
-                  <p className="text-3xl font-bold">
-                    {holidaysData.filter((h: any) => new Date(h.startDate) > new Date()).length}
-                  </p>
-                  <p className="text-xs text-amber-200 mt-1">Nog te komen</p>
-                </div>
-                <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl group-hover:bg-white/30 transition-all duration-300">
-                  <Clock className="h-7 w-7 text-white" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Schooljaar Beheer</h1>
+              <p className="text-gray-600">Beheer schooljaren en academische periodes</p>
+            </div>
+            <Button
+              onClick={() => setIsCreateYearDialogOpen(true)}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Nieuw Schooljaar
+            </Button>
+          </div>
         </div>
       </div>
 
-      <DataTableContainer>
-        <SearchActionBar>
-          {/* Search Bar */}
-          <div className="relative w-full sm:max-w-md">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-            <Input
-              type="text"
-              placeholder="Zoek schooljaren of vakanties..."
-              className="w-full pl-9 h-8 text-xs rounded-sm bg-white border-[#e5e7eb]"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-          
-          {/* Actions */}
-          <div className="flex flex-wrap items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowFilterOptions(!showFilterOptions)}
-              className="h-7 w-7 p-0 rounded-sm border-[#e5e7eb]"
-              title="Filters"
-            >
-              <Filter className="h-3.5 w-3.5" />
-            </Button>
-
-            <Button
-              size="sm"
-              onClick={() => setIsCreateYearDialogOpen(true)}
-              className="h-7 px-3 rounded-sm text-xs bg-blue-600 hover:bg-blue-700"
-            >
-              <Plus className="h-3.5 w-3.5 mr-1" />
-              Schooljaar
-            </Button>
-
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsCreateHolidayDialogOpen(true)}
-              className="h-7 px-3 rounded-sm text-xs border-[#e5e7eb]"
-            >
-              <Plus className="h-3.5 w-3.5 mr-1" />
-              Vakantie
-            </Button>
-          </div>
-        </SearchActionBar>
-
-        {/* Filter Options */}
-        {showFilterOptions && (
-          <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
-            <div className="flex flex-wrap gap-4">
-              <div className="flex items-center gap-2">
-                <label className="text-sm font-medium text-gray-700">Status:</label>
-                <Select defaultValue="all">
-                  <SelectTrigger className="w-40 h-8 text-xs">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Alle Schooljaren</SelectItem>
-                    <SelectItem value="active">Actief</SelectItem>
-                    <SelectItem value="inactive">Inactief</SelectItem>
-                  </SelectContent>
-                </Select>
+      {/* Statistics Cards */}
+      <div className="px-6 py-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <div className="p-2 bg-blue-100 rounded-lg">
+                  <Calendar className="h-6 w-6 text-blue-600" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Totaal Schooljaren</p>
+                  <p className="text-2xl font-bold text-gray-900">{filteredYears.length}</p>
+                </div>
               </div>
-            </div>
-          </div>
-        )}
+            </CardContent>
+          </Card>
 
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">Schooljaar Overzicht</h2>
-          <p className="text-sm text-gray-600">{filteredYears.length} schooljaren beheerd</p>
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <div className="p-2 bg-green-100 rounded-lg">
+                  <Settings className="h-6 w-6 text-green-600" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Actieve Schooljaren</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {academicYearsData.filter((y: any) => y.isActive).length}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <div className="p-2 bg-purple-100 rounded-lg">
+                  <Calendar className="h-6 w-6 text-purple-600" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Schoolvakanties</p>
+                  <p className="text-2xl font-bold text-gray-900">{filteredHolidays.length}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <div className="p-2 bg-amber-100 rounded-lg">
+                  <Clock className="h-6 w-6 text-amber-600" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Komende Vakanties</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {holidaysData.filter((h: any) => new Date(h.startDate) > new Date()).length}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
-        <TableContainer>
-          <Tabs defaultValue="years" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="years">
-                Schooljaren ({filteredYears.length})
-              </TabsTrigger>
-              <TabsTrigger value="holidays">
-                Vakanties ({filteredHolidays.length})
-              </TabsTrigger>
-            </TabsList>
-
-            {/* Academic Years Tab */}
-            <TabsContent value="years">
-              {yearsLoading ? (
-                <div className="text-center py-12">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                  <p className="mt-4 text-gray-500">Schooljaren laden...</p>
+        {/* Main Content */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Schooljaren Overzicht</CardTitle>
+                <CardDescription>Beheer en organiseer alle schooljaren</CardDescription>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="relative w-80">
+                  <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
+                  <Input
+                    type="text"
+                    placeholder="Zoek schooljaren..."
+                    className="pl-9"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
                 </div>
-              ) : filteredYears.length === 0 ? (
-                <div className="text-center py-12">
-                  <div className="flex justify-center mb-4">
-                    <Calendar className="h-12 w-12 text-gray-400" />
+                
+                <Button
+                  onClick={() => setIsCreateHolidayDialogOpen(true)}
+                  variant="outline"
+                  className="ml-2"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Vakantie Toevoegen
+                </Button>
+              </div>
+            </div>
+          </CardHeader>
+
+          <CardContent className="p-6">
+            {yearsLoading ? (
+              <div className="text-center py-12">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                <p className="mt-4 text-gray-500">Schooljaren laden...</p>
+              </div>
+            ) : filteredYears.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="flex justify-center mb-4">
+                  <Calendar className="h-12 w-12 text-gray-400" />
+                </div>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">Geen schooljaren</h3>
+                <p className="text-gray-500 mb-4">Begin met het toevoegen van je eerste schooljaar.</p>
+                <Button onClick={() => setIsCreateYearDialogOpen(true)}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Schooljaar Toevoegen
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {filteredYears.map((year: AcademicYear) => (
+                  <div key={year.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:shadow-sm transition-shadow">
+                    <div className="flex-1">
+                      <h3 className="font-medium text-gray-900">{year.name}</h3>
+                      <p className="text-sm text-gray-500 mt-1">
+                        {new Date(year.startDate).toLocaleDateString('nl-NL')} - {new Date(year.endDate).toLocaleDateString('nl-NL')}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {getStatusBadge(year)}
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => handleEditYear(year)}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        className="text-red-600 hover:text-red-700"
+                        onClick={() => handleDeleteYear(year)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">Geen schooljaren</h3>
-                  <p className="text-gray-500 mb-4">Begin met het toevoegen van je eerste schooljaar.</p>
-                  <Button onClick={() => setIsCreateYearDialogOpen(true)}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Schooljaar Toevoegen
-                  </Button>
-                </div>
-              ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Schooljaar</TableHead>
-                      <TableHead>Periode</TableHead>
-                      <TableHead>Inschrijving</TableHead>
-                      <TableHead>Eindrapport</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="text-right">Acties</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredYears.map((year: AcademicYear) => (
-                      <TableRow key={year.id}>
-                        <TableCell>
-                          <div>
-                            <div className="font-medium">{year.name}</div>
-                            {year.description && (
-                              <div className="text-sm text-gray-500">{year.description}</div>
-                            )}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="text-sm">
-                            <div>{format(parseISO(year.startDate), 'dd MMM yyyy', { locale: nl })}</div>
-                            <div className="text-gray-500">tot {format(parseISO(year.endDate), 'dd MMM yyyy', { locale: nl })}</div>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="text-sm">
-                            <div>{format(parseISO(year.registrationStartDate), 'dd MMM', { locale: nl })}</div>
-                            <div className="text-gray-500">tot {format(parseISO(year.registrationEndDate), 'dd MMM', { locale: nl })}</div>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          {format(parseISO(year.finalReportDate), 'dd MMM yyyy', { locale: nl })}
-                        </TableCell>
-                        <TableCell>{getStatusBadge(year)}</TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end gap-1">
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              className="h-8 w-8 p-0"
-                              onClick={() => handleEditYear(year)}
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
-                              onClick={() => handleDeleteYear(year)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )}
-            </TabsContent>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
-            {/* Holidays Tab */}
-            <TabsContent value="holidays">
-              {holidaysLoading ? (
-                <div className="text-center py-12">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                  <p className="mt-4 text-gray-500">Vakanties laden...</p>
+        {/* Holidays Section */}
+        <Card className="mt-6">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Schoolvakanties</CardTitle>
+                <CardDescription>Beheer vakanties en vrije dagen</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="p-6">
+            {holidaysLoading ? (
+              <div className="text-center py-12">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                <p className="mt-4 text-gray-500">Vakanties laden...</p>
+              </div>
+            ) : filteredHolidays.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="flex justify-center mb-4">
+                  <Calendar className="h-12 w-12 text-gray-400" />
                 </div>
-              ) : filteredHolidays.length === 0 ? (
-                <div className="text-center py-12">
-                  <div className="flex justify-center mb-4">
-                    <Calendar className="h-12 w-12 text-gray-400" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">Geen vakanties</h3>
+                <p className="text-gray-500 mb-4">Begin met het toevoegen van schoolvakanties.</p>
+                <Button onClick={() => setIsCreateHolidayDialogOpen(true)}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Vakantie Toevoegen
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {filteredHolidays.map((holiday: Holiday) => (
+                  <div key={holiday.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:shadow-sm transition-shadow">
+                    <div className="flex-1">
+                      <h3 className="font-medium text-gray-900">{holiday.name}</h3>
+                      <p className="text-sm text-gray-500 mt-1">
+                        {new Date(holiday.startDate).toLocaleDateString('nl-NL')} - {new Date(holiday.endDate).toLocaleDateString('nl-NL')}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">
+                        {holiday.type}
+                      </div>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => handleEditHoliday(holiday)}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        className="text-red-600 hover:text-red-700"
+                        onClick={() => handleDeleteHoliday(holiday)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">Geen vakanties</h3>
-                  <p className="text-gray-500 mb-4">Voeg schoolvakanties en vrije dagen toe.</p>
-                  <Button onClick={() => setIsCreateHolidayDialogOpen(true)}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Vakantie Toevoegen
-                  </Button>
-                </div>
-              ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Naam</TableHead>
-                      <TableHead>Type</TableHead>
-                      <TableHead>Periode</TableHead>
-                      <TableHead>Schooljaar</TableHead>
-                      <TableHead className="text-right">Acties</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredHolidays.map((holiday: Holiday) => (
-                      <TableRow key={holiday.id}>
-                        <TableCell>
-                          <div>
-                            <div className="font-medium">{holiday.name}</div>
-                            {holiday.description && (
-                              <div className="text-sm text-gray-500">{holiday.description}</div>
-                            )}
-                          </div>
-                        </TableCell>
-                        <TableCell>{getHolidayTypeBadge(holiday.type)}</TableCell>
-                        <TableCell>
-                          <div className="text-sm">
-                            {format(parseISO(holiday.startDate), 'dd MMM', { locale: nl })} - {format(parseISO(holiday.endDate), 'dd MMM yyyy', { locale: nl })}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          {academicYearsData.find((year: AcademicYear) => year.id === holiday.academicYearId)?.name || 'Onbekend'}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end gap-1">
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-red-600 hover:text-red-700">
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )}
-            </TabsContent>
-          </Tabs>
-        </TableContainer>
-      </DataTableContainer>
-
-      {/* Create Academic Year Dialog */}
-      <Dialog open={isCreateYearDialogOpen} onOpenChange={setIsCreateYearDialogOpen}>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Nieuw Schooljaar</DialogTitle>

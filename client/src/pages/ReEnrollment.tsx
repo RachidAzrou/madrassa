@@ -12,7 +12,10 @@ import {
   Plus,
   Settings,
   Award,
-  AlertTriangle
+  AlertTriangle,
+  RefreshCw,
+  TrendingUp,
+  UserCheck
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,7 +26,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from '@/hooks/use-toast';
-// Tijdelijke PageHeader component voor herinschrijvingen
+import { PageHeader } from '@/components/layout/page-header';
+import { Topbar } from '@/components/layout/topbar';
 
 interface Student {
   id: number;
@@ -196,31 +200,58 @@ export default function ReEnrollment() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-1">
-        <h1 className="text-3xl font-bold tracking-tight">Herinschrijvingen</h1>
-        <p className="text-muted-foreground">Beheer herinschrijvingen voor het nieuwe schooljaar</p>
-      </div>
-
-      {/* Registration Status Alert */}
-      {!canStartRegistration && (
-        <Card className="border-amber-200 bg-amber-50">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <AlertTriangle className="h-5 w-5 text-amber-600" />
-              <div>
-                <h3 className="font-medium text-amber-800">Herinschrijving Nog Niet Beschikbaar</h3>
-                <p className="text-sm text-amber-700">
-                  Herinschrijvingen worden beschikbaar na de eindrapport datum: {currentAcademicYear?.finalReportDate}
-                </p>
-              </div>
+    <>
+      <Topbar />
+      <div className="min-h-screen bg-gray-50/30">
+        <div className="max-w-[1400px] mx-auto px-6 py-8">
+          {/* Modern Header */}
+          <div className="mb-8">
+            <div className="space-y-1">
+              <h1 className="text-3xl font-bold text-gray-900">Herinschrijvingen</h1>
+              <p className="text-gray-600">
+                Beheer student herinschrijvingen voor het schooljaar {currentAcademicYear?.name || '2024-2025'}
+              </p>
             </div>
-          </CardContent>
-        </Card>
-      )}
+          </div>
+          
+          {/* Header Actions */}
+          <div className="mb-8 flex items-center justify-between">
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <RefreshCw className="h-4 w-4" />
+              <span>Academisch jaar: {currentAcademicYear?.name || '2024-2025'}</span>
+            </div>
+            <div className="flex gap-3">
+              <Button
+                onClick={() => setShowAcademicYearDialog(true)}
+                variant="outline"
+                className="flex items-center gap-2 bg-white border-gray-200 hover:bg-gray-50"
+              >
+                <Settings className="h-4 w-4" />
+                Schooljaar Beheer
+              </Button>
+            </div>
+          </div>
+          
+          <div className="space-y-8">
+            {/* Registration Status Alert */}
+            {!canStartRegistration && (
+              <Card className="border-amber-200 bg-amber-50">
+                <CardContent className="pt-6">
+                  <div className="flex items-center gap-3">
+                    <AlertTriangle className="h-5 w-5 text-amber-600" />
+                    <div>
+                      <h3 className="font-medium text-amber-800">Herinschrijving Nog Niet Beschikbaar</h3>
+                      <p className="text-sm text-amber-700">
+                        Herinschrijvingen worden beschikbaar na de eindrapport datum: {currentAcademicYear?.finalReportDate}
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
-      {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+            {/* Modern Stats Overview - Dashboard Style */}
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center">
@@ -522,6 +553,9 @@ export default function ReEnrollment() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }

@@ -6,7 +6,8 @@ import {
   fees, feeDiscounts, feeSettings, studentGroups, studentGroupEnrollments,
   lessons, examinations, guardians, studentGuardians, teachers, 
   teacherAvailability, teacherLanguages, teacherCourseAssignments,
-  teacherAttendance, notifications, messages, payments, invoices, tuitionRates
+  teacherAttendance, notifications, messages, payments, invoices, tuitionRates,
+  discountTypes, studentDiscounts
 } from "@shared/schema";
 import type { 
   InsertUser, User, InsertStudent, Student, InsertProgram,
@@ -23,7 +24,8 @@ import type {
   InsertTeacherLanguage, TeacherLanguage, InsertTeacherCourseAssignment,
   TeacherCourseAssignment, InsertNotification, Notification,
   InsertMessage, Message, InsertPayment, Payment, InsertInvoice, Invoice,
-  InsertTuitionRate, TuitionRate
+  InsertTuitionRate, TuitionRate, InsertDiscountType, DiscountType,
+  InsertStudentDiscount, StudentDiscount
 } from "@shared/schema";
 import type { IStorage } from "./IStorage";
 
@@ -1339,14 +1341,193 @@ export class DatabaseStorage implements IStorage {
 
   async calculateInvoiceAmount(baseAmount: number, studentId: number, academicYear: string): Promise<{ finalAmount: number; discountAmount: number; appliedDiscounts: string[] }> {
     try {
-      // For now, return base calculation - can be extended with discount logic
+      let discountAmount = 0;
+      const appliedDiscounts: string[] = [];
+
+      // Get active discounts for this student
+      const studentDiscountsList = await db.select()
+        .from(studentDiscounts)
+        .where(and(
+          eq(studentDiscounts.studentId, studentId),
+          eq(studentDiscounts.academicYear, academicYear),
+          eq(studentDiscounts.isActive, true)
+        ));
+
+      // Calculate automatic family discount if applicable
+      const familyDiscount = await this.calculateFamilyDiscount(studentId, academicYear);
+      if (familyDiscount.percentage > 0) {
+        const familyDiscountAmount = (baseAmount * familyDiscount.percentage) / 100;
+        discountAmount += familyDiscountAmount;
+        appliedDiscounts.push(`Familiekorting (${familyDiscount.percentage}%)`);
+        
+        // Auto-apply family discount if not already exists
+        const existingFamilyDiscount = studentDiscountsList.find(d => d.discountType === 'FAMILY');
+        if (!existingFamilyDiscount) {
+          await this.createStudentDiscount({
+            studentId,
+            discountType: 'FAMILY',
+            discountPercentage: familyDiscount.percentage,
+            discountAmount: familyDiscountAmount.toString(),
+            description: `Automatische familiekorting - ${familyDiscount.siblingCount} kinderen`,
+            isAutomatic: true,
+            academicYear,
+            isActive: true,
+          });
+        }
+      }
+
+      // Apply manual discounts
+      for (const discount of studentDiscountsList) {
+        if (discount.discountType !== 'FAMILY') { // Family discount already calculated
+          const manualDiscountAmount = discount.discountAmount 
+            ? parseFloat(discount.discountAmount) 
+            : (baseAmount * parseFloat(discount.discountPercentage)) / 100;
+          
+          discountAmount += manualDiscountAmount;
+          appliedDiscounts.push(`${discount.description} (${discount.discountPercentage}%)`);
+        }
+      }
+
+      const finalAmount = Math.max(0, baseAmount - discountAmount);
+
       return {
-        finalAmount: baseAmount,
-        discountAmount: 0,
-        appliedDiscounts: []
+        finalAmount,
+        discountAmount,
+        appliedDiscounts
       };
     } catch (error) {
       console.error('Error calculating invoice amount:', error);
+      throw error;
+    }
+  }
+
+  // Discount operations
+  async getDiscountTypes(): Promise<DiscountType[]> {
+    try {
+      const types = await db.select().from(discountTypes).where(eq(discountTypes.isActive, true));
+      return types;
+    } catch (error) {
+      console.error('Error fetching discount types:', error);
+      throw error;
+    }
+  }
+
+  async getStudentDiscounts(studentId: number, academicYear?: string): Promise<StudentDiscount[]> {
+    try {
+      let query = db.select().from(studentDiscounts).where(eq(studentDiscounts.studentId, studentId));
+      
+      if (academicYear) {
+        query = query.where(eq(studentDiscounts.academicYear, academicYear));
+      }
+      
+      const discounts = await query.orderBy(desc(studentDiscounts.createdAt));
+      return discounts;
+    } catch (error) {
+      console.error('Error fetching student discounts:', error);
+      throw error;
+    }
+  }
+
+  async createStudentDiscount(discount: InsertStudentDiscount): Promise<StudentDiscount> {
+    try {
+      const [newDiscount] = await db.insert(studentDiscounts).values(discount).returning();
+      return newDiscount;
+    } catch (error) {
+      console.error('Error creating student discount:', error);
+      throw error;
+    }
+  }
+
+  async updateStudentDiscount(id: number, discount: Partial<StudentDiscount>): Promise<StudentDiscount | undefined> {
+    try {
+      const [updatedDiscount] = await db.update(studentDiscounts)
+        .set({ ...discount, updatedAt: new Date() })
+        .where(eq(studentDiscounts.id, id))
+        .returning();
+      return updatedDiscount;
+    } catch (error) {
+      console.error('Error updating student discount:', error);
+      throw error;
+    }
+  }
+
+  async deleteStudentDiscount(id: number): Promise<boolean> {
+    try {
+      const result = await db.delete(studentDiscounts).where(eq(studentDiscounts.id, id));
+      return result.rowCount ? result.rowCount > 0 : false;
+    } catch (error) {
+      console.error('Error deleting student discount:', error);
+      throw error;
+    }
+  }
+
+  async calculateFamilyDiscount(studentId: number, academicYear: string): Promise<{ percentage: number; siblingCount: number }> {
+    try {
+      // Get student's guardians
+      const studentGuardianRelations = await db.select()
+        .from(studentGuardians)
+        .where(eq(studentGuardians.studentId, studentId));
+
+      if (studentGuardianRelations.length === 0) {
+        return { percentage: 0, siblingCount: 0 };
+      }
+
+      // Get all students with same guardians
+      const guardianIds = studentGuardianRelations.map(sg => sg.guardianId);
+      const siblingRelations = await db.select({ studentId: studentGuardians.studentId })
+        .from(studentGuardians)
+        .where(sql`${studentGuardians.guardianId} = ANY(${guardianIds})`);
+
+      const uniqueSiblingIds = [...new Set(siblingRelations.map(sr => sr.studentId))];
+      const siblingCount = uniqueSiblingIds.length;
+
+      // Family discount logic: 10% per child if >= 2 children
+      if (siblingCount >= 2) {
+        const basePercentage = 10;
+        const additionalPercentage = Math.min((siblingCount - 2) * 5, 20); // Max 20% additional
+        return { 
+          percentage: basePercentage + additionalPercentage, 
+          siblingCount 
+        };
+      }
+
+      return { percentage: 0, siblingCount };
+    } catch (error) {
+      console.error('Error calculating family discount:', error);
+      return { percentage: 0, siblingCount: 0 };
+    }
+  }
+
+  async applyAutomaticDiscounts(studentId: number, academicYear: string): Promise<void> {
+    try {
+      // Apply family discount
+      const familyDiscount = await this.calculateFamilyDiscount(studentId, academicYear);
+      
+      if (familyDiscount.percentage > 0) {
+        // Check if family discount already exists
+        const existingDiscount = await db.select()
+          .from(studentDiscounts)
+          .where(and(
+            eq(studentDiscounts.studentId, studentId),
+            eq(studentDiscounts.discountType, 'FAMILY'),
+            eq(studentDiscounts.academicYear, academicYear),
+            eq(studentDiscounts.isActive, true)
+          ));
+
+        if (existingDiscount.length === 0) {
+          await this.createStudentDiscount({
+            studentId,
+            discountType: 'FAMILY',
+            discountPercentage: familyDiscount.percentage,
+            description: `Automatische familiekorting - ${familyDiscount.siblingCount} kinderen`,
+            isAutomatic: true,
+            academicYear,
+            isActive: true,
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error applying automatic discounts:', error);
       throw error;
     }
   }

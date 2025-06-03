@@ -1304,3 +1304,65 @@ export const tuitionRatesRelations = relations(tuitionRates, ({ one }) => ({
     references: [programs.id],
   }),
 }));
+
+// Kortingssysteem - Automatische en handmatige kortingen
+export const discountTypes = pgTable("discount_types", {
+  id: serial("id").primaryKey(),
+  code: text("code").notNull().unique(),
+  name: text("name").notNull(),
+  description: text("description"),
+  defaultPercentage: decimal("default_percentage", { precision: 5, scale: 2 }),
+  isAutomatic: boolean("is_automatic").default(false),
+  requiresProof: boolean("requires_proof").default(false),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const studentDiscounts = pgTable("student_discounts", {
+  id: serial("id").primaryKey(),
+  studentId: integer("student_id").notNull().references(() => students.id),
+  discountType: text("discount_type").notNull(),
+  discountPercentage: decimal("discount_percentage", { precision: 5, scale: 2 }).notNull(),
+  discountAmount: decimal("discount_amount", { precision: 10, scale: 2 }),
+  description: text("description").notNull(),
+  isAutomatic: boolean("is_automatic").default(false),
+  proofDocument: text("proof_document"),
+  appliedBy: integer("applied_by").references(() => users.id),
+  academicYear: text("academic_year").notNull(),
+  isActive: boolean("is_active").default(true),
+  validFrom: date("valid_from"),
+  validUntil: date("valid_until"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Insert schemas voor kortingen
+export const insertDiscountTypeSchema = createInsertSchema(discountTypes).omit({
+  id: true,
+  createdAt: true
+});
+
+export const insertStudentDiscountSchema = createInsertSchema(studentDiscounts).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true
+});
+
+// Type exports voor kortingen
+export type InsertDiscountType = z.infer<typeof insertDiscountTypeSchema>;
+export type DiscountType = typeof discountTypes.$inferSelect;
+
+export type InsertStudentDiscount = z.infer<typeof insertStudentDiscountSchema>;
+export type StudentDiscount = typeof studentDiscounts.$inferSelect;
+
+// Korting Relations
+export const studentDiscountsRelations = relations(studentDiscounts, ({ one }) => ({
+  student: one(students, {
+    fields: [studentDiscounts.studentId],
+    references: [students.id],
+  }),
+  appliedByUser: one(users, {
+    fields: [studentDiscounts.appliedBy],
+    references: [users.id],
+  }),
+}));

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
+// import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -50,8 +51,7 @@ interface Receiver {
   name: string;
 }
 
-// Huidige gebruiker (Dit zou normaal gesproken uit een authenticatiecontext komen)
-// Voor demonstratie gebruiken we een admin gebruiker
+// Huidige gebruiker - dit zou uit de authenticatie context moeten komen
 const currentUser = {
   id: 1,
   role: "admin",

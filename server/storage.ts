@@ -166,6 +166,18 @@ export interface IStorage {
   updateGrade(id: number, grade: Partial<Grade>): Promise<Grade | undefined>;
   deleteGrade(id: number): Promise<boolean>;
   batchCreateGrades(grades: InsertGrade[]): Promise<Grade[]>;
+
+  // Message operations
+  getMessages(): Promise<Message[]>;
+  getMessage(id: number): Promise<Message | undefined>;
+  getMessagesBySender(senderId: number, senderRole: string): Promise<Message[]>;
+  getMessagesByReceiver(receiverId: number, receiverRole: string): Promise<Message[]>;
+  getMessageThread(parentMessageId: number): Promise<Message[]>;
+  getUnreadMessagesCount(receiverId: number, receiverRole: string): Promise<number>;
+  getAuthorizedReceivers(senderId: number, senderRole: string): Promise<{id: number, role: string, name: string}[]>;
+  createMessage(message: InsertMessage): Promise<Message>;
+  markMessageAsRead(id: number): Promise<Message | undefined>;
+  deleteMessage(id: number): Promise<boolean>;
 }
 
 // DatabaseStorage implementatie die gebruik maakt van de database
@@ -1271,6 +1283,294 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error('Error batch creating grades:', error);
       throw new Error('Failed to batch create grades');
+    }
+  }
+
+  // Message operations
+  async getMessages(): Promise<Message[]> {
+    try {
+      return await db.select().from(messages).orderBy(desc(messages.sentAt));
+    } catch (error) {
+      console.error('Error getting messages:', error);
+      return [];
+    }
+  }
+
+  async getMessage(id: number): Promise<Message | undefined> {
+    try {
+      const [message] = await db.select().from(messages).where(eq(messages.id, id));
+      return message || undefined;
+    } catch (error) {
+      console.error('Error getting message:', error);
+      return undefined;
+    }
+  }
+
+  async getMessagesBySender(senderId: number, senderRole: string): Promise<Message[]> {
+    try {
+      return await db.select().from(messages)
+        .where(and(eq(messages.senderId, senderId), eq(messages.senderRole, senderRole)))
+        .orderBy(desc(messages.sentAt));
+    } catch (error) {
+      console.error('Error getting messages by sender:', error);
+      return [];
+    }
+  }
+
+  async getMessagesByReceiver(receiverId: number, receiverRole: string): Promise<Message[]> {
+    try {
+      return await db.select().from(messages)
+        .where(and(eq(messages.receiverId, receiverId), eq(messages.receiverRole, receiverRole)))
+        .orderBy(desc(messages.sentAt));
+    } catch (error) {
+      console.error('Error getting messages by receiver:', error);
+      return [];
+    }
+  }
+
+  async getMessageThread(parentMessageId: number): Promise<Message[]> {
+    try {
+      return await db.select().from(messages)
+        .where(eq(messages.parentMessageId, parentMessageId))
+        .orderBy(messages.sentAt);
+    } catch (error) {
+      console.error('Error getting message thread:', error);
+      return [];
+    }
+  }
+
+  async getUnreadMessagesCount(receiverId: number, receiverRole: string): Promise<number> {
+    try {
+      const result = await db.select({ count: sql<number>`count(*)` })
+        .from(messages)
+        .where(and(
+          eq(messages.receiverId, receiverId),
+          eq(messages.receiverRole, receiverRole),
+          eq(messages.isRead, false)
+        ));
+      return result[0]?.count || 0;
+    } catch (error) {
+      console.error('Error getting unread messages count:', error);
+      return 0;
+    }
+  }
+
+  async getAuthorizedReceivers(senderId: number, senderRole: string): Promise<{id: number, role: string, name: string}[]> {
+    try {
+      const receivers: {id: number, role: string, name: string}[] = [];
+      
+      // Role-based communication rules
+      switch (senderRole.toLowerCase()) {
+        case 'admin':
+        case 'directeur':
+          // Admin can message everyone
+          const allUsers = await db.select().from(users);
+          const allStudents = await db.select().from(students);
+          const allTeachers = await db.select().from(teachers);
+          const allGuardians = await db.select().from(guardians);
+          
+          allUsers.forEach(user => receivers.push({
+            id: user.id,
+            role: user.role || 'user',
+            name: `${user.firstName} ${user.lastName}`
+          }));
+          
+          allStudents.forEach(student => receivers.push({
+            id: student.id,
+            role: 'student',
+            name: `${student.firstName} ${student.lastName}`
+          }));
+          
+          allTeachers.forEach(teacher => receivers.push({
+            id: teacher.id,
+            role: 'docent',
+            name: `${teacher.firstName} ${teacher.lastName}`
+          }));
+          
+          allGuardians.forEach(guardian => receivers.push({
+            id: guardian.id,
+            role: 'voogd',
+            name: `${guardian.firstName} ${guardian.lastName}`
+          }));
+          break;
+
+        case 'secretariaat':
+          // Secretariat can message everyone
+          const secretUsers = await db.select().from(users);
+          const secretStudents = await db.select().from(students);
+          const secretTeachers = await db.select().from(teachers);
+          const secretGuardians = await db.select().from(guardians);
+          
+          secretUsers.forEach(user => receivers.push({
+            id: user.id,
+            role: user.role || 'user',
+            name: `${user.firstName} ${user.lastName}`
+          }));
+          
+          secretStudents.forEach(student => receivers.push({
+            id: student.id,
+            role: 'student',
+            name: `${student.firstName} ${student.lastName}`
+          }));
+          
+          secretTeachers.forEach(teacher => receivers.push({
+            id: teacher.id,
+            role: 'docent',
+            name: `${teacher.firstName} ${teacher.lastName}`
+          }));
+          
+          secretGuardians.forEach(guardian => receivers.push({
+            id: guardian.id,
+            role: 'voogd',
+            name: `${guardian.firstName} ${guardian.lastName}`
+          }));
+          break;
+
+        case 'docent':
+          // Teachers can message other teachers, their students, guardians, and secretariat
+          const teacherUsers = await db.select().from(users).where(inArray(users.role, ['admin', 'secretariaat']));
+          const otherTeachers = await db.select().from(teachers).where(sql`id != ${senderId}`);
+          const teacherStudents = await db.select().from(students);
+          const teacherGuardians = await db.select().from(guardians);
+          
+          teacherUsers.forEach(user => receivers.push({
+            id: user.id,
+            role: user.role || 'user',
+            name: `${user.firstName} ${user.lastName}`
+          }));
+          
+          otherTeachers.forEach(teacher => receivers.push({
+            id: teacher.id,
+            role: 'docent',
+            name: `${teacher.firstName} ${teacher.lastName}`
+          }));
+          
+          teacherStudents.forEach(student => receivers.push({
+            id: student.id,
+            role: 'student',
+            name: `${student.firstName} ${student.lastName}`
+          }));
+          
+          teacherGuardians.forEach(guardian => receivers.push({
+            id: guardian.id,
+            role: 'voogd',
+            name: `${guardian.firstName} ${guardian.lastName}`
+          }));
+          break;
+
+        case 'voogd':
+        case 'ouder':
+          // Guardians can message their children, children's teachers, admin, and secretariat
+          const guardianUsers = await db.select().from(users).where(inArray(users.role, ['admin', 'secretariaat']));
+          const guardianTeachers = await db.select().from(teachers);
+          
+          // Get guardian's children
+          const guardianChildren = await db.select({
+            id: students.id,
+            firstName: students.firstName,
+            lastName: students.lastName
+          })
+          .from(studentGuardians)
+          .innerJoin(students, eq(studentGuardians.studentId, students.id))
+          .where(eq(studentGuardians.guardianId, senderId));
+          
+          guardianUsers.forEach(user => receivers.push({
+            id: user.id,
+            role: user.role || 'user',
+            name: `${user.firstName} ${user.lastName}`
+          }));
+          
+          guardianTeachers.forEach(teacher => receivers.push({
+            id: teacher.id,
+            role: 'docent',
+            name: `${teacher.firstName} ${teacher.lastName}`
+          }));
+          
+          guardianChildren.forEach(child => receivers.push({
+            id: child.id,
+            role: 'student',
+            name: `${child.firstName} ${child.lastName}`
+          }));
+          break;
+
+        case 'student':
+          // Students can message their teachers, classmates, admin, secretariat, and can receive from parents
+          const studentUsers = await db.select().from(users).where(inArray(users.role, ['admin', 'secretariaat']));
+          const studentTeachers = await db.select().from(teachers);
+          const classmates = await db.select().from(students).where(sql`id != ${senderId}`);
+          
+          studentUsers.forEach(user => receivers.push({
+            id: user.id,
+            role: user.role || 'user',
+            name: `${user.firstName} ${user.lastName}`
+          }));
+          
+          studentTeachers.forEach(teacher => receivers.push({
+            id: teacher.id,
+            role: 'docent',
+            name: `${teacher.firstName} ${teacher.lastName}`
+          }));
+          
+          classmates.forEach(student => receivers.push({
+            id: student.id,
+            role: 'student',
+            name: `${student.firstName} ${student.lastName}`
+          }));
+          break;
+
+        default:
+          // Default: can only message admin and secretariat
+          const defaultUsers = await db.select().from(users).where(inArray(users.role, ['admin', 'secretariaat']));
+          defaultUsers.forEach(user => receivers.push({
+            id: user.id,
+            role: user.role || 'user',
+            name: `${user.firstName} ${user.lastName}`
+          }));
+          break;
+      }
+      
+      return receivers;
+    } catch (error) {
+      console.error('Error getting authorized receivers:', error);
+      return [];
+    }
+  }
+
+  async createMessage(message: InsertMessage): Promise<Message> {
+    try {
+      const [newMessage] = await db.insert(messages).values({
+        ...message,
+        sentAt: new Date().toISOString(),
+        isRead: false
+      }).returning();
+      return newMessage;
+    } catch (error) {
+      console.error('Error creating message:', error);
+      throw new Error('Failed to create message');
+    }
+  }
+
+  async markMessageAsRead(id: number): Promise<Message | undefined> {
+    try {
+      const [updatedMessage] = await db
+        .update(messages)
+        .set({ isRead: true })
+        .where(eq(messages.id, id))
+        .returning();
+      return updatedMessage || undefined;
+    } catch (error) {
+      console.error('Error marking message as read:', error);
+      return undefined;
+    }
+  }
+
+  async deleteMessage(id: number): Promise<boolean> {
+    try {
+      const result = await db.delete(messages).where(eq(messages.id, id));
+      return (result as any).rowCount > 0;
+    } catch (error) {
+      console.error('Error deleting message:', error);
+      return false;
     }
   }
 

@@ -206,18 +206,17 @@ export default function Dashboard() {
   const navigateToGroups = () => setLocation('/student-groups');
 
   return (
-    <div className="flex-1 flex flex-col h-full">
-      <div className="fixed top-0 left-64 right-0 z-30">
-        <PageHeader
-          title="Dashboard"
-          icon={<LayoutDashboard className="h-5 w-5 text-white" />}
-          parent="Beheer"
-          current="Dashboard"
-        />
-      </div>
-      <div className="mt-[91px] flex-1 overflow-auto bg-[#f7f9fc]">
-        {/* Main content area */}
-        <div className="px-6 py-6 max-w-7xl mx-auto">{/* Start main content wrapper */}
+    <div className="bg-[#f7f9fc] min-h-screen">
+      {/* Desktop application header bar - Professionele stijl - Premium variant */}
+      <PageHeader
+        title="Dashboard"
+        icon={<LayoutDashboard className="h-5 w-5 text-white" />}
+        parent="Beheer"
+        current="Dashboard"
+      />
+      
+      {/* Main content area */}
+      <div className="px-6 py-6 max-w-7xl mx-auto">{/* Start main content wrapper */}
 
       {/* Stats Overview - Desktop-applicatie stijl */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -606,8 +605,7 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
-        </div> {/* End main content wrapper */}
-        </div>
+      </div>
       </div>
     </div>
   );

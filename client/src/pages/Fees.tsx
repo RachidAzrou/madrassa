@@ -124,17 +124,15 @@ export default function Fees() {
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full">
-      <div className="fixed top-0 left-64 right-0 z-30">
-        <PageHeader
-          title="Betalingsbeheer"
-          icon={<Euro className="h-5 w-5 text-white" />}
-          parent="Beheer"
-          current="Betalingsbeheer"
-        />
-      </div>
-      <div className="mt-[91px] flex-1 overflow-auto bg-[#f7f9fc]">
-        <div className="px-6 py-6 max-w-7xl mx-auto">
+    <div className="bg-[#f7f9fc] min-h-screen">
+      <PageHeader
+        title="Betalingsbeheer"
+        icon={<Euro className="h-5 w-5 text-white" />}
+        parent="Beheer"
+        current="Betalingsbeheer"
+      />
+      
+      <div className="px-6 py-6 max-w-7xl mx-auto">
         {/* Quick Action Bar */}
         <div className="flex flex-wrap gap-3 items-center justify-between bg-white border border-[#e5e7eb] rounded-sm p-4 mb-6">
           <div className="flex gap-2">
@@ -558,7 +556,6 @@ export default function Fees() {
           entityName="betalingen"
           onExport={handleExport}
         />
-        </div>
       </div>
     </div>
   );

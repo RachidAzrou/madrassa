@@ -501,6 +501,232 @@ export default function AcademicYearManagement() {
           </div>
         </div>
       </div>
+
+      {/* Academic Year Dialog */}
+      <Dialog open={yearDialogOpen} onOpenChange={setYearDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              {editingYear ? 'Schooljaar Bewerken' : 'Nieuw Schooljaar'}
+            </DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleYearSubmit} className="space-y-4">
+            <div>
+              <Label htmlFor="name">Naam</Label>
+              <Input
+                id="name"
+                value={yearForm.name}
+                onChange={(e) => setYearForm({ ...yearForm, name: e.target.value })}
+                required
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="startDate">Startdatum</Label>
+                <Input
+                  id="startDate"
+                  type="date"
+                  value={yearForm.startDate}
+                  onChange={(e) => setYearForm({ ...yearForm, startDate: e.target.value })}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="endDate">Einddatum</Label>
+                <Input
+                  id="endDate"
+                  type="date"
+                  value={yearForm.endDate}
+                  onChange={(e) => setYearForm({ ...yearForm, endDate: e.target.value })}
+                  required
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="regStart">Registratie Start</Label>
+                <Input
+                  id="regStart"
+                  type="date"
+                  value={yearForm.registrationStartDate}
+                  onChange={(e) => setYearForm({ ...yearForm, registrationStartDate: e.target.value })}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="regEnd">Registratie Eind</Label>
+                <Input
+                  id="regEnd"
+                  type="date"
+                  value={yearForm.registrationEndDate}
+                  onChange={(e) => setYearForm({ ...yearForm, registrationEndDate: e.target.value })}
+                  required
+                />
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="finalReport">Eindrapport Datum</Label>
+              <Input
+                id="finalReport"
+                type="date"
+                value={yearForm.finalReportDate}
+                onChange={(e) => setYearForm({ ...yearForm, finalReportDate: e.target.value })}
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="description">Beschrijving</Label>
+              <Textarea
+                id="description"
+                value={yearForm.description}
+                onChange={(e) => setYearForm({ ...yearForm, description: e.target.value })}
+                rows={3}
+              />
+            </div>
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="isActive"
+                checked={yearForm.isActive}
+                onChange={(e) => setYearForm({ ...yearForm, isActive: e.target.checked })}
+                className="rounded"
+              />
+              <Label htmlFor="isActive">Actief schooljaar</Label>
+            </div>
+            <div className="flex gap-2 pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setYearDialogOpen(false);
+                  setEditingYear(null);
+                  resetYearForm();
+                }}
+                className="flex-1"
+              >
+                Annuleren
+              </Button>
+              <Button
+                type="submit"
+                disabled={createYearMutation.isPending || updateYearMutation.isPending}
+                className="flex-1 bg-[#1e40af] hover:bg-[#1d4ed8]"
+              >
+                {createYearMutation.isPending || updateYearMutation.isPending ? 'Bezig...' : editingYear ? 'Bijwerken' : 'Toevoegen'}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Holiday Dialog */}
+      <Dialog open={holidayDialogOpen} onOpenChange={setHolidayDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              {editingHoliday ? 'Vakantie Bewerken' : 'Nieuwe Vakantie'}
+            </DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleHolidaySubmit} className="space-y-4">
+            <div>
+              <Label htmlFor="holidayName">Naam</Label>
+              <Input
+                id="holidayName"
+                value={holidayForm.name}
+                onChange={(e) => setHolidayForm({ ...holidayForm, name: e.target.value })}
+                required
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="holidayStartDate">Startdatum</Label>
+                <Input
+                  id="holidayStartDate"
+                  type="date"
+                  value={holidayForm.startDate}
+                  onChange={(e) => setHolidayForm({ ...holidayForm, startDate: e.target.value })}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="holidayEndDate">Einddatum</Label>
+                <Input
+                  id="holidayEndDate"
+                  type="date"
+                  value={holidayForm.endDate}
+                  onChange={(e) => setHolidayForm({ ...holidayForm, endDate: e.target.value })}
+                  required
+                />
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="holidayType">Type</Label>
+              <Select
+                value={holidayForm.type}
+                onValueChange={(value: 'vacation' | 'public_holiday' | 'study_break') => 
+                  setHolidayForm({ ...holidayForm, type: value })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecteer type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="vacation">Vakantie</SelectItem>
+                  <SelectItem value="public_holiday">Feestdag</SelectItem>
+                  <SelectItem value="study_break">Studiepauze</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="academicYear">Schooljaar</Label>
+              <Select
+                value={holidayForm.academicYearId}
+                onValueChange={(value) => setHolidayForm({ ...holidayForm, academicYearId: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecteer schooljaar" />
+                </SelectTrigger>
+                <SelectContent>
+                  {(academicYearsData as AcademicYear[]).map((year) => (
+                    <SelectItem key={year.id} value={year.id.toString()}>
+                      {year.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="holidayDescription">Beschrijving</Label>
+              <Textarea
+                id="holidayDescription"
+                value={holidayForm.description}
+                onChange={(e) => setHolidayForm({ ...holidayForm, description: e.target.value })}
+                rows={3}
+              />
+            </div>
+            <div className="flex gap-2 pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setHolidayDialogOpen(false);
+                  setEditingHoliday(null);
+                  resetHolidayForm();
+                }}
+                className="flex-1"
+              >
+                Annuleren
+              </Button>
+              <Button
+                type="submit"
+                disabled={createHolidayMutation.isPending || updateHolidayMutation.isPending}
+                className="flex-1 bg-[#1e40af] hover:bg-[#1d4ed8]"
+              >
+                {createHolidayMutation.isPending || updateHolidayMutation.isPending ? 'Bezig...' : editingHoliday ? 'Bijwerken' : 'Toevoegen'}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -5463,32 +5463,166 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all academic years
   app.get("/api/academic-years", async (req: Request, res: Response) => {
     try {
-      const academicYears = [
-        {
-          id: 1,
-          name: "2024-2025",
-          startDate: "2024-09-01",
-          endDate: "2025-07-31",
-          isActive: true,
-          registrationStartDate: "2025-06-01",
-          registrationEndDate: "2025-08-31",
-          finalReportDate: "2025-06-15"
-        },
-        {
-          id: 2,
-          name: "2025-2026",
-          startDate: "2025-09-01",
-          endDate: "2026-07-31",
-          isActive: false,
-          registrationStartDate: "2026-06-01",
-          registrationEndDate: "2026-08-31",
-          finalReportDate: "2026-06-15"
-        }
-      ];
+      const academicYears = await db.select().from(schema.academicYears);
       res.json(academicYears);
     } catch (error) {
       console.error("Error fetching academic years:", error);
       res.status(500).json({ error: "Failed to fetch academic years" });
+    }
+  });
+
+  // Create academic year
+  app.post("/api/academic-years", async (req: Request, res: Response) => {
+    try {
+      const { name, startDate, endDate, isActive, registrationStartDate, registrationEndDate, finalReportDate, description } = req.body;
+      
+      const [academicYear] = await db.insert(schema.academicYears).values({
+        name,
+        startDate,
+        endDate,
+        isActive: isActive || false,
+        registrationStartDate,
+        registrationEndDate,
+        finalReportDate,
+        notes: description
+      }).returning();
+      
+      res.status(201).json(academicYear);
+    } catch (error) {
+      console.error("Error creating academic year:", error);
+      res.status(500).json({ error: "Failed to create academic year" });
+    }
+  });
+
+  // Update academic year
+  app.put("/api/academic-years/:id", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const { name, startDate, endDate, isActive, registrationStartDate, registrationEndDate, finalReportDate, description } = req.body;
+      
+      const [academicYear] = await db.update(schema.academicYears)
+        .set({
+          name,
+          startDate,
+          endDate,
+          isActive,
+          registrationStartDate,
+          registrationEndDate,
+          finalReportDate,
+          notes: description
+        })
+        .where(eq(schema.academicYears.id, id))
+        .returning();
+      
+      if (!academicYear) {
+        return res.status(404).json({ error: "Academic year not found" });
+      }
+      
+      res.json(academicYear);
+    } catch (error) {
+      console.error("Error updating academic year:", error);
+      res.status(500).json({ error: "Failed to update academic year" });
+    }
+  });
+
+  // Delete academic year
+  app.delete("/api/academic-years/:id", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      
+      const [deletedYear] = await db.delete(schema.academicYears)
+        .where(eq(schema.academicYears.id, id))
+        .returning();
+      
+      if (!deletedYear) {
+        return res.status(404).json({ error: "Academic year not found" });
+      }
+      
+      res.json({ message: "Academic year deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting academic year:", error);
+      res.status(500).json({ error: "Failed to delete academic year" });
+    }
+  });
+
+  // Get all holidays
+  app.get("/api/holidays", async (req: Request, res: Response) => {
+    try {
+      const holidays = await db.select().from(schema.schoolHolidays);
+      res.json(holidays);
+    } catch (error) {
+      console.error("Error fetching holidays:", error);
+      res.status(500).json({ error: "Failed to fetch holidays" });
+    }
+  });
+
+  // Create holiday
+  app.post("/api/holidays", async (req: Request, res: Response) => {
+    try {
+      const { name, startDate, endDate, type, academicYearId, description } = req.body;
+      
+      const [holiday] = await db.insert(schema.schoolHolidays).values({
+        name,
+        startDate,
+        endDate,
+        type,
+        academicYearId,
+        description
+      }).returning();
+      
+      res.status(201).json(holiday);
+    } catch (error) {
+      console.error("Error creating holiday:", error);
+      res.status(500).json({ error: "Failed to create holiday" });
+    }
+  });
+
+  // Update holiday
+  app.put("/api/holidays/:id", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const { name, startDate, endDate, type, academicYearId, description } = req.body;
+      
+      const [holiday] = await db.update(schema.schoolHolidays)
+        .set({
+          name,
+          startDate,
+          endDate,
+          type,
+          academicYearId,
+          description
+        })
+        .where(eq(schema.schoolHolidays.id, id))
+        .returning();
+      
+      if (!holiday) {
+        return res.status(404).json({ error: "Holiday not found" });
+      }
+      
+      res.json(holiday);
+    } catch (error) {
+      console.error("Error updating holiday:", error);
+      res.status(500).json({ error: "Failed to update holiday" });
+    }
+  });
+
+  // Delete holiday
+  app.delete("/api/holidays/:id", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      
+      const [deletedHoliday] = await db.delete(schema.schoolHolidays)
+        .where(eq(schema.schoolHolidays.id, id))
+        .returning();
+      
+      if (!deletedHoliday) {
+        return res.status(404).json({ error: "Holiday not found" });
+      }
+      
+      res.json({ message: "Holiday deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting holiday:", error);
+      res.status(500).json({ error: "Failed to delete holiday" });
     }
   });
 

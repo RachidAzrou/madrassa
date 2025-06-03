@@ -768,16 +768,14 @@ export default function Reports() {
               </CardContent>
             </Card>
           ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Left Panel - Edit Controls */}
-              <div className="space-y-6">
-                <div className="flex justify-between items-center">
-                  <h2 className="text-2xl font-bold">Rapport Bewerken ({reportData.length})</h2>
-                  <Button onClick={generatePDF} className="flex items-center gap-2">
-                    <Download className="h-4 w-4" />
-                    Download PDF
-                  </Button>
-                </div>
+            <div className="space-y-6">
+              <div className="flex justify-between items-center">
+                <h2 className="text-2xl font-bold">Rapport Bewerken ({reportData.length})</h2>
+                <Button onClick={generatePDF} className="flex items-center gap-2">
+                  <Download className="h-4 w-4" />
+                  Download PDF
+                </Button>
+              </div>
 
                 {reportData.map((report, index) => (
                   <Card key={index} className="border-2 border-blue-200">
@@ -841,20 +839,13 @@ export default function Reports() {
                     </CardContent>
                   </Card>
                 ))}
-              </div>
-
-              {/* Right Panel - PDF Preview */}
-              <div className="space-y-6">
-                <h2 className="text-2xl font-bold">PDF Voorvertoning</h2>
-                
-                {reportData.map((report, index) => (
-                  <div key={index} className="space-y-6">
-                    {/* PAGE 1 - CIJFERS */}
-                    <Card className="border-2 border-gray-300 shadow-lg">
-                      <CardContent className="p-0">
-                        <div className="bg-white min-h-[600px] w-full mx-auto shadow-xl border border-blue-100 p-6 font-sans text-sm rounded-lg" style={{ aspectRatio: '297/210' }}>
-                        {/* Modern header with Madrassa colors */}
-                        <div className="relative mb-6">
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}
                           <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-t-lg p-4 -m-6 mb-6">
                             <div className="h-1 bg-blue-400 rounded mb-4"></div>
                             <div className="flex justify-between items-center">

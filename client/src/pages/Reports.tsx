@@ -131,7 +131,7 @@ export default function Reports() {
           percentage: 85
         },
         grades: {},
-        behavior: behaviorGrades[student.id] || { studentId: student.id, grade: 7, comments: '' },
+        behavior: behaviorGrades[student.id] || { studentId: student.id, grade: 3, comments: '' },
         generalComments
       }));
       
@@ -150,7 +150,7 @@ export default function Reports() {
             percentage: 85
           },
           grades: {},
-          behavior: behaviorGrades[student.id] || { studentId: student.id, grade: 7, comments: '' },
+          behavior: behaviorGrades[student.id] || { studentId: student.id, grade: 3, comments: '' },
           generalComments
         }];
         
@@ -255,7 +255,7 @@ export default function Reports() {
       
       pdf.setFont('helvetica', 'normal');
       pdf.setFontSize(10);
-      pdf.text(`Gedragscijfer: ${studentData.behavior.grade}/10`, margin, 75);
+      pdf.text(`Gedragscijfer: ${studentData.behavior.grade}/5`, margin, 75);
       pdf.text(`Opmerkingen: ${studentData.behavior.comments || 'Geen opmerkingen'}`, margin, 85);
 
       // Attendance section
@@ -530,8 +530,8 @@ export default function Reports() {
                             <Badge variant={student.attendance.percentage >= 85 ? "default" : "destructive"}>
                               {student.attendance.percentage.toFixed(1)}% aanwezigheid
                             </Badge>
-                            <Badge variant={student.behavior.grade >= 7 ? "default" : "secondary"}>
-                              Gedrag: {student.behavior.grade}/10
+                            <Badge variant={student.behavior.grade >= 4 ? "default" : "secondary"}>
+                              Gedrag: {student.behavior.grade}/5
                             </Badge>
                           </div>
                         </div>
@@ -669,31 +669,10 @@ export default function Reports() {
                           <div className="space-y-4">
                             <div>
                               <Label className="text-sm font-semibold mb-2 block">
-                                Gedragsopmerkingen
-                              </Label>
-                              <Textarea
-                                placeholder="Voeg opmerkingen toe over gedrag en sociale vaardigheden..."
-                                value={behaviorGrades[student.student.id]?.comments || ''}
-                                onChange={(e) => setBehaviorGrades(prev => ({
-                                  ...prev,
-                                  [student.student.id]: {
-                                    ...prev[student.student.id],
-                                    studentId: student.student.id,
-                                    grade: prev[student.student.id]?.grade || 7,
-                                    comments: e.target.value
-                                  }
-                                }))}
-                                rows={3}
-                                className="resize-none"
-                              />
-                            </div>
-                            
-                            <div>
-                              <Label className="text-sm font-semibold mb-2 block">
-                                Gedragscijfer (1-10)
+                                Gedragscijfer (1-5)
                               </Label>
                               <Select 
-                                value={behaviorGrades[student.student.id]?.grade?.toString() || '7'} 
+                                value={behaviorGrades[student.student.id]?.grade?.toString() || '3'} 
                                 onValueChange={(value) => setBehaviorGrades(prev => ({
                                   ...prev,
                                   [student.student.id]: {
@@ -708,13 +687,34 @@ export default function Reports() {
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  {[1,2,3,4,5,6,7,8,9,10].map(grade => (
-                                    <SelectItem key={grade} value={grade.toString()}>
-                                      {grade}/10 {grade >= 8 ? '- Uitstekend' : grade >= 7 ? '- Goed' : grade >= 6 ? '- Voldoende' : '- Verbetering nodig'}
-                                    </SelectItem>
-                                  ))}
+                                  <SelectItem value="1">1/5 - Onvoldoende</SelectItem>
+                                  <SelectItem value="2">2/5 - Matig</SelectItem>
+                                  <SelectItem value="3">3/5 - Voldoende</SelectItem>
+                                  <SelectItem value="4">4/5 - Goed</SelectItem>
+                                  <SelectItem value="5">5/5 - Uitstekend</SelectItem>
                                 </SelectContent>
                               </Select>
+                            </div>
+                            
+                            <div>
+                              <Label className="text-sm font-semibold mb-2 block">
+                                Gedragsopmerkingen
+                              </Label>
+                              <Textarea
+                                placeholder="Voeg opmerkingen toe over gedrag en sociale vaardigheden..."
+                                value={behaviorGrades[student.student.id]?.comments || ''}
+                                onChange={(e) => setBehaviorGrades(prev => ({
+                                  ...prev,
+                                  [student.student.id]: {
+                                    ...prev[student.student.id],
+                                    studentId: student.student.id,
+                                    grade: prev[student.student.id]?.grade || 3,
+                                    comments: e.target.value
+                                  }
+                                }))}
+                                rows={4}
+                                className="resize-none"
+                              />
                             </div>
                           </div>
 

@@ -414,10 +414,35 @@ export default function Reports() {
 
       yPos += 20;
 
+      // General Comments section on first page
+      yPos += 30;
+      
+      pdf.setFillColor(233, 243, 250);
+      pdf.roundedRect(20, yPos, pageWidth - 40, 80, 3, 3, 'F');
+      pdf.setDrawColor(33, 107, 169);
+      pdf.setLineWidth(1);
+      pdf.roundedRect(20, yPos, pageWidth - 40, 80, 3, 3, 'D');
+      
+      pdf.setFontSize(16);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(33, 107, 169);
+      pdf.text('💭 ALGEMENE OPMERKINGEN', 30, yPos + 20);
+      
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(11);
+      pdf.setTextColor(64, 75, 105);
+      
+      if (generalComments[report.student.id]) {
+        const commentLines = pdf.splitTextToSize(generalComments[report.student.id], pageWidth - 80);
+        pdf.text(commentLines, 30, yPos + 40);
+      } else {
+        pdf.text('Leerling toont goede vooruitgang in alle aspecten van het onderwijs.', 30, yPos + 40);
+      }
+
       // Footer with timestamp on first page
       pdf.setFontSize(8);
       pdf.setTextColor(150, 150, 150);
-      pdf.text(`Pagina 1 van 2 - Cijfers - Gegenereerd op ${new Date().toLocaleDateString('nl-NL')}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
+      pdf.text(`Pagina 1 van 2 - Cijfers & Opmerkingen - Gegenereerd op ${new Date().toLocaleDateString('nl-NL')}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
 
       // Start new page for behavior and attendance
       pdf.addPage();
@@ -471,76 +496,57 @@ export default function Reports() {
 
       yPos += 45;
 
-      // General Comments section on second page
-      pdf.setFillColor(233, 243, 250);
-      pdf.roundedRect(20, yPos, pageWidth - 40, 60, 3, 3, 'F');
-      pdf.setDrawColor(33, 107, 169);
-      pdf.setLineWidth(1);
-      pdf.roundedRect(20, yPos, pageWidth - 40, 60, 3, 3, 'D');
-      
-      pdf.setFontSize(16);
-      pdf.setFont('helvetica', 'bold');
-      pdf.setTextColor(33, 107, 169);
-      pdf.text('💭 Algemene opmerkingen', 30, yPos + 20);
-      
-      pdf.setFont('helvetica', 'normal');
-      pdf.setFontSize(11);
-      pdf.setTextColor(64, 75, 105);
-      
-      if (generalComments[report.student.id]) {
-        const commentLines = pdf.splitTextToSize(generalComments[report.student.id], pageWidth - 80);
-        pdf.text(commentLines, 30, yPos + 35);
-      } else {
-        pdf.text('Leerling toont goede vooruitgang in alle aspecten.', 30, yPos + 35);
-      }
-      
-      yPos += 80;
-
-      // Behavior section - full width
+      // Behavior section - optimized layout
       pdf.setFillColor(240, 253, 244);
-      pdf.roundedRect(20, yPos, pageWidth - 40, 60, 3, 3, 'F');
+      pdf.roundedRect(20, yPos, pageWidth - 40, 120, 3, 3, 'F');
       pdf.setDrawColor(34, 139, 34);
       pdf.setLineWidth(1);
-      pdf.roundedRect(20, yPos, pageWidth - 40, 60, 3, 3, 'D');
+      pdf.roundedRect(20, yPos, pageWidth - 40, 120, 3, 3, 'D');
       
-      pdf.setFontSize(16);
+      pdf.setFontSize(18);
       pdf.setFont('helvetica', 'bold');
       pdf.setTextColor(34, 139, 34);
-      pdf.text('😊 GEDRAG', 30, yPos + 20);
+      pdf.text('😊 GEDRAGSBEOORDELING', 30, yPos + 25);
       
       pdf.setFont('helvetica', 'normal');
-      pdf.setFontSize(11);
+      pdf.setFontSize(13);
       pdf.setTextColor(64, 75, 105);
-      pdf.text(`Gedragscijfer: ${behaviorGrades[report.student.id]?.grade || 7}/10`, 30, yPos + 35);
+      pdf.text(`Gedragscijfer: ${behaviorGrades[report.student.id]?.grade || 7}/10`, 30, yPos + 50);
       
       if (behaviorGrades[report.student.id]?.comments) {
         const behaviorComments = pdf.splitTextToSize(behaviorGrades[report.student.id]?.comments, pageWidth - 80);
-        pdf.text(behaviorComments, 30, yPos + 45);
+        pdf.text(behaviorComments, 30, yPos + 70);
       } else {
-        pdf.text('Leerling toont respectvol en positief gedrag in de klas.', 30, yPos + 45);
+        pdf.text('De leerling toont respectvol en positief gedrag tijdens alle lessen en activiteiten.', 30, yPos + 70);
+        pdf.text('Samenwerking met medeleerlingen verloopt harmonieus en constructief.', 30, yPos + 85);
       }
       
-      yPos += 80;
+      yPos += 140;
       
-      // Attendance section - full width
+      // Attendance section - optimized layout
       pdf.setFillColor(240, 248, 255);
-      pdf.roundedRect(20, yPos, pageWidth - 40, 60, 3, 3, 'F');
+      pdf.roundedRect(20, yPos, pageWidth - 40, 100, 3, 3, 'F');
       pdf.setDrawColor(52, 152, 219);
       pdf.setLineWidth(1);
-      pdf.roundedRect(20, yPos, pageWidth - 40, 60, 3, 3, 'D');
+      pdf.roundedRect(20, yPos, pageWidth - 40, 100, 3, 3, 'D');
       
-      pdf.setFontSize(16);
+      pdf.setFontSize(18);
       pdf.setFont('helvetica', 'bold');
       pdf.setTextColor(52, 152, 219);
-      pdf.text('📅 AANWEZIGHEID', 30, yPos + 20);
+      pdf.text('📅 AANWEZIGHEID', 30, yPos + 25);
       
       pdf.setFont('helvetica', 'normal');
-      pdf.setFontSize(11);
+      pdf.setFontSize(13);
       pdf.setTextColor(64, 75, 105);
-      pdf.text(`❌ Aantal keer afwezig: ${report.attendance.absent}`, 30, yPos + 35);
-      pdf.text(`⏰ Aantal keer te laat: ${report.attendance.late}`, 30, yPos + 45);
+      pdf.text(`❌ Aantal keer afwezig: ${report.attendance.absent} dagen`, 30, yPos + 50);
+      pdf.text(`⏰ Aantal keer te laat: ${report.attendance.late} keer`, 30, yPos + 70);
+      
+      // Calculate attendance percentage
+      const totalDays = 180; // Approximate school days
+      const attendancePercentage = ((totalDays - report.attendance.absent) / totalDays * 100).toFixed(1);
+      pdf.text(`📈 Aanwezigheidspercentage: ${attendancePercentage}%`, 30, yPos + 85);
 
-      yPos += 80;
+      yPos += 120;
 
       // Final signature section on second page
       const finalSigWidth = (pageWidth - 60) / 2;
@@ -839,381 +845,6 @@ export default function Reports() {
                     </CardContent>
                   </Card>
                 ))}
-            </div>
-          )}
-        </TabsContent>
-      </Tabs>
-    </div>
-  );
-}
-                          <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-t-lg p-4 -m-6 mb-6">
-                            <div className="h-1 bg-blue-400 rounded mb-4"></div>
-                            <div className="flex justify-between items-center">
-                              <div className="flex items-center space-x-4">
-                                {schoolLogo ? (
-                                  <img src={schoolLogo} alt="School logo" className="h-12 w-auto" />
-                                ) : (
-                                  <div className="h-12 w-16 bg-white/20 backdrop-blur rounded-lg flex items-center justify-center text-white text-xs border border-white/30">
-                                    <span>📚 Logo</span>
-                                  </div>
-                                )}
-                              </div>
-                              <div className="text-right">
-                                <h1 className="text-2xl font-bold text-white tracking-wide">RAPPORT</h1>
-                                <p className="text-blue-100 text-sm">{report.student.academicYear || '2024-2025'}</p>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Student Info - Modern card with icons */}
-                        <div className="mb-6 bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg border border-blue-200">
-                          <div className="grid grid-cols-2 gap-6 text-sm">
-                            <div className="space-y-3">
-                              <div className="flex items-center space-x-3">
-                                <span className="text-blue-600">👤</span>
-                                <span className="font-semibold text-blue-800">Naam:</span>
-                                <span className="text-gray-800">{report.student.firstName} {report.student.lastName}</span>
-                              </div>
-                              <div className="flex items-center space-x-3">
-                                <span className="text-blue-600">🆔</span>
-                                <span className="font-semibold text-blue-800">StudentID:</span>
-                                <span className="text-gray-800">{report.student.studentId}</span>
-                              </div>
-                            </div>
-                            <div className="space-y-3">
-                              <div className="flex items-center space-x-3">
-                                <span className="text-blue-600">🏫</span>
-                                <span className="font-semibold text-blue-800">Klas:</span>
-                                <span className="text-gray-800">1A</span>
-                              </div>
-                              <div className="flex items-center space-x-3">
-                                <span className="text-blue-600">📅</span>
-                                <span className="font-semibold text-blue-800">Datum:</span>
-                                <span className="text-gray-800">{new Date().toLocaleDateString('nl-NL')}</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Grades Table - Modern design with icons */}
-                        <div className="mb-6">
-                          <table className="w-full border-collapse bg-white rounded-lg overflow-hidden shadow-md border border-blue-100">
-                            <thead>
-                              <tr className="bg-gradient-to-r from-blue-600 to-blue-700 text-white">
-                                <th className="border-r border-blue-500 p-2 text-left font-semibold text-sm" style={{ width: '28%' }}>
-                                  <span className="flex items-center space-x-2">
-                                    <span>📚</span>
-                                    <span>Vak</span>
-                                  </span>
-                                </th>
-                                <th className="border-r border-blue-500 p-2 text-center font-semibold text-sm" style={{ width: '18%' }}>
-                                  <span className="flex items-center justify-center space-x-1">
-                                    <span>📝</span>
-                                    <span>Testen</span>
-                                  </span>
-                                </th>
-                                <th className="border-r border-blue-500 p-2 text-center font-semibold text-sm" style={{ width: '18%' }}>
-                                  <span className="flex items-center justify-center space-x-1">
-                                    <span>📋</span>
-                                    <span>Taken</span>
-                                  </span>
-                                </th>
-                                <th className="border-r border-blue-500 p-2 text-center font-semibold text-sm" style={{ width: '18%' }}>
-                                  <span className="flex items-center justify-center space-x-1">
-                                    <span>🎯</span>
-                                    <span>Examen</span>
-                                  </span>
-                                </th>
-                                <th className="p-2 text-left font-semibold text-sm" style={{ width: '18%' }}>
-                                  <span className="flex items-center space-x-2">
-                                    <span>💬</span>
-                                    <span>Opmerkingen</span>
-                                  </span>
-                                </th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {Object.entries(report.grades).map(([subject, grades], index) => {
-                                const testAvg = grades.tests.length > 0 ? (grades.tests.reduce((sum, g) => sum + (g.score/g.maxScore)*10, 0) / grades.tests.length).toFixed(1) : '-';
-                                const taskAvg = grades.tasks.length > 0 ? (grades.tasks.reduce((sum, g) => sum + (g.score/g.maxScore)*10, 0) / grades.tasks.length).toFixed(1) : '-';
-                                const isEven = index % 2 === 0;
-                                
-                                return (
-                                  <tr key={subject} className={`border-b border-blue-100 h-10 ${isEven ? 'bg-blue-25' : 'bg-white'} hover:bg-blue-50 transition-colors`}>
-                                    <td className="border-r border-blue-100 p-2 font-medium text-gray-800 text-sm">{subject}</td>
-                                    <td className="border-r border-blue-100 p-2 text-center">
-                                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold min-w-[40px] justify-center ${
-                                        parseFloat(testAvg) >= 6.5 ? 'bg-green-100 text-green-700 border border-green-200' : 
-                                        parseFloat(testAvg) >= 5.5 ? 'bg-orange-100 text-orange-700 border border-orange-200' : 
-                                        parseFloat(testAvg) < 5.5 && testAvg !== '-' ? 'bg-red-100 text-red-700 border border-red-200' :
-                                        'bg-gray-100 text-gray-500 border border-gray-200'
-                                      }`}>
-                                        {testAvg}
-                                      </span>
-                                    </td>
-                                    <td className="border-r border-blue-100 p-2 text-center">
-                                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold min-w-[40px] justify-center ${
-                                        parseFloat(taskAvg) >= 6.5 ? 'bg-green-100 text-green-700 border border-green-200' : 
-                                        parseFloat(taskAvg) >= 5.5 ? 'bg-orange-100 text-orange-700 border border-orange-200' : 
-                                        parseFloat(taskAvg) < 5.5 && taskAvg !== '-' ? 'bg-red-100 text-red-700 border border-red-200' :
-                                        'bg-gray-100 text-gray-500 border border-gray-200'
-                                      }`}>
-                                        {taskAvg}
-                                      </span>
-                                    </td>
-                                    <td className="border-r border-blue-100 p-2 text-center">
-                                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold min-w-[40px] justify-center ${
-                                        parseFloat(testAvg) >= 6.5 ? 'bg-green-100 text-green-700 border border-green-200' : 
-                                        parseFloat(testAvg) >= 5.5 ? 'bg-orange-100 text-orange-700 border border-orange-200' : 
-                                        parseFloat(testAvg) < 5.5 && testAvg !== '-' ? 'bg-red-100 text-red-700 border border-red-200' :
-                                        'bg-gray-100 text-gray-500 border border-gray-200'
-                                      }`}>
-                                        {testAvg}
-                                      </span>
-                                    </td>
-                                    <td className="p-2 text-gray-600 text-xs">Goede vooruitgang</td>
-                                  </tr>
-                                );
-                              })}
-                              {/* Empty rows with subtle styling */}
-                              {Array.from({ length: 1 }).map((_, i) => (
-                                <tr key={`empty-${i}`} className="border-b border-blue-100 h-10 bg-blue-25">
-                                  <td className="border-r border-blue-100 p-2"></td>
-                                  <td className="border-r border-blue-100 p-2"></td>
-                                  <td className="border-r border-blue-100 p-2"></td>
-                                  <td className="border-r border-blue-100 p-2"></td>
-                                  <td className="p-2"></td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-
-                        {/* Modern layout for remaining sections */}
-                        <div className="grid grid-cols-2 gap-6">
-                          {/* Left column - Comments and signatures */}
-                          <div className="space-y-4">
-                            {/* General Comments */}
-                            <div>
-                              <h3 className="flex items-center space-x-2 font-bold mb-2 text-blue-800 text-sm">
-                                <span>💭</span>
-                                <span>Algemene opmerkingen</span>
-                              </h3>
-                              <div className="border border-blue-200 rounded-lg p-3 bg-gradient-to-br from-blue-50 to-indigo-50 min-h-[60px]">
-                                {generalComments[report.student.id] ? (
-                                  <div className="text-gray-700 text-xs leading-relaxed">
-                                    {generalComments[report.student.id]}
-                                  </div>
-                                ) : (
-                                  <div className="text-blue-400 text-xs italic">Leerling toont goede vooruitgang</div>
-                                )}
-                              </div>
-                            </div>
-
-                            {/* Signatures */}
-                            <div className="space-y-3">
-                              <div className="bg-white border border-blue-200 rounded-lg p-3">
-                                <div className="flex items-center space-x-2 mb-2">
-                                  <span>✍️</span>
-                                  <span className="text-xs font-medium text-blue-700">Handtekening ouders</span>
-                                </div>
-                                <div className="border-b-2 border-blue-300 h-6 mb-1"></div>
-                              </div>
-                              <div className="bg-white border border-blue-200 rounded-lg p-3">
-                                <div className="flex items-center space-x-2 mb-2">
-                                  <span>👨‍🏫</span>
-                                  <span className="text-xs font-medium text-blue-700">Handtekening mentor</span>
-                                </div>
-                                <div className="border-b-2 border-blue-300 h-6 mb-1"></div>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Right column - Behavior and Attendance */}
-                          <div className="space-y-4">
-                            {/* Behavior section */}
-                            <div>
-                              <h3 className="flex items-center space-x-2 font-bold mb-2 text-green-700 text-sm">
-                                <span>😊</span>
-                                <span>Gedrag</span>
-                              </h3>
-                              <div className="border border-green-200 rounded-lg p-3 bg-gradient-to-br from-green-50 to-emerald-50">
-                                <div className="flex items-center justify-between mb-2">
-                                  <span className="text-green-700 font-medium text-xs">Gedragscijfer:</span>
-                                  <span className="text-lg font-bold text-green-600">{behaviorGrades[report.student.id]?.grade || 7}/10</span>
-                                </div>
-                                {behaviorGrades[report.student.id]?.comments && (
-                                  <div className="text-green-600 text-xs">
-                                    {behaviorGrades[report.student.id]?.comments}
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-
-                            {/* Attendance section */}
-                            <div>
-                              <h3 className="flex items-center space-x-2 font-bold mb-2 text-blue-700 text-sm">
-                                <span>📅</span>
-                                <span>Aanwezigheid</span>
-                              </h3>
-                              <div className="border border-blue-200 rounded-lg p-3 bg-gradient-to-br from-blue-50 to-cyan-50">
-                                <div className="grid grid-cols-2 gap-3 mb-2">
-                                  <div className="text-center">
-                                    <div className="flex items-center justify-center space-x-1 mb-1">
-                                      <span>❌</span>
-                                      <span className="text-xs text-red-600">Afwezig</span>
-                                    </div>
-                                    <div className="text-lg font-bold text-red-600">{report.attendance.absent}</div>
-                                  </div>
-                                  <div className="text-center">
-                                    <div className="flex items-center justify-center space-x-1 mb-1">
-                                      <span>⏰</span>
-                                      <span className="text-xs text-orange-600">Te laat</span>
-                                    </div>
-                                    <div className="text-lg font-bold text-orange-600">{report.attendance.late}</div>
-                                  </div>
-                                </div>
-                                <div className="flex items-center space-x-1">
-                                  <span>📈</span>
-                                  <span className="text-blue-600 text-xs">Goede aanwezigheid</span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        {/* Footer Page 1 */}
-                        <div className="mt-6 pt-4 border-t border-gray-200 text-center">
-                          <p className="text-xs text-gray-500">
-                            Pagina 1 van 2 - Cijfers - Gegenereerd op {new Date().toLocaleDateString('nl-NL')}
-                          </p>
-                        </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    {/* PAGE 2 - GEDRAG & AANWEZIGHEID */}
-                    <Card className="border-2 border-gray-300 shadow-lg">
-                      <CardContent className="p-0">
-                        <div className="bg-white min-h-[600px] w-full mx-auto shadow-xl border border-blue-100 p-6 font-sans text-sm rounded-lg" style={{ aspectRatio: '297/210' }}>
-                          {/* Page 2 Header */}
-                          <div className="relative mb-6">
-                            <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-t-lg p-4 -m-6 mb-6">
-                              <div className="h-1 bg-blue-400 rounded mb-4"></div>
-                              <div className="flex justify-between items-center">
-                                <div className="flex items-center space-x-4">
-                                  {schoolLogo ? (
-                                    <img src={schoolLogo} alt="School logo" className="h-12 w-auto" />
-                                  ) : (
-                                    <div className="h-12 w-16 bg-white/20 backdrop-blur rounded-lg flex items-center justify-center text-white text-xs border border-white/30">
-                                      <span>📚 Logo</span>
-                                    </div>
-                                  )}
-                                </div>
-                                <div className="text-right">
-                                  <h1 className="text-2xl font-bold text-white tracking-wide">GEDRAG & AANWEZIGHEID</h1>
-                                  <p className="text-blue-100 text-sm">{report.student.firstName} {report.student.lastName}</p>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Student Info Reminder */}
-                          <div className="mb-6 bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg border border-blue-200">
-                            <div className="grid grid-cols-2 gap-6 text-sm">
-                              <div className="space-y-3">
-                                <div className="flex items-center space-x-3">
-                                  <span className="text-blue-600">👤</span>
-                                  <span className="font-semibold text-blue-800">Naam:</span>
-                                  <span className="text-gray-800">{report.student.firstName} {report.student.lastName}</span>
-                                </div>
-                                <div className="flex items-center space-x-3">
-                                  <span className="text-blue-600">🆔</span>
-                                  <span className="font-semibold text-blue-800">StudentID:</span>
-                                  <span className="text-gray-800">{report.student.studentId}</span>
-                                </div>
-                              </div>
-                              <div className="space-y-3">
-                                <div className="flex items-center space-x-3">
-                                  <span className="text-blue-600">🏫</span>
-                                  <span className="font-semibold text-blue-800">Klas:</span>
-                                  <span className="text-gray-800">1A</span>
-                                </div>
-                                <div className="flex items-center space-x-3">
-                                  <span className="text-blue-600">📅</span>
-                                  <span className="font-semibold text-blue-800">Datum:</span>
-                                  <span className="text-gray-800">{new Date().toLocaleDateString('nl-NL')}</span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* General Comments Section */}
-                          <div className="mb-6 bg-blue-50 rounded-lg p-4 border border-blue-200">
-                            <div className="flex items-center space-x-2 mb-3">
-                              <span className="text-xl">💭</span>
-                              <h4 className="text-lg font-bold text-blue-700">Algemene opmerkingen</h4>
-                            </div>
-                            <p className="text-gray-700">
-                              {generalComments[report.student.id] || 'Leerling toont goede vooruitgang in alle aspecten.'}
-                            </p>
-                          </div>
-
-                          {/* Behavior Section */}
-                          <div className="mb-6 bg-green-50 rounded-lg p-4 border border-green-200">
-                            <div className="flex items-center space-x-2 mb-3">
-                              <span className="text-xl">😊</span>
-                              <h4 className="text-lg font-bold text-green-700">GEDRAG</h4>
-                            </div>
-                            <div className="space-y-2">
-                              <p className="text-sm">
-                                <span className="font-medium">Gedragscijfer:</span> {behaviorGrades[report.student.id]?.grade || 7}/10
-                              </p>
-                              <p className="text-sm text-gray-600">
-                                {behaviorGrades[report.student.id]?.comments || 'Leerling toont respectvol en positief gedrag in de klas.'}
-                              </p>
-                            </div>
-                          </div>
-
-                          {/* Attendance Section */}
-                          <div className="mb-6 bg-blue-50 rounded-lg p-4 border border-blue-200">
-                            <div className="flex items-center space-x-2 mb-3">
-                              <span className="text-xl">📅</span>
-                              <h4 className="text-lg font-bold text-blue-700">AANWEZIGHEID</h4>
-                            </div>
-                            <div className="space-y-1">
-                              <p className="text-sm">❌ Aantal keer afwezig: {report.attendance.absent}</p>
-                              <p className="text-sm">⏰ Aantal keer te laat: {report.attendance.late}</p>
-                            </div>
-                          </div>
-
-                          {/* Signature Section */}
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                            <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                              <h5 className="font-bold text-blue-600 mb-2">✍️ Handtekening ouders/verzorgers</h5>
-                              <div className="border-b-2 border-blue-300 h-8 mb-2"></div>
-                              <p className="text-xs text-gray-500">Datum: _______________</p>
-                            </div>
-                            <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                              <h5 className="font-bold text-blue-600 mb-2">👨‍🏫 Handtekening klassenmentor</h5>
-                              <div className="border-b-2 border-blue-300 h-8 mb-2"></div>
-                              <p className="text-xs text-gray-500">Datum: _______________</p>
-                            </div>
-                          </div>
-
-                          {/* Footer Page 2 */}
-                          <div className="mt-6 pt-4 border-t border-gray-200 text-center">
-                            <p className="text-xs text-gray-500">
-                              Pagina 2 van 2
-                            </p>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-                ))}
-              </div>
             </div>
           )}
         </TabsContent>

@@ -75,166 +75,134 @@ export default function Accounts() {
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [showFilterOptions, setShowFilterOptions] = useState(false);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [isBulkDialogOpen, setIsBulkDialogOpen] = useState(false);
+  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState<UserAccount | null>(null);
   const [accountToDelete, setAccountToDelete] = useState<UserAccount | null>(null);
   const [accountFormData, setAccountFormData] = useState<AccountFormData>({
-    email: "",
-    password: "",
-    role: "student",
+    email: '',
+    password: '',
+    role: 'student',
     personId: 0,
     isActive: true
   });
-  const [bulkRole, setBulkRole] = useState<'student' | 'teacher' | 'guardian'>('student');
-  const [selectedPersons, setSelectedPersons] = useState<number[]>([]);
-  const [bulkEmailTemplate, setBulkEmailTemplate] = useState("{firstName}.{lastName}@mymadrassa.nl");
 
-  // Fetch data
-  const { data: accountsData = [], isLoading } = useQuery({
-    queryKey: ["/api/accounts"]
-  });
-
-  const { data: teachersData = [] } = useQuery({
-    queryKey: ["/api/teachers"]
+  // Queries
+  const { data: accountsData = [], isLoading: isAccountsLoading } = useQuery({
+    queryKey: ["/api/accounts"],
   });
 
   const { data: studentsData = [] } = useQuery({
-    queryKey: ["/api/students"]
+    queryKey: ["/api/students"],
+  });
+
+  const { data: teachersData = [] } = useQuery({
+    queryKey: ["/api/teachers"],
   });
 
   const { data: guardiansData = [] } = useQuery({
-    queryKey: ["/api/guardians"]
+    queryKey: ["/api/guardians"],
   });
 
+  // Combine all persons for account creation
   const availablePersons = [
-    ...(teachersData?.teachers || []).map((t: any) => ({
-      id: t.id,
-      name: `${t.firstName} ${t.lastName}`,
-      type: 'teacher'
-    })),
-    ...(studentsData || []).map((s: any) => ({
-      id: s.id,
-      name: `${s.firstName} ${s.lastName}`,
-      type: 'student'
-    })),
-    ...(guardiansData || []).map((g: any) => ({
-      id: g.id,
-      name: `${g.firstName} ${g.lastName}`,
-      type: 'guardian'
-    }))
-  ];
+    ...(Array.isArray(studentsData) ? studentsData.map((s: any) => ({ ...s, type: 'Student' })) : []),
+    ...(Array.isArray(teachersData?.teachers) ? teachersData.teachers.map((t: any) => ({ ...t, type: 'Docent' })) : []),
+    ...(Array.isArray(guardiansData) ? guardiansData.map((g: any) => ({ ...g, type: 'Voogd' })) : [])
+  ].filter(person => !accountsData.some((account: any) => account.personId === person.id));
 
   // Mutations
   const createAccountMutation = useMutation({
     mutationFn: async (data: AccountFormData) => {
       return apiRequest("/api/accounts", {
         method: "POST",
-        body: JSON.stringify(data)
+        body: JSON.stringify(data),
       });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/accounts"] });
-      setIsAddDialogOpen(false);
+      setIsCreateDialogOpen(false);
       resetForm();
-    }
+    },
   });
 
   const updateAccountMutation = useMutation({
     mutationFn: async ({ id, data }: { id: number; data: Partial<AccountFormData> }) => {
       return apiRequest(`/api/accounts/${id}`, {
         method: "PUT",
-        body: JSON.stringify(data)
+        body: JSON.stringify(data),
       });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/accounts"] });
       setIsEditDialogOpen(false);
       resetForm();
-    }
+    },
   });
 
   const deleteAccountMutation = useMutation({
     mutationFn: async (id: number) => {
       return apiRequest(`/api/accounts/${id}`, {
-        method: "DELETE"
+        method: "DELETE",
       });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/accounts"] });
-      setIsDeleteDialogOpen(false);
-    }
-  });
-
-  const bulkCreateAccountsMutation = useMutation({
-    mutationFn: async (accounts: AccountFormData[]) => {
-      return apiRequest("/api/accounts/bulk", {
-        method: "POST",
-        body: JSON.stringify({ accounts })
-      });
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/accounts"] });
-      setIsBulkDialogOpen(false);
-      resetBulkForm();
-    }
   });
 
-  // Utility functions
-  const generateDefaultPassword = () => {
-    return Math.random().toString(36).slice(-8);
-  };
-
+  // Helper functions
   const resetForm = () => {
     setAccountFormData({
-      email: "",
-      password: "",
-      role: "student",
+      email: '',
+      password: '',
+      role: 'student',
       personId: 0,
       isActive: true
     });
     setSelectedAccount(null);
   };
 
-  const resetBulkForm = () => {
-    setSelectedPersons([]);
-    setBulkRole('student');
-    setBulkEmailTemplate("{firstName}.{lastName}@mymadrassa.nl");
+
+
+  const getPersonOptions = (role: string) => {
+    switch (role) {
+      case 'student':
+        return studentsData;
+      case 'teacher':
+        return teachersData;
+      case 'guardian':
+        return guardiansData;
+      default:
+        return [];
+    }
   };
 
-  const generateEmailFromTemplate = (firstName: string, lastName: string) => {
-    return bulkEmailTemplate
-      .replace('{firstName}', firstName.toLowerCase())
-      .replace('{lastName}', lastName.toLowerCase())
-      .replace(/\s+/g, '');
-  };
-
-  const getPersonsByRole = () => {
-    const dataMap = {
-      student: studentsData || [],
-      teacher: teachersData?.teachers || [],
-      guardian: guardiansData || []
+  const getRoleBadge = (role: string) => {
+    const roleConfig = {
+      student: { label: "Student", color: "bg-blue-100 text-blue-800" },
+      teacher: { label: "Docent", color: "bg-green-100 text-green-800" },
+      guardian: { label: "Voogd", color: "bg-purple-100 text-purple-800" },
+      secretariat: { label: "Secretariaat", color: "bg-orange-100 text-orange-800" },
+      admin: { label: "Admin", color: "bg-red-100 text-red-800" }
     };
-    return dataMap[bulkRole] || [];
-  };
-
-  // Role styling
-  const getRoleDisplay = (role: string) => {
-    const roleMap = {
-      admin: { label: "Administrator", color: "bg-red-100 text-red-800 border-red-200" },
-      secretariat: { label: "Secretariaat", color: "bg-orange-100 text-orange-800 border-orange-200" },
-      teacher: { label: "Docent", color: "bg-green-100 text-green-800 border-green-200" },
-      guardian: { label: "Voogd", color: "bg-purple-100 text-purple-800 border-purple-200" },
-      student: { label: "Student", color: "bg-blue-100 text-blue-800 border-blue-200" }
-    };
-
-    const roleInfo = roleMap[role as keyof typeof roleMap] || { label: role, color: "bg-gray-100 text-gray-800 border-gray-200" };
+    
+    const config = roleConfig[role as keyof typeof roleConfig] || { label: role, color: "bg-gray-100 text-gray-800" };
     
     return (
-      <Badge variant="outline" className={`${roleInfo.color} border`}>
-        {roleInfo.label}
+      <Badge className={`${config.color} text-xs`}>
+        {config.label}
+      </Badge>
+    );
+  };
+
+  const getStatusBadge = (isActive: boolean) => {
+    return (
+      <Badge className={`text-xs ${isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}`}>
+        {isActive ? "Actief" : "Inactief"}
       </Badge>
     );
   };
@@ -252,7 +220,7 @@ export default function Accounts() {
     if (!selectedAccount) return;
     const updateData = { ...accountFormData };
     if (!updateData.password) {
-      delete (updateData as any).password; // Don't update password if empty
+      delete updateData.password; // Don't update password if empty
     }
     updateAccountMutation.mutate({
       id: selectedAccount.id,
@@ -277,24 +245,10 @@ export default function Accounts() {
     setIsDeleteDialogOpen(true);
   };
 
-  const handleBulkCreateAccounts = () => {
-    const selectedPersonsData = getPersonsByRole().filter((person: any) => 
-      selectedPersons.includes(person.id)
-    );
 
-    const accounts = selectedPersonsData.map((person: any) => ({
-      email: generateEmailFromTemplate(person.firstName, person.lastName),
-      password: generateDefaultPassword(),
-      role: bulkRole,
-      personId: person.id,
-      isActive: true
-    }));
-
-    bulkCreateAccountsMutation.mutate(accounts);
-  };
 
   // Filter accounts
-  const filteredAccounts = (accountsData as UserAccount[]).filter((account: UserAccount) => {
+  const filteredAccounts = accountsData.filter((account: UserAccount) => {
     const matchesSearch = 
       account.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       account.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -310,506 +264,445 @@ export default function Accounts() {
 
   // Calculate stats
   const accountStats = {
-    total: (accountsData as UserAccount[]).length,
-    students: (accountsData as UserAccount[]).filter((a: UserAccount) => a.role === 'student').length,
-    teachers: (accountsData as UserAccount[]).filter((a: UserAccount) => a.role === 'teacher').length,
-    guardians: (accountsData as UserAccount[]).filter((a: UserAccount) => a.role === 'guardian').length,
-    secretariat: (accountsData as UserAccount[]).filter((a: UserAccount) => a.role === 'secretariat').length,
-    admin: (accountsData as UserAccount[]).filter((a: UserAccount) => a.role === 'admin').length,
-    active: (accountsData as UserAccount[]).filter((a: UserAccount) => a.isActive).length
+    students: accountsData.filter((a: UserAccount) => a.role === 'student').length,
+    teachers: accountsData.filter((a: UserAccount) => a.role === 'teacher').length,
+    guardians: accountsData.filter((a: UserAccount) => a.role === 'guardian').length,
+    secretariat: accountsData.filter((a: UserAccount) => a.role === 'secretariat').length,
+    admin: accountsData.filter((a: UserAccount) => a.role === 'admin').length,
+    active: accountsData.filter((a: UserAccount) => a.isActive).length
   };
 
-  if (isLoading) {
-    return (
-      <div className="p-6">
-        <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-gray-200 rounded w-1/4"></div>
-          <div className="h-32 bg-gray-200 rounded"></div>
-          <div className="h-64 bg-gray-200 rounded"></div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="container mx-auto py-6">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Accountbeheer</h1>
-        <p className="text-gray-600 mt-2">Beheer gebruikersaccounts en toegangsrechten</p>
-      </div>
+    <div className="flex-1 space-y-6 p-6">
+      <PageHeader
+        title="Account Beheer"
+        description="Beheer gebruikersaccounts en toegangsrechten voor het systeem."
+      />
+      
+      <div className="space-y-6">
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-medium text-gray-600 mb-1">Studenten</p>
+                  <p className="text-xl font-bold text-gray-900">{accountStats.students}</p>
+                </div>
+                <div className="p-2 bg-blue-100 rounded-sm">
+                  <Users className="h-4 w-4 text-blue-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-6">
-        <Card>
-          <CardContent className="p-4">
-            <div className="text-2xl font-bold text-blue-600">{accountStats.total}</div>
-            <p className="text-sm text-gray-600">Totaal</p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-4">
-            <div className="text-2xl font-bold text-blue-600">{accountStats.students}</div>
-            <p className="text-sm text-gray-600">Studenten</p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-4">
-            <div className="text-2xl font-bold text-green-600">{accountStats.teachers}</div>
-            <p className="text-sm text-gray-600">Docenten</p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-4">
-            <div className="text-2xl font-bold text-purple-600">{accountStats.guardians}</div>
-            <p className="text-sm text-gray-600">Voogden</p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-4">
-            <div className="text-2xl font-bold text-orange-600">{accountStats.secretariat}</div>
-            <p className="text-sm text-gray-600">Secretariaat</p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-4">
-            <div className="text-2xl font-bold text-red-600">{accountStats.admin}</div>
-            <p className="text-sm text-gray-600">Admins</p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-4">
-            <div className="text-2xl font-bold text-emerald-600">{accountStats.active}</div>
-            <p className="text-sm text-gray-600">Actief</p>
-          </CardContent>
-        </Card>
-      </div>
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-medium text-gray-600 mb-1">Docenten</p>
+                  <p className="text-xl font-bold text-gray-900">{accountStats.teachers}</p>
+                </div>
+                <div className="p-2 bg-green-100 rounded-sm">
+                  <GraduationCap className="h-4 w-4 text-green-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
-      {/* Controls */}
-      <div className="flex flex-col sm:flex-row gap-4 justify-between">
-        <div className="flex flex-col sm:flex-row gap-4 flex-1">
-          <div className="relative flex-1 sm:max-w-sm">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-            <Input
-              placeholder="Zoek accounts..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-medium text-gray-600 mb-1">Voogden</p>
+                  <p className="text-xl font-bold text-gray-900">{accountStats.guardians}</p>
+                </div>
+                <div className="p-2 bg-purple-100 rounded-sm">
+                  <Shield className="h-4 w-4 text-purple-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-medium text-gray-600 mb-1">Secretariaat</p>
+                  <p className="text-xl font-bold text-gray-900">{accountStats.secretariat}</p>
+                </div>
+                <div className="p-2 bg-orange-100 rounded-sm">
+                  <FileText className="h-4 w-4 text-orange-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-medium text-gray-600 mb-1">Administrator</p>
+                  <p className="text-xl font-bold text-gray-900">{accountStats.admin}</p>
+                </div>
+                <div className="p-2 bg-red-100 rounded-sm">
+                  <Settings className="h-4 w-4 text-red-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-medium text-gray-600 mb-1">Actief</p>
+                  <p className="text-xl font-bold text-gray-900">{accountStats.active}</p>
+                </div>
+                <div className="p-2 bg-teal-100 rounded-sm">
+                  <UserCheck className="h-4 w-4 text-teal-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Accounts Table Section */}
+        <div className="bg-white border border-[#e5e7eb] rounded-sm">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-[#e5e7eb] bg-[#f9fafc]">
+            <div className="flex items-center gap-2">
+              <Key className="h-3.5 w-3.5 text-[#1e40af]" />
+              <h3 className="text-xs font-medium text-gray-700 tracking-tight">Account Beheer</h3>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-gray-500">{filteredAccounts.length} accounts</span>
+              <Button 
+                onClick={() => setIsCreateDialogOpen(true)}
+                className="bg-[#1e40af] hover:bg-[#1d4ed8] text-white h-8 text-xs px-3 rounded-sm"
+              >
+                <Plus className="h-3.5 w-3.5 mr-1.5" />
+                Account Toevoegen
+              </Button>
+            </div>
           </div>
-          
-          <Select value={roleFilter} onValueChange={setRoleFilter}>
-            <SelectTrigger className="w-full sm:w-48">
-              <SelectValue placeholder="Filter op rol" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Alle rollen</SelectItem>
-              <SelectItem value="admin">Administrator</SelectItem>
-              <SelectItem value="secretariat">Secretariaat</SelectItem>
-              <SelectItem value="teacher">Docent</SelectItem>
-              <SelectItem value="guardian">Voogd</SelectItem>
-              <SelectItem value="student">Student</SelectItem>
-            </SelectContent>
-          </Select>
-          
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-full sm:w-48">
-              <SelectValue placeholder="Filter op status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Alle statussen</SelectItem>
-              <SelectItem value="active">Actief</SelectItem>
-              <SelectItem value="inactive">Inactief</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm">
-            <Download className="h-4 w-4 mr-2" />
-            Exporteer
-          </Button>
-          <Button variant="outline" onClick={() => setIsBulkDialogOpen(true)} size="sm">
-            <Users className="h-4 w-4 mr-2" />
-            Bulk Aanmaken
-          </Button>
-          <Button onClick={() => setIsAddDialogOpen(true)} size="sm">
-            <Plus className="h-4 w-4 mr-2" />
-            Account Toevoegen
-          </Button>
-        </div>
-      </div>
 
-      {/* Accounts Table */}
-      <div className="bg-white rounded-lg shadow-sm border">
-        <div className="p-6 border-b">
-          <h3 className="text-lg font-semibold">Gebruikersaccounts</h3>
-          <p className="text-sm text-gray-600">Beheer en monitor alle gebruikersaccounts</p>
-        </div>
-        <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="border-b bg-gray-50">
-                <tr>
-                  <th className="text-left p-4 font-medium text-gray-900">Gebruiker</th>
-                  <th className="text-left p-4 font-medium text-gray-900">Email</th>
-                  <th className="text-left p-4 font-medium text-gray-900">Rol</th>
-                  <th className="text-left p-4 font-medium text-gray-900">Status</th>
-                  <th className="text-left p-4 font-medium text-gray-900">Laatste Login</th>
-                  <th className="text-left p-4 font-medium text-gray-900">Acties</th>
-                </tr>
-              </thead>
-              <tbody>
+          <div className="p-4">
+            {/* Search and Filter Bar */}
+            <div className="flex flex-col md:flex-row gap-3 justify-between items-start md:items-center mb-4">
+              <div className="relative flex-1 max-w-md">
+                <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-gray-400 h-3.5 w-3.5" />
+                <Input
+                  placeholder="Zoek accounts..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-8 h-8 text-xs border-[#e5e7eb] rounded-sm"
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowFilterOptions(!showFilterOptions)}
+                  className="h-7 px-2 rounded-sm border-[#e5e7eb] text-xs"
+                >
+                  <Filter className="h-3.5 w-3.5 mr-1" />
+                  Filters
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsExportDialogOpen(true)}
+                  className="h-7 px-2 rounded-sm border-[#e5e7eb] text-xs"
+                >
+                  <Download className="h-3.5 w-3.5 mr-1" />
+                  Export
+                </Button>
+              </div>
+            </div>
+
+            {/* Filter Options */}
+            {showFilterOptions && (
+              <div className="mb-4 p-3 bg-gray-50 border border-[#e5e7eb] rounded-sm">
+                <div className="flex flex-wrap gap-4">
+                  <div className="flex items-center gap-2">
+                    <label className="text-xs font-medium text-gray-700">Rol:</label>
+                    <Select value={roleFilter} onValueChange={setRoleFilter}>
+                      <SelectTrigger className="w-32 h-7 text-xs">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Alle</SelectItem>
+                        <SelectItem value="student">Student</SelectItem>
+                        <SelectItem value="teacher">Docent</SelectItem>
+                        <SelectItem value="guardian">Voogd</SelectItem>
+                        <SelectItem value="secretariat">Secretariaat</SelectItem>
+                        <SelectItem value="admin">Admin</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <label className="text-xs font-medium text-gray-700">Status:</label>
+                    <Select value={statusFilter} onValueChange={setStatusFilter}>
+                      <SelectTrigger className="w-32 h-7 text-xs">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Alle</SelectItem>
+                        <SelectItem value="active">Actief</SelectItem>
+                        <SelectItem value="inactive">Inactief</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Accounts List */}
+            {isAccountsLoading ? (
+              <div className="h-32 flex items-center justify-center">
+                <div className="w-5 h-5 border-2 border-[#1e40af] border-t-transparent rounded-full animate-spin"></div>
+              </div>
+            ) : filteredAccounts.length === 0 ? (
+              <div className="h-32 flex flex-col items-center justify-center">
+                <div className="p-2 bg-[#f7f9fc] text-[#1e40af] mb-3 border border-[#e5e7eb] rounded-sm">
+                  <Key className="h-5 w-5 opacity-60" />
+                </div>
+                <p className="text-xs text-gray-500 mb-2">Geen accounts beschikbaar</p>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="text-xs h-6 border-[#e5e7eb] text-gray-600 hover:bg-gray-50 rounded-sm"
+                >
+                  Account toevoegen
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-2">
                 {filteredAccounts.map((account: UserAccount) => (
-                  <tr key={account.id} className="border-b hover:bg-gray-50">
-                    <td className="p-4">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                          <span className="text-blue-600 font-medium text-sm">
-                            {account.firstName[0]}{account.lastName[0]}
-                          </span>
-                        </div>
-                        <div>
-                          <div className="font-medium text-gray-900">
-                            {account.firstName} {account.lastName}
-                          </div>
-                          <div className="text-sm text-gray-500">ID: {account.id}</div>
-                        </div>
+                  <div key={account.id} className="flex items-center justify-between p-3 border border-[#e5e7eb] rounded-sm hover:bg-[#f8f9fa] transition-colors">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <h4 className="text-sm font-medium text-gray-800">{account.firstName} {account.lastName}</h4>
+                        {getRoleBadge(account.role)}
+                        {getStatusBadge(account.isActive)}
                       </div>
-                    </td>
-                    <td className="p-4 text-gray-900">{account.email}</td>
-                    <td className="p-4">{getRoleDisplay(account.role)}</td>
-                    <td className="p-4">
-                      <Badge variant={account.isActive ? "default" : "secondary"}>
-                        {account.isActive ? "Actief" : "Inactief"}
-                      </Badge>
-                    </td>
-                    <td className="p-4 text-gray-600">
-                      {account.lastLogin 
-                        ? format(parseISO(account.lastLogin), "dd MMM yyyy HH:mm", { locale: nl })
-                        : "Nooit ingelogd"
-                      }
-                    </td>
-                    <td className="p-4">
-                      <div className="flex items-center space-x-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleEditAccount(account)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDeleteAccount(account)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
+                      <p className="text-xs text-gray-500 mt-1">{account.email}</p>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        className="h-7 w-7 p-0 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+                      >
+                        <Edit className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        className="h-7 w-7 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+                        onClick={() => {
+                          setAccountToDelete(account);
+                          setIsDeleteDialogOpen(true);
+                        }}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                  </div>
                 ))}
-              </tbody>
-            </table>
-          
-          {filteredAccounts.length === 0 && (
-            <div className="text-center py-12">
-              <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-500">Geen accounts gevonden</p>
-            </div>
-          )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Add Account Dialog */}
-      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+      {/* Create Account Dialog */}
+      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
         <CustomDialogContent>
-          <DialogHeader>
-            <DialogTitle>Account Toevoegen</DialogTitle>
-            <DialogDescription>
-              Voeg een nieuw gebruikersaccount toe aan het systeem.
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={accountFormData.email}
-                onChange={(e) => setAccountFormData({ ...accountFormData, email: e.target.value })}
-                placeholder="gebruiker@example.com"
-              />
+          <div className="bg-[#1e40af] text-white px-6 py-4">
+            <div className="flex items-center gap-3">
+              <div className="flex-shrink-0">
+                <div className="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center">
+                  <Plus className="h-5 w-5 text-white" />
+                </div>
+              </div>
+              <div className="flex-1 min-w-0">
+                <h2 className="text-lg font-semibold text-white">Nieuw Account Aanmaken</h2>
+                <p className="text-sm text-blue-100 mt-1">Voeg een nieuw gebruikersaccount toe aan het systeem</p>
+              </div>
             </div>
-            
+          </div>
+          <div className="p-6 space-y-4">
             <div>
-              <Label htmlFor="password">Wachtwoord (optioneel)</Label>
-              <Input
-                id="password"
-                type="password"
-                value={accountFormData.password}
-                onChange={(e) => setAccountFormData({ ...accountFormData, password: e.target.value })}
-                placeholder="Laat leeg voor automatisch wachtwoord"
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor="role">Rol</Label>
-              <Select 
-                value={accountFormData.role} 
-                onValueChange={(value: any) => setAccountFormData({ ...accountFormData, role: value })}
-              >
+              <Label htmlFor="create-person">Persoon Selecteren</Label>
+              <Select value={accountFormData.personId?.toString() || ""} onValueChange={(value) => setAccountFormData(prev => ({ ...prev, personId: parseInt(value) }))}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Selecteer rol" />
+                  <SelectValue placeholder="Selecteer een persoon" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="admin">Administrator</SelectItem>
-                  <SelectItem value="secretariat">Secretariaat</SelectItem>
-                  <SelectItem value="teacher">Docent</SelectItem>
-                  <SelectItem value="guardian">Voogd</SelectItem>
-                  <SelectItem value="student">Student</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div>
-              <Label htmlFor="person">Gekoppelde Persoon</Label>
-              <Select 
-                value={accountFormData.personId.toString()} 
-                onValueChange={(value) => setAccountFormData({ ...accountFormData, personId: parseInt(value) })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecteer persoon" />
-                </SelectTrigger>
-                <SelectContent>
-                  {availablePersons.map((person) => (
+                  {availablePersons.map((person: any) => (
                     <SelectItem key={person.id} value={person.id.toString()}>
-                      {person.name} ({person.type})
+                      {person.firstName} {person.lastName} ({person.type})
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
-            
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="isActive"
-                checked={accountFormData.isActive}
-                onCheckedChange={(checked) => 
-                  setAccountFormData({ ...accountFormData, isActive: checked as boolean })
-                }
+            <div>
+              <Label htmlFor="create-email">Email</Label>
+              <Input
+                id="create-email"
+                type="email"
+                value={accountFormData.email}
+                onChange={(e) => setAccountFormData(prev => ({ ...prev, email: e.target.value }))}
+                placeholder="email@example.com"
               />
-              <Label htmlFor="isActive">Account is actief</Label>
+            </div>
+            <div>
+              <Label htmlFor="create-password">Wachtwoord</Label>
+              <Input
+                id="create-password"
+                type="password"
+                value={accountFormData.password}
+                onChange={(e) => setAccountFormData(prev => ({ ...prev, password: e.target.value }))}
+                placeholder="Wachtwoord"
+              />
+            </div>
+            <div>
+              <Label htmlFor="create-role">Rol</Label>
+              <Select value={accountFormData.role} onValueChange={(value: any) => setAccountFormData(prev => ({ ...prev, role: value }))}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="student">Student</SelectItem>
+                  <SelectItem value="teacher">Docent</SelectItem>
+                  <SelectItem value="guardian">Voogd</SelectItem>
+                  <SelectItem value="secretariat">Secretariaat</SelectItem>
+                  <SelectItem value="admin">Admin</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox 
+                id="create-isActive"
+                checked={accountFormData.isActive}
+                onCheckedChange={(checked) => setAccountFormData(prev => ({ ...prev, isActive: !!checked }))}
+              />
+              <Label htmlFor="create-isActive">Account is actief</Label>
             </div>
           </div>
-          
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
+          <div className="px-6 py-4 bg-gray-50 border-t flex items-center justify-end gap-3">
+            <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
               Annuleren
             </Button>
             <Button 
               onClick={handleCreateAccount}
-              disabled={createAccountMutation.isPending}
+              disabled={!accountFormData.email || !accountFormData.personId}
+              className="bg-[#1e40af] hover:bg-[#1d4ed8]"
             >
-              {createAccountMutation.isPending ? "Toevoegen..." : "Account Toevoegen"}
+              Account Aanmaken
             </Button>
-          </DialogFooter>
+          </div>
         </CustomDialogContent>
       </Dialog>
 
       {/* Edit Account Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <CustomDialogContent>
-          <DialogHeader>
-            <DialogTitle>Account Bewerken</DialogTitle>
-            <DialogDescription>
-              Wijzig de accountinstellingen.
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="space-y-4">
+          <div className="bg-[#059669] text-white px-6 py-4">
+            <div className="flex items-center gap-3">
+              <div className="flex-shrink-0">
+                <div className="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center">
+                  <Edit className="h-5 w-5 text-white" />
+                </div>
+              </div>
+              <div className="flex-1 min-w-0">
+                <h2 className="text-lg font-semibold text-white">Account Bewerken</h2>
+                <p className="text-sm text-green-100 mt-1">Pas de accountgegevens aan</p>
+              </div>
+            </div>
+          </div>
+          <div className="p-6 space-y-4">
             <div>
               <Label htmlFor="edit-email">Email</Label>
               <Input
                 id="edit-email"
                 type="email"
                 value={accountFormData.email}
-                onChange={(e) => setAccountFormData({ ...accountFormData, email: e.target.value })}
+                onChange={(e) => setAccountFormData(prev => ({ ...prev, email: e.target.value }))}
+                placeholder="email@example.com"
               />
             </div>
-            
             <div>
               <Label htmlFor="edit-password">Nieuw Wachtwoord (optioneel)</Label>
               <Input
                 id="edit-password"
                 type="password"
                 value={accountFormData.password}
-                onChange={(e) => setAccountFormData({ ...accountFormData, password: e.target.value })}
-                placeholder="Laat leeg om ongewijzigd te laten"
+                onChange={(e) => setAccountFormData(prev => ({ ...prev, password: e.target.value }))}
+                placeholder="Laat leeg om hetzelfde te houden"
               />
             </div>
-            
             <div>
               <Label htmlFor="edit-role">Rol</Label>
-              <Select 
-                value={accountFormData.role} 
-                onValueChange={(value: any) => setAccountFormData({ ...accountFormData, role: value })}
-              >
+              <Select value={accountFormData.role} onValueChange={(value: any) => setAccountFormData(prev => ({ ...prev, role: value }))}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Selecteer rol" />
+                  <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="admin">Administrator</SelectItem>
-                  <SelectItem value="secretariat">Secretariaat</SelectItem>
+                  <SelectItem value="student">Student</SelectItem>
                   <SelectItem value="teacher">Docent</SelectItem>
                   <SelectItem value="guardian">Voogd</SelectItem>
-                  <SelectItem value="student">Student</SelectItem>
+                  <SelectItem value="secretariat">Secretariaat</SelectItem>
+                  <SelectItem value="admin">Admin</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-            
             <div className="flex items-center space-x-2">
-              <Checkbox
+              <Checkbox 
                 id="edit-isActive"
                 checked={accountFormData.isActive}
-                onCheckedChange={(checked) => 
-                  setAccountFormData({ ...accountFormData, isActive: checked as boolean })
-                }
+                onCheckedChange={(checked) => setAccountFormData(prev => ({ ...prev, isActive: !!checked }))}
               />
               <Label htmlFor="edit-isActive">Account is actief</Label>
             </div>
           </div>
-          
-          <DialogFooter>
+          <div className="px-6 py-4 bg-gray-50 border-t flex items-center justify-end gap-3">
             <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
               Annuleren
             </Button>
             <Button 
               onClick={handleUpdateAccount}
-              disabled={updateAccountMutation.isPending}
+              disabled={!accountFormData.email}
+              className="bg-[#059669] hover:bg-[#047857]"
             >
-              {updateAccountMutation.isPending ? "Opslaan..." : "Wijzigingen Opslaan"}
+              Account Bijwerken
             </Button>
-          </DialogFooter>
+          </div>
         </CustomDialogContent>
       </Dialog>
 
-      {/* Bulk Create Dialog */}
-      <Dialog open={isBulkDialogOpen} onOpenChange={setIsBulkDialogOpen}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Bulk Accounts Aanmaken</DialogTitle>
-            <DialogDescription>
-              Selecteer personen om accounts voor aan te maken
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-6">
-            {/* Role Selection */}
-            <div>
-              <Label htmlFor="bulk-role">Rol Type</Label>
-              <Select value={bulkRole} onValueChange={(value: 'student' | 'teacher' | 'guardian') => setBulkRole(value)}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="student">Studenten</SelectItem>
-                  <SelectItem value="teacher">Docenten</SelectItem>
-                  <SelectItem value="guardian">Voogden</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Email Template */}
-            <div>
-              <Label htmlFor="email-template">Email Template</Label>
-              <Input
-                id="email-template"
-                value={bulkEmailTemplate}
-                onChange={(e) => setBulkEmailTemplate(e.target.value)}
-                placeholder="{firstName}.{lastName}@mymadrassa.nl"
-              />
-              <p className="text-sm text-gray-500 mt-1">
-                Gebruik {'{firstName}'} en {'{lastName}'} als placeholders
-              </p>
-            </div>
-
-            {/* Person Selection */}
-            <div>
-              <Label>Selecteer {bulkRole === 'student' ? 'Studenten' : bulkRole === 'teacher' ? 'Docenten' : 'Voogden'}</Label>
-              <div className="border rounded-lg max-h-60 overflow-y-auto">
-                {getPersonsByRole().map((person: any) => (
-                  <div key={person.id} className="flex items-center space-x-2 p-3 border-b">
-                    <Checkbox
-                      id={`person-${person.id}`}
-                      checked={selectedPersons.includes(person.id)}
-                      onCheckedChange={(checked) => {
-                        if (checked) {
-                          setSelectedPersons([...selectedPersons, person.id]);
-                        } else {
-                          setSelectedPersons(selectedPersons.filter(id => id !== person.id));
-                        }
-                      }}
-                    />
-                    <Label htmlFor={`person-${person.id}`} className="flex-1 cursor-pointer">
-                      <div className="flex justify-between">
-                        <span>{person.firstName} {person.lastName}</span>
-                        <span className="text-sm text-gray-500">
-                          {generateEmailFromTemplate(person.firstName, person.lastName)}
-                        </span>
-                      </div>
-                    </Label>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Summary */}
-            {selectedPersons.length > 0 && (
-              <div className="bg-blue-50 p-4 rounded-lg">
-                <h4 className="font-medium text-blue-900">Overzicht</h4>
-                <p className="text-blue-700">
-                  {selectedPersons.length} accounts worden aangemaakt voor {bulkRole === 'student' ? 'studenten' : bulkRole === 'teacher' ? 'docenten' : 'voogden'}
-                </p>
-                <p className="text-sm text-blue-600 mt-1">
-                  Automatisch gegenereerde wachtwoorden worden gebruikt
-                </p>
-              </div>
-            )}
-          </div>
-
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsBulkDialogOpen(false)}>
-              Annuleren
-            </Button>
-            <Button 
-              onClick={handleBulkCreateAccounts}
-              disabled={selectedPersons.length === 0 || bulkCreateAccountsMutation.isPending}
-            >
-              {bulkCreateAccountsMutation.isPending ? "Aanmaken..." : `${selectedPersons.length} Accounts Aanmaken`}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Delete Confirmation Dialog */}
+      {/* Delete Account Dialog */}
       <DeleteDialog
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
         onConfirm={() => {
           if (accountToDelete) {
             deleteAccountMutation.mutate(accountToDelete.id);
+            setIsDeleteDialogOpen(false);
+            setAccountToDelete(null);
           }
         }}
         title="Account Verwijderen"
-        description={`Weet je zeker dat je het account van ${accountToDelete?.firstName} ${accountToDelete?.lastName} wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.`}
+        description="Weet je zeker dat je dit account wilt verwijderen?"
+        item={{
+          name: accountToDelete ? `${accountToDelete.firstName} ${accountToDelete.lastName}` : "",
+          id: accountToDelete?.email || ""
+        }}
+        warningText="Deze actie kan niet ongedaan worden gemaakt."
         isLoading={deleteAccountMutation.isPending}
+        confirmButtonText="Definitief Verwijderen"
       />
     </div>
   );

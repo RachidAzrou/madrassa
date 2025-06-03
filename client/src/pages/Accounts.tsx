@@ -786,6 +786,7 @@ export default function Accounts() {
                   <SelectItem value="student">Student</SelectItem>
                   <SelectItem value="teacher">Docent</SelectItem>
                   <SelectItem value="guardian">Voogd</SelectItem>
+                  <SelectItem value="secretariat">Secretariaat</SelectItem>
                 </SelectContent>
               </Select>
             </div>

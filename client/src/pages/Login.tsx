@@ -49,7 +49,7 @@ export default function Login() {
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
-          filter: 'blur(8px)',
+          filter: 'blur(3px)',
           transform: 'scale(1.1)'
         }}
       ></div>

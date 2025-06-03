@@ -134,20 +134,18 @@ export default function Login() {
 
       {/* Right side - Login Form */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 z-10">
-        <Card className="w-full max-w-md bg-white/95 backdrop-blur-sm border-0 shadow-2xl">
+        <Card className="w-full max-w-md bg-white border-0 shadow-2xl">
           <CardHeader className="text-center pb-6">
-            <div className="lg:hidden mb-4">
+            <div className="lg:hidden mb-2">
               <img 
                 src={logoPath} 
                 alt="myMadrassa Logo" 
-                className="w-16 h-16 mx-auto mb-3"
+                className="w-16 h-16 mx-auto mb-1"
               />
-            </div>
-            <div className="mb-4">
               <img 
                 src={logoTextPath} 
                 alt="myMadrassa" 
-                className="h-12 mx-auto"
+                className="h-10 mx-auto"
               />
             </div>
             <CardDescription className="text-slate-600">

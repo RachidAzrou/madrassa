@@ -372,7 +372,7 @@ export default function Messages() {
                       <div className="flex justify-center py-4">
                         <Loader2 className="h-6 w-6 animate-spin" />
                       </div>
-                    ) : sentMessages && sentMessages.length > 0 ? (
+                    ) : Array.isArray(sentMessages) && sentMessages.length > 0 ? (
                       <div className="divide-y divide-gray-100">
                         {sentMessages.map((message: Message) => (
                           <div
@@ -536,7 +536,7 @@ export default function Messages() {
                       <div className="flex justify-center p-2">
                         <Loader2 className="h-4 w-4 animate-spin" />
                       </div>
-                    ) : receivers && receivers.length > 0 ? (
+                    ) : Array.isArray(receivers) && receivers.length > 0 ? (
                       receivers.map((receiver: Receiver) => (
                         <SelectItem 
                           key={`${receiver.id}-${receiver.role}`} 

@@ -257,18 +257,18 @@ export default function Reports() {
       pdf.setLineWidth(0.5);
       pdf.roundedRect(20, yPos, pageWidth - 40, 35, 3, 3, 'D');
 
-      // Student info with clean labels
+      // Student info with clean labels - better organized
       pdf.setFontSize(11);
       pdf.setFont('helvetica', 'bold');
       pdf.setTextColor(33, 107, 169);
       
-      // Left column
+      // First row
       pdf.text(`Leerling: ${report.student.firstName} ${report.student.lastName}`, 30, yPos + 15);
-      pdf.text(`Leerlingnummer: ${report.student.studentId}`, 30, yPos + 25);
+      pdf.text('Klas: 1A', pageWidth - 80, yPos + 15);
       
-      // Right column
-      pdf.text('Klas: 1A', pageWidth - 120, yPos + 15);
-      pdf.text(`Datum: ${new Date().toLocaleDateString('nl-NL')}`, pageWidth - 120, yPos + 25);
+      // Second row  
+      pdf.text(`Leerlingnummer: ${report.student.studentId}`, 30, yPos + 25);
+      pdf.text(`Datum: ${new Date().toLocaleDateString('nl-NL')}`, pageWidth - 80, yPos + 25);
 
       yPos += 50;
 
@@ -396,36 +396,61 @@ export default function Reports() {
         pdf.text('Leerling toont goede vooruitgang in alle aspecten van het onderwijs.', 25, yPos + 30);
       }
 
-      // Footer with timestamp on first page
+      // Footer on first page
       pdf.setFontSize(8);
       pdf.setTextColor(150, 150, 150);
-      pdf.text(`Pagina 1 van 2 - Cijfers & Opmerkingen - Gegenereerd op ${new Date().toLocaleDateString('nl-NL')}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
+      pdf.text('Pagina 1 van 2', pageWidth / 2, pageHeight - 10, { align: 'center' });
 
       // Start new page for behavior and attendance
       pdf.addPage();
       yPos = 20;
 
-      // Header for second page - smaller
+      // Header for second page - same as first page
       pdf.setFillColor(233, 243, 250);
-      pdf.rect(0, 0, pageWidth, 45, 'F');
+      pdf.rect(0, 0, pageWidth, 50, 'F');
       
       pdf.setFillColor(33, 107, 169);
       pdf.rect(0, 0, pageWidth, 3, 'F');
 
+      // School name as title
+      pdf.setFontSize(20);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(33, 107, 169);
+      pdf.text(schoolName, 20, 25);
+      
       pdf.setFontSize(16);
       pdf.setFont('helvetica', 'bold');
       pdf.setTextColor(33, 107, 169);
-      pdf.text(`${schoolName} - Rapport Pagina 2`, 20, 25);
+      pdf.text('SCHOOLRAPPORT', pageWidth - 20, 25, { align: 'right' });
       
       pdf.setFontSize(10);
       pdf.setFont('helvetica', 'normal');
       pdf.setTextColor(64, 75, 105);
-      pdf.text(`Leerling: ${report.student.firstName} ${report.student.lastName}`, 30, yPos + 10);
-      pdf.text(`Leerlingnummer: ${report.student.studentId}`, 30, yPos + 18);
-      pdf.text('Klas: 1A', pageWidth - 120, yPos + 10);
-      pdf.text(`Datum: ${new Date().toLocaleDateString('nl-NL')}`, pageWidth - 120, yPos + 18);
+      pdf.text(`Schooljaar ${report.student.academicYear || '2024-2025'}`, pageWidth - 20, 35, { align: 'right' });
 
-      yPos += 45;
+      yPos = 65;
+
+      // Student info card on second page
+      pdf.setFillColor(248, 249, 250);
+      pdf.roundedRect(20, yPos, pageWidth - 40, 35, 3, 3, 'F');
+      
+      pdf.setDrawColor(33, 107, 169);
+      pdf.setLineWidth(0.5);
+      pdf.roundedRect(20, yPos, pageWidth - 40, 35, 3, 3, 'D');
+
+      pdf.setFontSize(11);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(33, 107, 169);
+      
+      // First row
+      pdf.text(`Leerling: ${report.student.firstName} ${report.student.lastName}`, 30, yPos + 15);
+      pdf.text('Klas: 1A', pageWidth - 80, yPos + 15);
+      
+      // Second row  
+      pdf.text(`Leerlingnummer: ${report.student.studentId}`, 30, yPos + 25);
+      pdf.text(`Datum: ${new Date().toLocaleDateString('nl-NL')}`, pageWidth - 80, yPos + 25);
+
+      yPos += 50;
 
       // Behavior section - simplified layout
       pdf.setFillColor(248, 249, 250);
@@ -479,36 +504,39 @@ export default function Reports() {
 
       yPos += 80;
 
-      // Final signature section on second page
-      const finalSigWidth = (pageWidth - 60) / 2;
+      // Signature section with consistent styling
+      yPos += 20;
       
-      // Parent signature box
-      pdf.setFillColor(252, 252, 252);
-      pdf.rect(20, yPos, finalSigWidth, 50, 'F');
-      pdf.setDrawColor(200, 200, 200);
+      pdf.setFillColor(248, 249, 250);
+      pdf.rect(20, yPos, pageWidth - 40, 60, 'F');
+      pdf.setDrawColor(33, 107, 169);
       pdf.setLineWidth(0.5);
-      pdf.rect(20, yPos, finalSigWidth, 50, 'D');
+      pdf.rect(20, yPos, pageWidth - 40, 60, 'D');
       
-      pdf.setFontSize(10);
+      pdf.setFontSize(12);
       pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(33, 107, 169);
+      pdf.text('HANDTEKENINGEN', 25, yPos + 15);
+      
+      const sigWidth = (pageWidth - 60) / 2;
+      
+      // Parent signature
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'normal');
       pdf.setTextColor(64, 75, 105);
-      pdf.text('Handtekening Ouder/Voogd:', 25, yPos + 10);
-      pdf.text('Datum: ____________________', 25, yPos + 40);
+      pdf.text('Ouder/Voogd:', 25, yPos + 35);
+      pdf.setDrawColor(150, 150, 150);
+      pdf.setLineWidth(0.3);
+      pdf.line(65, yPos + 50, 25 + sigWidth - 10, yPos + 50);
       
-      // School signature box
-      pdf.setFillColor(252, 252, 252);
-      pdf.rect(30 + finalSigWidth, yPos, finalSigWidth, 50, 'F');
-      pdf.setDrawColor(200, 200, 200);
-      pdf.setLineWidth(0.5);
-      pdf.rect(30 + finalSigWidth, yPos, finalSigWidth, 50, 'D');
-      
-      pdf.text('Handtekening School:', 35 + finalSigWidth, yPos + 10);
-      pdf.text('Datum: ____________________', 35 + finalSigWidth, yPos + 40);
+      // School signature
+      pdf.text('School:', pageWidth / 2 + 15, yPos + 35);
+      pdf.line(pageWidth / 2 + 45, yPos + 50, pageWidth - 35, yPos + 50);
 
-      // Footer with timestamp on second page
+      // Footer on second page
       pdf.setFontSize(8);
       pdf.setTextColor(150, 150, 150);
-      pdf.text(`Pagina 2 van 2 - Gedrag & Aanwezigheid - Gegenereerd op ${new Date().toLocaleDateString('nl-NL')}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
+      pdf.text('Pagina 2 van 2', pageWidth / 2, pageHeight - 10, { align: 'center' });
     });
 
     // Save the PDF

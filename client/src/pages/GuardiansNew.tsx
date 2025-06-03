@@ -1982,7 +1982,7 @@ export default function Students() {
                         value={studentFormData.email}
                         onChange={(e) => setStudentFormData({ ...studentFormData, email: e.target.value })}
                         className="mt-1 h-9 text-sm bg-white border-gray-200"
-                        placeholder="student@mymadrassa.nl"
+                        placeholder="student@mymadrassa.be"
                       />
                     </div>
                     
@@ -2054,7 +2054,7 @@ export default function Students() {
                         value={studentFormData.postalCode}
                         onChange={(e) => setStudentFormData({ ...studentFormData, postalCode: e.target.value })}
                         className="mt-1 h-9 text-sm bg-white border-gray-200"
-                        placeholder="1234 AB"
+                        placeholder="1000"
                       />
                     </div>
                     
@@ -2067,7 +2067,7 @@ export default function Students() {
                         value={studentFormData.city}
                         onChange={(e) => setStudentFormData({ ...studentFormData, city: e.target.value })}
                         className="mt-1 h-9 text-sm bg-white border-gray-200"
-                        placeholder="Amsterdam"
+                        placeholder="Brussel"
                       />
                     </div>
                   </div>
@@ -2151,7 +2151,7 @@ export default function Students() {
                           value={guardianFormData.email}
                           onChange={(e) => setGuardianFormData({ ...guardianFormData, email: e.target.value })}
                           className="mt-1 h-9 text-sm bg-white border-gray-200"
-                          placeholder="email@voorbeeld.nl"
+                          placeholder="email@voorbeeld.be"
                         />
                       </div>
                       
@@ -2212,7 +2212,7 @@ export default function Students() {
                           value={guardianFormData.postalCode}
                           onChange={(e) => setGuardianFormData({ ...guardianFormData, postalCode: e.target.value })}
                           className="mt-1 h-9 text-sm bg-white border-gray-200"
-                          placeholder="1234 AB"
+                          placeholder="1000"
                         />
                       </div>
                       
@@ -2225,7 +2225,7 @@ export default function Students() {
                           value={guardianFormData.city}
                           onChange={(e) => setGuardianFormData({ ...guardianFormData, city: e.target.value })}
                           className="mt-1 h-9 text-sm bg-white border-gray-200"
-                          placeholder="Amsterdam"
+                          placeholder="Brussel"
                         />
                       </div>
                     </div>
@@ -2889,7 +2889,7 @@ export default function Students() {
                         value={studentFormData.email}
                         onChange={(e) => setStudentFormData({ ...studentFormData, email: e.target.value })}
                         className="mt-1 bg-white"
-                        placeholder="student@mymadrassa.nl"
+                        placeholder="student@mymadrassa.be"
                       />
                     </div>
                     
@@ -2962,7 +2962,7 @@ export default function Students() {
                         value={studentFormData.postalCode}
                         onChange={(e) => setStudentFormData({ ...studentFormData, postalCode: e.target.value })}
                         className="mt-1 bg-white"
-                        placeholder="1234 AB"
+                        placeholder="1000"
                       />
                     </div>
                     
@@ -2975,7 +2975,7 @@ export default function Students() {
                         value={studentFormData.city}
                         onChange={(e) => setStudentFormData({ ...studentFormData, city: e.target.value })}
                         className="mt-1 bg-white"
-                        placeholder="Amsterdam"
+                        placeholder="Brussel"
                       />
                     </div>
                   </div>

@@ -22,11 +22,11 @@ export default function Profile() {
   const [formData, setFormData] = useState({
     firstName: 'Admin',
     lastName: 'Gebruiker',
-    email: 'admin@mymadrassa.nl',
-    phone: '+31 6 12345678',
+    email: 'admin@mymadrassa.be',
+    phone: '+32 498 12 34 56',
     address: 'Voorbeeldstraat 123',
-    city: 'Amsterdam',
-    postalCode: '1234 AB',
+    city: 'Brussel',
+    postalCode: '1000',
     bio: 'Beheerder van het myMadrassa systeem. Verantwoordelijk voor het dagelijks beheer van de school en ondersteuning van docenten en studenten.'
   });
 

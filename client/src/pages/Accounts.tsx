@@ -1,47 +1,49 @@
-import { useState } from 'react';
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { queryClient, apiRequest } from '@/lib/queryClient';
-import { useToast } from "@/hooks/use-toast";
+import React, { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { format, parseISO } from "date-fns";
+import { nl } from "date-fns/locale";
 import { 
+  Key, 
+  Plus, 
   Search, 
   Filter, 
-  Plus,
-  Key,
-  Download,
-  Upload,
-  Edit,
-  Trash2,
-  Eye,
+  Download, 
+  Edit, 
+  Trash2, 
+  Users, 
+  GraduationCap, 
+  UserCheck, 
+  Eye, 
   EyeOff,
-  FileDown,
+  Shield,
   FileText,
-  UserCheck,
-  GraduationCap,
-  Users,
   Settings
-} from 'lucide-react';
-import { PageHeader } from '@/components/layout/page-header';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
-import { 
-  DataTableContainer, 
-  SearchActionBar, 
-  TableContainer,
-  TableLoadingState,
-  EmptyTableState,
-  QuickActions
-} from "@/components/ui/data-table-container";
+} from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { PageHeader } from "@/components/ui/page-header";
 import { DeleteDialog } from "@/components/ui/delete-dialog";
-import { format, parseISO } from 'date-fns';
-import { nl } from 'date-fns/locale';
+import { apiRequest } from "@/lib/queryClient";
 
 interface UserAccount {
   id: number;
@@ -51,189 +53,101 @@ interface UserAccount {
   isActive: boolean;
   lastLogin?: string;
   createdAt: string;
-  // Related person data
   personId: number;
   firstName: string;
   lastName: string;
   personType: string;
 }
 
-interface ExportData {
-  format: 'pdf' | 'excel';
-  includePasswords: boolean;
-  roleFilter: string;
+interface AccountFormData {
+  email: string;
+  password: string;
+  role: 'student' | 'teacher' | 'guardian' | 'secretariat' | 'admin';
+  personId: number;
+  isActive: boolean;
 }
 
 export default function Accounts() {
-  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  
+  // State
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [showFilterOptions, setShowFilterOptions] = useState(false);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [isBulkCreateDialogOpen, setIsBulkCreateDialogOpen] = useState(false);
+  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState<UserAccount | null>(null);
   const [accountToDelete, setAccountToDelete] = useState<UserAccount | null>(null);
-  const [selectedAccounts, setSelectedAccounts] = useState<number[]>([]);
-  const [showPasswords, setShowPasswords] = useState(false);
-
-  const [accountFormData, setAccountFormData] = useState({
+  const [accountFormData, setAccountFormData] = useState<AccountFormData>({
     email: '',
     password: '',
-    role: 'student' as 'student' | 'teacher' | 'guardian' | 'secretariat' | 'admin',
+    role: 'student',
     personId: 0,
     isActive: true
   });
 
-  const [exportFormData, setExportFormData] = useState<ExportData>({
-    format: 'excel',
-    includePasswords: false,
-    roleFilter: 'all'
-  });
-
-  const [bulkCreateFormData, setBulkCreateFormData] = useState({
-    type: 'all' as 'all' | 'class' | 'program',
-    role: 'student' as 'student' | 'teacher' | 'guardian' | 'secretariat' | 'admin',
-    classId: 0,
-    programId: 0,
-    generateDefaultPasswords: true,
-    defaultPassword: 'myMadrassa2024!',
-    sendEmailNotifications: false
-  });
-
-  // Data queries
-  const { data: accountsData = [], isLoading: accountsLoading } = useQuery({
-    queryKey: ['/api/user-accounts'],
-    select: (data: any) => Array.isArray(data) ? data : []
+  // Queries
+  const { data: accountsData = [], isLoading: isAccountsLoading } = useQuery({
+    queryKey: ["/api/accounts"],
   });
 
   const { data: studentsData = [] } = useQuery({
-    queryKey: ['/api/students'],
-    select: (data: any) => Array.isArray(data) ? data : []
+    queryKey: ["/api/students"],
   });
 
   const { data: teachersData = [] } = useQuery({
-    queryKey: ['/api/teachers'],
-    select: (data: any) => Array.isArray(data) ? data : []
+    queryKey: ["/api/teachers"],
   });
 
   const { data: guardiansData = [] } = useQuery({
-    queryKey: ['/api/guardians'],
-    select: (data: any) => Array.isArray(data) ? data : []
-  });
-
-  const { data: studentGroupsData = [] } = useQuery({
-    queryKey: ['/api/student-groups'],
-    select: (data: any) => Array.isArray(data) ? data : []
-  });
-
-  const { data: programsData = [] } = useQuery({
-    queryKey: ['/api/programs'],
-    select: (data: any) => data?.programs || []
+    queryKey: ["/api/guardians"],
   });
 
   // Mutations
   const createAccountMutation = useMutation({
-    mutationFn: async (data: any) => apiRequest('/api/user-accounts', {
-      method: 'POST',
-      body: JSON.stringify(data)
-    }),
-    onSuccess: () => {
-      toast({ title: "Succes", description: "Account succesvol aangemaakt" });
-      queryClient.invalidateQueries({ queryKey: ['/api/user-accounts'] });
-      setIsCreateDialogOpen(false);
-      resetAccountForm();
+    mutationFn: async (data: AccountFormData) => {
+      return apiRequest("/api/accounts", {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
     },
-    onError: () => {
-      toast({ title: "Fout", description: "Er ging iets mis bij het aanmaken", variant: "destructive" });
-    }
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/accounts"] });
+      setIsCreateDialogOpen(false);
+      resetForm();
+    },
   });
 
   const updateAccountMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: number; data: any }) => 
-      apiRequest(`/api/user-accounts/${id}`, {
-        method: 'PUT',
-        body: JSON.stringify(data)
-      }),
-    onSuccess: () => {
-      toast({ title: "Succes", description: "Account succesvol bijgewerkt" });
-      queryClient.invalidateQueries({ queryKey: ['/api/user-accounts'] });
-      setIsEditDialogOpen(false);
-      resetAccountForm();
+    mutationFn: async ({ id, data }: { id: number; data: Partial<AccountFormData> }) => {
+      return apiRequest(`/api/accounts/${id}`, {
+        method: "PUT",
+        body: JSON.stringify(data),
+      });
     },
-    onError: () => {
-      toast({ title: "Fout", description: "Er ging iets mis bij het bijwerken", variant: "destructive" });
-    }
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/accounts"] });
+      setIsEditDialogOpen(false);
+      resetForm();
+    },
   });
 
   const deleteAccountMutation = useMutation({
-    mutationFn: async (id: number) => apiRequest(`/api/user-accounts/${id}`, {
-      method: 'DELETE'
-    }),
-    onSuccess: () => {
-      toast({ title: "Succes", description: "Account succesvol verwijderd" });
-      queryClient.invalidateQueries({ queryKey: ['/api/user-accounts'] });
-      setIsDeleteDialogOpen(false);
-      setAccountToDelete(null);
-    },
-    onError: () => {
-      toast({ title: "Fout", description: "Er ging iets mis bij het verwijderen", variant: "destructive" });
-    }
-  });
-
-  const bulkCreateAccountsMutation = useMutation({
-    mutationFn: async (data: any) => apiRequest('/api/user-accounts/bulk-create', {
-      method: 'POST',
-      body: JSON.stringify(data)
-    }),
-    onSuccess: (result) => {
-      toast({ 
-        title: "Succes", 
-        description: `${result.created} accounts succesvol aangemaakt` 
+    mutationFn: async (id: number) => {
+      return apiRequest(`/api/accounts/${id}`, {
+        method: "DELETE",
       });
-      queryClient.invalidateQueries({ queryKey: ['/api/user-accounts'] });
-    },
-    onError: () => {
-      toast({ title: "Fout", description: "Er ging iets mis bij het bulk aanmaken", variant: "destructive" });
-    }
-  });
-
-  const exportAccountsMutation = useMutation({
-    mutationFn: async (exportData: ExportData) => {
-      const response = await fetch('/api/user-accounts/export', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(exportData)
-      });
-      
-      if (!response.ok) throw new Error('Export failed');
-      
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `accounts_export.${exportData.format === 'pdf' ? 'pdf' : 'xlsx'}`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-      
-      return { success: true };
     },
     onSuccess: () => {
-      toast({ title: "Succes", description: "Accounts succesvol geëxporteerd" });
-      setIsExportDialogOpen(false);
+      queryClient.invalidateQueries({ queryKey: ["/api/accounts"] });
     },
-    onError: () => {
-      toast({ title: "Fout", description: "Er ging iets mis bij het exporteren", variant: "destructive" });
-    }
   });
 
   // Helper functions
-  const resetAccountForm = () => {
+  const resetForm = () => {
     setAccountFormData({
       email: '',
       password: '',
@@ -245,155 +159,83 @@ export default function Accounts() {
   };
 
   const generateDefaultPassword = () => {
-    return 'myMadrassa2024!';
-  };
-
-  const handleEditAccount = (account: UserAccount) => {
-    setSelectedAccount(account);
-    setAccountFormData({
-      email: account.email,
-      password: account.password,
-      role: account.role,
-      personId: account.personId,
-      isActive: account.isActive
-    });
-    setIsEditDialogOpen(true);
-  };
-
-  const handleDeleteAccount = (account: UserAccount) => {
-    setAccountToDelete(account);
-    setIsDeleteDialogOpen(true);
-  };
-
-  const confirmDeleteAccount = () => {
-    if (accountToDelete) {
-      deleteAccountMutation.mutate(accountToDelete.id);
-    }
-  };
-
-  const handleCreateAccount = () => {
-    const accountData = {
-      ...accountFormData,
-      password: accountFormData.password || generateDefaultPassword()
-    };
-    createAccountMutation.mutate(accountData);
-  };
-
-  const handleUpdateAccount = () => {
-    if (selectedAccount) {
-      updateAccountMutation.mutate({ id: selectedAccount.id, data: accountFormData });
-    }
-  };
-
-  const handleBulkCreateAccounts = (role: string) => {
-    let people: any[] = [];
-    
-    switch(role) {
-      case 'student':
-        people = studentsData.filter((student: any) => 
-          !accountsData.some((account: UserAccount) => 
-            account.personId === student.id && account.role === 'student'
-          )
-        );
-        break;
-      case 'teacher':
-        people = teachersData.filter((teacher: any) => 
-          !accountsData.some((account: UserAccount) => 
-            account.personId === teacher.id && account.role === 'teacher'
-          )
-        );
-        break;
-      case 'guardian':
-        people = guardiansData.filter((guardian: any) => 
-          !accountsData.some((account: UserAccount) => 
-            account.personId === guardian.id && account.role === 'guardian'
-          )
-        );
-        break;
-    }
-
-    const accountsToCreate = people.map(person => ({
-      email: person.email,
-      password: generateDefaultPassword(),
-      role: role,
-      personId: person.id,
-      isActive: true
-    })).filter(account => account.email); // Only create accounts for people with email
-
-    if (accountsToCreate.length === 0) {
-      toast({ 
-        title: "Geen accounts", 
-        description: `Alle ${role === 'student' ? 'studenten' : role === 'teacher' ? 'docenten' : 'voogden'} hebben al een account of geen email.`,
-        variant: "destructive" 
-      });
-      return;
-    }
-
-    bulkCreateAccountsMutation.mutate({ accounts: accountsToCreate, role });
-  };
-
-  const handleExport = () => {
-    exportAccountsMutation.mutate(exportFormData);
-  };
-
-  const getRoleBadge = (role: string) => {
-    const roleMap = {
-      student: { label: 'Student', color: 'bg-blue-100 text-blue-800', icon: Users },
-      teacher: { label: 'Docent', color: 'bg-green-100 text-green-800', icon: GraduationCap },
-      guardian: { label: 'Voogd', color: 'bg-purple-100 text-purple-800', icon: UserCheck },
-      secretariat: { label: 'Secretariaat', color: 'bg-orange-100 text-orange-800', icon: FileText },
-      admin: { label: 'Administrator', color: 'bg-red-100 text-red-800', icon: Settings }
-    };
-    const config = roleMap[role as keyof typeof roleMap] || roleMap.student;
-    return <Badge className={config.color}>{config.label}</Badge>;
-  };
-
-  const getStatusBadge = (isActive: boolean) => {
-    return isActive ? 
-      <Badge variant="default" className="bg-green-100 text-green-800">Actief</Badge> :
-      <Badge variant="secondary" className="bg-gray-100 text-gray-800">Inactief</Badge>;
+    return "Welkom123!";
   };
 
   const getPersonOptions = (role: string) => {
-    switch(role) {
+    switch (role) {
       case 'student':
-        return studentsData.filter((student: any) => 
-          student.email && !accountsData.some((account: UserAccount) => 
-            account.personId === student.id && account.role === 'student'
-          )
-        );
+        return studentsData;
       case 'teacher':
-        return teachersData.filter((teacher: any) => 
-          teacher.email && !accountsData.some((account: UserAccount) => 
-            account.personId === teacher.id && account.role === 'teacher'
-          )
-        );
+        return teachersData;
       case 'guardian':
-        return guardiansData.filter((guardian: any) => 
-          guardian.email && !accountsData.some((account: UserAccount) => 
-            account.personId === guardian.id && account.role === 'guardian'
-          )
-        );
+        return guardiansData;
       default:
         return [];
     }
   };
 
-  // Filter functions
+  const getRoleBadge = (role: string) => {
+    const roleConfig = {
+      student: { label: "Student", color: "bg-blue-100 text-blue-800" },
+      teacher: { label: "Docent", color: "bg-green-100 text-green-800" },
+      guardian: { label: "Voogd", color: "bg-purple-100 text-purple-800" },
+      secretariat: { label: "Secretariaat", color: "bg-orange-100 text-orange-800" },
+      admin: { label: "Admin", color: "bg-red-100 text-red-800" }
+    };
+    
+    const config = roleConfig[role as keyof typeof roleConfig] || { label: role, color: "bg-gray-100 text-gray-800" };
+    
+    return (
+      <Badge className={`${config.color} text-xs`}>
+        {config.label}
+      </Badge>
+    );
+  };
+
+  const getStatusBadge = (isActive: boolean) => {
+    return (
+      <Badge className={`text-xs ${isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}`}>
+        {isActive ? "Actief" : "Inactief"}
+      </Badge>
+    );
+  };
+
+  // Event handlers
+  const handleCreateAccount = () => {
+    const password = accountFormData.password || generateDefaultPassword();
+    createAccountMutation.mutate({
+      ...accountFormData,
+      password
+    });
+  };
+
+  const handleUpdateAccount = () => {
+    if (!selectedAccount) return;
+    
+    updateAccountMutation.mutate({
+      id: selectedAccount.id,
+      data: accountFormData
+    });
+  };
+
+  // Filter accounts
   const filteredAccounts = accountsData.filter((account: UserAccount) => {
-    const matchesSearch = account.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         `${account.firstName} ${account.lastName}`.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = 
+      account.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      account.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      account.email.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesRole = roleFilter === "all" || account.role === roleFilter;
     const matchesStatus = statusFilter === "all" || 
-                         (statusFilter === "active" && account.isActive) ||
-                         (statusFilter === "inactive" && !account.isActive);
-
+      (statusFilter === "active" && account.isActive) ||
+      (statusFilter === "inactive" && !account.isActive);
+    
     return matchesSearch && matchesRole && matchesStatus;
   });
 
+  // Calculate stats
   const accountStats = {
-    total: accountsData.length,
     students: accountsData.filter((a: UserAccount) => a.role === 'student').length,
     teachers: accountsData.filter((a: UserAccount) => a.role === 'teacher').length,
     guardians: accountsData.filter((a: UserAccount) => a.role === 'guardian').length,
@@ -403,393 +245,281 @@ export default function Accounts() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#f8f9fa]">
-      <PageHeader 
-        title="Accounts"
-        icon={<Key className="h-4 w-4 text-white" />}
-        current="Accounts"
+    <div className="flex-1 space-y-6 p-6">
+      <PageHeader
+        heading="Account Beheer"
+        text="Beheer gebruikersaccounts en toegangsrechten voor het systeem."
       />
-
-      {/* Main content area */}
-      <div className="px-6 py-6 max-w-7xl mx-auto w-full">
-        {/* Statistics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <Card className="border border-[#e5e7eb] bg-white rounded-sm">
+      
+      <div className="space-y-6">
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
+          <Card>
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-gray-500 mb-1">Totaal Accounts</p>
-                  <p className="text-2xl font-bold text-gray-900">{accountStats.total}</p>
+                  <p className="text-xs font-medium text-gray-600 mb-1">Studenten</p>
+                  <p className="text-xl font-bold text-gray-900">{accountStats.students}</p>
                 </div>
-                <div className="p-2 bg-[#1e40af] rounded-sm">
-                  <Key className="h-4 w-4 text-white" />
+                <div className="p-2 bg-blue-100 rounded-sm">
+                  <Users className="h-4 w-4 text-blue-600" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border border-[#e5e7eb] bg-white rounded-sm">
+          <Card>
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-gray-500 mb-1">Student Accounts</p>
-                  <p className="text-2xl font-bold text-gray-900">{accountStats.students}</p>
+                  <p className="text-xs font-medium text-gray-600 mb-1">Docenten</p>
+                  <p className="text-xl font-bold text-gray-900">{accountStats.teachers}</p>
                 </div>
-                <div className="p-2 bg-blue-500 rounded-sm">
-                  <Users className="h-4 w-4 text-white" />
+                <div className="p-2 bg-green-100 rounded-sm">
+                  <GraduationCap className="h-4 w-4 text-green-600" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border border-[#e5e7eb] bg-white rounded-sm">
+          <Card>
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-gray-500 mb-1">Docent Accounts</p>
-                  <p className="text-2xl font-bold text-gray-900">{accountStats.teachers}</p>
+                  <p className="text-xs font-medium text-gray-600 mb-1">Voogden</p>
+                  <p className="text-xl font-bold text-gray-900">{accountStats.guardians}</p>
                 </div>
-                <div className="p-2 bg-green-500 rounded-sm">
-                  <GraduationCap className="h-4 w-4 text-white" />
+                <div className="p-2 bg-purple-100 rounded-sm">
+                  <Shield className="h-4 w-4 text-purple-600" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border border-[#e5e7eb] bg-white rounded-sm">
+          <Card>
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-gray-500 mb-1">Actieve Accounts</p>
-                  <p className="text-2xl font-bold text-gray-900">{accountStats.active}</p>
+                  <p className="text-xs font-medium text-gray-600 mb-1">Secretariaat</p>
+                  <p className="text-xl font-bold text-gray-900">{accountStats.secretariat}</p>
                 </div>
-                <div className="p-2 bg-purple-500 rounded-sm">
-                  <UserCheck className="h-4 w-4 text-white" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-orange-500 to-orange-600 border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group overflow-hidden relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-orange-400/20 to-transparent"></div>
-            <CardContent className="p-6 relative z-10">
-              <div className="flex items-center justify-between">
-                <div className="text-white">
-                  <p className="text-sm font-medium text-orange-100 mb-2">Secretariaat</p>
-                  <p className="text-3xl font-bold">{accountStats.secretariat}</p>
-                  <p className="text-xs text-orange-200 mt-1">Administratieve toegang</p>
-                </div>
-                <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl group-hover:bg-white/30 transition-all duration-300">
-                  <FileText className="h-7 w-7 text-white" />
+                <div className="p-2 bg-orange-100 rounded-sm">
+                  <FileText className="h-4 w-4 text-orange-600" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-red-500 to-red-600 border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group overflow-hidden relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-red-400/20 to-transparent"></div>
-            <CardContent className="p-6 relative z-10">
+          <Card>
+            <CardContent className="p-4">
               <div className="flex items-center justify-between">
-                <div className="text-white">
-                  <p className="text-sm font-medium text-red-100 mb-2">Administrator</p>
-                  <p className="text-3xl font-bold">{accountStats.admin}</p>
-                  <p className="text-xs text-red-200 mt-1">Volledige toegang</p>
+                <div>
+                  <p className="text-xs font-medium text-gray-600 mb-1">Administrator</p>
+                  <p className="text-xl font-bold text-gray-900">{accountStats.admin}</p>
                 </div>
-                <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl group-hover:bg-white/30 transition-all duration-300">
-                  <Settings className="h-7 w-7 text-white" />
+                <div className="p-2 bg-red-100 rounded-sm">
+                  <Settings className="h-4 w-4 text-red-600" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-teal-500 to-teal-600 border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group overflow-hidden relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-teal-400/20 to-transparent"></div>
-            <CardContent className="p-6 relative z-10">
+          <Card>
+            <CardContent className="p-4">
               <div className="flex items-center justify-between">
-                <div className="text-white">
-                  <p className="text-sm font-medium text-teal-100 mb-2">Actieve Accounts</p>
-                  <p className="text-3xl font-bold">{accountStats.active}</p>
-                  <p className="text-xs text-teal-200 mt-1">Momenteel ingelogd</p>
+                <div>
+                  <p className="text-xs font-medium text-gray-600 mb-1">Actief</p>
+                  <p className="text-xl font-bold text-gray-900">{accountStats.active}</p>
                 </div>
-                <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl group-hover:bg-white/30 transition-all duration-300">
-                  <UserCheck className="h-7 w-7 text-white" />
+                <div className="p-2 bg-teal-100 rounded-sm">
+                  <UserCheck className="h-4 w-4 text-teal-600" />
                 </div>
               </div>
             </CardContent>
           </Card>
         </div>
-      </div>
 
-      <DataTableContainer>
-        <SearchActionBar>
-          {/* Search Bar */}
-          <div className="relative w-full sm:max-w-md">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-            <Input
-              type="text"
-              placeholder="Zoek accounts..."
-              className="w-full pl-9 h-8 text-xs rounded-sm bg-white border-[#e5e7eb]"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-          
-          {/* Actions */}
-          <div className="flex flex-wrap items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowFilterOptions(!showFilterOptions)}
-              className="h-7 w-7 p-0 rounded-sm border-[#e5e7eb]"
-              title="Filters"
-            >
-              <Filter className="h-3.5 w-3.5" />
-            </Button>
-
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowPasswords(!showPasswords)}
-              className="h-7 px-2 rounded-sm border-[#e5e7eb] text-xs"
-            >
-              {showPasswords ? <EyeOff className="h-3.5 w-3.5 mr-1" /> : <Eye className="h-3.5 w-3.5 mr-1" />}
-              {showPasswords ? 'Verberg' : 'Toon'} Wachtwoorden
-            </Button>
-
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsExportDialogOpen(true)}
-              className="h-7 px-2 rounded-sm border-[#e5e7eb] text-xs"
-            >
-              <Download className="h-3.5 w-3.5 mr-1" />
-              Export
-            </Button>
-
-            <Button
-              size="sm"
-              onClick={() => setIsCreateDialogOpen(true)}
-              className="h-7 px-3 rounded-sm text-xs bg-blue-600 hover:bg-blue-700"
-            >
-              <Plus className="h-3.5 w-3.5 mr-1" />
-              Account
-            </Button>
-          </div>
-        </SearchActionBar>
-
-        {/* Filter Options */}
-        {showFilterOptions && (
-          <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
-            <div className="flex flex-wrap gap-4">
-              <div className="flex items-center gap-2">
-                <label className="text-sm font-medium text-gray-700">Rol:</label>
-                <Select value={roleFilter} onValueChange={setRoleFilter}>
-                  <SelectTrigger className="w-40 h-8 text-xs">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Alle Rollen</SelectItem>
-                    <SelectItem value="student">Studenten</SelectItem>
-                    <SelectItem value="teacher">Docenten</SelectItem>
-                    <SelectItem value="guardian">Voogden</SelectItem>
-                    <SelectItem value="secretariat">Secretariaat</SelectItem>
-                    <SelectItem value="admin">Administrator</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="flex items-center gap-2">
-                <label className="text-sm font-medium text-gray-700">Status:</label>
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-40 h-8 text-xs">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Alle Statussen</SelectItem>
-                    <SelectItem value="active">Actief</SelectItem>
-                    <SelectItem value="inactive">Inactief</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+        {/* Accounts Table Section */}
+        <div className="bg-white border border-[#e5e7eb] rounded-sm">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-[#e5e7eb] bg-[#f9fafc]">
+            <div className="flex items-center gap-2">
+              <Key className="h-3.5 w-3.5 text-[#1e40af]" />
+              <h3 className="text-xs font-medium text-gray-700 tracking-tight">Account Beheer</h3>
             </div>
-          </div>
-        )}
-
-        <div className="px-6 py-6 border-b border-gray-200 bg-white/70 backdrop-blur-sm">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-xl font-bold text-gray-900 mb-1">Account Overzicht</h2>
-              <p className="text-sm text-gray-600">{filteredAccounts.length} accounts beheerd met veilige toegangscontrole</p>
-            </div>
-            <div className="flex gap-3">
-              <div className="flex items-center gap-2 bg-gradient-to-r from-indigo-50 to-indigo-100 px-4 py-2 rounded-lg border border-indigo-200">
-                <Users className="h-4 w-4 text-indigo-600" />
-                <span className="text-sm font-medium text-indigo-700">Bulk Accounts:</span>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setIsBulkCreateDialogOpen(true)}
-                className="h-9 px-4 text-xs bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200 text-blue-700 hover:from-blue-100 hover:to-blue-200 hover:border-blue-300 transition-all duration-200"
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-gray-500">{filteredAccounts.length} accounts</span>
+              <Button 
+                onClick={() => setIsCreateDialogOpen(true)}
+                className="bg-[#1e40af] hover:bg-[#1d4ed8] text-white h-8 text-xs px-3 rounded-sm"
               >
-                <Plus className="h-3.5 w-3.5 mr-2" />
-                Geavanceerd Aanmaken
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleBulkCreateAccounts('student')}
-                className="h-9 px-4 text-xs bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100 hover:border-blue-300 transition-all duration-200"
-              >
-                <Users className="h-3.5 w-3.5 mr-2" />
-                Alle Studenten
-                <Badge className="ml-2 bg-blue-200 text-blue-800 text-xs">
-                  {studentsData.filter((student: any) => 
-                    student.email && !accountsData.some((account: UserAccount) => 
-                      account.personId === student.id && account.role === 'student'
-                    )
-                  ).length}
-                </Badge>
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleBulkCreateAccounts('teacher')}
-                className="h-9 px-4 text-xs bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100 hover:border-emerald-300 transition-all duration-200"
-              >
-                <GraduationCap className="h-3.5 w-3.5 mr-2" />
-                Alle Docenten
-                <Badge className="ml-2 bg-emerald-200 text-emerald-800 text-xs">
-                  {teachersData.filter((teacher: any) => 
-                    teacher.email && !accountsData.some((account: UserAccount) => 
-                      account.personId === teacher.id && account.role === 'teacher'
-                    )
-                  ).length}
-                </Badge>
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleBulkCreateAccounts('guardian')}
-                className="h-9 px-4 text-xs bg-purple-50 border-purple-200 text-purple-700 hover:bg-purple-100 hover:border-purple-300 transition-all duration-200"
-              >
-                <UserCheck className="h-3.5 w-3.5 mr-2" />
-                Alle Voogden
-                <Badge className="ml-2 bg-purple-200 text-purple-800 text-xs">
-                  {guardiansData.filter((guardian: any) => 
-                    guardian.email && !accountsData.some((account: UserAccount) => 
-                      account.personId === guardian.id && account.role === 'guardian'
-                    )
-                  ).length}
-                </Badge>
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        <TableContainer>
-          {accountsLoading ? (
-            <div className="text-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-              <p className="mt-4 text-gray-500">Accounts laden...</p>
-            </div>
-          ) : filteredAccounts.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="flex justify-center mb-4">
-                <Key className="h-12 w-12 text-gray-400" />
-              </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Geen accounts</h3>
-              <p className="text-gray-500 mb-4">Begin met het aanmaken van login accounts.</p>
-              <Button onClick={() => setIsCreateDialogOpen(true)}>
-                <Plus className="h-4 w-4 mr-2" />
+                <Plus className="h-3.5 w-3.5 mr-1.5" />
                 Account Toevoegen
               </Button>
             </div>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Gebruiker</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Wachtwoord</TableHead>
-                  <TableHead>Rol</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Laatste Login</TableHead>
-                  <TableHead className="text-right">Acties</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
+          </div>
+
+          <div className="p-4">
+            {/* Search and Filter Bar */}
+            <div className="flex flex-col md:flex-row gap-3 justify-between items-start md:items-center mb-4">
+              <div className="relative flex-1 max-w-md">
+                <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-gray-400 h-3.5 w-3.5" />
+                <Input
+                  placeholder="Zoek accounts..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-8 h-8 text-xs border-[#e5e7eb] rounded-sm"
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowFilterOptions(!showFilterOptions)}
+                  className="h-7 px-2 rounded-sm border-[#e5e7eb] text-xs"
+                >
+                  <Filter className="h-3.5 w-3.5 mr-1" />
+                  Filters
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsExportDialogOpen(true)}
+                  className="h-7 px-2 rounded-sm border-[#e5e7eb] text-xs"
+                >
+                  <Download className="h-3.5 w-3.5 mr-1" />
+                  Export
+                </Button>
+              </div>
+            </div>
+
+            {/* Filter Options */}
+            {showFilterOptions && (
+              <div className="mb-4 p-3 bg-gray-50 border border-[#e5e7eb] rounded-sm">
+                <div className="flex flex-wrap gap-4">
+                  <div className="flex items-center gap-2">
+                    <label className="text-xs font-medium text-gray-700">Rol:</label>
+                    <Select value={roleFilter} onValueChange={setRoleFilter}>
+                      <SelectTrigger className="w-32 h-7 text-xs">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Alle</SelectItem>
+                        <SelectItem value="student">Student</SelectItem>
+                        <SelectItem value="teacher">Docent</SelectItem>
+                        <SelectItem value="guardian">Voogd</SelectItem>
+                        <SelectItem value="secretariat">Secretariaat</SelectItem>
+                        <SelectItem value="admin">Admin</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <label className="text-xs font-medium text-gray-700">Status:</label>
+                    <Select value={statusFilter} onValueChange={setStatusFilter}>
+                      <SelectTrigger className="w-32 h-7 text-xs">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Alle</SelectItem>
+                        <SelectItem value="active">Actief</SelectItem>
+                        <SelectItem value="inactive">Inactief</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Accounts List */}
+            {isAccountsLoading ? (
+              <div className="h-32 flex items-center justify-center">
+                <div className="w-5 h-5 border-2 border-[#1e40af] border-t-transparent rounded-full animate-spin"></div>
+              </div>
+            ) : filteredAccounts.length === 0 ? (
+              <div className="h-32 flex flex-col items-center justify-center">
+                <div className="p-2 bg-[#f7f9fc] text-[#1e40af] mb-3 border border-[#e5e7eb] rounded-sm">
+                  <Key className="h-5 w-5 opacity-60" />
+                </div>
+                <p className="text-xs text-gray-500 mb-2">Geen accounts beschikbaar</p>
+                <Button 
+                  onClick={() => setIsCreateDialogOpen(true)}
+                  variant="outline" 
+                  size="sm" 
+                  className="text-xs h-6 border-[#e5e7eb] text-gray-600 hover:bg-gray-50 rounded-sm"
+                >
+                  Account toevoegen
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-2">
                 {filteredAccounts.map((account: UserAccount) => (
-                  <TableRow key={account.id}>
-                    <TableCell>
-                      <div>
-                        <div className="font-medium">{account.firstName} {account.lastName}</div>
-                        <div className="text-sm text-gray-500">ID: {account.personId}</div>
+                  <div key={account.id} className="flex items-center justify-between p-3 border border-[#e5e7eb] rounded-sm hover:bg-[#f8f9fa] transition-colors">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <h4 className="text-sm font-medium text-gray-800">{account.firstName} {account.lastName}</h4>
+                        {getRoleBadge(account.role)}
+                        {getStatusBadge(account.isActive)}
                       </div>
-                    </TableCell>
-                    <TableCell>{account.email}</TableCell>
-                    <TableCell>
-                      {showPasswords ? (
-                        <code className="text-sm bg-gray-100 px-2 py-1 rounded">{account.password}</code>
-                      ) : (
-                        <span className="text-gray-400">••••••••</span>
-                      )}
-                    </TableCell>
-                    <TableCell>{getRoleBadge(account.role)}</TableCell>
-                    <TableCell>{getStatusBadge(account.isActive)}</TableCell>
-                    <TableCell>
-                      {account.lastLogin ? 
-                        format(parseISO(account.lastLogin), 'dd MMM yyyy', { locale: nl }) : 
-                        <span className="text-gray-400">Nooit</span>
-                      }
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-1">
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="h-8 w-8 p-0"
-                          onClick={() => handleEditAccount(account)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
-                          onClick={() => handleDeleteAccount(account)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
+                      <p className="text-xs text-gray-500 mt-1">{account.email}</p>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        className="h-7 w-7 p-0 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+                        onClick={() => {
+                          setSelectedAccount(account);
+                          setAccountFormData({
+                            email: account.email,
+                            password: '',
+                            role: account.role,
+                            personId: account.personId,
+                            isActive: account.isActive
+                          });
+                          setIsEditDialogOpen(true);
+                        }}
+                      >
+                        <Edit className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        className="h-7 w-7 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+                        onClick={() => {
+                          setAccountToDelete(account);
+                          setIsDeleteDialogOpen(true);
+                        }}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                  </div>
                 ))}
-              </TableBody>
-            </Table>
-          )}
-        </TableContainer>
-      </DataTableContainer>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
 
       {/* Create Account Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>Nieuw Account</DialogTitle>
             <DialogDescription>
-              Maak een nieuwe login account aan.
+              Maak een nieuw account aan voor een gebruiker.
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
+          <div className="space-y-4">
             <div>
               <Label htmlFor="role">Rol</Label>
-              <Select 
-                value={accountFormData.role} 
-                onValueChange={(value: any) => {
-                  setAccountFormData(prev => ({ ...prev, role: value, personId: 0, email: '' }));
-                }}
+              <Select
+                value={accountFormData.role}
+                onValueChange={(value: 'student' | 'teacher' | 'guardian' | 'secretariat' | 'admin') => 
+                  setAccountFormData(prev => ({ ...prev, role: value, personId: 0 }))
+                }
               >
                 <SelectTrigger>
-                  <SelectValue />
+                  <SelectValue placeholder="Selecteer rol" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="student">Student</SelectItem>
@@ -802,16 +532,15 @@ export default function Accounts() {
             </div>
             <div>
               <Label htmlFor="person">Persoon</Label>
-              <Select 
-                value={accountFormData.personId.toString()} 
+              <Select
+                value={accountFormData.personId.toString()}
                 onValueChange={(value) => {
                   const personId = parseInt(value);
-                  const people = getPersonOptions(accountFormData.role);
-                  const person = people.find((p: any) => p.id === personId);
+                  const person = getPersonOptions(accountFormData.role).find((p: any) => p.id === personId);
                   setAccountFormData(prev => ({ 
                     ...prev, 
-                    personId: personId,
-                    email: person?.email || '' 
+                    personId,
+                    email: person?.email || ''
                   }));
                 }}
               >
@@ -834,14 +563,15 @@ export default function Accounts() {
                 type="email"
                 value={accountFormData.email}
                 onChange={(e) => setAccountFormData(prev => ({ ...prev, email: e.target.value }))}
-                placeholder="email@example.com"
+                placeholder="email@voorbeeld.nl"
+                disabled
               />
             </div>
             <div>
               <Label htmlFor="password">Wachtwoord</Label>
               <Input
                 id="password"
-                type="text"
+                type="password"
                 value={accountFormData.password}
                 onChange={(e) => setAccountFormData(prev => ({ ...prev, password: e.target.value }))}
                 placeholder={`Standaard: ${generateDefaultPassword()}`}
@@ -875,14 +605,14 @@ export default function Accounts() {
 
       {/* Edit Account Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>Account Bewerken</DialogTitle>
             <DialogDescription>
               Wijzig de accountgegevens.
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
+          <div className="space-y-4">
             <div>
               <Label htmlFor="edit-email">Email</Label>
               <Input
@@ -896,9 +626,10 @@ export default function Accounts() {
               <Label htmlFor="edit-password">Wachtwoord</Label>
               <Input
                 id="edit-password"
-                type="text"
+                type="password"
                 value={accountFormData.password}
                 onChange={(e) => setAccountFormData(prev => ({ ...prev, password: e.target.value }))}
+                placeholder="Nieuw wachtwoord"
               />
             </div>
             <div className="flex items-center space-x-2">
@@ -921,275 +652,26 @@ export default function Accounts() {
         </DialogContent>
       </Dialog>
 
-      {/* Export Dialog */}
-      <Dialog open={isExportDialogOpen} onOpenChange={setIsExportDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Accounts Exporteren</DialogTitle>
-            <DialogDescription>
-              Exporteer accountgegevens naar PDF of Excel.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div>
-              <Label htmlFor="export-format">Format</Label>
-              <Select 
-                value={exportFormData.format} 
-                onValueChange={(value: any) => setExportFormData(prev => ({ ...prev, format: value }))}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="excel">Excel (.xlsx)</SelectItem>
-                  <SelectItem value="pdf">PDF</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label htmlFor="export-role">Rol Filter</Label>
-              <Select 
-                value={exportFormData.roleFilter} 
-                onValueChange={(value) => setExportFormData(prev => ({ ...prev, roleFilter: value }))}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Alle Rollen</SelectItem>
-                  <SelectItem value="student">Alleen Studenten</SelectItem>
-                  <SelectItem value="teacher">Alleen Docenten</SelectItem>
-                  <SelectItem value="guardian">Alleen Voogden</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox 
-                id="includePasswords"
-                checked={exportFormData.includePasswords}
-                onCheckedChange={(checked) => setExportFormData(prev => ({ ...prev, includePasswords: !!checked }))}
-              />
-              <Label htmlFor="includePasswords">Wachtwoorden meenemen</Label>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsExportDialogOpen(false)}>
-              Annuleren
-            </Button>
-            <Button onClick={handleExport}>
-              <Download className="h-4 w-4 mr-2" />
-              Exporteren
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Bulk Create Dialog */}
-      <Dialog open={isBulkCreateDialogOpen} onOpenChange={setIsBulkCreateDialogOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5 text-blue-600" />
-              Geavanceerd Bulk Accounts Aanmaken
-            </DialogTitle>
-            <DialogDescription>
-              Maak accounts aan voor specifieke klassen, programma's of alle gebruikers van een bepaalde rol.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-6 py-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="bulk-role">Gebruikersrol</Label>
-                <Select 
-                  value={bulkCreateFormData.role} 
-                  onValueChange={(value: any) => setBulkCreateFormData(prev => ({ ...prev, role: value }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="student">Studenten</SelectItem>
-                    <SelectItem value="teacher">Docenten</SelectItem>
-                    <SelectItem value="guardian">Voogden</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="bulk-type">Aanmaak Type</Label>
-                <Select 
-                  value={bulkCreateFormData.type} 
-                  onValueChange={(value: any) => setBulkCreateFormData(prev => ({ ...prev, type: value }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Alle {bulkCreateFormData.role === 'student' ? 'Studenten' : bulkCreateFormData.role === 'teacher' ? 'Docenten' : 'Voogden'}</SelectItem>
-                    {bulkCreateFormData.role === 'student' && (
-                      <>
-                        <SelectItem value="class">Specifieke Klas</SelectItem>
-                        <SelectItem value="program">Specifiek Programma</SelectItem>
-                      </>
-                    )}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            {bulkCreateFormData.type === 'class' && bulkCreateFormData.role === 'student' && (
-              <div>
-                <Label htmlFor="bulk-class">Selecteer Klas</Label>
-                <Select 
-                  value={bulkCreateFormData.classId.toString()} 
-                  onValueChange={(value) => setBulkCreateFormData(prev => ({ ...prev, classId: parseInt(value) }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Kies een klas" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {studentGroupsData.map((group: any) => {
-                      const studentsInClass = studentsData.filter((student: any) => 
-                        student.currentClass === group.name && 
-                        student.email && 
-                        !accountsData.some((account: UserAccount) => 
-                          account.personId === student.id && account.role === 'student'
-                        )
-                      );
-                      return (
-                        <SelectItem key={group.id} value={group.id.toString()}>
-                          {group.name} ({studentsInClass.length} studenten zonder account)
-                        </SelectItem>
-                      );
-                    })}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-
-            {bulkCreateFormData.type === 'program' && bulkCreateFormData.role === 'student' && (
-              <div>
-                <Label htmlFor="bulk-program">Selecteer Programma</Label>
-                <Select 
-                  value={bulkCreateFormData.programId.toString()} 
-                  onValueChange={(value) => setBulkCreateFormData(prev => ({ ...prev, programId: parseInt(value) }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Kies een programma" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {programsData.map((program: any) => {
-                      const studentsInProgram = studentsData.filter((student: any) => 
-                        student.currentProgram === program.name && 
-                        student.email && 
-                        !accountsData.some((account: UserAccount) => 
-                          account.personId === student.id && account.role === 'student'
-                        )
-                      );
-                      return (
-                        <SelectItem key={program.id} value={program.id.toString()}>
-                          {program.name} ({studentsInProgram.length} studenten zonder account)
-                        </SelectItem>
-                      );
-                    })}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-
-            <div className="space-y-4 bg-gray-50 p-4 rounded-lg">
-              <h4 className="font-medium text-gray-900">Wachtwoord Instellingen</h4>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex items-center space-x-2">
-                  <Checkbox 
-                    id="generate-default"
-                    checked={bulkCreateFormData.generateDefaultPasswords}
-                    onCheckedChange={(checked) => setBulkCreateFormData(prev => ({ ...prev, generateDefaultPasswords: !!checked }))}
-                  />
-                  <Label htmlFor="generate-default" className="text-sm">Standaard wachtwoorden gebruiken</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox 
-                    id="send-notifications"
-                    checked={bulkCreateFormData.sendEmailNotifications}
-                    onCheckedChange={(checked) => setBulkCreateFormData(prev => ({ ...prev, sendEmailNotifications: !!checked }))}
-                  />
-                  <Label htmlFor="send-notifications" className="text-sm">Email notificaties versturen</Label>
-                </div>
-              </div>
-              <div>
-                <Label htmlFor="default-password">Standaard Wachtwoord</Label>
-                <Input
-                  id="default-password"
-                  value={bulkCreateFormData.defaultPassword}
-                  onChange={(e) => setBulkCreateFormData(prev => ({ ...prev, defaultPassword: e.target.value }))}
-                  disabled={!bulkCreateFormData.generateDefaultPasswords}
-                  className="bg-white"
-                />
-              </div>
-            </div>
-
-            <Card className="bg-blue-50 border-blue-200">
-              <CardContent className="p-4">
-                <div className="flex items-start gap-3">
-                  <Users className="h-5 w-5 text-blue-600 mt-0.5" />
-                  <div>
-                    <h4 className="font-medium text-blue-900 mb-1">Preview</h4>
-                    <p className="text-sm text-blue-700">
-                      {bulkCreateFormData.type === 'all' && 
-                        `Er worden accounts aangemaakt voor alle ${
-                          bulkCreateFormData.role === 'student' ? 'studenten' : 
-                          bulkCreateFormData.role === 'teacher' ? 'docenten' : 'voogden'
-                        } die nog geen account hebben.`
-                      }
-                      {bulkCreateFormData.type === 'class' && bulkCreateFormData.classId > 0 &&
-                        `Er worden accounts aangemaakt voor alle studenten in de geselecteerde klas die nog geen account hebben.`
-                      }
-                      {bulkCreateFormData.type === 'program' && bulkCreateFormData.programId > 0 &&
-                        `Er worden accounts aangemaakt voor alle studenten in het geselecteerde programma die nog geen account hebben.`
-                      }
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsBulkCreateDialogOpen(false)}>
-              Annuleren
-            </Button>
-            <Button 
-              onClick={() => {
-                // Handle advanced bulk creation logic here
-                const type = bulkCreateFormData.type;
-                const role = bulkCreateFormData.role;
-                
-                if (type === 'all') {
-                  handleBulkCreateAccounts(role);
-                } else {
-                  // Handle class/program specific logic
-                  toast({ 
-                    title: "Functionaliteit", 
-                    description: `${type === 'class' ? 'Klasgewijze' : 'Programmawijze'} account aanmaak wordt geïmplementeerd.` 
-                  });
-                }
-                setIsBulkCreateDialogOpen(false);
-              }}
-              className="bg-blue-600 hover:bg-blue-700"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Accounts Aanmaken
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Delete Dialog */}
+      {/* Delete Account Dialog */}
       <DeleteDialog
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
-        onConfirm={confirmDeleteAccount}
+        onConfirm={() => {
+          if (accountToDelete) {
+            deleteAccountMutation.mutate(accountToDelete.id);
+            setIsDeleteDialogOpen(false);
+            setAccountToDelete(null);
+          }
+        }}
         title="Account Verwijderen"
-        description={`Weet je zeker dat je het account van "${accountToDelete?.firstName} ${accountToDelete?.lastName}" wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.`}
+        description="Weet je zeker dat je dit account wilt verwijderen?"
+        item={{
+          name: accountToDelete ? `${accountToDelete.firstName} ${accountToDelete.lastName}` : "",
+          id: accountToDelete?.email || ""
+        }}
+        warningText="Deze actie kan niet ongedaan worden gemaakt."
+        isLoading={deleteAccountMutation.isPending}
+        confirmButtonText="Definitief Verwijderen"
       />
     </div>
   );

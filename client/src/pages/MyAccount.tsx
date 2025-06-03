@@ -75,8 +75,8 @@ const adminUser = {
   id: 1,
   firstName: "Ahmed",
   lastName: "Hassan",
-  email: "ahmed.hassan@mymadrassa.nl",
-  phone: "+31 6 12345678",
+  email: "ahmed.hassan@mymadrassa.be",
+  phone: "+32 498 12 34 56",
   role: "Administrator",
   avatar: "", // URL voor avatar indien beschikbaar
   language: "Nederlands",
@@ -93,8 +93,8 @@ const teacherUser = {
   id: 2,
   firstName: "Fatima",
   lastName: "El Amrani",
-  email: "fatima.elamrani@mymadrassa.nl",
-  phone: "+31 6 87654321",
+  email: "fatima.elamrani@mymadrassa.be",
+  phone: "+32 471 98 76 54",
   role: "Docent",
   avatar: "", // URL voor avatar indien beschikbaar
   subjects: ["Arabisch", "Islamitische Studies"],

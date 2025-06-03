@@ -198,7 +198,7 @@ export default function Login() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="uw.email@voorbeeld.nl"
+                  placeholder="uw.email@voorbeeld.be"
                   required
                   className="h-11 border-slate-300 focus:border-blue-500"
                 />
@@ -263,6 +263,12 @@ export default function Login() {
       {/* Wachtwoord Vergeten Modal */}
       <Dialog open={showForgotPassword} onOpenChange={setShowForgotPassword}>
         <DialogContent className="sm:max-w-lg bg-white border-0 shadow-2xl rounded-2xl overflow-hidden">
+          <DialogHeader className="sr-only">
+            <DialogTitle>Wachtwoord Reset</DialogTitle>
+            <DialogDescription>
+              Wachtwoord reset formulier voor myMadrassa
+            </DialogDescription>
+          </DialogHeader>
           {!resetSent ? (
             <div className="px-6 py-8">
               <div className="text-center mb-6">
@@ -287,7 +293,7 @@ export default function Login() {
                     type="email"
                     value={resetEmail}
                     onChange={(e) => setResetEmail(e.target.value)}
-                    placeholder="uw.email@mymadrassa.nl"
+                    placeholder="uw.email@mymadrassa.be"
                     required
                     className="h-12 text-base border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-lg"
                   />

@@ -34,7 +34,7 @@ export function PremiumHeader({ title, icon, description, breadcrumbs, path }: P
       // Generate breadcrumbs based on current location
       const getParentCategory = () => {
         if (['/student-groups', '/programs', '/calendar', '/courses', '/scheduling'].includes(location)) return 'Onderwijs';
-        if (['/students', '/guardians', '/teachers'].includes(location)) return 'Beheer';
+        if (['/students', '/guardians', '/teachers', '/accounts'].includes(location)) return 'Beheer';
         if (['/attendance', '/grading', '/reports', '/student-dossier'].includes(location)) return 'Evaluatie';
         if (location === '/fees') return 'Financien';
         return undefined;
@@ -50,6 +50,7 @@ export function PremiumHeader({ title, icon, description, breadcrumbs, path }: P
           '/students': 'Studenten',
           '/guardians': 'Voogden',
           '/teachers': 'Docenten',
+          '/accounts': 'Accounts',
           '/attendance': 'Aanwezigheid',
           '/grading': 'Cijfers',
           '/reports': 'Rapport',

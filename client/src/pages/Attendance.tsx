@@ -8,7 +8,7 @@ import {
 import { PremiumHeader } from '@/components/layout/premium-header';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
@@ -548,13 +548,15 @@ export default function Attendance() {
       {/* Attendance Content */}
       <Card className="mt-6 border-0 shadow-md overflow-hidden">
         <CardHeader className="pb-3 bg-gradient-to-r from-blue-50 to-indigo-50 border-b">
-          <CardTitle className="text-blue-900 flex items-center text-lg">
+          <CardTitle className="text-[#1e41af] flex items-center text-lg">
             <div className="mr-3 h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
               <ClipboardCheck className="h-4 w-4 text-blue-800" />
             </div>
             Aanwezigheidsregistratie
           </CardTitle>
-          <p className="text-sm text-gray-600">Registreer en beheer de aanwezigheid van studenten en docenten</p>
+          <CardDescription>
+            Registreer en beheer de aanwezigheid van studenten en docenten
+          </CardDescription>
         </CardHeader>
         <CardContent className="p-6 bg-white">
           {/* Clean Controls */}

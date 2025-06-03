@@ -73,21 +73,33 @@ export default function Messages() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Haal berichten op voor de huidige gebruiker
+  // Automatic refresh voor berichten elke 30 seconden
+  useEffect(() => {
+    const interval = setInterval(() => {
+      queryClient.invalidateQueries({ queryKey: ["/api/messages/receiver"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/messages/sender"] });
+    }, 30000); // 30 seconden
+
+    return () => clearInterval(interval);
+  }, [queryClient]);
+
+  // Haal berichten op voor de huidige gebruiker met automatic refresh
   const { data: inboxMessages, isLoading: isLoadingInbox } = useQuery({
     queryKey: ["/api/messages/receiver", currentUser.id, currentUser.role],
-    queryFn: () => apiRequest(`/api/messages/receiver/${currentUser.id}/${currentUser.role}`),
+    refetchInterval: 30000, // Auto-refresh elke 30 seconden
+    refetchIntervalInBackground: true,
   });
 
   const { data: sentMessages, isLoading: isLoadingSent } = useQuery({
     queryKey: ["/api/messages/sender", currentUser.id, currentUser.role],
-    queryFn: () => apiRequest(`/api/messages/sender/${currentUser.id}/${currentUser.role}`),
+    refetchInterval: 30000, // Auto-refresh elke 30 seconden
+    refetchIntervalInBackground: true,
   });
 
-  // Haal mogelijke ontvangers op
+  // Haal mogelijke ontvangers op met role-based filtering
   const { data: receivers, isLoading: isLoadingReceivers } = useQuery({
     queryKey: ["/api/messages/receivers", currentUser.id, currentUser.role],
-    queryFn: () => apiRequest(`/api/messages/receivers/${currentUser.id}/${currentUser.role}`),
+    refetchInterval: 60000, // Minder frequent voor ontvangers lijst
   });
 
   // Markeer bericht als gelezen
@@ -98,14 +110,20 @@ export default function Messages() {
     },
   });
 
-  // Verstuur een nieuw bericht
+  // Verstuur een nieuw bericht met role-based validation
   const sendMessageMutation = useMutation({
     mutationFn: (message: any) => apiRequest("/api/messages", {
       method: "POST",
-      body: JSON.stringify(message)
+      body: JSON.stringify({
+        ...message,
+        senderId: currentUser.id,
+        senderRole: currentUser.role
+      })
     }),
     onSuccess: () => {
+      // Refresh beide query caches voor real-time updates
       queryClient.invalidateQueries({ queryKey: ["/api/messages/sender"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/messages/receiver"] });
       setIsComposeOpen(false);
       setNewMessage({
         title: "",
@@ -211,19 +229,11 @@ export default function Messages() {
 
   return (
     <div className="container mx-auto py-6">
-      <header className="bg-white border-b border-[#e5e7eb] shadow-sm mb-6">
-        <div className="flex flex-col">
-          <div className="bg-[#1e40af] px-6 py-3.5 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <MessageCircle className="h-5 w-5 text-white" />
-              <h1 className="text-base font-medium text-white tracking-tight">Berichten</h1>
-            </div>
-          </div>
-          <div className="bg-white px-6 py-2 text-gray-600 text-sm">
-            Beheer communicatie met studenten, docenten en voogden
-          </div>
-        </div>
-      </header>
+      <PremiumHeader 
+        title="Berichten"
+        subtitle="Beheer communicatie met studenten, docenten en voogden"
+        icon={MessageCircle}
+      />
 
       <DataTableContainer>
         {/* Zoek- en actiesbalk */}

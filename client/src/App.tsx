@@ -40,6 +40,8 @@ import StudentLayout from "@/components/StudentLayout";
 import StudentDashboard from "@/pages/student/StudentDashboard";
 import GuardianLayout from "@/components/GuardianLayout";
 import GuardianDashboard from "@/pages/guardian/GuardianDashboard";
+import SecretariatLayout from "@/components/SecretariatLayout";
+import SecretariatDashboard from "@/pages/secretariat/SecretariatDashboard";
 
 // Authentication wrapper with RBAC
 function AuthenticatedRoute({ component: Component, ...rest }: any) {
@@ -67,6 +69,28 @@ function AuthenticatedRoute({ component: Component, ...rest }: any) {
 function AuthenticatedRouter() {
   const { user } = useAuth();
   
+  // Secretariat routes
+  if (user?.role === 'secretariat') {
+    return (
+      <SecretariatLayout>
+        <Switch>
+          <Route path="/" component={() => <AuthenticatedRoute component={SecretariatDashboard} />} />
+          <Route path="/secretariat/students" component={() => <AuthenticatedRoute component={Students} />} />
+          <Route path="/secretariat/guardians" component={() => <AuthenticatedRoute component={Guardians} />} />
+          <Route path="/secretariat/admissions" component={() => <AuthenticatedRoute component={Admissions} />} />
+          <Route path="/secretariat/classes" component={() => <AuthenticatedRoute component={StudentGroups} />} />
+          <Route path="/secretariat/schedule" component={() => <AuthenticatedRoute component={Calendar} />} />
+          <Route path="/secretariat/payments" component={() => <AuthenticatedRoute component={Fees} />} />
+          <Route path="/secretariat/communication" component={() => <AuthenticatedRoute component={Messages} />} />
+          <Route path="/notifications" component={() => <AuthenticatedRoute component={Notifications} />} />
+          <Route path="/messages" component={() => <AuthenticatedRoute component={Messages} />} />
+          <Route path="/mijn-account" component={() => <AuthenticatedRoute component={MyAccount} />} />
+          <Route component={NotFound} />
+        </Switch>
+      </SecretariatLayout>
+    );
+  }
+
   // Guardian routes
   if (user?.role === 'guardian') {
     return (

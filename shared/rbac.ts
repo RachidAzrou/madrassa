@@ -61,7 +61,7 @@ export const ROLE_PERMISSIONS: RolePermissions[] = [
     permissions: [
       { resource: RESOURCES.STUDENTS, action: 'manage' },
       { resource: RESOURCES.GUARDIANS, action: 'manage' },
-      { resource: RESOURCES.CLASSES, action: 'read' },
+      { resource: RESOURCES.CLASSES, action: 'manage' },
       { resource: RESOURCES.PROGRAMS, action: 'read' },
       { resource: RESOURCES.ENROLLMENTS, action: 'manage' },
       { resource: RESOURCES.RE_ENROLLMENTS, action: 'manage' },
@@ -69,7 +69,7 @@ export const ROLE_PERMISSIONS: RolePermissions[] = [
       { resource: RESOURCES.ATTENDANCE, action: 'read' },
       { resource: RESOURCES.REPORTS, action: 'read' },
       { resource: RESOURCES.DASHBOARD, action: 'read' },
-      { resource: RESOURCES.NOTIFICATIONS, action: 'read' }
+      { resource: RESOURCES.NOTIFICATIONS, action: 'manage' }
     ]
   },
   // TEACHER - Educational access

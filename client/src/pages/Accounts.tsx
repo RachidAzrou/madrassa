@@ -954,6 +954,205 @@ export default function Accounts() {
         </DialogContent>
       </Dialog>
 
+      {/* Bulk Create Dialog */}
+      <Dialog open={isBulkCreateDialogOpen} onOpenChange={setIsBulkCreateDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Users className="h-5 w-5 text-blue-600" />
+              Geavanceerd Bulk Accounts Aanmaken
+            </DialogTitle>
+            <DialogDescription>
+              Maak accounts aan voor specifieke klassen, programma's of alle gebruikers van een bepaalde rol.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-6 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="bulk-role">Gebruikersrol</Label>
+                <Select 
+                  value={bulkCreateFormData.role} 
+                  onValueChange={(value: any) => setBulkCreateFormData(prev => ({ ...prev, role: value }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="student">Studenten</SelectItem>
+                    <SelectItem value="teacher">Docenten</SelectItem>
+                    <SelectItem value="guardian">Voogden</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="bulk-type">Aanmaak Type</Label>
+                <Select 
+                  value={bulkCreateFormData.type} 
+                  onValueChange={(value: any) => setBulkCreateFormData(prev => ({ ...prev, type: value }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Alle {bulkCreateFormData.role === 'student' ? 'Studenten' : bulkCreateFormData.role === 'teacher' ? 'Docenten' : 'Voogden'}</SelectItem>
+                    {bulkCreateFormData.role === 'student' && (
+                      <>
+                        <SelectItem value="class">Specifieke Klas</SelectItem>
+                        <SelectItem value="program">Specifiek Programma</SelectItem>
+                      </>
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {bulkCreateFormData.type === 'class' && bulkCreateFormData.role === 'student' && (
+              <div>
+                <Label htmlFor="bulk-class">Selecteer Klas</Label>
+                <Select 
+                  value={bulkCreateFormData.classId.toString()} 
+                  onValueChange={(value) => setBulkCreateFormData(prev => ({ ...prev, classId: parseInt(value) }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Kies een klas" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {studentGroupsData.map((group: any) => {
+                      const studentsInClass = studentsData.filter((student: any) => 
+                        student.currentClass === group.name && 
+                        student.email && 
+                        !accountsData.some((account: UserAccount) => 
+                          account.personId === student.id && account.role === 'student'
+                        )
+                      );
+                      return (
+                        <SelectItem key={group.id} value={group.id.toString()}>
+                          {group.name} ({studentsInClass.length} studenten zonder account)
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {bulkCreateFormData.type === 'program' && bulkCreateFormData.role === 'student' && (
+              <div>
+                <Label htmlFor="bulk-program">Selecteer Programma</Label>
+                <Select 
+                  value={bulkCreateFormData.programId.toString()} 
+                  onValueChange={(value) => setBulkCreateFormData(prev => ({ ...prev, programId: parseInt(value) }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Kies een programma" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {programsData.map((program: any) => {
+                      const studentsInProgram = studentsData.filter((student: any) => 
+                        student.currentProgram === program.name && 
+                        student.email && 
+                        !accountsData.some((account: UserAccount) => 
+                          account.personId === student.id && account.role === 'student'
+                        )
+                      );
+                      return (
+                        <SelectItem key={program.id} value={program.id.toString()}>
+                          {program.name} ({studentsInProgram.length} studenten zonder account)
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            <div className="space-y-4 bg-gray-50 p-4 rounded-lg">
+              <h4 className="font-medium text-gray-900">Wachtwoord Instellingen</h4>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex items-center space-x-2">
+                  <Checkbox 
+                    id="generate-default"
+                    checked={bulkCreateFormData.generateDefaultPasswords}
+                    onCheckedChange={(checked) => setBulkCreateFormData(prev => ({ ...prev, generateDefaultPasswords: !!checked }))}
+                  />
+                  <Label htmlFor="generate-default" className="text-sm">Standaard wachtwoorden gebruiken</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox 
+                    id="send-notifications"
+                    checked={bulkCreateFormData.sendEmailNotifications}
+                    onCheckedChange={(checked) => setBulkCreateFormData(prev => ({ ...prev, sendEmailNotifications: !!checked }))}
+                  />
+                  <Label htmlFor="send-notifications" className="text-sm">Email notificaties versturen</Label>
+                </div>
+              </div>
+              <div>
+                <Label htmlFor="default-password">Standaard Wachtwoord</Label>
+                <Input
+                  id="default-password"
+                  value={bulkCreateFormData.defaultPassword}
+                  onChange={(e) => setBulkCreateFormData(prev => ({ ...prev, defaultPassword: e.target.value }))}
+                  disabled={!bulkCreateFormData.generateDefaultPasswords}
+                  className="bg-white"
+                />
+              </div>
+            </div>
+
+            <Card className="bg-blue-50 border-blue-200">
+              <CardContent className="p-4">
+                <div className="flex items-start gap-3">
+                  <Users className="h-5 w-5 text-blue-600 mt-0.5" />
+                  <div>
+                    <h4 className="font-medium text-blue-900 mb-1">Preview</h4>
+                    <p className="text-sm text-blue-700">
+                      {bulkCreateFormData.type === 'all' && 
+                        `Er worden accounts aangemaakt voor alle ${
+                          bulkCreateFormData.role === 'student' ? 'studenten' : 
+                          bulkCreateFormData.role === 'teacher' ? 'docenten' : 'voogden'
+                        } die nog geen account hebben.`
+                      }
+                      {bulkCreateFormData.type === 'class' && bulkCreateFormData.classId > 0 &&
+                        `Er worden accounts aangemaakt voor alle studenten in de geselecteerde klas die nog geen account hebben.`
+                      }
+                      {bulkCreateFormData.type === 'program' && bulkCreateFormData.programId > 0 &&
+                        `Er worden accounts aangemaakt voor alle studenten in het geselecteerde programma die nog geen account hebben.`
+                      }
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsBulkCreateDialogOpen(false)}>
+              Annuleren
+            </Button>
+            <Button 
+              onClick={() => {
+                // Handle advanced bulk creation logic here
+                const type = bulkCreateFormData.type;
+                const role = bulkCreateFormData.role;
+                
+                if (type === 'all') {
+                  handleBulkCreateAccounts(role);
+                } else {
+                  // Handle class/program specific logic
+                  toast({ 
+                    title: "Functionaliteit", 
+                    description: `${type === 'class' ? 'Klasgewijze' : 'Programmawijze'} account aanmaak wordt geïmplementeerd.` 
+                  });
+                }
+                setIsBulkCreateDialogOpen(false);
+              }}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Accounts Aanmaken
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Delete Dialog */}
       <DeleteDialog
         open={isDeleteDialogOpen}

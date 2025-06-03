@@ -304,14 +304,19 @@ export default function ReEnrollment() {
 
         {/* Registration Status Alert */}
         {!canStartRegistration && (
-          <Card className="border-amber-200 bg-amber-50 mb-6">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <AlertTriangle className="h-5 w-5 text-amber-600" />
-                <div>
-                  <h3 className="font-medium text-amber-800">Herinschrijving Nog Niet Beschikbaar</h3>
-                  <p className="text-sm text-amber-700">
-                    Herinschrijvingen worden beschikbaar na de eindrapport datum: {currentAcademicYear?.finalReportDate}
+          <Card className="border-amber-300 bg-gradient-to-r from-amber-50 to-yellow-50 mb-6 shadow-sm">
+            <CardContent className="p-5">
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0">
+                  <AlertTriangle className="h-6 w-6 text-amber-600 mt-0.5" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-amber-900 text-base mb-1">
+                    Herinschrijving Nog Niet Beschikbaar
+                  </h3>
+                  <p className="text-sm text-amber-800 leading-relaxed">
+                    Herinschrijvingen worden beschikbaar na de eindrapport datum: 
+                    <span className="font-medium ml-1">{currentAcademicYear?.finalReportDate}</span>
                   </p>
                 </div>
               </div>
@@ -323,38 +328,38 @@ export default function ReEnrollment() {
       <DataTableContainer>
         <SearchActionBar>
           {/* Search Bar */}
-          <div className="relative w-full sm:max-w-md">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+          <div className="relative w-full sm:max-w-lg">
+            <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
             <Input
               type="text"
-              placeholder="Zoek op naam of student ID..."
-              className="w-full pl-9 h-8 text-xs rounded-sm bg-white border-[#e5e7eb]"
+              placeholder="Zoek op naam, student ID of klas..."
+              className="w-full pl-10 h-10 text-sm rounded-lg bg-white border-gray-200 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
           
           {/* Actions */}
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-3">
             <Button
               variant="outline"
               size="sm"
               onClick={() => setShowFilterOptions(!showFilterOptions)}
-              className="h-7 w-7 p-0 rounded-sm border-[#e5e7eb]"
-              title="Filters"
+              className={`h-9 px-3 rounded-lg border-gray-200 shadow-sm hover:bg-gray-50 transition-colors ${
+                showFilterOptions ? 'bg-gray-100 border-gray-300' : ''
+              }`}
             >
-              <Filter className="h-3.5 w-3.5" />
+              <Filter className="h-4 w-4 mr-2" />
+              Filters
             </Button>
-
-
 
             {selectedStudents.length > 0 && (
               <Button
                 size="sm"
                 onClick={handleBulkEnrollment}
-                className="h-7 px-3 rounded-sm text-xs bg-blue-600 hover:bg-blue-700"
+                className="h-9 px-4 rounded-lg text-sm bg-blue-600 hover:bg-blue-700 shadow-sm transition-colors"
               >
-                <Plus className="h-3.5 w-3.5 mr-1" />
+                <Plus className="h-4 w-4 mr-2" />
                 Bulk Inschrijven ({selectedStudents.length})
               </Button>
             )}
@@ -363,13 +368,13 @@ export default function ReEnrollment() {
 
         {/* Filter Options */}
         {showFilterOptions && (
-          <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
-            <div className="flex flex-wrap gap-4">
-              <div className="flex items-center gap-2">
-                <label className="text-sm font-medium text-gray-700">Status:</label>
+          <div className="px-6 py-5 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100">
+            <div className="flex flex-wrap items-center gap-6">
+              <div className="flex items-center gap-3">
+                <label className="text-sm font-semibold text-gray-700">Status:</label>
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-40 h-8 text-xs">
-                    <SelectValue />
+                  <SelectTrigger className="w-48 h-9 text-sm rounded-lg border-gray-200 shadow-sm">
+                    <SelectValue placeholder="Selecteer status" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">Alle Studenten</SelectItem>
@@ -378,22 +383,49 @@ export default function ReEnrollment() {
                   </SelectContent>
                 </Select>
               </div>
+              <div className="text-sm text-gray-600">
+                {filteredStudents.length} van {reEnrollmentStats?.totalEligible || 0} studenten
+              </div>
             </div>
           </div>
         )}
 
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">Herinschrijvingen Overzicht</h2>
-          <p className="text-sm text-gray-600">{filteredStudents.length} studenten geschikt voor herinschrijving</p>
+        <div className="px-6 py-6 border-b border-gray-200 bg-white">
+          <div className="flex justify-between items-center">
+            <div>
+              <h2 className="text-xl font-bold text-gray-900 mb-1">Herinschrijvingen Overzicht</h2>
+              <p className="text-sm text-gray-600">
+                {filteredStudents.length} studenten geschikt voor herinschrijving
+              </p>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <div className="h-3 w-3 rounded-full bg-green-500"></div>
+                <span className="text-sm text-gray-600">Geslaagd: {passedStudents.length}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="h-3 w-3 rounded-full bg-red-500"></div>
+                <span className="text-sm text-gray-600">Gezakt: {failedStudents.length}</span>
+              </div>
+            </div>
+          </div>
         </div>
 
         <TableContainer>
           <Tabs defaultValue="passed" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="passed">
+            <TabsList className="grid w-full grid-cols-2 h-12 p-1 bg-gray-100 rounded-lg">
+              <TabsTrigger 
+                value="passed" 
+                className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-md"
+              >
+                <div className="h-2 w-2 rounded-full bg-green-500"></div>
                 Geslaagde Studenten ({passedStudents.length})
               </TabsTrigger>
-              <TabsTrigger value="failed">
+              <TabsTrigger 
+                value="failed"
+                className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-md"
+              >
+                <div className="h-2 w-2 rounded-full bg-red-500"></div>
                 Gezakte Studenten ({failedStudents.length})
               </TabsTrigger>
             </TabsList>
@@ -413,49 +445,66 @@ export default function ReEnrollment() {
               ) : (
                 <Table>
                   <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-12">
+                    <TableRow className="border-b border-gray-200 bg-gray-50/50">
+                      <TableHead className="w-12 py-4">
                         <Checkbox
                           checked={selectedStudents.length === passedStudents.length}
                           onCheckedChange={() => handleSelectAll(passedStudents)}
+                          className="rounded-md"
                         />
                       </TableHead>
-                      <TableHead>Student</TableHead>
-                      <TableHead>Huidige Klas</TableHead>
-                      <TableHead>Programma</TableHead>
-                      <TableHead>Eindcijfer</TableHead>
-                      <TableHead>Aanwezigheid</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="text-right">Acties</TableHead>
+                      <TableHead className="py-4 font-semibold text-gray-900">Student</TableHead>
+                      <TableHead className="py-4 font-semibold text-gray-900">Huidige Klas</TableHead>
+                      <TableHead className="py-4 font-semibold text-gray-900">Programma</TableHead>
+                      <TableHead className="py-4 font-semibold text-gray-900">Eindcijfer</TableHead>
+                      <TableHead className="py-4 font-semibold text-gray-900">Aanwezigheid</TableHead>
+                      <TableHead className="py-4 font-semibold text-gray-900">Status</TableHead>
+                      <TableHead className="text-right py-4 font-semibold text-gray-900">Acties</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {passedStudents.map((student: Student) => (
-                      <TableRow key={student.id}>
-                        <TableCell>
+                      <TableRow key={student.id} className="border-b border-gray-100 hover:bg-gray-50/50 transition-colors">
+                        <TableCell className="py-4">
                           <Checkbox
                             checked={selectedStudents.includes(student.id)}
                             onCheckedChange={() => handleSelectStudent(student.id)}
+                            className="rounded-md"
                           />
                         </TableCell>
-                        <TableCell>
-                          <div>
-                            <div className="font-medium">{student.firstName} {student.lastName}</div>
-                            <div className="text-sm text-gray-500">{student.studentId}</div>
+                        <TableCell className="py-4">
+                          <div className="flex items-center gap-3">
+                            <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center">
+                              <span className="text-xs font-medium text-green-700">
+                                {student.firstName?.[0]}{student.lastName?.[0]}
+                              </span>
+                            </div>
+                            <div>
+                              <div className="font-medium text-gray-900">{student.firstName} {student.lastName}</div>
+                              <div className="text-sm text-gray-500">{student.studentId}</div>
+                            </div>
                           </div>
                         </TableCell>
-                        <TableCell>{student.currentClass}</TableCell>
-                        <TableCell>{student.currentProgram}</TableCell>
-                        <TableCell>{student.finalGrade}/10</TableCell>
-                        <TableCell>{student.attendancePercentage}%</TableCell>
-                        <TableCell>{getStatusBadge(student)}</TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end gap-1">
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                              <Eye className="h-4 w-4" />
+                        <TableCell className="py-4 text-gray-700">{student.currentClass}</TableCell>
+                        <TableCell className="py-4 text-gray-700">{student.currentProgram}</TableCell>
+                        <TableCell className="py-4">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            {student.finalGrade}/10
+                          </span>
+                        </TableCell>
+                        <TableCell className="py-4">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            {student.attendancePercentage}%
+                          </span>
+                        </TableCell>
+                        <TableCell className="py-4">{getStatusBadge(student)}</TableCell>
+                        <TableCell className="text-right py-4">
+                          <div className="flex justify-end gap-2">
+                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-blue-50 rounded-md">
+                              <Eye className="h-4 w-4 text-gray-600" />
                             </Button>
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                              <Edit className="h-4 w-4" />
+                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-blue-50 rounded-md">
+                              <Edit className="h-4 w-4 text-gray-600" />
                             </Button>
                           </div>
                         </TableCell>

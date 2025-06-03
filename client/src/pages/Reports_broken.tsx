@@ -6,8 +6,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { FileDown, Users, User, FileText, BarChart3, Target, Settings, Eye, Download, TrendingUp, Calculator, School, Calendar, CheckCircle, AlertCircle, Clock } from 'lucide-react';
+import { FileDown, Upload, Users, User, FileText, BarChart3, Target, TrendingUp, Filter, Search, Plus, Settings, Eye, Download } from 'lucide-react';
 import { PremiumHeader } from '@/components/layout/premium-header';
 import { 
   DataTableContainer, 
@@ -100,19 +101,18 @@ export default function Reports() {
   const [attendanceComments, setAttendanceComments] = useState('');
   const [reportPreview, setReportPreview] = useState<ReportData[]>([]);
   const [behaviorGrades, setBehaviorGrades] = useState<{[key: number]: BehaviorGrade}>({});
+  const [searchTerm, setSearchTerm] = useState('');
 
-  const { data: classesData, isLoading: classesLoading } = useQuery({ queryKey: ['/api/student-groups'] });
-  const { data: studentsData, isLoading: studentsLoading } = useQuery({ queryKey: ['/api/students'] });
-  const { data: programsData, isLoading: programsLoading } = useQuery({ queryKey: ['/api/programs'] });
-
-  const classes = classesData || [];
-  const students = studentsData || [];
-  const subjects = programsData?.programs || [];
+  const { data: classesData = [] } = useQuery({ queryKey: ['/api/student-groups'] });
+  const { data: studentsData = [] } = useQuery({ queryKey: ['/api/students'] });
+  const { data: gradesData = [] } = useQuery({ queryKey: ['/api/grades'] });
+  const { data: attendanceData = [] } = useQuery({ queryKey: ['/api/attendance'] });
+  const { data: programsData = { programs: [] } } = useQuery({ queryKey: ['/api/programs'] });
 
   const generatePreviewData = () => {
     if (selectedReportType === 'class' && selectedClass) {
-      const classStudents = students.filter((s: Student) => 
-        classes.find((c: StudentGroup) => c.id.toString() === selectedClass)?.id
+      const classStudents = studentsData.filter((s: Student) => 
+        classesData.find((c: StudentGroup) => c.id.toString() === selectedClass)?.id
       ) || [];
       
       const previewData = classStudents.map((student: Student) => ({
@@ -132,7 +132,7 @@ export default function Reports() {
       setReportPreview(previewData);
       setActiveTab('preview');
     } else if (selectedReportType === 'individual' && selectedStudent) {
-      const student = students.find((s: Student) => s.id.toString() === selectedStudent);
+      const student = studentsData.find((s: Student) => s.id.toString() === selectedStudent);
       if (student) {
         const previewData = [{
           student,
@@ -193,6 +193,7 @@ export default function Reports() {
         ['VAK', 'TESTEN', 'TAKEN', 'EXAMEN', 'GEMIDDELDE', 'BEOORDELING']
       ];
 
+      const subjects = programsData?.programs || [];
       subjects.forEach((subject: any) => {
         const average = 7.5; // Mock data
         let assessment = '';
@@ -279,19 +280,11 @@ export default function Reports() {
     });
 
     const fileName = selectedReportType === 'class' 
-      ? `Klasserapport_${classes.find((c: StudentGroup) => c.id.toString() === selectedClass)?.name || 'Onbekend'}_${new Date().toLocaleDateString('nl-NL')}.pdf`
+      ? `Klasserapport_${classesData?.find((c: StudentGroup) => c.id.toString() === selectedClass)?.name || 'Onbekend'}_${new Date().toLocaleDateString('nl-NL')}.pdf`
       : `Individueel_Rapport_${reportPreview[0]?.student.firstName}_${reportPreview[0]?.student.lastName}_${new Date().toLocaleDateString('nl-NL')}.pdf`;
     
     pdf.save(fileName);
   };
-
-  const filteredStudents = students.filter((student: Student) => {
-    if (selectedReportType === 'class' && selectedClass) {
-      const selectedClassData = classes.find((c: StudentGroup) => c.id.toString() === selectedClass);
-      return selectedClassData;
-    }
-    return true;
-  });
 
   return (
     <DataTableContainer>
@@ -303,7 +296,7 @@ export default function Reports() {
 
       <div className="space-y-5">
         <Tabs 
-          value={activeTab} 
+          defaultValue={activeTab} 
           className="w-full"
           onValueChange={(value) => setActiveTab(value)}
         >
@@ -336,43 +329,32 @@ export default function Reports() {
                       Kies het type rapport dat u wilt genereren
                     </CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div 
-                        className={`p-4 border-2 rounded-lg cursor-pointer transition-all hover:shadow-md ${
-                          selectedReportType === 'class' 
-                            ? 'border-blue-500 bg-blue-50' 
-                            : 'border-gray-200 hover:border-gray-300'
-                        }`}
-                        onClick={() => setSelectedReportType('class')}
-                      >
-                        <div className="flex items-center gap-3">
-                          <Users className={`h-6 w-6 ${selectedReportType === 'class' ? 'text-blue-600' : 'text-gray-400'}`} />
-                          <div>
-                            <h3 className="font-semibold">Klasserapport</h3>
-                            <p className="text-sm text-gray-600">Voor alle studenten in een klas</p>
-                          </div>
-                        </div>
-                      </div>
-                      <div 
-                        className={`p-4 border-2 rounded-lg cursor-pointer transition-all hover:shadow-md ${
-                          selectedReportType === 'individual' 
-                            ? 'border-blue-500 bg-blue-50' 
-                            : 'border-gray-200 hover:border-gray-300'
-                        }`}
-                        onClick={() => setSelectedReportType('individual')}
-                      >
-                        <div className="flex items-center gap-3">
-                          <User className={`h-6 w-6 ${selectedReportType === 'individual' ? 'text-blue-600' : 'text-gray-400'}`} />
-                          <div>
-                            <h3 className="font-semibold">Individueel Rapport</h3>
-                            <p className="text-sm text-gray-600">Voor één specifieke student</p>
-                          </div>
-                        </div>
-                      </div>
+                  <CardContent>
+                    {/* Report Type Selection */}
+                    <div className="space-y-2">
+                      <Label>Type Rapport</Label>
+                      <Select value={selectedReportType} onValueChange={(value: 'class' | 'individual') => setSelectedReportType(value)}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecteer rapporttype" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="class">
+                            <div className="flex items-center gap-2">
+                              <Users className="h-4 w-4" />
+                              Klasserapport
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="individual">
+                            <div className="flex items-center gap-2">
+                              <User className="h-4 w-4" />
+                              Individueel Rapport
+                            </div>
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
 
-                    {/* Selection based on report type */}
+                    {/* Class/Student Selection */}
                     {selectedReportType === 'class' ? (
                       <div className="space-y-2">
                         <Label>Selecteer Klas</Label>
@@ -381,7 +363,7 @@ export default function Reports() {
                             <SelectValue placeholder="Kies een klas" />
                           </SelectTrigger>
                           <SelectContent>
-                            {classes.map((cls: StudentGroup) => (
+                            {classesData?.map((cls: StudentGroup) => (
                               <SelectItem key={cls.id} value={cls.id.toString()}>
                                 {cls.name} - {cls.academicYear}
                               </SelectItem>
@@ -397,7 +379,7 @@ export default function Reports() {
                             <SelectValue placeholder="Kies een student" />
                           </SelectTrigger>
                           <SelectContent>
-                            {students.map((student: Student) => (
+                            {studentsData?.map((student: Student) => (
                               <SelectItem key={student.id} value={student.id.toString()}>
                                 {student.firstName} {student.lastName} ({student.studentId})
                               </SelectItem>
@@ -406,21 +388,10 @@ export default function Reports() {
                         </Select>
                       </div>
                     )}
-                  </CardContent>
-                </Card>
 
-                {/* School Configuration Card */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <School className="h-5 w-5 text-green-600" />
-                      School Instellingen
-                    </CardTitle>
-                    <CardDescription>
-                      Configureer de schoolgegevens voor het rapport
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
+                    <Separator />
+
+                    {/* School Configuration */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label>Schoolnaam</Label>
@@ -439,51 +410,38 @@ export default function Reports() {
                         />
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
 
-                {/* Comments Card */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <FileText className="h-5 w-5 text-purple-600" />
-                      Opmerkingen & Notities
-                    </CardTitle>
-                    <CardDescription>
-                      Voeg algemene opmerkingen toe voor het rapport
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="space-y-2">
-                      <Label>Algemene Opmerkingen</Label>
-                      <Textarea
-                        value={generalComments}
-                        onChange={(e) => setGeneralComments(e.target.value)}
-                        placeholder="Voeg algemene opmerkingen toe voor het rapport..."
-                        rows={3}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Aanwezigheid Opmerkingen</Label>
-                      <Textarea
-                        value={attendanceComments}
-                        onChange={(e) => setAttendanceComments(e.target.value)}
-                        placeholder="Voeg opmerkingen toe over aanwezigheid..."
-                        rows={2}
-                      />
+                    <Separator />
+
+                    {/* Comments */}
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label>Algemene Opmerkingen</Label>
+                        <Textarea
+                          value={generalComments}
+                          onChange={(e) => setGeneralComments(e.target.value)}
+                          placeholder="Voeg algemene opmerkingen toe voor het rapport..."
+                          rows={3}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Aanwezigheid Opmerkingen</Label>
+                        <Textarea
+                          value={attendanceComments}
+                          onChange={(e) => setAttendanceComments(e.target.value)}
+                          placeholder="Voeg opmerkingen toe over aanwezigheid..."
+                          rows={2}
+                        />
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
               </div>
 
-              {/* Actions Sidebar */}
-              <div className="space-y-6">
+              <div>
                 <Card>
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Download className="h-5 w-5 text-blue-600" />
-                      Acties
-                    </CardTitle>
+                    <CardTitle>Acties</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <Button 
@@ -492,8 +450,8 @@ export default function Reports() {
                       className="w-full"
                       variant="outline"
                     >
-                      <Eye className="h-4 w-4 mr-2" />
-                      Bekijk Voorvertoning
+                      <FileText className="h-4 w-4 mr-2" />
+                      Bekijk Rapportoverzicht
                     </Button>
 
                     <Button 
@@ -506,181 +464,49 @@ export default function Reports() {
                       Genereer PDF Rapport
                     </Button>
                     
-                    <div className="bg-gray-50 p-4 rounded-lg space-y-2">
-                      <h4 className="font-medium text-sm">Rapport bevat:</h4>
-                      <ul className="text-xs text-gray-600 space-y-1">
-                        <li className="flex items-center gap-2">
-                          <CheckCircle className="h-3 w-3 text-green-500" />
-                          Pagina 1: Cijfertabel en algemene opmerkingen
-                        </li>
-                        <li className="flex items-center gap-2">
-                          <CheckCircle className="h-3 w-3 text-green-500" />
-                          Pagina 2: Gedragsbeoordeling en aanwezigheid
-                        </li>
-                        <li className="flex items-center gap-2">
-                          <CheckCircle className="h-3 w-3 text-green-500" />
-                          Handtekeningvelden voor ouders en school
-                        </li>
+                    <div className="text-sm text-gray-600 space-y-1">
+                      <p>Rapport bevat:</p>
+                      <ul className="list-disc list-inside text-xs space-y-1 ml-2">
+                        <li>Pagina 1: Cijfertabel en algemene opmerkingen</li>
+                        <li>Pagina 2: Gedragsbeoordeling en aanwezigheid</li>
+                        <li>Handtekeningvelden voor ouders en school</li>
                       </ul>
                     </div>
                   </CardContent>
                 </Card>
 
-                {/* Quick Stats */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <TrendingUp className="h-5 w-5 text-orange-600" />
-                      Overzicht
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Totaal klassen:</span>
-                      <Badge variant="secondary">{classes.length}</Badge>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Totaal studenten:</span>
-                      <Badge variant="secondary">{students.length}</Badge>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Vakken:</span>
-                      <Badge variant="secondary">{subjects.length}</Badge>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="preview" className="space-y-6">
-            {reportPreview.length > 0 ? (
-              <div className="space-y-6">
-                <div className="flex justify-between items-center">
-                  <h3 className="text-lg font-semibold">Rapportoverzicht</h3>
-                  <Badge variant="outline" className="flex items-center gap-1">
-                    <Clock className="h-3 w-3" />
-                    {reportPreview.length} student{reportPreview.length !== 1 ? 'en' : ''}
-                  </Badge>
-                </div>
-                
-                <div className="grid gap-4">
-                  {reportPreview.map((student, index) => (
-                    <Card key={index}>
-                      <CardContent className="p-6">
-                        <div className="flex justify-between items-start mb-4">
-                          <div>
-                            <h4 className="font-semibold text-lg">
-                              {student.student.firstName} {student.student.lastName}
-                            </h4>
-                            <p className="text-sm text-gray-600">Student ID: {student.student.studentId}</p>
-                          </div>
-                          <Badge variant="outline">
-                            {student.attendance.percentage.toFixed(1)}% aanwezigheid
-                          </Badge>
-                        </div>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          <div className="space-y-2">
-                            <h5 className="font-medium text-sm">Aanwezigheid</h5>
-                            <div className="text-sm text-gray-600">
-                              <p>Aanwezig: {student.attendance.present} dagen</p>
-                              <p>Afwezig: {student.attendance.absent} dagen</p>
-                              <p>Te laat: {student.attendance.late} dagen</p>
+                {/* Report Preview */}
+                {reportPreview.length > 0 && (
+                  <Card className="mt-4">
+                    <CardHeader>
+                      <CardTitle>Rapportoverzicht</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      {reportPreview.map((student, index) => (
+                        <div key={index} className="mb-4 p-4 border rounded">
+                          <h3 className="font-semibold text-lg mb-2">
+                            {student.student.firstName} {student.student.lastName}
+                          </h3>
+                          <div className="grid grid-cols-2 gap-4 text-sm">
+                            <div>
+                              <p><strong>Student ID:</strong> {student.student.studentId}</p>
+                              <p><strong>Aanwezigheid:</strong> {student.attendance.percentage.toFixed(1)}%</p>
                             </div>
-                          </div>
-                          
-                          <div className="space-y-2">
-                            <h5 className="font-medium text-sm">Gedrag</h5>
-                            <div className="text-sm text-gray-600">
-                              <p>Cijfer: {student.behavior.grade}/10</p>
-                              <p>Opmerkingen: {student.behavior.comments || 'Geen opmerkingen'}</p>
-                            </div>
-                          </div>
-                          
-                          <div className="space-y-2">
-                            <h5 className="font-medium text-sm">Algemeen</h5>
-                            <div className="text-sm text-gray-600">
-                              <p>{student.generalComments || 'Geen algemene opmerkingen'}</p>
+                            <div>
+                              <p><strong>Gedragsgemiddelde:</strong> {student.behavior.grade}/10</p>
+                              <p><strong>Algemene opmerkingen:</strong> {student.generalComments || 'Geen opmerkingen'}</p>
                             </div>
                           </div>
                         </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-
-                <div className="flex justify-center">
-                  <Button onClick={generateReportData} size="lg">
-                    <FileDown className="h-4 w-4 mr-2" />
-                    Download PDF Rapport
-                  </Button>
-                </div>
+                      ))}
+                    </CardContent>
+                  </Card>
+                )}
               </div>
-            ) : (
-              <EmptyTableState 
-                icon={FileText}
-                title="Geen rapportgegevens"
-                description="Configureer eerst uw rapport instellingen om een voorvertoning te zien."
-                actionLabel="Ga naar configuratie"
-                onAction={() => setActiveTab('configure')}
-              />
-            )}
-          </TabsContent>
-
-          <TabsContent value="statistics" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">Totaal Klassen</p>
-                      <p className="text-2xl font-bold">{classes.length}</p>
-                    </div>
-                    <Users className="h-8 w-8 text-blue-600" />
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">Totaal Studenten</p>
-                      <p className="text-2xl font-bold">{students.length}</p>
-                    </div>
-                    <User className="h-8 w-8 text-green-600" />
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">Vakken</p>
-                      <p className="text-2xl font-bold">{subjects.length}</p>
-                    </div>
-                    <Calculator className="h-8 w-8 text-purple-600" />
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">Rapporten</p>
-                      <p className="text-2xl font-bold">{reportPreview.length}</p>
-                    </div>
-                    <FileText className="h-8 w-8 text-orange-600" />
-                  </div>
-                </CardContent>
-              </Card>
             </div>
-          </TabsContent>
-        </Tabs>
+          </div>
+        </div>
       </div>
-    </DataTableContainer>
+    </div>
   );
 }

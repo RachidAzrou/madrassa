@@ -1,17 +1,24 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   Search, 
   Plus,
   Calendar,
   Edit,
   Trash2,
-  Clock
+  Clock,
+  X
 } from 'lucide-react';
 import { PageHeader } from '@/components/layout/page-header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useToast } from '@/hooks/use-toast';
+import { apiRequest } from '@/lib/queryClient';
 
 interface AcademicYear {
   id: number;
@@ -37,6 +44,35 @@ interface Holiday {
 
 export default function AcademicYearManagement() {
   const [searchTerm, setSearchTerm] = useState('');
+  const [yearDialogOpen, setYearDialogOpen] = useState(false);
+  const [holidayDialogOpen, setHolidayDialogOpen] = useState(false);
+  const [editingYear, setEditingYear] = useState<AcademicYear | null>(null);
+  const [editingHoliday, setEditingHoliday] = useState<Holiday | null>(null);
+
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  // Form state for academic year
+  const [yearForm, setYearForm] = useState({
+    name: '',
+    startDate: '',
+    endDate: '',
+    isActive: false,
+    registrationStartDate: '',
+    registrationEndDate: '',
+    finalReportDate: '',
+    description: ''
+  });
+
+  // Form state for holiday
+  const [holidayForm, setHolidayForm] = useState({
+    name: '',
+    startDate: '',
+    endDate: '',
+    type: 'vacation' as 'vacation' | 'public_holiday' | 'study_break',
+    academicYearId: '',
+    description: ''
+  });
 
   // Data fetching
   const { data: academicYearsData = [], isLoading: yearsLoading } = useQuery({
@@ -47,21 +83,228 @@ export default function AcademicYearManagement() {
     queryKey: ['/api/holidays']
   });
 
+  // Mutations
+  const createYearMutation = useMutation({
+    mutationFn: (data: any) => apiRequest('/api/academic-years', { method: 'POST', body: data }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/academic-years'] });
+      setYearDialogOpen(false);
+      resetYearForm();
+      toast({
+        title: "Succes",
+        description: "Schooljaar succesvol toegevoegd",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Fout",
+        description: error.message || "Er ging iets mis bij het toevoegen van het schooljaar",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const updateYearMutation = useMutation({
+    mutationFn: ({ id, data }: { id: number; data: any }) => 
+      apiRequest(`/api/academic-years/${id}`, { method: 'PUT', body: data }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/academic-years'] });
+      setYearDialogOpen(false);
+      setEditingYear(null);
+      resetYearForm();
+      toast({
+        title: "Succes",
+        description: "Schooljaar succesvol bijgewerkt",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Fout",
+        description: error.message || "Er ging iets mis bij het bijwerken van het schooljaar",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const deleteYearMutation = useMutation({
+    mutationFn: (id: number) => apiRequest(`/api/academic-years/${id}`, { method: 'DELETE' }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/academic-years'] });
+      toast({
+        title: "Succes",
+        description: "Schooljaar succesvol verwijderd",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Fout",
+        description: error.message || "Er ging iets mis bij het verwijderen van het schooljaar",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const createHolidayMutation = useMutation({
+    mutationFn: (data: any) => apiRequest('/api/holidays', { method: 'POST', body: data }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/holidays'] });
+      setHolidayDialogOpen(false);
+      resetHolidayForm();
+      toast({
+        title: "Succes",
+        description: "Vakantie succesvol toegevoegd",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Fout",
+        description: error.message || "Er ging iets mis bij het toevoegen van de vakantie",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const updateHolidayMutation = useMutation({
+    mutationFn: ({ id, data }: { id: number; data: any }) => 
+      apiRequest(`/api/holidays/${id}`, { method: 'PUT', body: data }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/holidays'] });
+      setHolidayDialogOpen(false);
+      setEditingHoliday(null);
+      resetHolidayForm();
+      toast({
+        title: "Succes",
+        description: "Vakantie succesvol bijgewerkt",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Fout",
+        description: error.message || "Er ging iets mis bij het bijwerken van de vakantie",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const deleteHolidayMutation = useMutation({
+    mutationFn: (id: number) => apiRequest(`/api/holidays/${id}`, { method: 'DELETE' }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/holidays'] });
+      toast({
+        title: "Succes",
+        description: "Vakantie succesvol verwijderd",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Fout",
+        description: error.message || "Er ging iets mis bij het verwijderen van de vakantie",
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Helper functions
+  const resetYearForm = () => {
+    setYearForm({
+      name: '',
+      startDate: '',
+      endDate: '',
+      isActive: false,
+      registrationStartDate: '',
+      registrationEndDate: '',
+      finalReportDate: '',
+      description: ''
+    });
+  };
+
+  const resetHolidayForm = () => {
+    setHolidayForm({
+      name: '',
+      startDate: '',
+      endDate: '',
+      type: 'vacation',
+      academicYearId: '',
+      description: ''
+    });
+  };
+
   // Event handlers
   const handleEditYear = (year: AcademicYear) => {
-    console.log('Edit year:', year);
+    setEditingYear(year);
+    setYearForm({
+      name: year.name,
+      startDate: year.startDate,
+      endDate: year.endDate,
+      isActive: year.isActive,
+      registrationStartDate: year.registrationStartDate,
+      registrationEndDate: year.registrationEndDate,
+      finalReportDate: year.finalReportDate,
+      description: year.description || ''
+    });
+    setYearDialogOpen(true);
   };
 
   const handleDeleteYear = (year: AcademicYear) => {
-    console.log('Delete year:', year);
+    if (confirm(`Weet je zeker dat je het schooljaar "${year.name}" wilt verwijderen?`)) {
+      deleteYearMutation.mutate(year.id);
+    }
   };
 
   const handleEditHoliday = (holiday: Holiday) => {
-    console.log('Edit holiday:', holiday);
+    setEditingHoliday(holiday);
+    setHolidayForm({
+      name: holiday.name,
+      startDate: holiday.startDate,
+      endDate: holiday.endDate,
+      type: holiday.type,
+      academicYearId: holiday.academicYearId.toString(),
+      description: holiday.description || ''
+    });
+    setHolidayDialogOpen(true);
   };
 
   const handleDeleteHoliday = (holiday: Holiday) => {
-    console.log('Delete holiday:', holiday);
+    if (confirm(`Weet je zeker dat je de vakantie "${holiday.name}" wilt verwijderen?`)) {
+      deleteHolidayMutation.mutate(holiday.id);
+    }
+  };
+
+  const handleYearSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (editingYear) {
+      updateYearMutation.mutate({ id: editingYear.id, data: yearForm });
+    } else {
+      createYearMutation.mutate(yearForm);
+    }
+  };
+
+  const handleHolidaySubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    const submitData = {
+      ...holidayForm,
+      academicYearId: parseInt(holidayForm.academicYearId)
+    };
+    
+    if (editingHoliday) {
+      updateHolidayMutation.mutate({ id: editingHoliday.id, data: submitData });
+    } else {
+      createHolidayMutation.mutate(submitData);
+    }
+  };
+
+  const openNewYearDialog = () => {
+    setEditingYear(null);
+    resetYearForm();
+    setYearDialogOpen(true);
+  };
+
+  const openNewHolidayDialog = () => {
+    setEditingHoliday(null);
+    resetHolidayForm();
+    setHolidayDialogOpen(true);
   };
 
   const getStatusBadge = (year: AcademicYear) => {
@@ -102,7 +345,10 @@ export default function AcademicYearManagement() {
               className="pl-8 h-8 text-xs border-[#e5e7eb] rounded-sm"
             />
           </div>
-          <Button className="bg-[#1e40af] hover:bg-[#1d4ed8] text-white h-8 text-xs px-3 rounded-sm">
+          <Button 
+            onClick={openNewYearDialog}
+            className="bg-[#1e40af] hover:bg-[#1d4ed8] text-white h-8 text-xs px-3 rounded-sm"
+          >
             <Plus className="h-3.5 w-3.5 mr-1.5" />
             Schooljaar Toevoegen
           </Button>
@@ -182,7 +428,17 @@ export default function AcademicYearManagement() {
               <Clock className="h-3.5 w-3.5 text-[#1e40af]" />
               <h3 className="text-xs font-medium text-gray-700 tracking-tight">Schoolvakanties</h3>
             </div>
-            <span className="text-xs text-gray-500">{filteredHolidays.length} vakanties</span>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-gray-500">{filteredHolidays.length} vakanties</span>
+              <Button 
+                onClick={openNewHolidayDialog}
+                size="sm" 
+                className="bg-[#1e40af] hover:bg-[#1d4ed8] text-white h-6 text-[10px] px-2 rounded-sm"
+              >
+                <Plus className="h-3 w-3 mr-1" />
+                Vakantie Toevoegen
+              </Button>
+            </div>
           </div>
 
           <div className="p-4">
@@ -197,6 +453,7 @@ export default function AcademicYearManagement() {
                 </div>
                 <p className="text-xs text-gray-500 mb-2">Geen vakanties beschikbaar</p>
                 <Button 
+                  onClick={openNewHolidayDialog}
                   variant="outline" 
                   size="sm" 
                   className="text-[10px] h-6 border-[#e5e7eb] text-gray-600 hover:bg-gray-50 rounded-sm"

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
+import { apiRequest } from "@/lib/queryClient";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -55,6 +56,9 @@ export default function Messages() {
   const { data: currentUser, isLoading: isAuthLoading } = useQuery({
     queryKey: ["/api/profile"],
   });
+
+  // Type the currentUser properly
+  const typedUser = currentUser as { id: number; role: string; firstName: string; lastName: string } | undefined;
   const [selectedTab, setSelectedTab] = useState("inbox");
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [isComposeOpen, setIsComposeOpen] = useState(false);
@@ -78,14 +82,14 @@ export default function Messages() {
     );
   }
 
-  if (!currentUser) {
+  if (!typedUser) {
     window.location.href = "/api/login";
     return null;
   }
 
   // Automatic refresh voor berichten elke 30 seconden
   useEffect(() => {
-    if (!currentUser) return;
+    if (!typedUser) return;
     
     const interval = setInterval(() => {
       queryClient.invalidateQueries({ queryKey: ["/api/messages/receiver"] });
@@ -93,27 +97,27 @@ export default function Messages() {
     }, 30000); // 30 seconden
 
     return () => clearInterval(interval);
-  }, [queryClient, currentUser]);
+  }, [queryClient, typedUser]);
 
   // Haal berichten op voor de huidige gebruiker met automatic refresh
-  const { data: inboxMessages, isLoading: isLoadingInbox } = useQuery({
-    queryKey: ["/api/messages/receiver", currentUser?.id, currentUser?.role],
-    enabled: !!currentUser,
+  const { data: inboxMessages = [], isLoading: isLoadingInbox } = useQuery({
+    queryKey: ["/api/messages/receiver", typedUser?.id, typedUser?.role],
+    enabled: !!typedUser,
     refetchInterval: 30000, // Auto-refresh elke 30 seconden
     refetchIntervalInBackground: true,
   });
 
-  const { data: sentMessages, isLoading: isLoadingSent } = useQuery({
-    queryKey: ["/api/messages/sender", currentUser?.id, currentUser?.role],
-    enabled: !!currentUser,
+  const { data: sentMessages = [], isLoading: isLoadingSent } = useQuery({
+    queryKey: ["/api/messages/sender", typedUser?.id, typedUser?.role],
+    enabled: !!typedUser,
     refetchInterval: 30000, // Auto-refresh elke 30 seconden
     refetchIntervalInBackground: true,
   });
 
   // Haal mogelijke ontvangers op met role-based filtering
-  const { data: receivers, isLoading: isLoadingReceivers } = useQuery({
-    queryKey: ["/api/messages/receivers", currentUser?.id, currentUser?.role],
-    enabled: !!currentUser,
+  const { data: receivers = [], isLoading: isLoadingReceivers } = useQuery({
+    queryKey: ["/api/messages/receivers", typedUser?.id, typedUser?.role],
+    enabled: !!typedUser,
     refetchInterval: 60000, // Minder frequent voor ontvangers lijst
   });
 
@@ -131,8 +135,8 @@ export default function Messages() {
       method: "POST",
       body: JSON.stringify({
         ...message,
-        senderId: currentUser.id,
-        senderRole: currentUser.role
+        senderId: typedUser.id,
+        senderRole: typedUser.role
       })
     }),
     onSuccess: () => {
@@ -202,8 +206,8 @@ export default function Messages() {
     }
 
     const messageToSend = {
-      senderId: currentUser.id,
-      senderRole: currentUser.role,
+      senderId: typedUser.id,
+      senderRole: typedUser.role,
       receiverId: newMessage.receiverId,
       receiverRole: newMessage.receiverRole,
       title: newMessage.title,
@@ -225,7 +229,7 @@ export default function Messages() {
 
   // Helper functie om afzender/ontvanger te formatteren
   const formatPersonName = (id: number, role: string): string => {
-    if (receivers) {
+    if (Array.isArray(receivers)) {
       const person = receivers.find((r: Receiver) => r.id === id && r.role === role);
       return person ? person.name : `${role} #${id}`;
     }
@@ -246,7 +250,6 @@ export default function Messages() {
     <div className="container mx-auto py-6">
       <PremiumHeader 
         title="Berichten"
-        subtitle="Beheer communicatie met studenten, docenten en voogden"
         icon={MessageCircle}
       />
 
@@ -313,7 +316,7 @@ export default function Messages() {
                       <div className="flex justify-center py-4">
                         <Loader2 className="h-6 w-6 animate-spin" />
                       </div>
-                    ) : inboxMessages && inboxMessages.length > 0 ? (
+                    ) : Array.isArray(inboxMessages) && inboxMessages.length > 0 ? (
                       <div className="divide-y divide-gray-100">
                         {inboxMessages.map((message: Message) => (
                           <div

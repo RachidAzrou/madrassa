@@ -12,7 +12,7 @@ import {
   Users,
   Target,
   Eye,
-  Edit3,
+  Edit,
   Trash2,
   TrendingUp,
   CreditCard,
@@ -493,30 +493,120 @@ export default function Fees() {
           <TabsContent value="settings" className="space-y-4">
             <div className="grid gap-4 md:grid-cols-2">
               <Card>
-                <CardHeader>
-                  <CardTitle>Collegegeld Tarieven</CardTitle>
-                  <CardDescription>
-                    Beheer de tarieven voor verschillende programma's
-                  </CardDescription>
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <div>
+                    <CardTitle className="text-[#1e41af]">Collegegeld Tarieven</CardTitle>
+                    <CardDescription>
+                      Beheer de tarieven voor verschillende programma's
+                    </CardDescription>
+                  </div>
+                  <Button 
+                    onClick={() => setShowTuitionRateDialog(true)}
+                    size="sm"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Nieuw Tarief
+                  </Button>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-center text-muted-foreground py-8">
-                    Geen tarifering instellingen beschikbaar
-                  </p>
+                  {tuitionRatesData.length > 0 ? (
+                    <div className="space-y-3">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Naam</TableHead>
+                            <TableHead>Bedrag</TableHead>
+                            <TableHead>Programma</TableHead>
+                            <TableHead>Acties</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {tuitionRatesData.map((rate: any) => (
+                            <TableRow key={rate.id}>
+                              <TableCell className="font-medium">{rate.name}</TableCell>
+                              <TableCell>€{rate.amount}</TableCell>
+                              <TableCell>{rate.programName || 'Onbekend'}</TableCell>
+                              <TableCell>
+                                <div className="flex gap-2">
+                                  <Button variant="ghost" size="sm">
+                                    <Edit className="h-4 w-4" />
+                                  </Button>
+                                  <Button variant="ghost" size="sm">
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  ) : (
+                    <p className="text-center text-muted-foreground py-8">
+                      Geen tarieven beschikbaar
+                    </p>
+                  )}
                 </CardContent>
               </Card>
               
               <Card>
-                <CardHeader>
-                  <CardTitle>Kortingsregelingen</CardTitle>
-                  <CardDescription>
-                    Beheer kortingen en speciale aanbiedingen
-                  </CardDescription>
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <div>
+                    <CardTitle className="text-[#1e41af]">Kortingsregelingen</CardTitle>
+                    <CardDescription>
+                      Beheer kortingen en speciale aanbiedingen
+                    </CardDescription>
+                  </div>
+                  <Button 
+                    onClick={() => setShowDiscountRuleDialog(true)}
+                    size="sm"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Nieuwe Korting
+                  </Button>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-center text-muted-foreground py-8">
-                    Geen kortingsregelingen beschikbaar
-                  </p>
+                  {discountRulesData.length > 0 ? (
+                    <div className="space-y-3">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Naam</TableHead>
+                            <TableHead>Type</TableHead>
+                            <TableHead>Waarde</TableHead>
+                            <TableHead>Geldig tot</TableHead>
+                            <TableHead>Acties</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {discountRulesData.map((rule: any) => (
+                            <TableRow key={rule.id}>
+                              <TableCell className="font-medium">{rule.name}</TableCell>
+                              <TableCell>
+                                <Badge variant="outline">{rule.type}</Badge>
+                              </TableCell>
+                              <TableCell>{rule.value}</TableCell>
+                              <TableCell>{rule.validUntil}</TableCell>
+                              <TableCell>
+                                <div className="flex gap-2">
+                                  <Button variant="ghost" size="sm">
+                                    <Edit className="h-4 w-4" />
+                                  </Button>
+                                  <Button variant="ghost" size="sm">
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  ) : (
+                    <p className="text-center text-muted-foreground py-8">
+                      Geen kortingsregelingen beschikbaar
+                    </p>
+                  )}
                 </CardContent>
               </Card>
             </div>
@@ -550,7 +640,7 @@ export default function Fees() {
 
         {/* Payment Dialog */}
         <Dialog open={showPaymentDialog} onOpenChange={setShowPaymentDialog}>
-          <DialogContent>
+          <CustomDialogContent>
             <DialogHeader>
               <DialogTitle>Nieuwe Betaling</DialogTitle>
               <DialogDescription>
@@ -632,7 +722,370 @@ export default function Fees() {
                 Opslaan
               </Button>
             </DialogFooter>
-          </DialogContent>
+          </CustomDialogContent>
+        </Dialog>
+
+        {/* Invoice Dialog */}
+        <Dialog open={showInvoiceDialog} onOpenChange={setShowInvoiceDialog}>
+          <CustomDialogContent>
+            <DialogHeader>
+              <DialogTitle>Nieuwe Factuur</DialogTitle>
+              <DialogDescription>
+                Maak een nieuwe factuur aan voor een student
+              </DialogDescription>
+            </DialogHeader>
+            <Form {...invoiceForm}>
+              <form className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={invoiceForm.control}
+                    name="studentId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Student</FormLabel>
+                        <Select onValueChange={(value) => field.onChange(parseInt(value))}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecteer student" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {studentsData.map((student: any) => (
+                              <SelectItem key={student.id} value={student.id.toString()}>
+                                {student.firstName} {student.lastName}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={invoiceForm.control}
+                    name="amount"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Bedrag</FormLabel>
+                        <FormControl>
+                          <Input placeholder="0.00" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <FormField
+                  control={invoiceForm.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Beschrijving</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Beschrijving van de factuur" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={invoiceForm.control}
+                    name="academicYear"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Academisch Jaar</FormLabel>
+                        <Select onValueChange={field.onChange}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecteer jaar" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {academicYearsData.map((year: any) => (
+                              <SelectItem key={year.id} value={year.name}>
+                                {year.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={invoiceForm.control}
+                    name="semester"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Semester</FormLabel>
+                        <Select onValueChange={field.onChange}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecteer semester" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="1">Semester 1</SelectItem>
+                            <SelectItem value="2">Semester 2</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <FormField
+                  control={invoiceForm.control}
+                  name="dueDate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Vervaldatum</FormLabel>
+                      <FormControl>
+                        <Input type="date" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </form>
+            </Form>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowInvoiceDialog(false)}>
+                Annuleren
+              </Button>
+              <Button onClick={() => setShowInvoiceDialog(false)}>
+                Factuur Maken
+              </Button>
+            </DialogFooter>
+          </CustomDialogContent>
+        </Dialog>
+
+        {/* Tuition Rate Dialog */}
+        <Dialog open={showTuitionRateDialog} onOpenChange={setShowTuitionRateDialog}>
+          <CustomDialogContent>
+            <DialogHeader>
+              <DialogTitle>Nieuw Tarief</DialogTitle>
+              <DialogDescription>
+                Voeg een nieuw collegegeld tarief toe
+              </DialogDescription>
+            </DialogHeader>
+            <Form {...tuitionRateForm}>
+              <form className="space-y-4">
+                <FormField
+                  control={tuitionRateForm.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Tarief Naam</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Bijv. Basis Collegegeld" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={tuitionRateForm.control}
+                    name="amount"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Bedrag</FormLabel>
+                        <FormControl>
+                          <Input placeholder="0.00" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={tuitionRateForm.control}
+                    name="programId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Programma</FormLabel>
+                        <Select onValueChange={(value) => field.onChange(parseInt(value))}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecteer programma" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {programsData.map((program: any) => (
+                              <SelectItem key={program.id} value={program.id.toString()}>
+                                {program.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <FormField
+                  control={tuitionRateForm.control}
+                  name="academicYear"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Academisch Jaar</FormLabel>
+                      <Select onValueChange={field.onChange}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecteer jaar" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {academicYearsData.map((year: any) => (
+                            <SelectItem key={year.id} value={year.name}>
+                              {year.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={tuitionRateForm.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Beschrijving (optioneel)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Extra informatie over dit tarief" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </form>
+            </Form>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowTuitionRateDialog(false)}>
+                Annuleren
+              </Button>
+              <Button onClick={() => setShowTuitionRateDialog(false)}>
+                Tarief Opslaan
+              </Button>
+            </DialogFooter>
+          </CustomDialogContent>
+        </Dialog>
+
+        {/* Discount Rule Dialog */}
+        <Dialog open={showDiscountRuleDialog} onOpenChange={setShowDiscountRuleDialog}>
+          <CustomDialogContent>
+            <DialogHeader>
+              <DialogTitle>Nieuwe Kortingsregeling</DialogTitle>
+              <DialogDescription>
+                Voeg een nieuwe kortingsregeling toe
+              </DialogDescription>
+            </DialogHeader>
+            <Form {...discountRuleForm}>
+              <form className="space-y-4">
+                <FormField
+                  control={discountRuleForm.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Korting Naam</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Bijv. Familiekorting" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={discountRuleForm.control}
+                    name="type"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Type</FormLabel>
+                        <Select onValueChange={field.onChange}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecteer type" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="percentage">Percentage</SelectItem>
+                            <SelectItem value="fixed">Vast bedrag</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={discountRuleForm.control}
+                    name="value"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Waarde</FormLabel>
+                        <FormControl>
+                          <Input placeholder="10% of €50" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <FormField
+                  control={discountRuleForm.control}
+                  name="conditions"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Voorwaarden</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Bijv. Minimaal 2 kinderen" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={discountRuleForm.control}
+                    name="validFrom"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Geldig vanaf</FormLabel>
+                        <FormControl>
+                          <Input type="date" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={discountRuleForm.control}
+                    name="validUntil"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Geldig tot</FormLabel>
+                        <FormControl>
+                          <Input type="date" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </form>
+            </Form>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowDiscountRuleDialog(false)}>
+                Annuleren
+              </Button>
+              <Button onClick={() => setShowDiscountRuleDialog(false)}>
+                Korting Opslaan
+              </Button>
+            </DialogFooter>
+          </CustomDialogContent>
         </Dialog>
 
         {/* Export Dialog */}

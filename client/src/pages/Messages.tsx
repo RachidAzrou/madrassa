@@ -73,42 +73,16 @@ export default function Messages() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Redirect if not authenticated
-  if (isAuthLoading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
-    );
-  }
-
-  if (!typedUser) {
-    window.location.href = "/api/login";
-    return null;
-  }
-
-  // Automatic refresh voor berichten elke 30 seconden
-  useEffect(() => {
-    if (!typedUser) return;
-    
-    const interval = setInterval(() => {
-      queryClient.invalidateQueries({ queryKey: ["/api/messages/receiver"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/messages/sender"] });
-    }, 30000); // 30 seconden
-
-    return () => clearInterval(interval);
-  }, [queryClient, typedUser]);
-
   // Haal berichten op voor de huidige gebruiker met automatic refresh
   const { data: inboxMessages = [], isLoading: isLoadingInbox } = useQuery({
-    queryKey: ["/api/messages/receiver", typedUser?.id, typedUser?.role],
+    queryKey: [`/api/messages/receiver/${typedUser?.id}/${typedUser?.role}`],
     enabled: !!typedUser,
     refetchInterval: 30000, // Auto-refresh elke 30 seconden
     refetchIntervalInBackground: true,
   });
 
   const { data: sentMessages = [], isLoading: isLoadingSent } = useQuery({
-    queryKey: ["/api/messages/sender", typedUser?.id, typedUser?.role],
+    queryKey: [`/api/messages/sender/${typedUser?.id}/${typedUser?.role}`],
     enabled: !!typedUser,
     refetchInterval: 30000, // Auto-refresh elke 30 seconden
     refetchIntervalInBackground: true,
@@ -116,7 +90,7 @@ export default function Messages() {
 
   // Haal mogelijke ontvangers op met role-based filtering
   const { data: receivers = [], isLoading: isLoadingReceivers } = useQuery({
-    queryKey: ["/api/messages/receivers", typedUser?.id, typedUser?.role],
+    queryKey: [`/api/messages/receivers/${typedUser?.id}/${typedUser?.role}`],
     enabled: !!typedUser,
     refetchInterval: 60000, // Minder frequent voor ontvangers lijst
   });
@@ -135,14 +109,14 @@ export default function Messages() {
       method: "POST",
       body: JSON.stringify({
         ...message,
-        senderId: typedUser.id,
-        senderRole: typedUser.role
+        senderId: typedUser?.id,
+        senderRole: typedUser?.role
       })
     }),
     onSuccess: () => {
       // Refresh beide query caches voor real-time updates
-      queryClient.invalidateQueries({ queryKey: ["/api/messages/sender"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/messages/receiver"] });
+      queryClient.invalidateQueries({ queryKey: [`/api/messages/sender/${typedUser?.id}/${typedUser?.role}`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/messages/receiver/${typedUser?.id}/${typedUser?.role}`] });
       setIsComposeOpen(false);
       setNewMessage({
         title: "",
@@ -206,8 +180,8 @@ export default function Messages() {
     }
 
     const messageToSend = {
-      senderId: typedUser.id,
-      senderRole: typedUser.role,
+      senderId: typedUser?.id,
+      senderRole: typedUser?.role,
       receiverId: newMessage.receiverId,
       receiverRole: newMessage.receiverRole,
       title: newMessage.title,

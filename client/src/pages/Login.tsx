@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Eye, EyeOff, LogIn, GraduationCap, Users, CreditCard, Shield, BookOpen } from 'lucide-react';
 import logoPath from '@assets/myMadrassa.png';
-import backgroundImage from '@assets/top-view-items-blue-background.jpg';
+import backgroundImageUrl from '@assets/top-view-items-blue-background.jpg';
 
 export default function Login() {
   const { login } = useAuth();
@@ -16,6 +16,9 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  
+  // Debug background image
+  console.log('Background image URL:', backgroundImageUrl);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,26 +45,19 @@ export default function Login() {
     <div 
       className="min-h-screen flex relative overflow-hidden"
       style={{
-        backgroundImage: `url(/top-view-items-blue-background.jpg)`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
+        backgroundColor: '#e0f2fe',
+        backgroundImage: `url(${backgroundImageUrl}), linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)`,
+        backgroundSize: 'cover, 100% 100%',
+        backgroundPosition: 'center, center',
+        backgroundRepeat: 'no-repeat, no-repeat',
+        backgroundBlendMode: 'overlay'
       }}
     >
-      {/* Blue overlay for better readability */}
+      {/* Educational overlay for better contrast */}
       <div 
         className="absolute inset-0"
         style={{
-          backgroundColor: 'rgba(59, 130, 246, 0.15)'
-        }}
-      ></div>
-      
-      {/* Blur overlay for modern effect */}
-      <div 
-        className="absolute inset-0"
-        style={{
-          backdropFilter: 'blur(1px)',
-          background: 'linear-gradient(135deg, rgba(219, 234, 254, 0.2) 0%, rgba(147, 197, 253, 0.1) 100%)'
+          background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(147, 197, 253, 0.1) 100%)'
         }}
       ></div>
       {/* Enhanced Educational Pattern Overlay */}

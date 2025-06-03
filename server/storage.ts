@@ -1429,6 +1429,229 @@ export class DatabaseStorage implements IStorage {
       return undefined;
     }
   }
+
+  // Payment operations implementation
+  async getPayments(): Promise<Payment[]> {
+    try {
+      const paymentsList = await db
+        .select({
+          id: payments.id,
+          invoiceId: payments.invoiceId,
+          studentId: payments.studentId,
+          amount: payments.amount,
+          description: payments.description,
+          status: payments.status,
+          paidAt: payments.paidAt,
+          createdAt: payments.createdAt,
+          studentName: sql<string>`CONCAT(${students.firstName}, ' ', ${students.lastName})`,
+          invoiceNumber: invoices.invoiceNumber
+        })
+        .from(payments)
+        .leftJoin(students, eq(payments.studentId, students.id))
+        .leftJoin(invoices, eq(payments.invoiceId, invoices.id))
+        .orderBy(desc(payments.createdAt));
+      
+      return paymentsList;
+    } catch (error) {
+      console.error('Error fetching payments:', error);
+      return [];
+    }
+  }
+
+  async getPayment(id: number): Promise<Payment | undefined> {
+    try {
+      const [payment] = await db.select().from(payments).where(eq(payments.id, id));
+      return payment || undefined;
+    } catch (error) {
+      console.error('Error fetching payment:', error);
+      return undefined;
+    }
+  }
+
+  async getPaymentByMollieId(molliePaymentId: string): Promise<Payment | undefined> {
+    try {
+      const [payment] = await db.select().from(payments).where(eq(payments.molliePaymentId, molliePaymentId));
+      return payment || undefined;
+    } catch (error) {
+      console.error('Error fetching payment by Mollie ID:', error);
+      return undefined;
+    }
+  }
+
+  async getPaymentsByStudent(studentId: number): Promise<Payment[]> {
+    try {
+      return await db.select().from(payments).where(eq(payments.studentId, studentId));
+    } catch (error) {
+      console.error('Error fetching payments by student:', error);
+      return [];
+    }
+  }
+
+  async getPaymentsByInvoice(invoiceId: number): Promise<Payment[]> {
+    try {
+      return await db.select().from(payments).where(eq(payments.invoiceId, invoiceId));
+    } catch (error) {
+      console.error('Error fetching payments by invoice:', error);
+      return [];
+    }
+  }
+
+  async getPaymentsByStatus(status: string): Promise<Payment[]> {
+    try {
+      return await db.select().from(payments).where(eq(payments.status, status));
+    } catch (error) {
+      console.error('Error fetching payments by status:', error);
+      return [];
+    }
+  }
+
+  async createPayment(payment: InsertPayment): Promise<Payment> {
+    try {
+      const [newPayment] = await db.insert(payments).values(payment).returning();
+      return newPayment;
+    } catch (error) {
+      console.error('Error creating payment:', error);
+      throw error;
+    }
+  }
+
+  async updatePayment(id: number, payment: Partial<Payment>): Promise<Payment | undefined> {
+    try {
+      const [updatedPayment] = await db
+        .update(payments)
+        .set({ ...payment, updatedAt: new Date() })
+        .where(eq(payments.id, id))
+        .returning();
+      return updatedPayment || undefined;
+    } catch (error) {
+      console.error('Error updating payment:', error);
+      return undefined;
+    }
+  }
+
+  async updatePaymentByMollieId(molliePaymentId: string, payment: Partial<Payment>): Promise<Payment | undefined> {
+    try {
+      const [updatedPayment] = await db
+        .update(payments)
+        .set({ ...payment, updatedAt: new Date() })
+        .where(eq(payments.molliePaymentId, molliePaymentId))
+        .returning();
+      return updatedPayment || undefined;
+    } catch (error) {
+      console.error('Error updating payment by Mollie ID:', error);
+      return undefined;
+    }
+  }
+
+  async deletePayment(id: number): Promise<boolean> {
+    try {
+      const result = await db.delete(payments).where(eq(payments.id, id));
+      return result.rowCount > 0;
+    } catch (error) {
+      console.error('Error deleting payment:', error);
+      return false;
+    }
+  }
+
+  async getPaymentStats(): Promise<{ totalPaid: number; totalPending: number; totalFailed: number; successRate: number; } | undefined> {
+    try {
+      const stats = await db
+        .select({
+          totalPaid: sql<number>`COALESCE(SUM(CASE WHEN ${payments.status} = 'paid' THEN CAST(${payments.amount} AS DECIMAL) ELSE 0 END), 0)`,
+          totalPending: sql<number>`COALESCE(SUM(CASE WHEN ${payments.status} = 'pending' THEN CAST(${payments.amount} AS DECIMAL) ELSE 0 END), 0)`,
+          totalFailed: sql<number>`COALESCE(SUM(CASE WHEN ${payments.status} = 'failed' THEN CAST(${payments.amount} AS DECIMAL) ELSE 0 END), 0)`,
+          totalCount: sql<number>`COUNT(*)`,
+          paidCount: sql<number>`SUM(CASE WHEN ${payments.status} = 'paid' THEN 1 ELSE 0 END)`
+        })
+        .from(payments);
+      
+      const result = stats[0];
+      if (!result) return undefined;
+      
+      const successRate = result.totalCount > 0 ? (result.paidCount / result.totalCount) * 100 : 0;
+      
+      return {
+        totalPaid: Number(result.totalPaid) || 0,
+        totalPending: Number(result.totalPending) || 0,
+        totalFailed: Number(result.totalFailed) || 0,
+        successRate: Number(successRate) || 0
+      };
+    } catch (error) {
+      console.error('Error fetching payment stats:', error);
+      return { totalPaid: 0, totalPending: 0, totalFailed: 0, successRate: 0 };
+    }
+  }
+
+  // Tuition Rates operations implementation
+  async getTuitionRates(): Promise<TuitionRate[]> {
+    try {
+      return await db.select().from(tuitionRates).where(eq(tuitionRates.isActive, true));
+    } catch (error) {
+      console.error('Error fetching tuition rates:', error);
+      return [];
+    }
+  }
+
+  async getTuitionRate(id: number): Promise<TuitionRate | undefined> {
+    try {
+      const [rate] = await db.select().from(tuitionRates).where(eq(tuitionRates.id, id));
+      return rate || undefined;
+    } catch (error) {
+      console.error('Error fetching tuition rate:', error);
+      return undefined;
+    }
+  }
+
+  async getTuitionRateByTypeAndYear(type: string, academicYear: string): Promise<TuitionRate | undefined> {
+    try {
+      const [rate] = await db
+        .select()
+        .from(tuitionRates)
+        .where(and(
+          eq(tuitionRates.type, type),
+          eq(tuitionRates.academicYear, academicYear),
+          eq(tuitionRates.isActive, true)
+        ));
+      return rate || undefined;
+    } catch (error) {
+      console.error('Error fetching tuition rate by type and year:', error);
+      return undefined;
+    }
+  }
+
+  async createTuitionRate(rate: InsertTuitionRate): Promise<TuitionRate> {
+    try {
+      const [newRate] = await db.insert(tuitionRates).values(rate).returning();
+      return newRate;
+    } catch (error) {
+      console.error('Error creating tuition rate:', error);
+      throw error;
+    }
+  }
+
+  async updateTuitionRate(id: number, rate: Partial<TuitionRate>): Promise<TuitionRate | undefined> {
+    try {
+      const [updatedRate] = await db
+        .update(tuitionRates)
+        .set(rate)
+        .where(eq(tuitionRates.id, id))
+        .returning();
+      return updatedRate || undefined;
+    } catch (error) {
+      console.error('Error updating tuition rate:', error);
+      return undefined;
+    }
+  }
+
+  async deleteTuitionRate(id: number): Promise<boolean> {
+    try {
+      const result = await db.delete(tuitionRates).where(eq(tuitionRates.id, id));
+      return result.rowCount > 0;
+    } catch (error) {
+      console.error('Error deleting tuition rate:', error);
+      return false;
+    }
+  }
 }
 
 export const storage = new DatabaseStorage();

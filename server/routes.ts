@@ -1074,6 +1074,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // ********************
+  // Payment Management API endpoints
+  // ********************
+  apiRouter.get("/api/payments", async (_req, res) => {
+    try {
+      const payments = await storage.getPayments();
+      res.json(payments);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching payments" });
+    }
+  });
+
+  apiRouter.get("/api/payment-stats", async (_req, res) => {
+    try {
+      const stats = await storage.getPaymentStats();
+      res.json(stats);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching payment statistics" });
+    }
+  });
+
+  apiRouter.get("/api/tuition-rates", async (_req, res) => {
+    try {
+      const rates = await storage.getTuitionRates();
+      res.json(rates);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching tuition rates" });
+    }
+  });
+
+  apiRouter.get("/api/fee-discounts", async (_req, res) => {
+    try {
+      const discounts = await storage.getFeeDiscounts();
+      res.json(discounts);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching fee discounts" });
+    }
+  });
+
+  // ********************
   // Attendance API endpoints
   // ********************
   apiRouter.get("/api/attendance", async (_req, res) => {

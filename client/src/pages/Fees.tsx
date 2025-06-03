@@ -53,9 +53,9 @@ export default function Fees() {
     select: (data: any) => Array.isArray(data) ? data : []
   });
   
-  const { data: paymentStats = {} } = useQuery({ 
+  const { data: paymentStats = { totalPaid: 0, totalPending: 0, successRate: 0 } } = useQuery({ 
     queryKey: ['/api/payment-stats'],
-    select: (data: any) => data || {}
+    select: (data: any) => data || { totalPaid: 0, totalPending: 0, successRate: 0 }
   });
 
   // Form instance

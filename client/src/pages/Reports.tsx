@@ -239,7 +239,7 @@ export default function Reports() {
     }
 
     const pdf = new jsPDF({
-      orientation: 'landscape',
+      orientation: 'portrait',
       unit: 'mm',
       format: 'a4'
     });
@@ -279,14 +279,14 @@ export default function Reports() {
       }
 
       // School name and title with modern typography
-      pdf.setFontSize(24);
+      pdf.setFontSize(16);
       pdf.setFont('helvetica', 'bold');
-      pdf.setTextColor(...primaryBlue);
+      pdf.setTextColor(33, 107, 169);
       pdf.text('RAPPORT', pageWidth - 20, 25, { align: 'right' });
       
-      pdf.setFontSize(10);
+      pdf.setFontSize(9);
       pdf.setFont('helvetica', 'normal');
-      pdf.setTextColor(...darkGray);
+      pdf.setTextColor(64, 75, 105);
       pdf.text(`Schooljaar ${report.student.academicYear || '2024-2025'}`, pageWidth - 20, 35, { align: 'right' });
 
       yPos = 65;
@@ -300,9 +300,9 @@ export default function Reports() {
       pdf.roundedRect(20, yPos, pageWidth - 40, 35, 3, 3, 'D');
 
       // Student info with icons (represented as Unicode symbols)
-      pdf.setFontSize(11);
+      pdf.setFontSize(10);
       pdf.setFont('helvetica', 'bold');
-      pdf.setTextColor(...primaryBlue);
+      pdf.setTextColor(33, 107, 169);
       
       // Left column
       pdf.text('👤 ' + `${report.student.firstName} ${report.student.lastName}`, 30, yPos + 12);
@@ -317,7 +317,7 @@ export default function Reports() {
       // Modern table with rounded corners and better colors
       const tableStartX = 20;
       const tableWidth = pageWidth - 40;
-      const colWidths = [70, 35, 35, 35, 95];
+      const colWidths = [50, 25, 25, 25, 45];
       
       // Table header with gradient effect
       pdf.setFillColor(...primaryBlue);

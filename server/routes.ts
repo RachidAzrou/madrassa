@@ -5476,6 +5476,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { name, startDate, endDate, isActive, registrationStartDate, registrationEndDate, finalReportDate, description } = req.body;
       
+      // Check if academic year with this name already exists
+      const existingYear = await db.select().from(schema.academicYears).where(eq(schema.academicYears.name, name));
+      
+      if (existingYear.length > 0) {
+        return res.status(400).json({ 
+          error: "Een schooljaar met deze naam bestaat al",
+          field: "name"
+        });
+      }
+      
       const [academicYear] = await db.insert(schema.academicYears).values({
         name,
         startDate,
@@ -5488,8 +5498,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }).returning();
       
       res.status(201).json(academicYear);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error creating academic year:", error);
+      
+      // Handle specific database constraint errors
+      if (error.code === '23505' && error.constraint === 'academic_years_name_key') {
+        return res.status(400).json({ 
+          error: "Een schooljaar met deze naam bestaat al",
+          field: "name"
+        });
+      }
+      
       res.status(500).json({ error: "Failed to create academic year" });
     }
   });

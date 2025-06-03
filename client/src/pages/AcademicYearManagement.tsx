@@ -103,9 +103,19 @@ export default function AcademicYearManagement() {
       });
     },
     onError: (error: any) => {
+      console.error('Create year error:', error);
+      let errorMessage = "Er ging iets mis bij het toevoegen van het schooljaar";
+      
+      // Check if it's a duplicate name error
+      if (error.message && error.message.includes("Een schooljaar met deze naam bestaat al")) {
+        errorMessage = "Een schooljaar met deze naam bestaat al. Kies een andere naam.";
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
         title: "Fout",
-        description: error.message || "Er ging iets mis bij het toevoegen van het schooljaar",
+        description: errorMessage,
         variant: "destructive",
       });
     }

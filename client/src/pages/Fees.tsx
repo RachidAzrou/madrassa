@@ -705,7 +705,7 @@ export default function Fees() {
                 Beheer alle openstaande en recente betalingen
               </CardDescription>
             </CardHeader>
-            <CardContent className="p-8 min-h-[700px]">
+            <CardContent className="p-8">
               <div className="flex gap-4 mb-6">
                 <div className="flex-1">
                   <Input
@@ -805,7 +805,7 @@ export default function Fees() {
                 Volledige geschiedenis met filteropties
               </CardDescription>
             </CardHeader>
-            <CardContent className="p-8 min-h-[700px]">
+            <CardContent className="p-8">
               <div className="flex gap-4 mb-6">
                 <div className="flex-1">
                   <Input
@@ -895,7 +895,7 @@ export default function Fees() {
                   Systeem berekent automatisch familiekortingen voor gezinnen met meerdere kinderen
                 </CardDescription>
               </CardHeader>
-              <CardContent className="p-8 min-h-[500px]">
+              <CardContent className="p-8">
                 <div className="space-y-6">
                   <div className="bg-green-50 p-6 rounded-lg">
                     <div className="flex items-center mb-3">
@@ -955,7 +955,7 @@ export default function Fees() {
                   Beheer speciale kortingen voor sociale tarieven en personeel
                 </CardDescription>
               </CardHeader>
-              <CardContent className="p-8 min-h-[500px]">
+              <CardContent className="p-8">
                 <div className="space-y-6">
                   <div className="grid gap-4">
                     <div className="bg-blue-50 p-5 rounded-lg">
@@ -1076,7 +1076,7 @@ export default function Fees() {
                 Goedkeuren en beheren van ingediende kortingsaanvragen
               </CardDescription>
             </CardHeader>
-            <CardContent className="p-8 min-h-[600px]">
+            <CardContent className="p-8">
               <Table>
                 <TableHeader>
                   <TableRow>

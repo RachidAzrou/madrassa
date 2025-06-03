@@ -1031,3 +1031,187 @@ export const insertStudentSiblingSchema = createInsertSchema(studentSiblings).om
 
 export type InsertStudentSibling = z.infer<typeof insertStudentSiblingSchema>;
 export type StudentSibling = typeof studentSiblings.$inferSelect;
+
+// Academic Years (Schooljaren)
+export const academicYears = pgTable("academic_years", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(), // e.g. "2024-2025"
+  startDate: date("start_date").notNull(),
+  endDate: date("end_date").notNull(),
+  isActive: boolean("is_active").default(false),
+  registrationStartDate: date("registration_start_date"), // Wanneer herinschrijving start
+  registrationEndDate: date("registration_end_date"), // Wanneer herinschrijving eindigt
+  finalReportDate: date("final_report_date"), // Eindrapport datum
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => {
+  return {
+    unqName: unique().on(table.name),
+  };
+});
+
+export const insertAcademicYearSchema = createInsertSchema(academicYears).omit({
+  id: true,
+  createdAt: true
+});
+
+export type InsertAcademicYear = z.infer<typeof insertAcademicYearSchema>;
+export type AcademicYear = typeof academicYears.$inferSelect;
+
+// School Holidays (Schoolvakanties)
+export const schoolHolidays = pgTable("school_holidays", {
+  id: serial("id").primaryKey(),
+  academicYearId: integer("academic_year_id").notNull().references(() => academicYears.id),
+  name: text("name").notNull(), // e.g. "Kerstvakantie", "Paasvakantie"
+  startDate: date("start_date").notNull(),
+  endDate: date("end_date").notNull(),
+  type: text("type").notNull().default("holiday"), // holiday, closure, exam_period
+  description: text("description"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertSchoolHolidaySchema = createInsertSchema(schoolHolidays).omit({
+  id: true,
+  createdAt: true
+});
+
+export type InsertSchoolHoliday = z.infer<typeof insertSchoolHolidaySchema>;
+export type SchoolHoliday = typeof schoolHolidays.$inferSelect;
+
+// Academic Progress (Academische Voortgang)
+export const academicProgress = pgTable("academic_progress", {
+  id: serial("id").primaryKey(),
+  studentId: integer("student_id").notNull().references(() => students.id),
+  academicYearId: integer("academic_year_id").notNull().references(() => academicYears.id),
+  classId: integer("class_id").notNull().references(() => studentGroups.id),
+  programId: integer("program_id").notNull().references(() => programs.id),
+  finalGrade: decimal("final_grade", { precision: 4, scale: 2 }), // Eindcijfer
+  averageGrade: decimal("average_grade", { precision: 4, scale: 2 }), // Gemiddeld cijfer
+  attendancePercentage: decimal("attendance_percentage", { precision: 5, scale: 2 }), // Aanwezigheidspercentage
+  isPassed: boolean("is_passed"), // Geslaagd of niet
+  status: text("status").notNull().default("in_progress"), // in_progress, passed, failed, transferred
+  promotionEligible: boolean("promotion_eligible").default(false), // Geschikt voor promotie
+  notes: text("notes"), // Opmerkingen van docenten
+  completedAt: timestamp("completed_at"), // Wanneer het jaar voltooid is
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => {
+  return {
+    unqStudentYear: unique().on(table.studentId, table.academicYearId),
+  };
+});
+
+export const insertAcademicProgressSchema = createInsertSchema(academicProgress).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true
+});
+
+export type InsertAcademicProgress = z.infer<typeof insertAcademicProgressSchema>;
+export type AcademicProgress = typeof academicProgress.$inferSelect;
+
+// Re-enrollments (Herinschrijvingen)
+export const reEnrollments = pgTable("re_enrollments", {
+  id: serial("id").primaryKey(),
+  studentId: integer("student_id").notNull().references(() => students.id),
+  fromAcademicYearId: integer("from_academic_year_id").notNull().references(() => academicYears.id),
+  toAcademicYearId: integer("to_academic_year_id").notNull().references(() => academicYears.id),
+  fromClassId: integer("from_class_id").references(() => studentGroups.id),
+  toClassId: integer("to_class_id").references(() => studentGroups.id),
+  fromProgramId: integer("from_program_id").references(() => programs.id),
+  toProgramId: integer("to_program_id").references(() => programs.id),
+  status: text("status").notNull().default("pending"), // pending, approved, rejected, completed
+  isPromotion: boolean("is_promotion").default(true), // true = promotie, false = blijven zitten
+  applicationDate: timestamp("application_date").defaultNow(),
+  approvedBy: integer("approved_by").references(() => teachers.id),
+  approvedAt: timestamp("approved_at"),
+  rejectedReason: text("rejected_reason"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertReEnrollmentSchema = createInsertSchema(reEnrollments).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  applicationDate: true
+});
+
+export type InsertReEnrollment = z.infer<typeof insertReEnrollmentSchema>;
+export type ReEnrollment = typeof reEnrollments.$inferSelect;
+
+// Relations voor de nieuwe tabellen
+export const academicYearsRelations = relations(academicYears, ({ many }) => ({
+  schoolHolidays: many(schoolHolidays),
+  academicProgress: many(academicProgress),
+  reEnrollmentsFrom: many(reEnrollments, { relationName: "from_academic_year" }),
+  reEnrollmentsTo: many(reEnrollments, { relationName: "to_academic_year" }),
+}));
+
+export const schoolHolidaysRelations = relations(schoolHolidays, ({ one }) => ({
+  academicYear: one(academicYears, {
+    fields: [schoolHolidays.academicYearId],
+    references: [academicYears.id],
+  }),
+}));
+
+export const academicProgressRelations = relations(academicProgress, ({ one }) => ({
+  student: one(students, {
+    fields: [academicProgress.studentId],
+    references: [students.id],
+  }),
+  academicYear: one(academicYears, {
+    fields: [academicProgress.academicYearId],
+    references: [academicYears.id],
+  }),
+  class: one(studentGroups, {
+    fields: [academicProgress.classId],
+    references: [studentGroups.id],
+  }),
+  program: one(programs, {
+    fields: [academicProgress.programId],
+    references: [programs.id],
+  }),
+}));
+
+export const reEnrollmentsRelations = relations(reEnrollments, ({ one }) => ({
+  student: one(students, {
+    fields: [reEnrollments.studentId],
+    references: [students.id],
+  }),
+  fromAcademicYear: one(academicYears, {
+    fields: [reEnrollments.fromAcademicYearId],
+    references: [academicYears.id],
+    relationName: "from_academic_year"
+  }),
+  toAcademicYear: one(academicYears, {
+    fields: [reEnrollments.toAcademicYearId],
+    references: [academicYears.id],
+    relationName: "to_academic_year"
+  }),
+  fromClass: one(studentGroups, {
+    fields: [reEnrollments.fromClassId],
+    references: [studentGroups.id],
+    relationName: "from_class"
+  }),
+  toClass: one(studentGroups, {
+    fields: [reEnrollments.toClassId],
+    references: [studentGroups.id],
+    relationName: "to_class"
+  }),
+  fromProgram: one(programs, {
+    fields: [reEnrollments.fromProgramId],
+    references: [programs.id],
+    relationName: "from_program"
+  }),
+  toProgram: one(programs, {
+    fields: [reEnrollments.toProgramId],
+    references: [programs.id],
+    relationName: "to_program"
+  }),
+  approver: one(teachers, {
+    fields: [reEnrollments.approvedBy],
+    references: [teachers.id],
+  }),
+}));

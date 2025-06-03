@@ -30,6 +30,7 @@ import Planning from "@/pages/Planning";
 import Fees from "@/pages/Fees";
 import StudentDossier from "@/pages/StudentDossier";
 import Profile from "@/pages/Profile";
+import ReEnrollment from "@/pages/ReEnrollment";
 
 // Authentication check route component
 function AuthenticatedRoute({ component: Component, ...rest }: any) {

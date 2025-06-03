@@ -24,7 +24,10 @@ export default function Reports() {
   // Fetch data
   const { data: students = [] } = useQuery({ queryKey: ['/api/students'] });
   const { data: classes = [] } = useQuery({ queryKey: ['/api/student-groups'] });
-  const { data: courses = [] } = useQuery({ queryKey: ['/api/courses'] });
+  const { data: coursesData } = useQuery({ queryKey: ['/api/courses'] });
+  
+  // Extract courses array from the response - handle both array and object formats
+  const courses = Array.isArray(coursesData) ? coursesData : (coursesData?.courses || []);
 
   const handleCourseChange = (courseId: string) => {
     setSelectedCourse(courseId);
@@ -57,8 +60,8 @@ export default function Reports() {
   // Filter students based on selected class
   const filteredStudents = selectedClass 
     ? (students as any[]).filter((student: any) => {
-        // Find students in the selected class
-        return true; // Simplified for now
+        // Filter students by selected class - this would need proper class-student relationship
+        return student.classId === parseInt(selectedClass) || true; // Show all for now
       })
     : (students as any[]);
 
@@ -135,10 +138,10 @@ export default function Reports() {
                     <SelectValue placeholder="Selecteer een curriculum" />
                   </SelectTrigger>
                   <SelectContent>
-                    {(courses as any[]).length === 0 ? (
+                    {courses.length === 0 ? (
                       <SelectItem value="loading" disabled>Curriculum laden...</SelectItem>
                     ) : (
-                      (courses as any[]).map((course: any) => (
+                      courses.map((course: any) => (
                         <SelectItem key={course.id} value={course.id.toString()}>
                           {course.name || course.title} ({course.courseCode})
                         </SelectItem>

@@ -294,9 +294,9 @@ export default function Accounts() {
   // Filter accounts
   const filteredAccounts = accountsData.filter((account: UserAccount) => {
     const matchesSearch = 
-      account.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      account.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      account.email.toLowerCase().includes(searchTerm.toLowerCase());
+      (account.firstName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (account.lastName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (account.email || '').toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesRole = roleFilter === "all" || account.role === roleFilter;
     const matchesStatus = statusFilter === "all" || 

@@ -39,6 +39,8 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { toast } from '@/hooks/use-toast';
 import { PageHeader } from '@/components/layout/page-header';
+import { ExportButton } from '@/components/ui/export-button';
+import { ExportDialog } from '@/components/ui/export-dialog';
 
 // Form schemas
 const paymentFormSchema = z.object({
@@ -53,6 +55,7 @@ export default function Fees() {
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPayment, setSelectedPayment] = useState<any>(null);
+  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
   
   // Echte data queries - alleen authentieke database informatie
   const { data: studentsData = [] } = useQuery({ 
@@ -95,12 +98,10 @@ export default function Fees() {
   };
 
   // Export handlers
-  const handleExportExcel = () => {
-    toast({ title: "Export gestart", description: "Het Excel bestand wordt gegenereerd..." });
-  };
-
-  const handleExportCSV = () => {
-    toast({ title: "Export gestart", description: "Het CSV bestand wordt gegenereerd..." });
+  const handleExport = (format: string) => {
+    // Implementeer export functionaliteit
+    console.log(`Exporteren naar ${format}`);
+    toast({ title: "Export gestart", description: `Het ${format.toUpperCase()} bestand wordt gegenereerd...` });
   };
 
   // Filter payments based on search - alleen echte data
@@ -148,14 +149,10 @@ export default function Fees() {
             </Button>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={handleExportCSV} className="border-[#e5e7eb]">
-              <Download className="h-4 w-4 mr-2" />
-              Export CSV
-            </Button>
-            <Button variant="outline" size="sm" onClick={handleExportExcel} className="border-[#e5e7eb]">
-              <Download className="h-4 w-4 mr-2" />
-              Export Excel
-            </Button>
+            <ExportButton 
+              onClick={() => setIsExportDialogOpen(true)}
+              title="Exporteer betalingsgegevens"
+            />
           </div>
         </div>
 
@@ -444,14 +441,10 @@ export default function Fees() {
                 </p>
               </div>
               <div className="flex gap-2">
-                <Button variant="outline" onClick={handleExportCSV}>
-                  <Download className="h-4 w-4 mr-2" />
-                  CSV Export
-                </Button>
-                <Button variant="outline" onClick={handleExportExcel}>
-                  <Download className="h-4 w-4 mr-2" />
-                  Excel Export
-                </Button>
+                <ExportButton 
+                  onClick={() => setIsExportDialogOpen(true)}
+                  title="Exporteer betalingsgegevens"
+                />
               </div>
             </div>
             

@@ -307,30 +307,7 @@ export default function Profile() {
           </Card>
         </div>
 
-        {/* Bio */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-[#1e40af]" />
-              Over mij
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <Label htmlFor="bio">Beschrijving</Label>
-              {isEditing ? (
-                <Textarea
-                  id="bio"
-                  value={formData.bio}
-                  onChange={(e) => handleInputChange('bio', e.target.value)}
-                  rows={4}
-                />
-              ) : (
-                <p className="text-sm bg-gray-50 p-3 rounded">{formData.bio}</p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+
 
         {/* Wachtwoord wijzigen */}
         <Card>

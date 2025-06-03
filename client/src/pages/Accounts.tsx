@@ -41,7 +41,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { PageHeader } from "@/components/ui/page-header";
+import PageHeader from "@/components/common/PageHeader";
 import { DeleteDialog } from "@/components/ui/delete-dialog";
 import { apiRequest } from "@/lib/queryClient";
 
@@ -247,8 +247,8 @@ export default function Accounts() {
   return (
     <div className="flex-1 space-y-6 p-6">
       <PageHeader
-        heading="Account Beheer"
-        text="Beheer gebruikersaccounts en toegangsrechten voor het systeem."
+        title="Account Beheer"
+        description="Beheer gebruikersaccounts en toegangsrechten voor het systeem."
       />
       
       <div className="space-y-6">

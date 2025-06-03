@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Eye, EyeOff, LogIn, GraduationCap, Users, CreditCard, Shield, BookOpen } from 'lucide-react';
 import logoPath from '@assets/myMadrassa.png';
+import backgroundPath from '@assets/top-view-items-blue-background.jpg';
 
 export default function Login() {
   const { login } = useAuth();
@@ -41,88 +42,29 @@ export default function Login() {
     <div 
       className="min-h-screen flex relative overflow-hidden"
       style={{
-        background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #ecfeff 100%)'
+        backgroundImage: `url(${backgroundPath})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
       }}
     >
-      {/* Background Pattern - Educational Theme */}
-      <div className="absolute inset-0">
-        {/* Geometric shapes representing knowledge and learning */}
-        <div 
-          className="absolute top-20 left-20 w-32 h-32 rounded-full"
-          style={{
-            background: 'linear-gradient(135deg, #93c5fd, #6366f1)',
-            filter: 'blur(40px)',
-            opacity: 0.3
-          }}
-        ></div>
-        <div 
-          className="absolute top-40 right-40 w-24 h-24 rounded-lg transform rotate-45"
-          style={{
-            background: 'linear-gradient(135deg, #86efac, #10b981)',
-            filter: 'blur(30px)',
-            opacity: 0.3
-          }}
-        ></div>
-        <div 
-          className="absolute bottom-32 left-32 w-40 h-40 rounded-full"
-          style={{
-            background: 'linear-gradient(135deg, #c4b5fd, #8b5cf6)',
-            filter: 'blur(50px)',
-            opacity: 0.3
-          }}
-        ></div>
-        <div 
-          className="absolute bottom-20 right-20 w-28 h-28 rounded-lg transform rotate-12"
-          style={{
-            background: 'linear-gradient(135deg, #fdba74, #f97316)',
-            filter: 'blur(35px)',
-            opacity: 0.3
-          }}
-        ></div>
-        <div 
-          className="absolute top-1/2 left-1/2 w-60 h-60 rounded-full transform -translate-x-1/2 -translate-y-1/2"
-          style={{
-            background: 'linear-gradient(135deg, #e0e7ff, #c7d2fe)',
-            filter: 'blur(60px)',
-            opacity: 0.2
-          }}
-        ></div>
-        
-        {/* Floating educational elements */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div 
-            className="absolute top-1/4 left-1/4 w-4 h-4 rounded-full"
-            style={{
-              background: '#3b82f6',
-              opacity: 0.2,
-              animation: 'float 6s ease-in-out infinite'
-            }}
-          ></div>
-          <div 
-            className="absolute top-3/4 right-1/4 w-3 h-3 rounded-full"
-            style={{
-              background: '#10b981',
-              opacity: 0.3,
-              animation: 'float 8s ease-in-out infinite reverse'
-            }}
-          ></div>
-          <div 
-            className="absolute top-1/2 right-1/3 w-2 h-2 rounded-full"
-            style={{
-              background: '#8b5cf6',
-              opacity: 0.25,
-              animation: 'float 7s ease-in-out infinite'
-            }}
-          ></div>
-        </div>
-      </div>
+      {/* Blurred overlay */}
+      <div 
+        className="absolute inset-0 z-0"
+        style={{
+          backdropFilter: 'blur(8px)',
+          background: 'rgba(59, 130, 246, 0.15)'
+        }}
+      ></div>
 
-      <style jsx>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-20px); }
-        }
-      `}</style>
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+          }
+        `
+      }} />
 
       {/* Left side - Brand */}
       <div 

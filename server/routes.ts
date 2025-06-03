@@ -5530,6 +5530,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       
+      // First delete all holidays associated with this academic year
+      await db.delete(schema.schoolHolidays)
+        .where(eq(schema.schoolHolidays.academicYearId, id));
+      
+      // Then delete the academic year
       const [deletedYear] = await db.delete(schema.academicYears)
         .where(eq(schema.academicYears.id, id))
         .returning();

@@ -778,7 +778,7 @@ export default function Reports() {
                 </div>
 
                 <div className="flex justify-center gap-4">
-                  <Button onClick={() => generatePreviewData()} variant="outline">
+                  <Button onClick={() => generatePreviewData()} variant="outline" size="lg">
                     <Eye className="h-4 w-4 mr-2" />
                     Ververs voorvertoning
                   </Button>

@@ -76,10 +76,12 @@ export const ROLE_PERMISSIONS: RolePermissions[] = [
   {
     role: 'teacher',
     permissions: [
-      { resource: RESOURCES.STUDENTS, action: 'read' },
-      { resource: RESOURCES.CLASSES, action: 'read' },
-      { resource: RESOURCES.ATTENDANCE, action: 'manage' },
-      { resource: RESOURCES.GRADES, action: 'manage' },
+      { resource: RESOURCES.STUDENTS, action: 'read' }, // Own students only
+      { resource: RESOURCES.CLASSES, action: 'read' }, // Own classes only
+      { resource: RESOURCES.GUARDIANS, action: 'read' }, // Own students' guardians only
+      { resource: RESOURCES.ATTENDANCE, action: 'manage' }, // Own classes only
+      { resource: RESOURCES.GRADES, action: 'manage' }, // Own subjects only
+      { resource: RESOURCES.REPORTS, action: 'manage' }, // Own students only
       { resource: RESOURCES.DASHBOARD, action: 'read' },
       { resource: RESOURCES.NOTIFICATIONS, action: 'read' }
     ]

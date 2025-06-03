@@ -280,6 +280,10 @@ export default function Fees() {
     window.open(`/api/payments/${payment.id}/invoice.pdf`, '_blank');
   };
 
+  const handleNewPayment = () => {
+    setShowAddPaymentDialog(true);
+  };
+
   const handleExportData = () => {
     const params = new URLSearchParams({
       status: statusFilter,

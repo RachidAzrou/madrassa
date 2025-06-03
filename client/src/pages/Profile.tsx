@@ -500,9 +500,12 @@ export default function Profile() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <MapPin className="h-5 w-5 text-[#1e40af]" />
+                <MapPin className="h-5 w-5" />
                 Adresgegevens
               </CardTitle>
+              <CardDescription>
+                Beheer je adres en contactinformatie
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
@@ -554,9 +557,12 @@ export default function Profile() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Lock className="h-5 w-5 text-[#1e40af]" />
+              <Lock className="h-5 w-5" />
               Wachtwoord wijzigen
             </CardTitle>
+            <CardDescription>
+              Wijzig je wachtwoord voor extra beveiliging
+            </CardDescription>
           </CardHeader>
           <CardContent>
             {!isChangingPassword ? (

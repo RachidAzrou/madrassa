@@ -82,7 +82,7 @@ export default function Reports() {
   const [selectedReportType, setSelectedReportType] = useState<'class' | 'individual'>('class');
   const [selectedClass, setSelectedClass] = useState<string>('');
   const [selectedStudent, setSelectedStudent] = useState<string>('');
-  const [schoolLogo, setSchoolLogo] = useState<string>('');
+  const [schoolName, setSchoolName] = useState<string>('myMadrassa');
   const [generalComments, setGeneralComments] = useState<{[key: number]: string}>({});
   const [behaviorGrades, setBehaviorGrades] = useState<{[key: number]: BehaviorGrade}>({});
 
@@ -116,16 +116,7 @@ export default function Reports() {
     },
   });
 
-  const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setSchoolLogo(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+  // No longer needed - removed logo upload functionality
 
   const generateReportData = async () => {
     try {
@@ -240,20 +231,11 @@ export default function Reports() {
       pdf.setFillColor(33, 107, 169);
       pdf.rect(0, 0, pageWidth, 3, 'F');
 
-      // Logo and title section
-      if (schoolLogo) {
-        try {
-          pdf.addImage(schoolLogo, 'JPEG', 20, 12, 40, 25);
-        } catch (error) {
-          console.warn('Could not add logo to PDF:', error);
-        }
-      }
-
-      // School name and title with modern typography
+      // School name as title
       pdf.setFontSize(20);
       pdf.setFont('helvetica', 'bold');
       pdf.setTextColor(33, 107, 169);
-      pdf.text('myMadrassa', 20, 25);
+      pdf.text(schoolName, 20, 25);
       
       pdf.setFontSize(16);
       pdf.setFont('helvetica', 'bold');
@@ -290,10 +272,10 @@ export default function Reports() {
 
       yPos += 50;
 
-      // Modern table with rounded corners and better colors
+      // Modern table with optimized column widths for portrait
       const tableStartX = 20;
       const tableWidth = pageWidth - 40;
-      const colWidths = [50, 25, 25, 25, 45];
+      const colWidths = [60, 30, 30, 30, 20];
       
       // Table header with gradient effect
       pdf.setFillColor(33, 107, 169);
@@ -306,13 +288,13 @@ export default function Reports() {
       let xPos = tableStartX;
       pdf.text('VAK', xPos + 5, yPos + 12);
       xPos += colWidths[0];
-      pdf.text('TESTEN', xPos + 8, yPos + 12);
+      pdf.text('TESTEN', xPos + 3, yPos + 12);
       xPos += colWidths[1];
-      pdf.text('TAKEN', xPos + 8, yPos + 12);
+      pdf.text('TAKEN', xPos + 3, yPos + 12);
       xPos += colWidths[2];
-      pdf.text('EXAMEN', xPos + 6, yPos + 12);
+      pdf.text('EXAMEN', xPos + 3, yPos + 12);
       xPos += colWidths[3];
-      pdf.text('OPMERKINGEN', xPos + 5, yPos + 12);
+      pdf.text('BEORD.', xPos + 2, yPos + 12);
       
       yPos += 18;
 
@@ -371,9 +353,18 @@ export default function Reports() {
         pdf.text('-', xPos + 15, yPos + 10, { align: 'center' });
         xPos += colWidths[3];
         
-        // Comments (brief)
+        // Comments based on performance
         pdf.setTextColor(64, 75, 105);
-        pdf.text('Goed', xPos + 5, yPos + 10);
+        const avgScore = (parseFloat(testAvg) + parseFloat(taskAvg)) / 2;
+        let comment = 'Goed';
+        if (!isNaN(avgScore)) {
+          if (avgScore >= 8) comment = 'Uitstekend';
+          else if (avgScore >= 7) comment = 'Goed';
+          else if (avgScore >= 6) comment = 'Voldoende';
+          else comment = 'Aandacht nodig';
+        }
+        const shortComment = comment.substring(0, 8);
+        pdf.text(shortComment, xPos + 2, yPos + 10);
         
         yPos += 15;
       });
@@ -424,7 +415,7 @@ export default function Reports() {
       pdf.setFontSize(16);
       pdf.setFont('helvetica', 'bold');
       pdf.setTextColor(33, 107, 169);
-      pdf.text('myMadrassa - Rapport Pagina 2', 20, 25);
+      pdf.text(`${schoolName} - Rapport Pagina 2`, 20, 25);
       
       pdf.setFontSize(10);
       pdf.setFont('helvetica', 'normal');
@@ -606,24 +597,17 @@ export default function Reports() {
 
               <Separator />
 
-              {/* School Logo Upload */}
+              {/* School Name Input */}
               <div className="space-y-2">
-                <Label htmlFor="logo-upload">School Logo</Label>
-                <div className="flex items-center gap-2">
-                  <Input
-                    id="logo-upload"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleLogoUpload}
-                    className="flex-1"
-                  />
-                  <Upload className="h-4 w-4 text-gray-400" />
-                </div>
-                {schoolLogo && (
-                  <div className="mt-2">
-                    <img src={schoolLogo} alt="School Logo" className="h-16 w-auto border rounded" />
-                  </div>
-                )}
+                <Label htmlFor="school-name">Schoolnaam</Label>
+                <Input
+                  id="school-name"
+                  type="text"
+                  value={schoolName}
+                  onChange={(e) => setSchoolName(e.target.value)}
+                  placeholder="Voer schoolnaam in..."
+                  className="w-full"
+                />
               </div>
 
               <Separator />

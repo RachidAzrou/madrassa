@@ -164,7 +164,7 @@ export default function Profile() {
                   <div className="flex gap-2">
                     <Button
                       onClick={handleSave}
-                      className="bg-green-600 hover:bg-green-700"
+                      className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded text-sm font-medium tracking-tight ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 text-white shadow-sm h-9 px-4 py-2 hover:bg-green-700 bg-[#3a5a99]"
                     >
                       <Save className="h-4 w-4 mr-2" />
                       Opslaan

@@ -313,7 +313,7 @@ export default function Reports() {
           className="w-full"
           onValueChange={(value) => setActiveTab(value)}
         >
-          <TabsList className="grid w-full grid-cols-3 h-11">
+          <TabsList className="grid w-full grid-cols-2 h-11">
             <TabsTrigger value="configure" className="text-sm flex items-center gap-2">
               <Settings className="h-4 w-4" />
               Configuratie
@@ -321,10 +321,6 @@ export default function Reports() {
             <TabsTrigger value="preview" className="text-sm flex items-center gap-2">
               <Eye className="h-4 w-4" />
               Voorvertoning
-            </TabsTrigger>
-            <TabsTrigger value="statistics" className="text-sm flex items-center gap-2">
-              <BarChart3 className="h-4 w-4" />
-              Statistieken
             </TabsTrigger>
           </TabsList>
 
@@ -780,57 +776,7 @@ export default function Reports() {
             )}
           </TabsContent>
 
-          <TabsContent value="statistics" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">Totaal Klassen</p>
-                      <p className="text-2xl font-bold">{classes.length}</p>
-                    </div>
-                    <Users className="h-8 w-8 text-blue-600" />
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">Totaal Studenten</p>
-                      <p className="text-2xl font-bold">{students.length}</p>
-                    </div>
-                    <User className="h-8 w-8 text-green-600" />
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">Vakken</p>
-                      <p className="text-2xl font-bold">{subjects.length}</p>
-                    </div>
-                    <Calculator className="h-8 w-8 text-purple-600" />
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">Rapporten</p>
-                      <p className="text-2xl font-bold">{reportPreview.length}</p>
-                    </div>
-                    <FileText className="h-8 w-8 text-orange-600" />
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
+
         </Tabs>
       </div>
     </DataTableContainer>

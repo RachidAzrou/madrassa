@@ -41,7 +41,6 @@ import {
   insertTeacherAttendanceSchema,
   insertBehaviorAssessmentSchema,
   insertNotificationSchema,
-  insertMessageSchema,
   type Student,
   type Teacher,
   type BehaviorAssessment,

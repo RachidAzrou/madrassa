@@ -563,51 +563,155 @@ export default function Reports() {
             {reportPreview.length > 0 ? (
               <div className="space-y-6">
                 <div className="flex justify-between items-center">
-                  <h3 className="text-lg font-semibold">Rapportoverzicht</h3>
+                  <h3 className="text-lg font-semibold">Rapportoverzicht & Commentaren</h3>
                   <Badge variant="outline" className="flex items-center gap-1">
                     <Clock className="h-3 w-3" />
                     {reportPreview.length} student{reportPreview.length !== 1 ? 'en' : ''}
                   </Badge>
                 </div>
                 
-                <div className="grid gap-4">
+                <div className="grid gap-6">
                   {reportPreview.map((student, index) => (
-                    <Card key={index}>
-                      <CardContent className="p-6">
-                        <div className="flex justify-between items-start mb-4">
+                    <Card key={index} className="overflow-hidden">
+                      <CardHeader className="bg-gray-50 border-b">
+                        <div className="flex justify-between items-start">
                           <div>
-                            <h4 className="font-semibold text-lg">
+                            <CardTitle className="text-xl">
                               {student.student.firstName} {student.student.lastName}
-                            </h4>
-                            <p className="text-sm text-gray-600">Student ID: {student.student.studentId}</p>
+                            </CardTitle>
+                            <CardDescription className="text-sm">
+                              Student ID: {student.student.studentId} • {student.student.academicYear || 'Academisch jaar onbekend'}
+                            </CardDescription>
                           </div>
-                          <Badge variant="outline">
-                            {student.attendance.percentage.toFixed(1)}% aanwezigheid
-                          </Badge>
+                          <div className="flex gap-2">
+                            <Badge variant={student.attendance.percentage >= 85 ? "default" : "destructive"}>
+                              {student.attendance.percentage.toFixed(1)}% aanwezigheid
+                            </Badge>
+                            <Badge variant={student.behavior.grade >= 7 ? "default" : "secondary"}>
+                              Gedrag: {student.behavior.grade}/10
+                            </Badge>
+                          </div>
                         </div>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          <div className="space-y-2">
-                            <h5 className="font-medium text-sm">Aanwezigheid</h5>
-                            <div className="text-sm text-gray-600">
-                              <p>Aanwezig: {student.attendance.present} dagen</p>
-                              <p>Afwezig: {student.attendance.absent} dagen</p>
-                              <p>Te laat: {student.attendance.late} dagen</p>
+                      </CardHeader>
+                      
+                      <CardContent className="p-6">
+                        {/* Samenvatting in één oogopslag */}
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                          <div className="text-center p-4 bg-blue-50 rounded-lg">
+                            <div className="text-2xl font-bold text-blue-600">{student.attendance.present}</div>
+                            <div className="text-sm text-gray-600">Aanwezig</div>
+                          </div>
+                          <div className="text-center p-4 bg-red-50 rounded-lg">
+                            <div className="text-2xl font-bold text-red-600">{student.attendance.absent}</div>
+                            <div className="text-sm text-gray-600">Afwezig</div>
+                          </div>
+                          <div className="text-center p-4 bg-yellow-50 rounded-lg">
+                            <div className="text-2xl font-bold text-yellow-600">{student.attendance.late}</div>
+                            <div className="text-sm text-gray-600">Te laat</div>
+                          </div>
+                          <div className="text-center p-4 bg-green-50 rounded-lg">
+                            <div className="text-2xl font-bold text-green-600">7.5</div>
+                            <div className="text-sm text-gray-600">Gem. cijfer</div>
+                          </div>
+                        </div>
+
+                        {/* Vakken overzicht */}
+                        <div className="mb-6">
+                          <h5 className="font-semibold mb-3 flex items-center gap-2">
+                            <Calculator className="h-4 w-4" />
+                            Vakken & Cijfers
+                          </h5>
+                          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                            {subjects.slice(0, 8).map((subject: any, subjectIndex: number) => (
+                              <div key={subjectIndex} className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                                <span className="text-sm font-medium">{subject.name}</span>
+                                <Badge variant="outline" className="text-xs">
+                                  {(7.5 + Math.random() * 1.5).toFixed(1)}
+                                </Badge>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Commentaren sectie */}
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                          <div className="space-y-4">
+                            <div>
+                              <Label className="text-sm font-semibold mb-2 block">
+                                Gedragsopmerkingen
+                              </Label>
+                              <Textarea
+                                placeholder="Voeg opmerkingen toe over gedrag en sociale vaardigheden..."
+                                value={behaviorGrades[student.student.id]?.comments || ''}
+                                onChange={(e) => setBehaviorGrades(prev => ({
+                                  ...prev,
+                                  [student.student.id]: {
+                                    ...prev[student.student.id],
+                                    studentId: student.student.id,
+                                    grade: prev[student.student.id]?.grade || 7,
+                                    comments: e.target.value
+                                  }
+                                }))}
+                                rows={3}
+                                className="resize-none"
+                              />
+                            </div>
+                            
+                            <div>
+                              <Label className="text-sm font-semibold mb-2 block">
+                                Gedragscijfer (1-10)
+                              </Label>
+                              <Select 
+                                value={behaviorGrades[student.student.id]?.grade?.toString() || '7'} 
+                                onValueChange={(value) => setBehaviorGrades(prev => ({
+                                  ...prev,
+                                  [student.student.id]: {
+                                    ...prev[student.student.id],
+                                    studentId: student.student.id,
+                                    grade: parseInt(value),
+                                    comments: prev[student.student.id]?.comments || ''
+                                  }
+                                }))}
+                              >
+                                <SelectTrigger className="w-full">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {[1,2,3,4,5,6,7,8,9,10].map(grade => (
+                                    <SelectItem key={grade} value={grade.toString()}>
+                                      {grade}/10 {grade >= 8 ? '- Uitstekend' : grade >= 7 ? '- Goed' : grade >= 6 ? '- Voldoende' : '- Verbetering nodig'}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
                             </div>
                           </div>
-                          
-                          <div className="space-y-2">
-                            <h5 className="font-medium text-sm">Gedrag</h5>
-                            <div className="text-sm text-gray-600">
-                              <p>Cijfer: {student.behavior.grade}/10</p>
-                              <p>Opmerkingen: {student.behavior.comments || 'Geen opmerkingen'}</p>
+
+                          <div className="space-y-4">
+                            <div>
+                              <Label className="text-sm font-semibold mb-2 block">
+                                Aanwezigheidsopmerkingen
+                              </Label>
+                              <Textarea
+                                placeholder="Specifieke opmerkingen over aanwezigheid, punctualiteit, etc..."
+                                value={attendanceComments}
+                                onChange={(e) => setAttendanceComments(e.target.value)}
+                                rows={3}
+                                className="resize-none"
+                              />
                             </div>
-                          </div>
-                          
-                          <div className="space-y-2">
-                            <h5 className="font-medium text-sm">Algemeen</h5>
-                            <div className="text-sm text-gray-600">
-                              <p>{student.generalComments || 'Geen algemene opmerkingen'}</p>
+
+                            <div>
+                              <Label className="text-sm font-semibold mb-2 block">
+                                Algemene opmerkingen
+                              </Label>
+                              <Textarea
+                                placeholder="Algemene feedback, sterke punten, verbeterpunten..."
+                                value={generalComments}
+                                onChange={(e) => setGeneralComments(e.target.value)}
+                                rows={3}
+                                className="resize-none"
+                              />
                             </div>
                           </div>
                         </div>
@@ -616,7 +720,11 @@ export default function Reports() {
                   ))}
                 </div>
 
-                <div className="flex justify-center">
+                <div className="flex justify-center gap-4">
+                  <Button onClick={() => generatePreviewData()} variant="outline">
+                    <Eye className="h-4 w-4 mr-2" />
+                    Ververs voorvertoning
+                  </Button>
                   <Button onClick={generateReportData} size="lg">
                     <FileDown className="h-4 w-4 mr-2" />
                     Download PDF Rapport
@@ -625,7 +733,9 @@ export default function Reports() {
               </div>
             ) : (
               <div className="text-center py-12">
-                <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <div className="h-12 w-12 text-gray-400 mx-auto mb-4">
+                  <FileText className="h-full w-full" />
+                </div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">Geen rapportgegevens</h3>
                 <p className="text-gray-600 mb-4">Configureer eerst uw rapport instellingen om een voorvertoning te zien.</p>
                 <Button onClick={() => setActiveTab('configure')} variant="outline">

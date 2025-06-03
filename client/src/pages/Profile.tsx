@@ -285,6 +285,50 @@ export default function Profile() {
     fileInputRef.current?.click();
   };
 
+  // Show loading state
+  if (isLoadingProfile) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <PremiumHeader
+          title="Mijn Profiel"
+          description="Beheer je persoonlijke gegevens en account instellingen"
+          icon={User}
+          breadcrumbs={{
+            current: "Mijn Profiel"
+          }}
+        />
+        <div className="max-w-4xl mx-auto p-6">
+          <div className="flex justify-center items-center h-64">
+            <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (profileError) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <PremiumHeader
+          title="Mijn Profiel"
+          description="Beheer je persoonlijke gegevens en account instellingen"
+          icon={User}
+          breadcrumbs={{
+            current: "Mijn Profiel"
+          }}
+        />
+        <div className="max-w-4xl mx-auto p-6">
+          <Card>
+            <CardContent className="p-6 text-center">
+              <p className="text-red-600">Fout bij laden van profielgegevens. Probeer de pagina te verversen.</p>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <PremiumHeader
@@ -297,27 +341,54 @@ export default function Profile() {
       />
 
       <div className="max-w-4xl mx-auto p-6 space-y-6">
+        {/* Hidden file input for image upload */}
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleImageUpload}
+          accept="image/*"
+          className="hidden"
+        />
+
         {/* Profiel Header */}
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center gap-6">
-              <Avatar className="h-20 w-20">
-                <AvatarFallback className="bg-[#1e40af] text-white text-xl">
-                  {formData.firstName[0]}{formData.lastName[0]}
-                </AvatarFallback>
-              </Avatar>
+              <div className="relative">
+                <Avatar className="h-20 w-20">
+                  {profileData?.profileImageUrl ? (
+                    <AvatarImage src={profileData.profileImageUrl} alt="Profielfoto" />
+                  ) : null}
+                  <AvatarFallback className="bg-[#1e40af] text-white text-xl">
+                    {profileData?.firstName?.[0] || ''}{profileData?.lastName?.[0] || ''}
+                  </AvatarFallback>
+                </Avatar>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full p-0 bg-white border-2 border-white shadow-lg hover:bg-gray-50"
+                  onClick={triggerImageUpload}
+                  disabled={uploadImageMutation.isPending}
+                >
+                  {uploadImageMutation.isPending ? (
+                    <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <Camera className="h-4 w-4 text-gray-600" />
+                  )}
+                </Button>
+              </div>
               <div className="flex-1">
                 <h2 className="text-2xl font-bold text-gray-900">
-                  {formData.firstName} {formData.lastName}
+                  {profileData?.firstName} {profileData?.lastName}
                 </h2>
-                <p className="text-gray-600">Beheerder</p>
-                <p className="text-sm text-gray-500">Lid sinds januari 2024</p>
+                <p className="text-gray-600">{profileData?.role}</p>
+                <p className="text-sm text-gray-500">Email: {profileData?.email}</p>
               </div>
               <div className="flex gap-2">
                 {!isEditing ? (
                   <Button
                     onClick={() => setIsEditing(true)}
-                    className="bg-[#1e40af] hover:bg-[#1e40af]/90"
+                    className="bg-[#3a5a99] hover:bg-[#3a5a99]/90"
                   >
                     <Edit2 className="h-4 w-4 mr-2" />
                     Bewerken
@@ -326,9 +397,14 @@ export default function Profile() {
                   <div className="flex gap-2">
                     <Button
                       onClick={handleSave}
-                      className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded text-sm font-medium tracking-tight ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 text-white shadow-sm h-9 px-4 py-2 hover:bg-green-700 bg-[#3a5a99]"
+                      disabled={updateProfileMutation.isPending}
+                      className="bg-[#3a5a99] hover:bg-[#3a5a99]/90"
                     >
-                      <Save className="h-4 w-4 mr-2" />
+                      {updateProfileMutation.isPending ? (
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                      ) : (
+                        <Save className="h-4 w-4 mr-2" />
+                      )}
                       Opslaan
                     </Button>
                     <Button
@@ -572,9 +648,14 @@ export default function Profile() {
                 <div className="flex gap-2 pt-4">
                   <Button
                     onClick={handlePasswordSave}
-                    className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded text-sm font-medium tracking-tight ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 text-white shadow-sm h-9 px-4 py-2 hover:bg-green-700 flex-1 bg-[#3a5a99]"
+                    disabled={updatePasswordMutation.isPending}
+                    className="bg-[#3a5a99] hover:bg-[#3a5a99]/90 flex-1"
                   >
-                    <Save className="h-4 w-4 mr-2" />
+                    {updatePasswordMutation.isPending ? (
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                    ) : (
+                      <Save className="h-4 w-4 mr-2" />
+                    )}
                     Wachtwoord opslaan
                   </Button>
                   <Button

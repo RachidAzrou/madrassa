@@ -506,10 +506,9 @@ export default function AcademicYearManagement() {
               <span className="text-xs text-gray-500">{filteredHolidays.length} vakanties</span>
               <Button 
                 onClick={openNewHolidayDialog}
-                size="sm" 
-                className="bg-[#1e40af] hover:bg-[#1d4ed8] text-white h-6 text-[10px] px-2 rounded-sm"
+                className="bg-[#1e40af] hover:bg-[#1d4ed8] text-white h-8 text-xs px-3 rounded-sm"
               >
-                <Plus className="h-3 w-3 mr-1" />
+                <Plus className="h-3.5 w-3.5 mr-1.5" />
                 Vakantie Toevoegen
               </Button>
             </div>

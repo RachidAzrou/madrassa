@@ -15,7 +15,7 @@ interface DataTableContainerProps {
  */
 export function DataTableContainer({ children, className = "" }: DataTableContainerProps) {
   return (
-    <div className={`px-6 py-6 flex-1 ${className}`}>
+    <div className={`px-6 py-6 flex-1 overflow-visible ${className}`}>
       {children}
     </div>
   );

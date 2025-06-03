@@ -792,7 +792,8 @@ export default function AcademicYearManagement() {
               </Button>
             </div>
           </form>
-        </DialogContent>
+          </div>
+        </CustomDialogContent>
       </Dialog>
 
       {/* Delete Academic Year Dialog */}

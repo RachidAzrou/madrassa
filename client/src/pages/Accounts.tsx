@@ -41,7 +41,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import PageHeader from "@/components/common/PageHeader";
+import { PremiumHeader } from "@/components/layout/premium-header";
 import { DeleteDialog } from "@/components/ui/delete-dialog";
 import { CustomDialogContent } from "@/components/ui/custom-dialog-content";
 import { apiRequest } from "@/lib/queryClient";
@@ -329,11 +329,18 @@ export default function Accounts() {
   };
 
   return (
-    <div className="flex-1 space-y-6 p-6">
-      <PageHeader
-        title="Account Beheer"
-        description="Beheer gebruikersaccounts en toegangsrechten voor het systeem."
-      />
+    <div className="flex-1 flex flex-col h-full">
+      <div className="fixed top-0 left-64 right-0 z-30">
+        <PremiumHeader 
+          title="Accounts" 
+          icon={Key}
+          breadcrumbs={{
+            parent: "Beheer",
+            current: "Accounts"
+          }}
+        />
+      </div>
+      <div className="mt-[73px] flex-1 overflow-auto p-6 space-y-6">
       
       <div className="space-y-6">
         {/* Stats Cards */}
@@ -893,6 +900,7 @@ export default function Accounts() {
         isLoading={deleteAccountMutation.isPending}
         confirmButtonText="Definitief Verwijderen"
       />
+      </div>
     </div>
   );
 }

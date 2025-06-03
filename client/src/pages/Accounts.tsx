@@ -17,7 +17,8 @@ import {
   FileText,
   UserCheck,
   GraduationCap,
-  Users
+  Users,
+  Settings
 } from 'lucide-react';
 import { PremiumHeader } from '@/components/layout/premium-header';
 import { Button } from '@/components/ui/button';
@@ -46,7 +47,7 @@ interface UserAccount {
   id: number;
   email: string;
   password: string;
-  role: 'student' | 'teacher' | 'guardian' | 'secretariat';
+  role: 'student' | 'teacher' | 'guardian' | 'secretariat' | 'admin';
   isActive: boolean;
   lastLogin?: string;
   createdAt: string;
@@ -82,7 +83,7 @@ export default function Accounts() {
   const [accountFormData, setAccountFormData] = useState({
     email: '',
     password: '',
-    role: 'student' as 'student' | 'teacher' | 'guardian' | 'secretariat',
+    role: 'student' as 'student' | 'teacher' | 'guardian' | 'secretariat' | 'admin',
     personId: 0,
     isActive: true
   });
@@ -95,7 +96,7 @@ export default function Accounts() {
 
   const [bulkCreateFormData, setBulkCreateFormData] = useState({
     type: 'all' as 'all' | 'class' | 'program',
-    role: 'student' as 'student' | 'teacher' | 'guardian' | 'secretariat',
+    role: 'student' as 'student' | 'teacher' | 'guardian' | 'secretariat' | 'admin',
     classId: 0,
     programId: 0,
     generateDefaultPasswords: true,
@@ -340,7 +341,8 @@ export default function Accounts() {
       student: { label: 'Student', color: 'bg-blue-100 text-blue-800', icon: Users },
       teacher: { label: 'Docent', color: 'bg-green-100 text-green-800', icon: GraduationCap },
       guardian: { label: 'Voogd', color: 'bg-purple-100 text-purple-800', icon: UserCheck },
-      secretariat: { label: 'Secretariaat', color: 'bg-orange-100 text-orange-800', icon: FileText }
+      secretariat: { label: 'Secretariaat', color: 'bg-orange-100 text-orange-800', icon: FileText },
+      admin: { label: 'Administrator', color: 'bg-red-100 text-red-800', icon: Settings }
     };
     const config = roleMap[role as keyof typeof roleMap] || roleMap.student;
     return <Badge className={config.color}>{config.label}</Badge>;
@@ -396,6 +398,7 @@ export default function Accounts() {
     teachers: accountsData.filter((a: UserAccount) => a.role === 'teacher').length,
     guardians: accountsData.filter((a: UserAccount) => a.role === 'guardian').length,
     secretariat: accountsData.filter((a: UserAccount) => a.role === 'secretariat').length,
+    admin: accountsData.filter((a: UserAccount) => a.role === 'admin').length,
     active: accountsData.filter((a: UserAccount) => a.isActive).length
   };
 
@@ -413,7 +416,7 @@ export default function Accounts() {
 
       {/* Enhanced Statistics Dashboard */}
       <div className="max-w-[1400px] mx-auto px-6 py-8">
-        <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-6 mb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-7 gap-6 mb-10">
           <Card className="bg-gradient-to-br from-slate-600 to-slate-700 border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group overflow-hidden relative">
             <div className="absolute inset-0 bg-gradient-to-br from-slate-500/20 to-transparent"></div>
             <CardContent className="p-6 relative z-10">
@@ -489,6 +492,22 @@ export default function Accounts() {
                 </div>
                 <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl group-hover:bg-white/30 transition-all duration-300">
                   <FileText className="h-7 w-7 text-white" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-red-500 to-red-600 border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group overflow-hidden relative">
+            <div className="absolute inset-0 bg-gradient-to-br from-red-400/20 to-transparent"></div>
+            <CardContent className="p-6 relative z-10">
+              <div className="flex items-center justify-between">
+                <div className="text-white">
+                  <p className="text-sm font-medium text-red-100 mb-2">Administrator</p>
+                  <p className="text-3xl font-bold">{accountStats.admin}</p>
+                  <p className="text-xs text-red-200 mt-1">Volledige toegang</p>
+                </div>
+                <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl group-hover:bg-white/30 transition-all duration-300">
+                  <Settings className="h-7 w-7 text-white" />
                 </div>
               </div>
             </CardContent>

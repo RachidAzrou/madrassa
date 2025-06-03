@@ -325,14 +325,14 @@ export default function Reports() {
   });
 
   return (
-    <DataTableContainer>
+    <>
       <PremiumHeader 
         title="Rapportage" 
         icon={FileText}
         description="Genereer professionele schoolrapporten met cijfers en beoordeling"
       />
 
-      <div className="space-y-5">
+      <div className="flex-1 space-y-5 p-6">
         <Tabs 
           value={activeTab} 
           className="w-full"
@@ -804,6 +804,6 @@ export default function Reports() {
 
         </Tabs>
       </div>
-    </DataTableContainer>
+    </>
   );
 }

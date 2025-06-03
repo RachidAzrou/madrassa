@@ -62,7 +62,7 @@ interface UserAccount {
 
 interface AccountFormData {
   email: string;
-  password: string;
+  password?: string;
   role: 'student' | 'teacher' | 'guardian' | 'secretariat' | 'admin';
   personId: number;
   isActive: boolean;
@@ -166,9 +166,7 @@ export default function Accounts() {
     setSelectedAccount(null);
   };
 
-  const generateDefaultPassword = () => {
-    return "Welkom123!";
-  };
+
 
   const getPersonOptions = (role: string) => {
     switch (role) {
@@ -220,12 +218,34 @@ export default function Accounts() {
 
   const handleUpdateAccount = () => {
     if (!selectedAccount) return;
-    
+    const updateData = { ...accountFormData };
+    if (!updateData.password) {
+      delete updateData.password; // Don't update password if empty
+    }
     updateAccountMutation.mutate({
       id: selectedAccount.id,
-      data: accountFormData
+      data: updateData
     });
   };
+
+  const handleEditAccount = (account: UserAccount) => {
+    setSelectedAccount(account);
+    setAccountFormData({
+      email: account.email,
+      password: '',
+      role: account.role,
+      personId: account.personId,
+      isActive: account.isActive
+    });
+    setIsEditDialogOpen(true);
+  };
+
+  const handleDeleteAccount = (account: UserAccount) => {
+    setAccountToDelete(account);
+    setIsDeleteDialogOpen(true);
+  };
+
+
 
   // Filter accounts
   const filteredAccounts = accountsData.filter((account: UserAccount) => {
@@ -589,9 +609,78 @@ export default function Accounts() {
 
       {/* Edit Account Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-
-
-
+        <CustomDialogContent>
+          <div className="bg-[#059669] text-white px-6 py-4">
+            <div className="flex items-center gap-3">
+              <div className="flex-shrink-0">
+                <div className="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center">
+                  <Edit className="h-5 w-5 text-white" />
+                </div>
+              </div>
+              <div className="flex-1 min-w-0">
+                <h2 className="text-lg font-semibold text-white">Account Bewerken</h2>
+                <p className="text-sm text-green-100 mt-1">Pas de accountgegevens aan</p>
+              </div>
+            </div>
+          </div>
+          <div className="p-6 space-y-4">
+            <div>
+              <Label htmlFor="edit-email">Email</Label>
+              <Input
+                id="edit-email"
+                type="email"
+                value={accountFormData.email}
+                onChange={(e) => setAccountFormData(prev => ({ ...prev, email: e.target.value }))}
+                placeholder="email@example.com"
+              />
+            </div>
+            <div>
+              <Label htmlFor="edit-password">Nieuw Wachtwoord (optioneel)</Label>
+              <Input
+                id="edit-password"
+                type="password"
+                value={accountFormData.password}
+                onChange={(e) => setAccountFormData(prev => ({ ...prev, password: e.target.value }))}
+                placeholder="Laat leeg om hetzelfde te houden"
+              />
+            </div>
+            <div>
+              <Label htmlFor="edit-role">Rol</Label>
+              <Select value={accountFormData.role} onValueChange={(value: any) => setAccountFormData(prev => ({ ...prev, role: value }))}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="student">Student</SelectItem>
+                  <SelectItem value="teacher">Docent</SelectItem>
+                  <SelectItem value="guardian">Voogd</SelectItem>
+                  <SelectItem value="secretariat">Secretariaat</SelectItem>
+                  <SelectItem value="admin">Admin</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox 
+                id="edit-isActive"
+                checked={accountFormData.isActive}
+                onCheckedChange={(checked) => setAccountFormData(prev => ({ ...prev, isActive: !!checked }))}
+              />
+              <Label htmlFor="edit-isActive">Account is actief</Label>
+            </div>
+          </div>
+          <div className="px-6 py-4 bg-gray-50 border-t flex items-center justify-end gap-3">
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+              Annuleren
+            </Button>
+            <Button 
+              onClick={handleUpdateAccount}
+              disabled={!accountFormData.email}
+              className="bg-[#059669] hover:bg-[#047857]"
+            >
+              Account Bijwerken
+            </Button>
+          </div>
+        </CustomDialogContent>
       </Dialog>
 
       {/* Delete Account Dialog */}

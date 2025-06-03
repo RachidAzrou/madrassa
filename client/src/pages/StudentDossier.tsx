@@ -179,24 +179,9 @@ export default function StudentDossier() {
     return <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>;
   };
 
-  // Echte data van API's
-  const { data: studentGrades = [] } = useQuery({ 
-    queryKey: ['/api/grades', selectedStudent?.id],
-    enabled: !!selectedStudent
-  });
-  
-  const { data: studentAttendance = [] } = useQuery({ 
-    queryKey: ['/api/attendance', selectedStudent?.id],
-    enabled: !!selectedStudent
-  });
-  
-  const { data: studentPayments = [] } = useQuery({ 
-    queryKey: ['/api/payments', selectedStudent?.id],
-    enabled: !!selectedStudent
-  });
-  
+  // Echte data van API's - alleen ophalen als student geselecteerd is
   const { data: studentGuardians = [] } = useQuery({ 
-    queryKey: ['/api/guardians', selectedStudent?.id],
+    queryKey: [`/api/students/${selectedStudent?.id}/guardians`],
     enabled: !!selectedStudent
   });
 
@@ -204,6 +189,24 @@ export default function StudentDossier() {
     queryKey: [`/api/students/${selectedStudent?.id}/siblings`],
     enabled: !!selectedStudent
   });
+
+  // Gebruik bestaande programma's voor vakken die student volgt
+  const studentPrograms = selectedStudent ? subjects.filter((program: any) => 
+    selectedStudent.programId === program.id
+  ) : [];
+
+  // Bereken geboorteleeftijd
+  const calculateAge = (birthDate: string | null) => {
+    if (!birthDate) return null;
+    const today = new Date();
+    const birth = new Date(birthDate);
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+      age--;
+    }
+    return age;
+  };
 
   return (
     <DataTableContainer>
@@ -489,9 +492,9 @@ export default function StudentDossier() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    {studentGuardians.length > 0 ? (
+                    {(studentGuardians as any[]).length > 0 ? (
                       <div className="space-y-4">
-                        {studentGuardians.map((guardian: any) => (
+                        {(studentGuardians as any[]).map((guardian: any) => (
                           <div key={guardian.id} className="p-4 border rounded-lg">
                             <div className="flex justify-between items-start">
                               <div className="space-y-2">
@@ -549,7 +552,8 @@ export default function StudentDossier() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    {studentGrades.length > 0 ? (
+                    {/* Geen cijfers data beschikbaar in huidige systeem */}
+                    {false ? (
                       <Table>
                         <TableHeader>
                           <TableRow>
@@ -562,18 +566,7 @@ export default function StudentDossier() {
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {studentGrades.map((grade: any) => (
-                            <TableRow key={grade.id}>
-                              <TableCell className="font-medium">{grade.programName || 'Onbekend vak'}</TableCell>
-                              <TableCell>
-                                <Badge variant="outline">{grade.gradeType || 'Test'}</Badge>
-                              </TableCell>
-                              <TableCell className="font-bold">{grade.score}</TableCell>
-                              <TableCell>{grade.maxScore}</TableCell>
-                              <TableCell>{formatDate(grade.date)}</TableCell>
-                              <TableCell>{grade.notes || '-'}</TableCell>
-                            </TableRow>
-                          ))}
+                          {/* Placeholder voor als cijfers data beschikbaar zou zijn */}
                         </TableBody>
                       </Table>
                     ) : (
@@ -592,7 +585,8 @@ export default function StudentDossier() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    {(studentAttendance as any[]).length > 0 ? (
+                    {/* Geen aanwezigheidsdata beschikbaar in huidige systeem */}
+                    {false ? (
                       <Table>
                         <TableHeader>
                           <TableRow>
@@ -602,23 +596,7 @@ export default function StudentDossier() {
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {(studentAttendance as any[]).map((attendance: any) => (
-                            <TableRow key={attendance.id}>
-                              <TableCell>{formatDate(attendance.date)}</TableCell>
-                              <TableCell>
-                                <Badge 
-                                  variant={
-                                    attendance.status === 'present' ? 'default' :
-                                    attendance.status === 'late' ? 'secondary' : 'destructive'
-                                  }
-                                >
-                                  {attendance.status === 'present' ? 'Aanwezig' :
-                                   attendance.status === 'late' ? 'Te laat' : 'Afwezig'}
-                                </Badge>
-                              </TableCell>
-                              <TableCell>{attendance.notes || '-'}</TableCell>
-                            </TableRow>
-                          ))}
+                          {/* Placeholder voor als aanwezigheidsdata beschikbaar zou zijn */}
                         </TableBody>
                       </Table>
                     ) : (
@@ -637,7 +615,8 @@ export default function StudentDossier() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    {(studentPayments as any[]).length > 0 ? (
+                    {/* Geen betalingsdata beschikbaar in huidige systeem */}
+                    {false ? (
                       <Table>
                         <TableHeader>
                           <TableRow>
@@ -649,25 +628,7 @@ export default function StudentDossier() {
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {(studentPayments as any[]).map((payment: any) => (
-                            <TableRow key={payment.id}>
-                              <TableCell className="font-medium">{payment.description || 'Schoolgeld'}</TableCell>
-                              <TableCell>€{payment.amount?.toFixed(2) || '0.00'}</TableCell>
-                              <TableCell>{formatDate(payment.dueDate)}</TableCell>
-                              <TableCell>
-                                <Badge 
-                                  variant={
-                                    payment.status === 'paid' ? 'default' :
-                                    payment.status === 'pending' ? 'secondary' : 'destructive'
-                                  }
-                                >
-                                  {payment.status === 'paid' ? 'Betaald' :
-                                   payment.status === 'pending' ? 'Wachtend' : 'Achterstallig'}
-                                </Badge>
-                              </TableCell>
-                              <TableCell>{formatDate(payment.paidDate)}</TableCell>
-                            </TableRow>
-                          ))}
+                          {/* Placeholder voor als betalingsdata beschikbaar zou zijn */}
                         </TableBody>
                       </Table>
                     ) : (

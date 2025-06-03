@@ -6096,6 +6096,123 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ===== DISCOUNT SYSTEM ROUTES =====
+  
+  // Get discount types
+  app.get('/api/discount-types', async (req, res) => {
+    try {
+      const discountTypes = await storage.getDiscountTypes();
+      res.json(discountTypes);
+    } catch (error) {
+      console.error('Error fetching discount types:', error);
+      res.status(500).json({ message: 'Error fetching discount types' });
+    }
+  });
+
+  // Get student discounts
+  app.get('/api/students/:studentId/discounts', async (req, res) => {
+    try {
+      const studentId = parseInt(req.params.studentId);
+      const { academicYear } = req.query;
+      
+      const discounts = await storage.getStudentDiscounts(studentId, academicYear as string);
+      res.json(discounts);
+    } catch (error) {
+      console.error('Error fetching student discounts:', error);
+      res.status(500).json({ message: 'Error fetching student discounts' });
+    }
+  });
+
+  // Calculate family discount for student
+  app.get('/api/students/:studentId/family-discount', async (req, res) => {
+    try {
+      const studentId = parseInt(req.params.studentId);
+      const { academicYear } = req.query;
+      
+      if (!academicYear) {
+        return res.status(400).json({ message: 'Academic year is required' });
+      }
+      
+      const familyDiscount = await storage.calculateFamilyDiscount(studentId, academicYear as string);
+      res.json(familyDiscount);
+    } catch (error) {
+      console.error('Error calculating family discount:', error);
+      res.status(500).json({ message: 'Error calculating family discount' });
+    }
+  });
+
+  // Create student discount (manual administrative discount)
+  app.post('/api/students/:studentId/discounts', async (req, res) => {
+    try {
+      const studentId = parseInt(req.params.studentId);
+      
+      const discountData = {
+        ...req.body,
+        studentId,
+        isAutomatic: false,
+        appliedBy: req.user?.id || 1, // Admin/staff user who applied the discount
+      };
+      
+      const newDiscount = await storage.createStudentDiscount(discountData);
+      res.status(201).json(newDiscount);
+    } catch (error) {
+      console.error('Error creating student discount:', error);
+      res.status(500).json({ message: 'Error creating student discount' });
+    }
+  });
+
+  // Update student discount
+  app.put('/api/discounts/:id', async (req, res) => {
+    try {
+      const discountId = parseInt(req.params.id);
+      const updatedDiscount = await storage.updateStudentDiscount(discountId, req.body);
+      
+      if (!updatedDiscount) {
+        return res.status(404).json({ message: 'Discount not found' });
+      }
+      
+      res.json(updatedDiscount);
+    } catch (error) {
+      console.error('Error updating student discount:', error);
+      res.status(500).json({ message: 'Error updating student discount' });
+    }
+  });
+
+  // Delete student discount
+  app.delete('/api/discounts/:id', async (req, res) => {
+    try {
+      const discountId = parseInt(req.params.id);
+      const deleted = await storage.deleteStudentDiscount(discountId);
+      
+      if (!deleted) {
+        return res.status(404).json({ message: 'Discount not found' });
+      }
+      
+      res.json({ message: 'Discount deleted successfully' });
+    } catch (error) {
+      console.error('Error deleting student discount:', error);
+      res.status(500).json({ message: 'Error deleting student discount' });
+    }
+  });
+
+  // Apply automatic discounts for student
+  app.post('/api/students/:studentId/apply-automatic-discounts', async (req, res) => {
+    try {
+      const studentId = parseInt(req.params.studentId);
+      const { academicYear } = req.body;
+      
+      if (!academicYear) {
+        return res.status(400).json({ message: 'Academic year is required' });
+      }
+      
+      await storage.applyAutomaticDiscounts(studentId, academicYear);
+      res.json({ message: 'Automatic discounts applied successfully' });
+    } catch (error) {
+      console.error('Error applying automatic discounts:', error);
+      res.status(500).json({ message: 'Error applying automatic discounts' });
+    }
+  });
+
   // creëer HTTP server
   const server = createServer(app);
 

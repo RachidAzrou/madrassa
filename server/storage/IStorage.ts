@@ -300,4 +300,40 @@ export interface IStorage {
   createMessage(message: InsertMessage): Promise<Message>;
   markMessageAsRead(messageId: number): Promise<Message | undefined>;
   deleteMessage(messageId: number): Promise<boolean>;
+
+  // Payment system operations
+  getPayments(): Promise<any[]>;
+  getPayment(id: number): Promise<any | undefined>;
+  getPaymentsByStudent(studentId: number): Promise<any[]>;
+  createPayment(payment: any): Promise<any>;
+  updatePayment(id: number, payment: Partial<any>): Promise<any | undefined>;
+  updatePaymentByMollieId(molliePaymentId: string, updates: Partial<any>): Promise<any | undefined>;
+  deletePayment(id: number): Promise<boolean>;
+  getPaymentStats(): Promise<any>;
+
+  // Invoice operations
+  getInvoices(): Promise<any[]>;
+  getInvoice(id: number): Promise<any | undefined>;
+  getInvoicesByStudent(studentId: number): Promise<any[]>;
+  generateInvoiceNumber(type: string): Promise<string>;
+  calculateInvoiceAmount(baseAmount: number, studentId: number, academicYear: string): Promise<{ finalAmount: number; discountAmount: number; appliedDiscounts: string[] }>;
+  createInvoice(invoice: any): Promise<any>;
+  updateInvoice(id: number, invoice: Partial<any>): Promise<any | undefined>;
+  deleteInvoice(id: number): Promise<boolean>;
+
+  // Tuition Rate operations
+  getTuitionRates(): Promise<any[]>;
+  getTuitionRate(id: number): Promise<any | undefined>;
+  createTuitionRate(rate: any): Promise<any>;
+  updateTuitionRate(id: number, rate: Partial<any>): Promise<any | undefined>;
+  deleteTuitionRate(id: number): Promise<boolean>;
+
+  // Discount system operations
+  getDiscountTypes(): Promise<any[]>;
+  getStudentDiscounts(studentId: number, academicYear?: string): Promise<any[]>;
+  createStudentDiscount(discount: any): Promise<any>;
+  updateStudentDiscount(id: number, discount: Partial<any>): Promise<any | undefined>;
+  deleteStudentDiscount(id: number): Promise<boolean>;
+  calculateFamilyDiscount(studentId: number, academicYear: string): Promise<{ percentage: number; siblingCount: number }>;
+  applyAutomaticDiscounts(studentId: number, academicYear: string): Promise<void>;
 }

@@ -1,4 +1,4 @@
-import { and, eq, desc, isNull, sql } from "drizzle-orm";
+import { and, eq, desc, isNull, sql, inArray } from "drizzle-orm";
 import { db } from "../db";
 import { 
   users, students, programs, courses, enrollments, attendance, 
@@ -1476,7 +1476,7 @@ export class DatabaseStorage implements IStorage {
       const guardianIds = studentGuardianRelations.map(sg => sg.guardianId);
       const siblingRelations = await db.select({ studentId: studentGuardians.studentId })
         .from(studentGuardians)
-        .where(sql`${studentGuardians.guardianId} = ANY(${guardianIds})`);
+        .where(sql`${studentGuardians.guardianId} IN (${guardianIds.join(',')})`);
 
       const uniqueSiblingIds = [...new Set(siblingRelations.map(sr => sr.studentId))];
       const siblingCount = uniqueSiblingIds.length;

@@ -325,18 +325,24 @@ export default function Reports() {
   });
 
   return (
-    <DataTableContainer>
-      <PremiumHeader 
-        title="Rapportage" 
-        icon={FileText}
-        description="Genereer professionele schoolrapporten met cijfers en beoordeling"
-      />
-
-      <div className="space-y-5">
-        <Tabs 
-          value={activeTab} 
-          className="w-full"
-          onValueChange={(value) => setActiveTab(value)}
+    <div className="flex-1 flex flex-col h-full">
+      <div className="fixed top-0 left-64 right-0 z-30">
+        <PremiumHeader 
+          title="Rapport" 
+          icon={FileText}
+          breadcrumbs={{
+            parent: "Evaluatie",
+            current: "Rapport"
+          }}
+        />
+      </div>
+      <div className="mt-[73px] flex-1 overflow-auto">
+        <DataTableContainer>
+          <div className="p-6 space-y-5">
+            <Tabs 
+              value={activeTab} 
+              className="w-full"
+              onValueChange={(value) => setActiveTab(value)}
         >
           <TabsList className="grid w-full grid-cols-2 h-11">
             <TabsTrigger value="configure" className="text-sm flex items-center gap-2">
@@ -803,7 +809,9 @@ export default function Reports() {
 
 
         </Tabs>
+          </div>
+        </DataTableContainer>
       </div>
-    </DataTableContainer>
+    </div>
   );
 }

@@ -36,6 +36,7 @@ import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { CustomDialogContent } from '@/components/ui/custom-dialog-content';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { toast } from '@/hooks/use-toast';
 import { PageHeader } from '@/components/layout/page-header';
@@ -50,9 +51,38 @@ const paymentFormSchema = z.object({
   dueDate: z.string().min(1, "Vervaldatum is verplicht"),
 });
 
+const invoiceFormSchema = z.object({
+  studentId: z.number().min(1, "Student is verplicht"),
+  amount: z.string().min(1, "Bedrag is verplicht"),
+  description: z.string().min(1, "Beschrijving is verplicht"),
+  dueDate: z.string().min(1, "Vervaldatum is verplicht"),
+  academicYear: z.string().min(1, "Academisch jaar is verplicht"),
+  semester: z.string().min(1, "Semester is verplicht"),
+});
+
+const tuitionRateFormSchema = z.object({
+  name: z.string().min(1, "Naam is verplicht"),
+  amount: z.string().min(1, "Bedrag is verplicht"),
+  programId: z.number().min(1, "Programma is verplicht"),
+  academicYear: z.string().min(1, "Academisch jaar is verplicht"),
+  description: z.string().optional(),
+});
+
+const discountRuleFormSchema = z.object({
+  name: z.string().min(1, "Naam is verplicht"),
+  type: z.string().min(1, "Type is verplicht"),
+  value: z.string().min(1, "Waarde is verplicht"),
+  conditions: z.string().min(1, "Voorwaarden zijn verplicht"),
+  validFrom: z.string().min(1, "Geldig vanaf is verplicht"),
+  validUntil: z.string().min(1, "Geldig tot is verplicht"),
+});
+
 export default function Fees() {
   // State management
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
+  const [showInvoiceDialog, setShowInvoiceDialog] = useState(false);
+  const [showTuitionRateDialog, setShowTuitionRateDialog] = useState(false);
+  const [showDiscountRuleDialog, setShowDiscountRuleDialog] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPayment, setSelectedPayment] = useState<any>(null);
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
@@ -73,7 +103,28 @@ export default function Fees() {
     select: (data: any) => data || { totalPaid: 0, totalPending: 0, successRate: 0 }
   });
 
-  // Form instance
+  // Data queries
+  const { data: programsData = [] } = useQuery({ 
+    queryKey: ['/api/programs'],
+    select: (data: any) => data?.programs || []
+  });
+
+  const { data: academicYearsData = [] } = useQuery({ 
+    queryKey: ['/api/academic-years'],
+    select: (data: any) => Array.isArray(data) ? data : []
+  });
+
+  const { data: tuitionRatesData = [] } = useQuery({ 
+    queryKey: ['/api/tuition-rates'],
+    select: (data: any) => Array.isArray(data) ? data : []
+  });
+
+  const { data: discountRulesData = [] } = useQuery({ 
+    queryKey: ['/api/discount-rules'],
+    select: (data: any) => Array.isArray(data) ? data : []
+  });
+
+  // Form instances
   const paymentForm = useForm({
     resolver: zodResolver(paymentFormSchema),
     defaultValues: {
@@ -81,6 +132,41 @@ export default function Fees() {
       amount: '',
       description: '',
       dueDate: '',
+    },
+  });
+
+  const invoiceForm = useForm({
+    resolver: zodResolver(invoiceFormSchema),
+    defaultValues: {
+      studentId: 0,
+      amount: '',
+      description: '',
+      dueDate: '',
+      academicYear: '',
+      semester: '',
+    },
+  });
+
+  const tuitionRateForm = useForm({
+    resolver: zodResolver(tuitionRateFormSchema),
+    defaultValues: {
+      name: '',
+      amount: '',
+      programId: 0,
+      academicYear: '',
+      description: '',
+    },
+  });
+
+  const discountRuleForm = useForm({
+    resolver: zodResolver(discountRuleFormSchema),
+    defaultValues: {
+      name: '',
+      type: '',
+      value: '',
+      conditions: '',
+      validFrom: '',
+      validUntil: '',
     },
   });
 
@@ -143,7 +229,11 @@ export default function Fees() {
               <Plus className="h-4 w-4 mr-2" />
               Nieuwe Betaling
             </Button>
-            <Button variant="outline" className="border-[#e5e7eb] hover:bg-[#f9fafc]">
+            <Button 
+              onClick={() => setShowInvoiceDialog(true)}
+              variant="outline" 
+              className="border-[#e5e7eb] hover:bg-[#f9fafc]"
+            >
               <Receipt className="h-4 w-4 mr-2" />
               Factuur Maken
             </Button>

@@ -109,6 +109,7 @@ export function PremiumHeader({ title, icon, description, breadcrumbs, path }: P
                 location === '/students' ? 'Studenten' :
                 location === '/guardians' ? 'Voogden' :
                 location === '/teachers' ? 'Docenten' :
+                location === '/accounts' ? 'Accounts' :
                 location === '/attendance' ? 'Aanwezigheid' :
                 location === '/grading' ? 'Cijfers' :
                 location === '/reports' ? 'Rapport' :

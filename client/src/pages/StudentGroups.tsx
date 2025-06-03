@@ -317,13 +317,16 @@ export default function StudentGroups() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <PremiumHeader 
-        title="Klassen" 
-        path="Beheer > Klassen" 
-        icon={School}
-        description="Beheer klasgroepen, bekijk studentenlijsten en wijs docenten toe aan klassen"
-      />
+    <div className="flex-1 flex flex-col h-full">
+      <div className="fixed top-0 left-64 right-0 z-30">
+        <PremiumHeader 
+          title="Klassen" 
+          path="Beheer > Klassen" 
+          icon={School}
+          description="Beheer klasgroepen, bekijk studentenlijsten en wijs docenten toe aan klassen"
+        />
+      </div>
+      <div className="mt-[115px] flex-1 overflow-auto bg-gray-50">
 
       <DataTableContainer>
         {/* Search and action bar */}

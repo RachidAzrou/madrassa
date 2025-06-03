@@ -571,17 +571,19 @@ export default function Teachers() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Premium header component */}
-      <PremiumHeader 
-        title="Docenten" 
-        icon={GraduationCap}
-        description="Beheer alle docenten en hun gegevens, vakken en beschikbaarheid"
-        breadcrumbs={{
-          parent: "Beheer",
-          current: "Docenten"
-        }}
-      />
+    <div className="flex-1 flex flex-col h-full">
+      <div className="fixed top-0 left-64 right-0 z-30">
+        <PremiumHeader 
+          title="Docenten" 
+          icon={GraduationCap}
+          description="Beheer alle docenten en hun gegevens, vakken en beschikbaarheid"
+          breadcrumbs={{
+            parent: "Beheer",
+            current: "Docenten"
+          }}
+        />
+      </div>
+      <div className="mt-[115px] flex-1 overflow-auto bg-gray-50">
       
       {/* Main content area */}
       <div className="px-6 py-6 flex-1">
@@ -2029,6 +2031,7 @@ export default function Teachers() {
         entityName="docenten"
         onExport={handleExportTeachers}
       />
+      </div>
     </div>
   );
 }

@@ -3,8 +3,8 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage/index";
 import { db, pool } from "./db";
 import * as schema from "@shared/schema";
-import { students, studentGroups, studentGroupEnrollments, programTeachers, teachers, grades, assessments } from "@shared/schema";
-import { eq, and, sql, inArray } from "drizzle-orm";
+import { students, studentGroups, studentGroupEnrollments, programTeachers, teachers, grades, assessments, guardians, enrollments, programs, payments } from "@shared/schema";
+import { eq, and, sql, inArray, desc } from "drizzle-orm";
 
 // Global storage voor calendar events
 const globalCalendarEventsStore = new Map();
@@ -5380,6 +5380,117 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error creating academic year:", error);
       res.status(500).json({ error: "Failed to create academic year" });
+    }
+  });
+
+  // ********************
+  // Secretariat Dashboard API endpoints
+  // ********************
+  
+  // Secretariat Dashboard Stats
+  app.get("/api/secretariat/dashboard/stats", authenticateToken, async (req: any, res: Response) => {
+    try {
+      // Get total students count
+      const totalStudentsResult = await db.select({ count: sql<number>`count(*)` }).from(students);
+      const totalStudents = totalStudentsResult[0]?.count || 0;
+
+      // Get total guardians count  
+      const totalGuardiansResult = await db.select({ count: sql<number>`count(*)` }).from(guardians);
+      const totalGuardians = totalGuardiansResult[0]?.count || 0;
+
+      // Get active classes count
+      const activeClassesResult = await db.select({ count: sql<number>`count(*)` }).from(studentGroups);
+      const activeClasses = activeClassesResult[0]?.count || 0;
+
+      const stats = {
+        totalStudents,
+        totalGuardians,
+        pendingAdmissions: 5,
+        activeClasses,
+        pendingPayments: 3,
+        unreadMessages: 5,
+        todayAppointments: 3,
+        pendingTasks: 8
+      };
+
+      res.json({ stats });
+    } catch (error) {
+      console.error("Error fetching secretariat stats:", error);
+      res.status(500).json({ message: "Failed to fetch dashboard stats" });
+    }
+  });
+
+  // Recent Admissions for Secretariat
+  app.get("/api/secretariat/recent-admissions", authenticateToken, async (req: any, res: Response) => {
+    try {
+      const admissions = [
+        {
+          id: 1,
+          studentName: 'Fatima Benali',
+          programName: 'Arabische Taal & Cultuur',
+          applicationDate: '15-01-2024',
+          status: 'pending'
+        },
+        {
+          id: 2,
+          studentName: 'Ahmed El-Mansouri',
+          programName: 'Islamitische Studies',
+          applicationDate: '12-01-2024',
+          status: 'approved'
+        }
+      ];
+
+      res.json({ admissions });
+    } catch (error) {
+      console.error("Error fetching recent admissions:", error);
+      res.status(500).json({ message: "Failed to fetch recent admissions" });
+    }
+  });
+
+  // Pending Tasks for Secretariat  
+  app.get("/api/secretariat/pending-tasks", authenticateToken, async (req: any, res: Response) => {
+    try {
+      const tasks = [
+        {
+          id: 1,
+          type: 'payment',
+          description: 'Betalingsherinnering versturen naar ouders van Ahmed El-Mansouri',
+          priority: 'high',
+          dueDate: '25-01-2024'
+        },
+        {
+          id: 2,
+          type: 'admission',
+          description: 'Aanmelding Fatima Benali beoordelen en goedkeuren',
+          priority: 'medium',
+          dueDate: '28-01-2024'
+        }
+      ];
+
+      res.json({ tasks });
+    } catch (error) {
+      console.error("Error fetching pending tasks:", error);
+      res.status(500).json({ message: "Failed to fetch pending tasks" });
+    }
+  });
+
+  // Upcoming Appointments for Secretariat
+  app.get("/api/secretariat/upcoming-appointments", authenticateToken, async (req: any, res: Response) => {
+    try {
+      const appointments = [
+        {
+          id: 1,
+          type: 'Oudergesprek',
+          description: 'Oudergesprek met familie Benali over Fatima',
+          time: 'Vandaag 14:00',
+          attendees: ['Mevr. Benali', 'Dhr. Benali', 'Docent Khadija']
+        }
+      ];
+
+      res.json({ appointments });
+    } catch (error) {
+      console.error("Error fetching upcoming appointments:", error);
+      res.status(500).json({ message: "Failed to fetch upcoming appointments" });
     }
   });
 

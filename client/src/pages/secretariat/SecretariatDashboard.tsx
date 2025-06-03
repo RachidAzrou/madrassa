@@ -304,7 +304,7 @@ export default function SecretariatDashboard() {
       </div>
 
       {/* Upcoming Appointments */}
-      {upcomingAppointments?.appointments?.length > 0 && (
+      {upcomingAppointments?.appointments && upcomingAppointments.appointments.length > 0 && (
         <Card className="mt-6">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="flex items-center">

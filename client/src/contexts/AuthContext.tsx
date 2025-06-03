@@ -77,6 +77,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
       
       localStorage.setItem('authToken', token);
       setUser(userData);
+      
+      // Redirect to dashboard after successful login
+      window.location.href = '/';
     } catch (error) {
       console.error('Login failed:', error);
       throw error;

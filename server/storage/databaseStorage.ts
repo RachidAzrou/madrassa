@@ -1476,7 +1476,7 @@ export class DatabaseStorage implements IStorage {
       const guardianIds = studentGuardianRelations.map(sg => sg.guardianId);
       const siblingRelations = await db.select({ studentId: studentGuardians.studentId })
         .from(studentGuardians)
-        .where(sql`${studentGuardians.guardianId} IN (${guardianIds.join(',')})`);
+        .where(inArray(studentGuardians.guardianId, guardianIds));
 
       const uniqueSiblingIds = [...new Set(siblingRelations.map(sr => sr.studentId))];
       const siblingCount = uniqueSiblingIds.length;

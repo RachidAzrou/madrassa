@@ -21,7 +21,11 @@ import {
   Filter,
   FileText,
   Mail,
-  DollarSign
+  DollarSign,
+  Percent,
+  Gift,
+  Shield,
+  UserCheck
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -57,6 +61,16 @@ const markPaidSchema = z.object({
   notes: z.string().optional(),
 });
 
+const discountSchema = z.object({
+  discountType: z.string().min(1, "Kortingstype is verplicht"),
+  discountPercentage: z.string().min(1, "Kortingspercentage is verplicht"),
+  description: z.string().min(1, "Omschrijving is verplicht"),
+  academicYear: z.string().min(1, "Academisch jaar is verplicht"),
+  proofDocument: z.string().optional(),
+  validFrom: z.string().optional(),
+  validUntil: z.string().optional(),
+});
+
 export default function Fees() {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -87,7 +101,9 @@ export default function Fees() {
   const [classFilter, setClassFilter] = useState('alle');
   const [showAddPaymentDialog, setShowAddPaymentDialog] = useState(false);
   const [showMarkPaidDialog, setShowMarkPaidDialog] = useState(false);
+  const [showDiscountDialog, setShowDiscountDialog] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState<any>(null);
+  const [selectedStudent, setSelectedStudent] = useState<any>(null);
   const [activeTab, setActiveTab] = useState('current');
   
   // Bepaal weergave gebaseerd op rol
@@ -120,6 +136,19 @@ export default function Fees() {
   const { data: paymentHistoryData = [] } = useQuery({ 
     queryKey: ['/api/payments/history'],
     select: (data: any) => Array.isArray(data) ? data : []
+  });
+
+  // Discount queries
+  const { data: discountsData = [] } = useQuery({ 
+    queryKey: ['/api/discounts'],
+    select: (data: any) => Array.isArray(data) ? data : [],
+    enabled: isStaffOrAdmin
+  });
+
+  const { data: discountApplicationsData = [] } = useQuery({ 
+    queryKey: ['/api/discount-applications'],
+    select: (data: any) => Array.isArray(data) ? data : [],
+    enabled: isStaffOrAdmin
   });
 
   // Forms

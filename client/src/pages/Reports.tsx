@@ -604,45 +604,51 @@ export default function Reports() {
   };
 
   return (
-    <div className="container mx-auto p-6">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">📊 Rapportage</h1>
-        <p className="text-gray-600">Genereer professionele schoolrapporten voor studenten</p>
-      </div>
+    <div className="flex h-screen bg-gray-50">
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <div className="flex-1 overflow-auto p-6">
+          <div className="max-w-7xl mx-auto">
+            <div className="mb-6">
+              <h1 className="text-2xl font-bold text-gray-900">Rapportage</h1>
+              <p className="text-gray-600">Genereer professionele schoolrapporten met cijfers en beoordeling</p>
+            </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5" />
-                Rapport Configuratie
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Report Type Selection */}
-              <div className="space-y-2">
-                <Label>Type Rapport</Label>
-                <Select value={selectedReportType} onValueChange={(value: 'class' | 'individual') => setSelectedReportType(value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecteer rapporttype" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="class">
-                      <div className="flex items-center gap-2">
-                        <Users className="h-4 w-4" />
-                        Klasserapport
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="individual">
-                      <div className="flex items-center gap-2">
-                        <User className="h-4 w-4" />
-                        Individueel Rapport
-                      </div>
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <FileText className="h-5 w-5" />
+                      Rapport Configuratie
+                    </CardTitle>
+                    <CardDescription>
+                      Stel uw rapport parameters in
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    {/* Report Type Selection */}
+                    <div className="space-y-2">
+                      <Label>Type Rapport</Label>
+                      <Select value={selectedReportType} onValueChange={(value: 'class' | 'individual') => setSelectedReportType(value)}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecteer rapporttype" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="class">
+                            <div className="flex items-center gap-2">
+                              <Users className="h-4 w-4" />
+                              Klasserapport
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="individual">
+                            <div className="flex items-center gap-2">
+                              <User className="h-4 w-4" />
+                              Individueel Rapport
+                            </div>
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
 
               {/* Class/Student Selection */}
               {selectedReportType === 'class' ? (
@@ -766,38 +772,56 @@ export default function Reports() {
           </Card>
         </div>
 
-        <div>
-          <Card>
-            <CardHeader>
-              <CardTitle>Acties</CardTitle>
+        <div className="space-y-6">
+          {/* Actions Card */}
+          <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
+            <CardHeader className="bg-gradient-to-r from-green-600 to-blue-600 text-white rounded-t-lg">
+              <CardTitle className="flex items-center gap-3">
+                <div className="bg-white/20 p-2 rounded-lg">
+                  <FileDown className="h-5 w-5" />
+                </div>
+                <div>
+                  <span className="text-lg font-semibold">Acties</span>
+                  <p className="text-green-100 text-sm font-normal">Genereer en bekijk rapporten</p>
+                </div>
+              </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 p-6">
               <Button 
                 onClick={generatePreviewData}
                 disabled={!selectedClass && !selectedStudent}
-                className="w-full"
+                className="w-full h-12 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white border-0 shadow-lg transform hover:scale-105 transition-all duration-200"
                 variant="outline"
               >
-                <FileText className="h-4 w-4 mr-2" />
-                Bekijk Rapportoverzicht
+                <FileText className="h-5 w-5 mr-3" />
+                <span className="font-semibold">Bekijk Rapportoverzicht</span>
               </Button>
 
               <Button 
                 onClick={generateReportData}
                 disabled={!selectedClass && !selectedStudent}
-                className="w-full"
+                className="w-full h-14 bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white border-0 shadow-xl transform hover:scale-105 transition-all duration-200"
                 size="lg"
               >
-                <FileDown className="h-4 w-4 mr-2" />
-                Genereer PDF Rapport
+                <FileDown className="h-5 w-5 mr-3" />
+                <span className="font-bold text-lg">Genereer PDF Rapport</span>
               </Button>
               
-              <div className="text-sm text-gray-600 space-y-1">
-                <p>Rapport bevat:</p>
-                <ul className="list-disc list-inside text-xs space-y-1 ml-2">
-                  <li>Pagina 1: Cijfertabel en algemene opmerkingen</li>
-                  <li>Pagina 2: Gedragsbeoordeling en aanwezigheid</li>
-                  <li>Handtekeningvelden voor ouders en school</li>
+              <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-xl border border-blue-200">
+                <p className="font-semibold text-gray-700 mb-2">Rapport bevat:</p>
+                <ul className="space-y-1 text-sm text-gray-600">
+                  <li className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    Pagina 1: Cijfertabel en algemene opmerkingen
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                    Pagina 2: Gedragsbeoordeling en aanwezigheid
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    Handtekeningvelden voor ouders en school
+                  </li>
                 </ul>
               </div>
             </CardContent>
@@ -848,6 +872,7 @@ export default function Reports() {
               </CardContent>
             </Card>
           )}
+          </div>
         </div>
       </div>
     </div>

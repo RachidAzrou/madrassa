@@ -331,7 +331,6 @@ export default function Reports() {
         icon={FileText}
         description="Genereer professionele schoolrapporten met cijfers en beoordeling"
       />
-
       <div className="px-6 py-6 overflow-visible">
         <div className="space-y-5 overflow-visible">
         <Tabs 
@@ -377,7 +376,7 @@ export default function Reports() {
                         <div className="flex items-center gap-3">
                           <Users className={`h-6 w-6 ${selectedReportType === 'class' ? 'text-blue-600' : 'text-gray-400'}`} />
                           <div>
-                            <h3 className="font-semibold">Klasserapport</h3>
+                            <h3 className="font-semibold">Klas-rapport</h3>
                             <p className="text-sm text-gray-600">Voor alle studenten in een klas</p>
                           </div>
                         </div>

@@ -88,6 +88,7 @@ export function PremiumHeader({ title, icon, description, breadcrumbs, path }: P
                     location === '/students' ? 'Beheer' :
                     location === '/guardians' ? 'Beheer' :
                     location === '/teachers' ? 'Beheer' :
+                    location === '/accounts' ? 'Beheer' :
                     location === '/attendance' ? 'Evaluatie' :
                     location === '/grading' ? 'Evaluatie' :
                     location === '/reports' ? 'Evaluatie' :

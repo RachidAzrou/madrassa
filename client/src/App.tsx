@@ -32,6 +32,7 @@ import StudentDossier from "@/pages/StudentDossier";
 import Profile from "@/pages/Profile";
 import ReEnrollment from "@/pages/ReEnrollment";
 import AcademicYearManagement from "@/pages/AcademicYearManagement";
+import Accounts from "@/pages/Accounts";
 
 // Authentication check route component
 function AuthenticatedRoute({ component: Component, ...rest }: any) {
@@ -59,6 +60,7 @@ function AuthenticatedRouter() {
         <Route path="/teachers" component={() => <AuthenticatedRoute component={Teachers} />} />
         <Route path="/admissions" component={() => <AuthenticatedRoute component={Admissions} />} />
         <Route path="/academic-year-management" component={() => <AuthenticatedRoute component={AcademicYearManagement} />} />
+        <Route path="/accounts" component={() => <AuthenticatedRoute component={Accounts} />} />
         <Route path="/student-groups" component={() => <AuthenticatedRoute component={StudentGroups} />} />
         <Route path="/courses" component={() => <AuthenticatedRoute component={Courses} />} />
         <Route path="/programs" component={() => <AuthenticatedRoute component={Programs} />} />

@@ -1,603 +1,520 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { apiRequest } from '@/lib/queryClient';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { 
+  FileText, 
   User, 
+  Users, 
   GraduationCap, 
   Calendar, 
-  FileText, 
-  CreditCard, 
-  Users, 
+  MapPin, 
   Phone, 
   Mail, 
-  MapPin,
-  CheckCircle,
-  XCircle,
+  Calculator, 
+  CreditCard,
   Clock,
-  BookOpen,
-  TrendingUp,
-  AlertCircle
+  MessageSquare,
+  Search,
+  Eye,
+  UserPlus,
+  Heart,
+  Home,
+  BookOpen
 } from 'lucide-react';
 import { PremiumHeader } from '@/components/layout/premium-header';
+import { 
+  DataTableContainer, 
+  SearchActionBar, 
+  TableContainer,
+  DataTableHeader,
+  TableLoadingState,
+  EmptyTableState,
+  QuickActions
+} from "@/components/ui/data-table-container";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
-// Echte data uit database ophalen
+interface Student {
+  id: number;
+  studentId: string;
+  firstName: string;
+  lastName: string;
+  email: string | null;
+  phone: string | null;
+  dateOfBirth: string | null;
+  gender: string | null;
+  address: string | null;
+  street: string | null;
+  houseNumber: string | null;
+  postalCode: string | null;
+  city: string | null;
+  programId: number | null;
+  academicYear: string | null;
+  enrollmentDate: string | null;
+  status: string;
+  photoUrl: string | null;
+  emergencyContact: string | null;
+  emergencyPhone: string | null;
+  medicalInfo: string | null;
+  notes: string | null;
+}
 
-const students = {
-  'arabisch-beginners': [
-    { 
-      id: 'STU-001', 
-      name: 'Ahmed Hassan', 
-      email: 'ahmed.hassan@email.com',
-      phone: '06-12345678',
-      dateOfBirth: '2010-03-15',
-      address: 'Lange Voorhout 10, 2514 ED Den Haag',
-      enrollmentDate: '2024-09-01',
-      status: 'Actief'
-    },
-    { 
-      id: 'STU-004', 
-      name: 'Yusuf Ibrahim', 
-      email: 'yusuf.ibrahim@email.com',
-      phone: '06-87654321',
-      dateOfBirth: '2011-07-22',
-      address: 'Prinsengracht 123, 1015 DX Amsterdam',
-      enrollmentDate: '2024-09-01',
-      status: 'Actief'
-    }
-  ],
-  'quran-memorisatie': [
-    { 
-      id: 'STU-002', 
-      name: 'Fatima Al-Zahra', 
-      email: 'fatima.zahra@email.com',
-      phone: '06-11223344',
-      dateOfBirth: '2009-11-08',
-      address: 'Kalverstraat 92, 1012 PH Amsterdam',
-      enrollmentDate: '2024-09-01',
-      status: 'Actief'
-    }
-  ]
-};
+interface Guardian {
+  id: number;
+  firstName: string;
+  lastName: string;
+  relationship: string;
+  email: string;
+  phone: string | null;
+  address: string | null;
+  isEmergencyContact: boolean;
+}
 
-const mockStudentData = {
-  'STU-001': {
-    personal: {
-      id: 'STU-001',
-      name: 'Ahmed Hassan',
-      email: 'ahmed.hassan@email.com',
-      phone: '06-12345678',
-      dateOfBirth: '2010-03-15',
-      address: 'Lange Voorhout 10, 2514 ED Den Haag',
-      enrollmentDate: '2024-09-01',
-      status: 'Actief',
-      avatar: null
-    },
-    guardians: [
-      {
-        id: 'GUA-001',
-        name: 'Omar Hassan',
-        relationship: 'Vader',
-        email: 'omar.hassan@email.com',
-        phone: '06-98765432',
-        address: 'Lange Voorhout 10, 2514 ED Den Haag',
-        occupation: 'Software Engineer',
-        emergencyContact: true
-      },
-      {
-        id: 'GUA-002',
-        name: 'Zahra Hassan',
-        relationship: 'Moeder',
-        email: 'zahra.hassan@email.com',
-        phone: '06-11111111',
-        address: 'Lange Voorhout 10, 2514 ED Den Haag',
-        occupation: 'Lerares',
-        emergencyContact: false
-      }
-    ],
-    siblings: [
-      {
-        id: 'STU-007',
-        name: 'Amina Hassan',
-        class: 'Islamitische Studies',
-        year: '2024-2025',
-        status: 'Actief'
-      }
-    ],
-    grades: [
-      {
-        subject: 'Arabisch',
-        period: 'Periode 1',
-        grade: 8.5,
-        date: '2024-10-15',
-        teacher: 'Ustadh Abdullah',
-        notes: 'Uitstekende vooruitgang in grammatica'
-      },
-      {
-        subject: 'Quran Recitatie',
-        period: 'Periode 1',
-        grade: 9.0,
-        date: '2024-10-20',
-        teacher: 'Ustadha Khadija',
-        notes: 'Zeer goede uitspraak en memorisatie'
-      },
-      {
-        subject: 'Islamitische Studies',
-        period: 'Periode 1',
-        grade: 7.8,
-        date: '2024-10-25',
-        teacher: 'Ustadh Muhammad',
-        notes: 'Goed begrip van de leerstof'
-      }
-    ],
-    attendance: [
-      { date: '2024-12-16', status: 'Aanwezig', subject: 'Arabisch' },
-      { date: '2024-12-15', status: 'Aanwezig', subject: 'Quran Recitatie' },
-      { date: '2024-12-14', status: 'Afwezig', subject: 'Islamitische Studies', reason: 'Ziek' },
-      { date: '2024-12-13', status: 'Aanwezig', subject: 'Arabisch' },
-      { date: '2024-12-12', status: 'Te laat', subject: 'Quran Recitatie', reason: '15 minuten' }
-    ],
-    payments: [
-      {
-        id: 'PAY-001',
-        type: 'Inschrijvingsgeld',
-        amount: 150.00,
-        status: 'Betaald',
-        date: '2024-08-15',
-        dueDate: '2024-09-01',
-        reference: 'INS001'
-      },
-      {
-        id: 'PAY-002',
-        type: 'Lesmateriaal',
-        amount: 45.00,
-        status: 'Openstaand',
-        date: null,
-        dueDate: '2024-12-31',
-        reference: 'LES001'
-      }
-    ],
-    reports: [
-      {
-        id: 'REP-001',
-        title: 'Tussenrapport Periode 1',
-        date: '2024-11-15',
-        type: 'Tussenrapport',
-        status: 'Definitief'
-      },
-      {
-        id: 'REP-002',
-        title: 'Voortgangsrapport',
-        date: '2024-10-30',
-        type: 'Voortgang',
-        status: 'Concept'
-      }
-    ]
-  }
-};
+interface StudentGroup {
+  id: number;
+  name: string;
+  academicYear: string;
+  programId: number;
+}
+
+interface Grade {
+  id: number;
+  studentId: number;
+  programId: number;
+  gradeType: string;
+  score: number;
+  maxScore: number;
+  weight: number;
+  date: string;
+  notes: string | null;
+  programName?: string;
+}
+
+interface AttendanceRecord {
+  id: number;
+  studentId: number;
+  date: string;
+  status: 'present' | 'absent' | 'late';
+  notes: string | null;
+}
+
+interface Payment {
+  id: number;
+  studentId: number;
+  amount: number;
+  status: 'paid' | 'pending' | 'overdue';
+  dueDate: string;
+  paidDate: string | null;
+  description: string;
+}
 
 export default function StudentDossier() {
-  const [selectedYear, setSelectedYear] = useState('');
+  const [selectedAcademicYear, setSelectedAcademicYear] = useState('');
   const [selectedClass, setSelectedClass] = useState('');
-  const [selectedStudent, setSelectedStudent] = useState('');
+  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [studentData, setStudentData] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState('overview');
 
-  // Haal echte data op uit database
-  const { data: programsData } = useQuery({
-    queryKey: ['/api/programs'],
-    staleTime: 300000,
+  const { data: classesData = [] } = useQuery({ 
+    queryKey: ['/api/student-groups']
+  });
+  const { data: studentsData = [] } = useQuery({ 
+    queryKey: ['/api/students']
+  });
+  const { data: programsData = { programs: [] } } = useQuery({ 
+    queryKey: ['/api/programs']
   });
 
-  const { data: studentGroupsData } = useQuery({
-    queryKey: ['/api/student-groups'],
-    staleTime: 300000,
+  const classes = classesData as StudentGroup[];
+  const students = studentsData as Student[];
+  const subjects = (programsData as any)?.programs || [];
+
+  // Academic years from classes
+  const uniqueYears = new Set<string>();
+  classes.forEach(c => uniqueYears.add(c.academicYear));
+  const academicYears = Array.from(uniqueYears);
+
+  // Filter classes by academic year
+  const filteredClasses = selectedAcademicYear 
+    ? classes.filter(c => c.academicYear === selectedAcademicYear)
+    : classes;
+
+  // Filter students by class or search term
+  const filteredStudents = students.filter(student => {
+    const matchesSearch = searchTerm === '' || 
+      `${student.firstName} ${student.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.studentId.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    if (selectedClass) {
+      // Filter by selected class (would need enrollment data in real app)
+      return matchesSearch;
+    }
+    
+    return matchesSearch;
   });
 
-  const { data: teachersData } = useQuery({
-    queryKey: ['/api/teachers'],
-    staleTime: 300000,
-  });
-
-  const { data: studentsData } = useQuery({
-    queryKey: ['/api/students'],
-    staleTime: 300000,
-  });
-
-  // Extract data from API responses
-  const programs = programsData?.programs || [];
-  const studentGroups = studentGroupsData?.studentGroups || [];
-  const teachers = teachersData?.teachers || [];
-  const students = studentsData?.students || [];
-
-  // Academic years - gebruik echte jaren uit de database
-  const academicYears = [
-    { id: '2025-2026', name: '2025-2026' },
-    { id: '2024-2025', name: '2024-2025' },
-    { id: '2023-2024', name: '2023-2024' },
-    { id: '2022-2023', name: '2022-2023' }
-  ];
-
-  const handleStudentSelect = (studentId: string) => {
-    setSelectedStudent(studentId);
-    // In echte implementatie zou hier een API call komen
-    setStudentData(mockStudentData[studentId as keyof typeof mockStudentData] || null);
+  const handleStudentSelect = (student: Student) => {
+    setSelectedStudent(student);
+    setActiveTab('overview');
   };
 
-  const getAttendanceStats = () => {
-    if (!studentData?.attendance) return { aanwezig: 0, afwezig: 0, teLaat: 0, percentage: 0 };
-    
-    const aanwezig = studentData.attendance.filter((a: any) => a.status === 'Aanwezig').length;
-    const afwezig = studentData.attendance.filter((a: any) => a.status === 'Afwezig').length;
-    const teLaat = studentData.attendance.filter((a: any) => a.status === 'Te laat').length;
-    const total = studentData.attendance.length;
-    const percentage = total > 0 ? Math.round((aanwezig / total) * 100) : 0;
-    
-    return { aanwezig, afwezig, teLaat, percentage };
+  const getStudentInitials = (student: Student) => {
+    return `${student.firstName.charAt(0)}${student.lastName.charAt(0)}`.toUpperCase();
   };
 
-  const getGradeAverage = () => {
-    if (!studentData?.grades || studentData.grades.length === 0) return 0;
-    const sum = studentData.grades.reduce((acc: number, grade: any) => acc + grade.grade, 0);
-    return (sum / studentData.grades.length).toFixed(1);
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return 'Niet opgegeven';
+    return new Date(dateString).toLocaleDateString('nl-NL');
   };
 
-  // Filter student groups based on selected year
-  const availableClasses = selectedYear 
-    ? studentGroups.filter((group: any) => group.academicYear === selectedYear)
-    : [];
-  
-  // Filter students based on selected class
-  const availableStudents = selectedClass 
-    ? students.filter((student: any) => student.studentGroupId?.toString() === selectedClass)
-    : [];
-    
-  const filteredStudents = availableStudents.filter((student: any) => 
-    `${student.firstName} ${student.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    student.studentId.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const getStatusBadge = (status: string) => {
+    const statusMap = {
+      'active': { label: 'Actief', variant: 'default' as const },
+      'inactive': { label: 'Inactief', variant: 'secondary' as const },
+      'graduated': { label: 'Afgestudeerd', variant: 'outline' as const },
+    };
+    const statusInfo = statusMap[status as keyof typeof statusMap] || { label: status, variant: 'secondary' as const };
+    return <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>;
+  };
 
-  const attendanceStats = getAttendanceStats();
-  const gradeAverage = getGradeAverage();
+  // Mock data voor demonstratie - in echte app zou dit van API komen
+  const mockGrades: Grade[] = selectedStudent ? [
+    { id: 1, studentId: selectedStudent.id, programId: 36, gradeType: 'test', score: 8.5, maxScore: 10, weight: 0.3, date: '2025-01-15', notes: null, programName: 'Koran' },
+    { id: 2, studentId: selectedStudent.id, programId: 36, gradeType: 'homework', score: 7.8, maxScore: 10, weight: 0.2, date: '2025-01-20', notes: null, programName: 'Koran' },
+    { id: 3, studentId: selectedStudent.id, programId: 37, gradeType: 'test', score: 9.0, maxScore: 10, weight: 0.3, date: '2025-01-18', notes: null, programName: 'Arabisch' },
+  ] : [];
+
+  const mockAttendance: AttendanceRecord[] = selectedStudent ? [
+    { id: 1, studentId: selectedStudent.id, date: '2025-06-01', status: 'present', notes: null },
+    { id: 2, studentId: selectedStudent.id, date: '2025-06-02', status: 'present', notes: null },
+    { id: 3, studentId: selectedStudent.id, date: '2025-06-03', status: 'late', notes: 'Verkeer' },
+  ] : [];
+
+  const mockPayments: Payment[] = selectedStudent ? [
+    { id: 1, studentId: selectedStudent.id, amount: 250.00, status: 'paid', dueDate: '2025-01-01', paidDate: '2024-12-28', description: 'Schoolgeld Q1 2025' },
+    { id: 2, studentId: selectedStudent.id, amount: 250.00, status: 'pending', dueDate: '2025-04-01', paidDate: null, description: 'Schoolgeld Q2 2025' },
+  ] : [];
+
+  const mockGuardians: Guardian[] = selectedStudent ? [
+    { id: 1, firstName: 'Ahmed', lastName: 'El Mouden', relationship: 'Vader', email: 'ahmed@email.com', phone: '0496123456', address: 'Schoolstraat 123, 2000 Antwerpen', isEmergencyContact: true },
+    { id: 2, firstName: 'Fatima', lastName: 'El Mouden', relationship: 'Moeder', email: 'fatima@email.com', phone: '0496789012', address: 'Schoolstraat 123, 2000 Antwerpen', isEmergencyContact: false },
+  ] : [];
 
   return (
-    <div className="min-h-screen">
+    <DataTableContainer>
       <PremiumHeader 
-        title="Leerlingendossier"
-        description="Bekijk uitgebreide leerlinggegevens en voortgang"
-        icon={User}
-        breadcrumbs={[
-          { label: "Dashboard", href: "/" },
-          { label: "Leerlingendossier" }
-        ]}
+        title="Leerlingendossier" 
+        icon={FileText}
+        description="Bekijk complete studentinformatie en historiek"
       />
 
-      <div className="container mx-auto px-6 py-8">
-        {!studentData ? (
-          // Student selectie interface
-          <div className="max-w-4xl mx-auto space-y-6">
+      <div className="space-y-6">
+        {!selectedStudent ? (
+          // Student selectie
+          <div className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg font-medium leading-tight tracking-tight flex items-center gap-2 text-[#0b4ca4]">
-                  <GraduationCap className="h-5 w-5" />
-                  Student Selecteren
+                <CardTitle className="flex items-center gap-2">
+                  <Search className="h-5 w-5" />
+                  Student selecteren
                 </CardTitle>
                 <CardDescription>
-                  Zoek een student om het volledige dossier te bekijken
+                  Kies een schooljaar en klas, of zoek direct op naam of student ID
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                {/* Schooljaar selectie */}
+                {/* Filters */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="year">Schooljaar</Label>
-                    <Select value={selectedYear} onValueChange={setSelectedYear}>
+                    <label className="text-sm font-medium">Schooljaar</label>
+                    <Select value={selectedAcademicYear} onValueChange={setSelectedAcademicYear}>
                       <SelectTrigger>
                         <SelectValue placeholder="Selecteer schooljaar" />
                       </SelectTrigger>
                       <SelectContent>
+                        <SelectItem value="all">Alle schooljaren</SelectItem>
                         {academicYears.map(year => (
-                          <SelectItem key={year.id} value={year.id}>
-                            {year.name}
-                          </SelectItem>
+                          <SelectItem key={year} value={year}>{year}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   </div>
-
+                  
                   <div className="space-y-2">
-                    <Label htmlFor="class">Klas</Label>
-                    <Select 
-                      value={selectedClass} 
-                      onValueChange={setSelectedClass}
-                      disabled={!selectedYear}
-                    >
+                    <label className="text-sm font-medium">Klas</label>
+                    <Select value={selectedClass} onValueChange={setSelectedClass}>
                       <SelectTrigger>
                         <SelectValue placeholder="Selecteer klas" />
                       </SelectTrigger>
                       <SelectContent>
-                        {availableClasses.map((cls: any) => (
+                        <SelectItem value="all">Alle klassen</SelectItem>
+                        {filteredClasses.map(cls => (
                           <SelectItem key={cls.id} value={cls.id.toString()}>
-                            {cls.name}
+                            {cls.name} - {cls.academicYear}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   </div>
-
+                  
                   <div className="space-y-2">
-                    <Label htmlFor="search">Zoek student</Label>
-                    <Input
-                      placeholder="Naam of student-ID..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      disabled={!selectedClass}
-                    />
+                    <label className="text-sm font-medium">Zoek student</label>
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <Input
+                        placeholder="Naam of student ID"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-10"
+                      />
+                    </div>
                   </div>
                 </div>
 
-                {/* Studenten lijst */}
-                {selectedClass && (
-                  <div className="space-y-4">
-                    <div className="border-t pt-4">
-                      <h3 className="text-lg font-semibold mb-3">
-                        Studenten in {availableClasses.find((c: any) => c.id.toString() === selectedClass)?.name}
-                      </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {filteredStudents.map((student: any) => (
-                          <Card 
-                            key={student.id} 
-                            className="cursor-pointer hover:shadow-md transition-shadow"
-                            onClick={() => handleStudentSelect(student.id.toString())}
-                          >
-                            <CardContent className="p-4">
-                              <div className="flex items-center space-x-3">
-                                <Avatar>
-                                  <AvatarFallback>
-                                    {`${student.firstName} ${student.lastName}`.split(' ').map((n: any) => n[0]).join('')}
-                                  </AvatarFallback>
-                                </Avatar>
-                                <div>
-                                  <div className="font-medium">{student.firstName} {student.lastName}</div>
-                                  <div className="text-sm text-gray-500">{student.studentId}</div>
-                                  <Badge variant="outline" className="mt-1">
-                                    {student.status || 'Actief'}
-                                  </Badge>
-                                </div>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        ))}
-                      </div>
-                      {filteredStudents.length === 0 && selectedClass && (
-                        <div className="text-center py-8 text-gray-500">
-                          Geen studenten gevonden
+                {/* Student lijst */}
+                <div className="space-y-4">
+                  <h4 className="font-medium">Studenten ({filteredStudents.length})</h4>
+                  <div className="grid gap-3 max-h-96 overflow-y-auto">
+                    {filteredStudents.map(student => (
+                      <div 
+                        key={student.id}
+                        className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                        onClick={() => handleStudentSelect(student)}
+                      >
+                        <div className="flex items-center gap-3">
+                          <Avatar>
+                            <AvatarImage src={student.photoUrl || undefined} />
+                            <AvatarFallback>{getStudentInitials(student)}</AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <h5 className="font-medium">{student.firstName} {student.lastName}</h5>
+                            <p className="text-sm text-gray-600">ID: {student.studentId}</p>
+                          </div>
                         </div>
-                      )}
-                    </div>
+                        <div className="flex items-center gap-2">
+                          {getStatusBadge(student.status)}
+                          <Button size="sm" variant="outline">
+                            <Eye className="h-4 w-4 mr-1" />
+                            Bekijk
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                )}
+                </div>
               </CardContent>
             </Card>
           </div>
         ) : (
-          // Student dossier weergave
-          <div className="max-w-7xl mx-auto space-y-6">
+          // Student dossier
+          <div className="space-y-6">
             {/* Student header */}
             <Card>
               <CardContent className="p-6">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center space-x-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
                     <Avatar className="h-16 w-16">
-                      <AvatarFallback className="text-lg">
-                        {studentData.personal.name.split(' ').map((n: string) => n[0]).join('')}
-                      </AvatarFallback>
+                      <AvatarImage src={selectedStudent.photoUrl || undefined} />
+                      <AvatarFallback className="text-lg">{getStudentInitials(selectedStudent)}</AvatarFallback>
                     </Avatar>
                     <div>
-                      <h1 className="text-2xl font-bold">{studentData.personal.name}</h1>
-                      <p className="text-gray-600">{studentData.personal.id}</p>
-                      <div className="flex items-center gap-4 mt-2">
-                        <Badge variant={studentData.personal.status === 'Actief' ? 'default' : 'secondary'}>
-                          {studentData.personal.status}
-                        </Badge>
-                        <span className="text-sm text-gray-500">
-                          Ingeschreven: {new Date(studentData.personal.enrollmentDate).toLocaleDateString('nl-NL')}
-                        </span>
+                      <h2 className="text-2xl font-bold">{selectedStudent.firstName} {selectedStudent.lastName}</h2>
+                      <p className="text-gray-600">Student ID: {selectedStudent.studentId}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        {getStatusBadge(selectedStudent.status)}
+                        <Badge variant="outline">{selectedStudent.academicYear}</Badge>
                       </div>
                     </div>
                   </div>
-                  <Button 
-                    variant="outline" 
-                    onClick={() => {
-                      setStudentData(null);
-                      setSelectedStudent('');
-                    }}
-                  >
-                    Andere student
+                  <Button onClick={() => setSelectedStudent(null)} variant="outline">
+                    Andere student kiezen
                   </Button>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Quick stats */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <Card>
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-gray-600">Gemiddeld cijfer</p>
-                      <p className="text-2xl font-bold text-green-600">{gradeAverage}</p>
-                    </div>
-                    <TrendingUp className="h-8 w-8 text-green-600" />
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-gray-600">Aanwezigheid</p>
-                      <p className="text-2xl font-bold text-blue-600">{attendanceStats.percentage}%</p>
-                    </div>
-                    <CheckCircle className="h-8 w-8 text-blue-600" />
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-gray-600">Openstaande betalingen</p>
-                      <p className="text-2xl font-bold text-orange-600">
-                        €{studentData.payments.filter((p: any) => p.status === 'Openstaand').reduce((acc: number, p: any) => acc + p.amount, 0).toFixed(2)}
-                      </p>
-                    </div>
-                    <CreditCard className="h-8 w-8 text-orange-600" />
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-gray-600">Rapporten</p>
-                      <p className="text-2xl font-bold text-purple-600">{studentData.reports.length}</p>
-                    </div>
-                    <FileText className="h-8 w-8 text-purple-600" />
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Detailed tabs */}
-            <Tabs defaultValue="overview" className="space-y-4">
+            {/* Tabs */}
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="grid w-full grid-cols-6">
-                <TabsTrigger value="overview">Overzicht</TabsTrigger>
-                <TabsTrigger value="grades">Cijfers</TabsTrigger>
-                <TabsTrigger value="attendance">Aanwezigheid</TabsTrigger>
-                <TabsTrigger value="payments">Betalingen</TabsTrigger>
-                <TabsTrigger value="family">Familie</TabsTrigger>
-                <TabsTrigger value="reports">Rapporten</TabsTrigger>
+                <TabsTrigger value="overview" className="flex items-center gap-2">
+                  <User className="h-4 w-4" />
+                  Overzicht
+                </TabsTrigger>
+                <TabsTrigger value="guardians" className="flex items-center gap-2">
+                  <Users className="h-4 w-4" />
+                  Voogden
+                </TabsTrigger>
+                <TabsTrigger value="grades" className="flex items-center gap-2">
+                  <Calculator className="h-4 w-4" />
+                  Cijfers
+                </TabsTrigger>
+                <TabsTrigger value="attendance" className="flex items-center gap-2">
+                  <Clock className="h-4 w-4" />
+                  Aanwezigheid
+                </TabsTrigger>
+                <TabsTrigger value="payments" className="flex items-center gap-2">
+                  <CreditCard className="h-4 w-4" />
+                  Betalingen
+                </TabsTrigger>
+                <TabsTrigger value="notes" className="flex items-center gap-2">
+                  <MessageSquare className="h-4 w-4" />
+                  Notities
+                </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="overview" className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <TabsContent value="overview" className="space-y-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Persoonlijke informatie */}
                   <Card>
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
                         <User className="h-5 w-5" />
-                        Persoonlijke gegevens
+                        Persoonlijke informatie
                       </CardTitle>
                     </CardHeader>
-                    <CardContent className="space-y-3">
+                    <CardContent className="space-y-4">
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <Label className="text-sm font-medium text-gray-600">Geboortedatum</Label>
-                          <p>{new Date(studentData.personal.dateOfBirth).toLocaleDateString('nl-NL')}</p>
+                          <label className="text-sm font-medium text-gray-600">Voornaam</label>
+                          <p className="font-medium">{selectedStudent.firstName}</p>
                         </div>
                         <div>
-                          <Label className="text-sm font-medium text-gray-600">Leeftijd</Label>
-                          <p>{new Date().getFullYear() - new Date(studentData.personal.dateOfBirth).getFullYear()} jaar</p>
+                          <label className="text-sm font-medium text-gray-600">Achternaam</label>
+                          <p className="font-medium">{selectedStudent.lastName}</p>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-gray-600">Geboortedatum</label>
+                          <p className="font-medium">{formatDate(selectedStudent.dateOfBirth)}</p>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-gray-600">Geslacht</label>
+                          <p className="font-medium">{selectedStudent.gender || 'Niet opgegeven'}</p>
                         </div>
                       </div>
+                      
+                      <Separator />
+                      
                       <div>
-                        <Label className="text-sm font-medium text-gray-600">E-mail</Label>
-                        <p className="flex items-center gap-2">
+                        <label className="text-sm font-medium text-gray-600 flex items-center gap-1">
                           <Mail className="h-4 w-4" />
-                          {studentData.personal.email}
-                        </p>
+                          E-mail
+                        </label>
+                        <p className="font-medium">{selectedStudent.email || 'Niet opgegeven'}</p>
                       </div>
+                      
                       <div>
-                        <Label className="text-sm font-medium text-gray-600">Telefoon</Label>
-                        <p className="flex items-center gap-2">
+                        <label className="text-sm font-medium text-gray-600 flex items-center gap-1">
                           <Phone className="h-4 w-4" />
-                          {studentData.personal.phone}
-                        </p>
+                          Telefoon
+                        </label>
+                        <p className="font-medium">{selectedStudent.phone || 'Niet opgegeven'}</p>
                       </div>
+                      
                       <div>
-                        <Label className="text-sm font-medium text-gray-600">Adres</Label>
-                        <p className="flex items-center gap-2">
+                        <label className="text-sm font-medium text-gray-600 flex items-center gap-1">
                           <MapPin className="h-4 w-4" />
-                          {studentData.personal.address}
+                          Adres
+                        </label>
+                        <p className="font-medium">
+                          {selectedStudent.street && selectedStudent.houseNumber 
+                            ? `${selectedStudent.street} ${selectedStudent.houseNumber}`
+                            : selectedStudent.address || 'Niet opgegeven'
+                          }
                         </p>
+                        {selectedStudent.postalCode && selectedStudent.city && (
+                          <p className="text-sm text-gray-600">
+                            {selectedStudent.postalCode} {selectedStudent.city}
+                          </p>
+                        )}
                       </div>
                     </CardContent>
                   </Card>
 
+                  {/* Inschrijving informatie */}
                   <Card>
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
-                        <BookOpen className="h-5 w-5" />
-                        Recente activiteit
+                        <GraduationCap className="h-5 w-5" />
+                        Inschrijving
                       </CardTitle>
                     </CardHeader>
-                    <CardContent>
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-                          <div className="flex items-center gap-2">
-                            <CheckCircle className="h-4 w-4 text-green-600" />
-                            <span className="text-sm">Aanwezig bij Arabisch</span>
-                          </div>
-                          <span className="text-xs text-gray-500">Vandaag</span>
+                    <CardContent className="space-y-4">
+                      <div>
+                        <label className="text-sm font-medium text-gray-600">Eerste inschrijving</label>
+                        <p className="font-medium">{formatDate(selectedStudent.enrollmentDate)}</p>
+                      </div>
+                      
+                      <div>
+                        <label className="text-sm font-medium text-gray-600">Academisch jaar</label>
+                        <p className="font-medium">{selectedStudent.academicYear || 'Niet opgegeven'}</p>
+                      </div>
+                      
+                      <div>
+                        <label className="text-sm font-medium text-gray-600">Status</label>
+                        <div className="mt-1">
+                          {getStatusBadge(selectedStudent.status)}
                         </div>
-                        <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-                          <div className="flex items-center gap-2">
-                            <TrendingUp className="h-4 w-4 text-blue-600" />
-                            <span className="text-sm">Cijfer 9.0 voor Quran Recitatie</span>
-                          </div>
-                          <span className="text-xs text-gray-500">Gisteren</span>
-                        </div>
-                        <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
-                          <div className="flex items-center gap-2">
-                            <AlertCircle className="h-4 w-4 text-orange-600" />
-                            <span className="text-sm">Openstaande betaling lesmateriaal</span>
-                          </div>
-                          <span className="text-xs text-gray-500">3 dagen geleden</span>
-                        </div>
+                      </div>
+                      
+                      <Separator />
+                      
+                      <div>
+                        <label className="text-sm font-medium text-gray-600 flex items-center gap-1">
+                          <Heart className="h-4 w-4" />
+                          Medische informatie
+                        </label>
+                        <p className="font-medium">{selectedStudent.medicalInfo || 'Geen bijzonderheden'}</p>
+                      </div>
+                      
+                      <div>
+                        <label className="text-sm font-medium text-gray-600">Notities</label>
+                        <p className="font-medium">{selectedStudent.notes || 'Geen notities'}</p>
                       </div>
                     </CardContent>
                   </Card>
                 </div>
               </TabsContent>
 
-              <TabsContent value="grades" className="space-y-4">
+              <TabsContent value="guardians">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Cijfers overzicht</CardTitle>
-                    <CardDescription>Alle behaalde resultaten en voortgang</CardDescription>
+                    <CardTitle className="flex items-center gap-2">
+                      <Users className="h-5 w-5" />
+                      Voogden & Familie
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      {studentData.grades.map((grade: any, index: number) => (
-                        <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
-                          <div>
-                            <div className="font-medium">{grade.subject}</div>
-                            <div className="text-sm text-gray-600">{grade.period} • {grade.teacher}</div>
-                            {grade.notes && (
-                              <div className="text-sm text-gray-500 mt-1">{grade.notes}</div>
+                      {mockGuardians.map(guardian => (
+                        <div key={guardian.id} className="p-4 border rounded-lg">
+                          <div className="flex justify-between items-start">
+                            <div className="space-y-2">
+                              <h4 className="font-semibold">{guardian.firstName} {guardian.lastName}</h4>
+                              <p className="text-sm text-gray-600">{guardian.relationship}</p>
+                              <div className="space-y-1 text-sm">
+                                <p className="flex items-center gap-2">
+                                  <Mail className="h-4 w-4" />
+                                  {guardian.email}
+                                </p>
+                                <p className="flex items-center gap-2">
+                                  <Phone className="h-4 w-4" />
+                                  {guardian.phone || 'Niet opgegeven'}
+                                </p>
+                                <p className="flex items-center gap-2">
+                                  <Home className="h-4 w-4" />
+                                  {guardian.address || 'Niet opgegeven'}
+                                </p>
+                              </div>
+                            </div>
+                            {guardian.isEmergencyContact && (
+                              <Badge variant="destructive">Noodcontact</Badge>
                             )}
-                          </div>
-                          <div className="text-right">
-                            <div className={`text-2xl font-bold ${
-                              grade.grade >= 8 ? 'text-green-600' : 
-                              grade.grade >= 6.5 ? 'text-blue-600' : 
-                              'text-orange-600'
-                            }`}>
-                              {grade.grade}
-                            </div>
-                            <div className="text-sm text-gray-500">
-                              {new Date(grade.date).toLocaleDateString('nl-NL')}
-                            </div>
                           </div>
                         </div>
                       ))}
@@ -606,175 +523,158 @@ export default function StudentDossier() {
                 </Card>
               </TabsContent>
 
-              <TabsContent value="attendance" className="space-y-4">
+              <TabsContent value="grades">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Aanwezigheidsoverzicht</CardTitle>
-                    <CardDescription>
-                      {attendanceStats.aanwezig} aanwezig, {attendanceStats.afwezig} afwezig, {attendanceStats.teLaat} te laat
-                    </CardDescription>
+                    <CardTitle className="flex items-center gap-2">
+                      <Calculator className="h-5 w-5" />
+                      Cijfers overzicht
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-3">
-                      {studentData.attendance.map((record: any, index: number) => (
-                        <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                          <div className="flex items-center gap-3">
-                            {record.status === 'Aanwezig' && <CheckCircle className="h-5 w-5 text-green-600" />}
-                            {record.status === 'Afwezig' && <XCircle className="h-5 w-5 text-red-600" />}
-                            {record.status === 'Te laat' && <Clock className="h-5 w-5 text-orange-600" />}
-                            <div>
-                              <div className="font-medium">{record.subject}</div>
-                              <div className="text-sm text-gray-600">
-                                {new Date(record.date).toLocaleDateString('nl-NL')}
-                              </div>
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <Badge variant={
-                              record.status === 'Aanwezig' ? 'default' :
-                              record.status === 'Afwezig' ? 'destructive' :
-                              'secondary'
-                            }>
-                              {record.status}
-                            </Badge>
-                            {record.reason && (
-                              <div className="text-sm text-gray-500 mt-1">{record.reason}</div>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="payments" className="space-y-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Betalingsoverzicht</CardTitle>
-                    <CardDescription>Alle betalingen en openstaande bedragen</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      {studentData.payments.map((payment: any, index: number) => (
-                        <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
-                          <div>
-                            <div className="font-medium">{payment.type}</div>
-                            <div className="text-sm text-gray-600">
-                              Referentie: {payment.reference}
-                            </div>
-                            <div className="text-sm text-gray-500">
-                              Vervaldatum: {new Date(payment.dueDate).toLocaleDateString('nl-NL')}
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <div className="text-lg font-bold">€{payment.amount.toFixed(2)}</div>
-                            <Badge variant={payment.status === 'Betaald' ? 'default' : 'destructive'}>
-                              {payment.status}
-                            </Badge>
-                            {payment.date && (
-                              <div className="text-sm text-gray-500 mt-1">
-                                Betaald: {new Date(payment.date).toLocaleDateString('nl-NL')}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="family" className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Users className="h-5 w-5" />
-                        Voogden
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        {studentData.guardians.map((guardian: any, index: number) => (
-                          <div key={index} className="p-4 border rounded-lg">
-                            <div className="flex items-start justify-between">
-                              <div>
-                                <div className="font-medium">{guardian.name}</div>
-                                <div className="text-sm text-gray-600">{guardian.relationship}</div>
-                                <div className="text-sm text-gray-500 mt-1">{guardian.occupation}</div>
-                              </div>
-                              {guardian.emergencyContact && (
-                                <Badge variant="outline">Noodcontact</Badge>
-                              )}
-                            </div>
-                            <div className="mt-3 space-y-1">
-                              <div className="flex items-center gap-2 text-sm">
-                                <Mail className="h-4 w-4" />
-                                {guardian.email}
-                              </div>
-                              <div className="flex items-center gap-2 text-sm">
-                                <Phone className="h-4 w-4" />
-                                {guardian.phone}
-                              </div>
-                            </div>
-                          </div>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Vak</TableHead>
+                          <TableHead>Type</TableHead>
+                          <TableHead>Cijfer</TableHead>
+                          <TableHead>Max</TableHead>
+                          <TableHead>Datum</TableHead>
+                          <TableHead>Notities</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {mockGrades.map(grade => (
+                          <TableRow key={grade.id}>
+                            <TableCell className="font-medium">{grade.programName}</TableCell>
+                            <TableCell>
+                              <Badge variant="outline">{grade.gradeType}</Badge>
+                            </TableCell>
+                            <TableCell className="font-bold">{grade.score}</TableCell>
+                            <TableCell>{grade.maxScore}</TableCell>
+                            <TableCell>{formatDate(grade.date)}</TableCell>
+                            <TableCell>{grade.notes || '-'}</TableCell>
+                          </TableRow>
                         ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Broers/Zussen</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-3">
-                        {studentData.siblings.map((sibling: any, index: number) => (
-                          <div key={index} className="p-3 border rounded-lg">
-                            <div className="font-medium">{sibling.name}</div>
-                            <div className="text-sm text-gray-600">{sibling.class} • {sibling.year}</div>
-                            <Badge variant="outline" className="mt-2">
-                              {sibling.status}
-                            </Badge>
-                          </div>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
+                      </TableBody>
+                    </Table>
+                  </CardContent>
+                </Card>
               </TabsContent>
 
-              <TabsContent value="reports" className="space-y-4">
+              <TabsContent value="attendance">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Rapporten en documenten</CardTitle>
-                    <CardDescription>Alle gegenereerde rapporten en documenten</CardDescription>
+                    <CardTitle className="flex items-center gap-2">
+                      <Clock className="h-5 w-5" />
+                      Aanwezigheid
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-3">
-                      {studentData.reports.map((report: any, index: number) => (
-                        <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
-                          <div className="flex items-center gap-3">
-                            <FileText className="h-5 w-5 text-blue-600" />
-                            <div>
-                              <div className="font-medium">{report.title}</div>
-                              <div className="text-sm text-gray-600">{report.type}</div>
-                              <div className="text-sm text-gray-500">
-                                {new Date(report.date).toLocaleDateString('nl-NL')}
-                              </div>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Badge variant={report.status === 'Definitief' ? 'default' : 'secondary'}>
-                              {report.status}
-                            </Badge>
-                            <Button variant="outline" size="sm">
-                              Download
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Datum</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead>Notities</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {mockAttendance.map(attendance => (
+                          <TableRow key={attendance.id}>
+                            <TableCell>{formatDate(attendance.date)}</TableCell>
+                            <TableCell>
+                              <Badge 
+                                variant={
+                                  attendance.status === 'present' ? 'default' :
+                                  attendance.status === 'late' ? 'secondary' : 'destructive'
+                                }
+                              >
+                                {attendance.status === 'present' ? 'Aanwezig' :
+                                 attendance.status === 'late' ? 'Te laat' : 'Afwezig'}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>{attendance.notes || '-'}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="payments">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <CreditCard className="h-5 w-5" />
+                      Betalingen
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Beschrijving</TableHead>
+                          <TableHead>Bedrag</TableHead>
+                          <TableHead>Vervaldatum</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead>Betaaldatum</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {mockPayments.map(payment => (
+                          <TableRow key={payment.id}>
+                            <TableCell className="font-medium">{payment.description}</TableCell>
+                            <TableCell>€{payment.amount.toFixed(2)}</TableCell>
+                            <TableCell>{formatDate(payment.dueDate)}</TableCell>
+                            <TableCell>
+                              <Badge 
+                                variant={
+                                  payment.status === 'paid' ? 'default' :
+                                  payment.status === 'pending' ? 'secondary' : 'destructive'
+                                }
+                              >
+                                {payment.status === 'paid' ? 'Betaald' :
+                                 payment.status === 'pending' ? 'Wachtend' : 'Achterstallig'}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>{formatDate(payment.paidDate)}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="notes">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <MessageSquare className="h-5 w-5" />
+                      Notities & Opmerkingen
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="p-4 bg-blue-50 rounded-lg">
+                        <h4 className="font-semibold text-blue-900">Gedragsnotities</h4>
+                        <p className="text-blue-800 text-sm mt-1">Goede student, werkt goed samen met klasgenoten. Toont respect voor docenten.</p>
+                        <p className="text-xs text-blue-600 mt-2">Toegevoegd: 15 januari 2025</p>
+                      </div>
+                      
+                      <div className="p-4 bg-yellow-50 rounded-lg">
+                        <h4 className="font-semibold text-yellow-900">Aanwezigheidsnotities</h4>
+                        <p className="text-yellow-800 text-sm mt-1">Af en toe te laat door openbaar vervoer. Ouders zijn op de hoogte.</p>
+                        <p className="text-xs text-yellow-600 mt-2">Toegevoegd: 20 januari 2025</p>
+                      </div>
+                      
+                      <div className="p-4 bg-green-50 rounded-lg">
+                        <h4 className="font-semibold text-green-900">Algemene notities</h4>
+                        <p className="text-green-800 text-sm mt-1">Zeer gemotiveerde student. Interesse in extra Arabische lessen.</p>
+                        <p className="text-xs text-green-600 mt-2">Toegevoegd: 25 januari 2025</p>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -783,6 +683,6 @@ export default function StudentDossier() {
           </div>
         )}
       </div>
-    </div>
+    </DataTableContainer>
   );
 }

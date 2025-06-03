@@ -174,6 +174,19 @@ export default function Fees() {
     }
   });
 
+  const discountForm = useForm({
+    resolver: zodResolver(discountSchema),
+    defaultValues: {
+      discountType: '',
+      discountPercentage: '',
+      description: '',
+      academicYear: '',
+      proofDocument: '',
+      validFrom: '',
+      validUntil: '',
+    }
+  });
+
   // Mutations
   const addPaymentMutation = useMutation({
     mutationFn: (data: any) => apiRequest('POST', '/api/payments', data),
@@ -200,6 +213,39 @@ export default function Fees() {
     },
     onError: () => {
       toast({ title: "Fout", description: "Er is een fout opgetreden bij het markeren van de betaling.", variant: "destructive" });
+    }
+  });
+
+  const applyDiscountMutation = useMutation({
+    mutationFn: (data: any) => 
+      apiRequest('POST', '/api/discount-applications', {
+        ...data,
+        studentId: selectedStudent?.id,
+        appliedBy: user.id,
+        status: 'pending'
+      }),
+    onSuccess: () => {
+      toast({ title: "Korting aangevraagd", description: "De kortingsaanvraag is ingediend voor goedkeuring." });
+      queryClient.invalidateQueries({ queryKey: ['/api/discount-applications'] });
+      setShowDiscountDialog(false);
+      discountForm.reset();
+      setSelectedStudent(null);
+    },
+    onError: () => {
+      toast({ title: "Fout", description: "Er is een fout opgetreden bij het aanvragen van de korting.", variant: "destructive" });
+    }
+  });
+
+  const approveDiscountMutation = useMutation({
+    mutationFn: (id: number) => 
+      apiRequest('PATCH', `/api/discount-applications/${id}/approve`, {}),
+    onSuccess: () => {
+      toast({ title: "Korting goedgekeurd", description: "De korting is goedgekeurd en toegepast." });
+      queryClient.invalidateQueries({ queryKey: ['/api/discount-applications'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/payments'] });
+    },
+    onError: () => {
+      toast({ title: "Fout", description: "Er is een fout opgetreden bij het goedkeuren van de korting.", variant: "destructive" });
     }
   });
 
@@ -648,6 +694,7 @@ export default function Fees() {
         <TabsList>
           <TabsTrigger value="current">Huidige Betalingen</TabsTrigger>
           <TabsTrigger value="history">Betalingsgeschiedenis</TabsTrigger>
+          <TabsTrigger value="discounts">Kortingsbeheer</TabsTrigger>
         </TabsList>
 
         <TabsContent value="current" className="space-y-4">
@@ -827,6 +874,273 @@ export default function Fees() {
                           <Download className="h-4 w-4 mr-2" />
                           Factuur
                         </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="discounts" className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-green-700 flex items-center">
+                  <Gift className="h-5 w-5 mr-2" />
+                  Automatische Kortingen
+                </CardTitle>
+                <CardDescription>
+                  Systeem berekent automatisch familiekortingen voor gezinnen met meerdere kinderen
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="bg-green-50 p-4 rounded-lg">
+                    <div className="flex items-center mb-2">
+                      <Users className="h-4 w-4 text-green-600 mr-2" />
+                      <span className="font-semibold text-green-800">Familiekorting</span>
+                    </div>
+                    <p className="text-sm text-green-700">
+                      10% korting voor gezinnen met 2 of meer kinderen
+                    </p>
+                    <p className="text-xs text-green-600 mt-1">
+                      Wordt automatisch toegepast bij nieuwe betalingen
+                    </p>
+                  </div>
+                  
+                  <div className="text-sm">
+                    <p className="font-medium mb-2">Actieve familieregelingen:</p>
+                    {studentsData
+                      .reduce((families: any[], student: any) => {
+                        const existingFamily = families.find(f => 
+                          student.guardians?.some((g: any) => 
+                            f.guardians?.some((fg: any) => fg.email === g.email)
+                          )
+                        );
+                        if (!existingFamily && student.guardians?.length > 0) {
+                          families.push({
+                            guardians: student.guardians,
+                            children: [student],
+                            discount: 10
+                          });
+                        } else if (existingFamily) {
+                          existingFamily.children.push(student);
+                        }
+                        return families;
+                      }, [])
+                      .filter(family => family.children.length >= 2)
+                      .map((family, index) => (
+                        <div key={index} className="flex justify-between items-center py-2 border-b">
+                          <span className="text-sm">
+                            Familie {family.guardians[0]?.lastName} ({family.children.length} kinderen)
+                          </span>
+                          <Badge variant="secondary">{family.discount}% korting</Badge>
+                        </div>
+                      ))
+                    }
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-blue-700 flex items-center">
+                  <Shield className="h-5 w-5 mr-2" />
+                  Handmatige Kortingen
+                </CardTitle>
+                <CardDescription>
+                  Beheer speciale kortingen voor sociale tarieven en personeel
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="grid gap-2">
+                    <div className="bg-blue-50 p-3 rounded">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm font-medium text-blue-800">Sociaal tarief</span>
+                        <Badge variant="outline">25% korting</Badge>
+                      </div>
+                      <p className="text-xs text-blue-600 mt-1">Voor gezinnen met financiële ondersteuning</p>
+                    </div>
+                    
+                    <div className="bg-purple-50 p-3 rounded">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm font-medium text-purple-800">Personeelskorting</span>
+                        <Badge variant="outline">100% korting</Badge>
+                      </div>
+                      <p className="text-xs text-purple-600 mt-1">Voor kinderen van schoolpersoneel</p>
+                    </div>
+                  </div>
+
+                  <Dialog open={showDiscountDialog} onOpenChange={setShowDiscountDialog}>
+                    <DialogTrigger asChild>
+                      <Button className="w-full" variant="outline">
+                        <Percent className="h-4 w-4 mr-2" />
+                        Korting Aanvragen
+                      </Button>
+                    </DialogTrigger>
+                    <CustomDialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Kortingsaanvraag Indienen</DialogTitle>
+                        <DialogDescription>
+                          Vraag een speciale korting aan voor een student
+                        </DialogDescription>
+                      </DialogHeader>
+                      <Form {...discountForm}>
+                        <form onSubmit={discountForm.handleSubmit((data) => applyDiscountMutation.mutate(data))} className="space-y-4">
+                          <FormField
+                            control={discountForm.control}
+                            name="discountType"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Kortingstype</FormLabel>
+                                <Select onValueChange={field.onChange} value={field.value}>
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Selecteer kortingstype" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    <SelectItem value="social_rate">Sociaal tarief (25%)</SelectItem>
+                                    <SelectItem value="staff_discount">Personeelskorting (100%)</SelectItem>
+                                    <SelectItem value="custom">Aangepaste korting</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={discountForm.control}
+                            name="discountPercentage"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Kortingspercentage</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="Bijvoorbeeld: 25" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={discountForm.control}
+                            name="description"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Reden voor korting</FormLabel>
+                                <FormControl>
+                                  <Textarea placeholder="Beschrijf de reden voor deze korting..." {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <div className="flex justify-end gap-2 pt-4">
+                            <Button 
+                              type="button" 
+                              variant="outline" 
+                              onClick={() => setShowDiscountDialog(false)}
+                            >
+                              Annuleren
+                            </Button>
+                            <Button 
+                              type="submit" 
+                              disabled={applyDiscountMutation.isPending}
+                            >
+                              {applyDiscountMutation.isPending ? "Indienen..." : "Aanvraag Indienen"}
+                            </Button>
+                          </div>
+                        </form>
+                      </Form>
+                    </CustomDialogContent>
+                  </Dialog>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-orange-700 flex items-center">
+                <UserCheck className="h-5 w-5 mr-2" />
+                Kortingsaanvragen Beheer
+              </CardTitle>
+              <CardDescription>
+                Goedkeuren en beheren van ingediende kortingsaanvragen
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Student</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Percentage</TableHead>
+                    <TableHead>Reden</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Aangevraagd door</TableHead>
+                    <TableHead>Acties</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {discountApplicationsData.map((application: any) => (
+                    <TableRow key={application.id}>
+                      <TableCell className="font-medium">
+                        {application.student ? `${application.student.firstName} ${application.student.lastName}` : 'Onbekend'}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline">
+                          {application.discountType === 'social_rate' && 'Sociaal tarief'}
+                          {application.discountType === 'staff_discount' && 'Personeelskorting'}
+                          {application.discountType === 'custom' && 'Aangepast'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{application.discountPercentage}%</TableCell>
+                      <TableCell className="max-w-xs truncate">
+                        {application.description}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={
+                          application.status === 'approved' ? 'default' :
+                          application.status === 'rejected' ? 'destructive' : 'secondary'
+                        }>
+                          {application.status === 'pending' && 'In behandeling'}
+                          {application.status === 'approved' && 'Goedgekeurd'}
+                          {application.status === 'rejected' && 'Afgewezen'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {application.appliedBy ? `${application.appliedBy.firstName} ${application.appliedBy.lastName}` : 'Systeem'}
+                      </TableCell>
+                      <TableCell>
+                        {application.status === 'pending' && (
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              onClick={() => approveDiscountMutation.mutate(application.id)}
+                              disabled={approveDiscountMutation.isPending}
+                            >
+                              <CheckCircle2 className="h-4 w-4 mr-2" />
+                              Goedkeuren
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => {
+                                // Reject functionality can be added here
+                              }}
+                            >
+                              Afwijzen
+                            </Button>
+                          </div>
+                        )}
                       </TableCell>
                     </TableRow>
                   ))}

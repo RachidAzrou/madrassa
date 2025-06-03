@@ -222,11 +222,30 @@ export default function Scheduling() {
     queryFn: () => fetch('/api/rooms').then(res => res.json()),
   });
 
+  // Fetch academic years data
+  const { data: academicYearsData = [] } = useQuery({
+    queryKey: ['/api/academic-years'],
+    staleTime: 300000,
+  });
+
+  // Fetch holidays data
+  const { data: holidaysData = [] } = useQuery({
+    queryKey: ['/api/holidays'],
+    staleTime: 300000,
+  });
+
   // Use mock data with authentic Islamic school content
   const schedules = mockScheduleData;
   const courses = coursesData?.courses || [];
   const teachers = teachersData?.teachers || [];
   const rooms = roomsData?.rooms || [];
+  
+  // Process academic year and holiday data
+  const academicYears = Array.isArray(academicYearsData) ? academicYearsData : [];
+  const holidays = Array.isArray(holidaysData) ? holidaysData : [];
+  
+  // Get current academic year
+  const currentAcademicYear = academicYears.find((year: any) => year.isActive) || academicYears[0] || null;
 
   // Get unique values for filters
   const uniqueClasses = Array.from(new Set(schedules.map((s: ScheduleEntry) => s.className)));
@@ -376,6 +395,78 @@ export default function Scheduling() {
       />
 
       <div className="p-6 space-y-6">
+        {/* Schooljaar & Vakanties Informatie */}
+        <div className="bg-white border border-gray-200 rounded-sm">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-gray-50">
+            <div className="flex items-center gap-2">
+              <Calendar className="h-4 w-4 text-blue-600" />
+              <h3 className="text-sm font-medium text-gray-900">Schooljaar Informatie</h3>
+            </div>
+          </div>
+          
+          <div className="p-4">
+            {/* Huidig Schooljaar */}
+            {currentAcademicYear ? (
+              <div className="mb-4">
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="text-sm font-semibold text-gray-900">Huidig Schooljaar</h4>
+                  <Badge className="bg-blue-100 text-blue-800">{currentAcademicYear.name}</Badge>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                  <div className="space-y-1">
+                    <span className="text-gray-500 text-xs">Startdatum</span>
+                    <p className="font-medium">{new Date(currentAcademicYear.startDate).toLocaleDateString('nl-NL')}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-gray-500 text-xs">Einddatum</span>
+                    <p className="font-medium">{new Date(currentAcademicYear.endDate).toLocaleDateString('nl-NL')}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-gray-500 text-xs">Eindrapport</span>
+                    <p className="font-medium">{new Date(currentAcademicYear.finalReportDate).toLocaleDateString('nl-NL')}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-gray-500 text-xs">Registratie</span>
+                    <p className="font-medium">{new Date(currentAcademicYear.registrationStartDate).toLocaleDateString('nl-NL')} - {new Date(currentAcademicYear.registrationEndDate).toLocaleDateString('nl-NL')}</p>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-4">
+                <p className="text-sm text-gray-500">Geen actief schooljaar gevonden</p>
+              </div>
+            )}
+
+            {/* Vakanties */}
+            {holidays.length > 0 && (
+              <div className="border-t border-gray-200 pt-4">
+                <h4 className="text-sm font-semibold text-gray-900 mb-3">Geplande Vakanties</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {holidays.map((holiday: any) => (
+                    <div key={holiday.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">{holiday.name}</p>
+                        <p className="text-xs text-gray-500">
+                          {new Date(holiday.startDate).toLocaleDateString('nl-NL')} - {new Date(holiday.endDate).toLocaleDateString('nl-NL')}
+                        </p>
+                      </div>
+                      <div className={`px-2 py-1 text-xs rounded-md font-medium ${
+                        holiday.type === 'vacation' 
+                          ? 'bg-green-100 text-green-800'
+                          : holiday.type === 'public_holiday'
+                          ? 'bg-yellow-100 text-yellow-800'
+                          : 'bg-red-100 text-red-800'
+                      }`}>
+                        {holiday.type === 'vacation' ? 'Vakantie' : holiday.type === 'public_holiday' ? 'Feestdag' : 'Studiepauze'}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
         {/* Search and Action Bar */}
         <SearchActionBar>
           <div className="flex items-center gap-3">

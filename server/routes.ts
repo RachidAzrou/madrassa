@@ -5105,6 +5105,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/payments/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ error: "Invalid payment ID" });
+      }
       const payment = await storage.getPayment(id);
       
       if (!payment) {
@@ -5185,7 +5188,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       if (studentId) {
-        payments = payments.filter(p => p.studentId === parseInt(studentId as string));
+        const parsedStudentId = parseInt(studentId as string);
+        if (!isNaN(parsedStudentId)) {
+          payments = payments.filter(p => p.studentId === parsedStudentId);
+        }
       }
       
       // Get additional data for each payment

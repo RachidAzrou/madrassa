@@ -743,56 +743,118 @@ export default function Fees() {
                 </Select>
               </div>
 
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Student</TableHead>
-                    <TableHead>Ouder</TableHead>
-                    <TableHead>Omschrijving</TableHead>
-                    <TableHead>Bedrag</TableHead>
-                    <TableHead>Vervaldatum</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Acties</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredPayments.map((payment: any) => (
-                    <TableRow key={payment.id}>
-                      <TableCell className="font-medium">{payment.studentName}</TableCell>
-                      <TableCell>{payment.guardianEmail}</TableCell>
-                      <TableCell>{payment.description}</TableCell>
-                      <TableCell>{formatCurrency(payment.amount)}</TableCell>
-                      <TableCell>{formatDate(payment.dueDate)}</TableCell>
-                      <TableCell>{getStatusBadge(payment.status)}</TableCell>
-                      <TableCell>
-                        <div className="flex gap-2">
-                          {payment.status === 'openstaand' && (
+              <div className="space-y-4">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Student</TableHead>
+                      <TableHead>Ouder</TableHead>
+                      <TableHead>Omschrijving</TableHead>
+                      <TableHead>Bedrag</TableHead>
+                      <TableHead>Vervaldatum</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Acties</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredPayments.map((payment: any) => (
+                      <TableRow key={payment.id} className="h-16">
+                        <TableCell className="font-medium py-4">{payment.studentName}</TableCell>
+                        <TableCell className="py-4">{payment.guardianEmail}</TableCell>
+                        <TableCell className="py-4 max-w-xs">
+                          <div className="space-y-1">
+                            <p className="font-medium">{payment.description}</p>
+                            {payment.notes && (
+                              <p className="text-sm text-gray-500">{payment.notes}</p>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell className="py-4 font-semibold">{formatCurrency(payment.amount)}</TableCell>
+                        <TableCell className="py-4">{formatDate(payment.dueDate)}</TableCell>
+                        <TableCell className="py-4">{getStatusBadge(payment.status)}</TableCell>
+                        <TableCell className="py-4">
+                          <div className="flex flex-col gap-2">
+                            {payment.status === 'openstaand' && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => {
+                                  setSelectedPayment(payment);
+                                  setShowMarkPaidDialog(true);
+                                }}
+                                className="w-full"
+                              >
+                                <CheckCircle2 className="h-4 w-4 mr-2" />
+                                Markeren als betaald
+                              </Button>
+                            )}
                             <Button
                               size="sm"
                               variant="outline"
-                              onClick={() => {
-                                setSelectedPayment(payment);
-                                setShowMarkPaidDialog(true);
-                              }}
+                              onClick={() => handleDownloadInvoice(payment)}
+                              className="w-full"
                             >
-                              <CheckCircle2 className="h-4 w-4 mr-2" />
-                              Markeren als betaald
+                              <Download className="h-4 w-4 mr-2" />
+                              Factuur
                             </Button>
-                          )}
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleDownloadInvoice(payment)}
-                          >
-                            <Download className="h-4 w-4 mr-2" />
-                            Factuur
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+                
+                {/* Additional spacing to ensure more content and natural scrolling */}
+                <div className="grid gap-6 mt-8">
+                  <div className="bg-blue-50 p-6 rounded-lg">
+                    <h3 className="font-semibold text-blue-800 mb-4">Betalingsstatistieken</h3>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div className="text-center">
+                        <p className="text-2xl font-bold text-green-600">
+                          {filteredPayments.filter((p: any) => p.status === 'betaald').length}
+                        </p>
+                        <p className="text-sm text-gray-600">Betaald</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-2xl font-bold text-orange-600">
+                          {filteredPayments.filter((p: any) => p.status === 'openstaand').length}
+                        </p>
+                        <p className="text-sm text-gray-600">Openstaand</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-2xl font-bold text-blue-600">
+                          {filteredPayments.filter((p: any) => p.status === 'verwerking').length}
+                        </p>
+                        <p className="text-sm text-gray-600">In verwerking</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-2xl font-bold text-red-600">
+                          {filteredPayments.filter((p: any) => p.status === 'mislukt').length}
+                        </p>
+                        <p className="text-sm text-gray-600">Mislukt</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-gray-50 p-6 rounded-lg">
+                    <h3 className="font-semibold text-gray-800 mb-4">Snelle acties</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <Button variant="outline" className="h-12">
+                        <Plus className="h-4 w-4 mr-2" />
+                        Nieuwe betaling aanmaken
+                      </Button>
+                      <Button variant="outline" className="h-12">
+                        <FileText className="h-4 w-4 mr-2" />
+                        Betalingsrapport exporteren
+                      </Button>
+                      <Button variant="outline" className="h-12">
+                        <Mail className="h-4 w-4 mr-2" />
+                        Herinneringen versturen
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>

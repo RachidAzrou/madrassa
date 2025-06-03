@@ -119,6 +119,18 @@ export default function Dashboard() {
     staleTime: 60000,
   });
 
+  // Fetch academic years data
+  const { data: academicYearsData = [], isLoading: isAcademicYearsLoading } = useQuery({
+    queryKey: ['/api/academic-years'],
+    staleTime: 60000,
+  });
+
+  // Fetch holidays data
+  const { data: holidaysData = [], isLoading: isHolidaysLoading } = useQuery({
+    queryKey: ['/api/holidays'],
+    staleTime: 60000,
+  });
+
   const events = calendarData?.events || [];
 
   // Bereid data voor met veilige defaults als de data nog niet geladen is
@@ -144,6 +156,23 @@ export default function Dashboard() {
     };
   });
   
+  // Get current academic year
+  const currentAcademicYear = (academicYearsData as any[]).find((year: any) => year.isActive) || null;
+
+  // Filter holidays for the current week
+  const currentWeekHolidays = (holidaysData as any[]).filter((holiday: any) => {
+    if (!holiday.startDate || !holiday.endDate) return false;
+    const holidayStart = parseISO(holiday.startDate);
+    const holidayEnd = parseISO(holiday.endDate);
+    const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
+    const weekEnd = endOfWeek(new Date(), { weekStartsOn: 1 });
+    
+    // Check if holiday overlaps with current week
+    return (isWithinInterval(holidayStart, { start: weekStart, end: weekEnd }) ||
+            isWithinInterval(holidayEnd, { start: weekStart, end: weekEnd }) ||
+            (holidayStart <= weekStart && holidayEnd >= weekEnd));
+  });
+
   // Filter events for the current week
   const currentWeekEvents = events.filter((event) => {
     if (!event.date) return false;
@@ -158,6 +187,14 @@ export default function Dashboard() {
     if (!event.date) return false;
     const eventDate = parseISO(event.date);
     return format(eventDate, 'yyyy-MM-dd') === format(selectedDate, 'yyyy-MM-dd');
+  });
+
+  // Filter holidays for the selected date
+  const selectedDateHolidays = (holidaysData as any[]).filter((holiday: any) => {
+    if (!holiday.startDate || !holiday.endDate) return false;
+    const holidayStart = parseISO(holiday.startDate);
+    const holidayEnd = parseISO(holiday.endDate);
+    return isWithinInterval(selectedDate, { start: holidayStart, end: holidayEnd });
   });
   
   // Navigatiefuncties
@@ -343,6 +380,74 @@ export default function Dashboard() {
               </div>
             </div>
           )}
+        </div>
+
+        {/* Schooljaar & Vakanties Sectie */}
+        <div className="bg-white border border-[#e5e7eb] rounded-sm mb-4">
+          <div className="flex items-center justify-between px-4 py-2 border-b border-[#e5e7eb] bg-[#f9fafc]">
+            <div className="flex items-center gap-2">
+              <Calendar className="h-3.5 w-3.5 text-[#1e40af]" />
+              <h3 className="text-xs font-medium text-gray-700 tracking-tight">Schooljaar Informatie</h3>
+            </div>
+          </div>
+          
+          <div className="p-4">
+            {/* Huidig Schooljaar */}
+            {currentAcademicYear ? (
+              <div className="mb-4">
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="text-sm font-medium text-gray-900">Huidig Schooljaar</h4>
+                  <span className="px-2 py-1 bg-[#1e40af] text-white text-xs rounded-sm">{currentAcademicYear.name}</span>
+                </div>
+                <div className="grid grid-cols-2 gap-4 text-xs text-gray-600">
+                  <div>
+                    <span className="font-medium">Start:</span> {new Date(currentAcademicYear.startDate).toLocaleDateString('nl-NL')}
+                  </div>
+                  <div>
+                    <span className="font-medium">Eind:</span> {new Date(currentAcademicYear.endDate).toLocaleDateString('nl-NL')}
+                  </div>
+                  <div>
+                    <span className="font-medium">Eindrapport:</span> {new Date(currentAcademicYear.finalReportDate).toLocaleDateString('nl-NL')}
+                  </div>
+                  <div>
+                    <span className="font-medium">Registratie:</span> {new Date(currentAcademicYear.registrationStartDate).toLocaleDateString('nl-NL')} - {new Date(currentAcademicYear.registrationEndDate).toLocaleDateString('nl-NL')}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="mb-4 text-center py-3">
+                <p className="text-xs text-gray-500">Geen actief schooljaar gevonden</p>
+              </div>
+            )}
+
+            {/* Huidige Week Vakanties */}
+            {currentWeekHolidays.length > 0 && (
+              <div className="border-t border-[#e5e7eb] pt-4">
+                <h4 className="text-sm font-medium text-gray-900 mb-2">Vakanties Deze Week</h4>
+                <div className="space-y-2">
+                  {currentWeekHolidays.map((holiday: any) => (
+                    <div key={holiday.id} className="flex items-center justify-between p-2 bg-[#f8f9fa] rounded-sm">
+                      <div>
+                        <span className="text-xs font-medium text-gray-900">{holiday.name}</span>
+                        <p className="text-xs text-gray-500">
+                          {new Date(holiday.startDate).toLocaleDateString('nl-NL')} - {new Date(holiday.endDate).toLocaleDateString('nl-NL')}
+                        </p>
+                      </div>
+                      <div className={`px-2 py-1 text-xs rounded-sm font-medium ${
+                        holiday.type === 'vacation' 
+                          ? 'bg-[#E8F5E9] text-[#43A047] border border-[#43A047]'
+                          : holiday.type === 'public_holiday'
+                          ? 'bg-[#FFF9C4] text-[#FDD835] border border-[#FDD835]'
+                          : 'bg-[#FFEBEE] text-[#E53935] border border-[#E53935]'
+                      }`}>
+                        {holiday.type === 'vacation' ? 'Vakantie' : holiday.type === 'public_holiday' ? 'Feestdag' : 'Studiepauze'}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
         
         {/* Weekkalender - Desktop application styling */}

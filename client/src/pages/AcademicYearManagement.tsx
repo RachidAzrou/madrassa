@@ -353,19 +353,19 @@ export default function AcademicYearManagement() {
     switch (type) {
       case 'vacation':
         return (
-          <div className="px-2 py-0.5 bg-blue-100 text-blue-700 text-[10px] rounded-sm font-medium">
+          <div className="px-2 py-0.5 bg-[#E8F5E9] text-[#43A047] text-[10px] rounded-sm font-medium border border-[#43A047]">
             {label}
           </div>
         );
       case 'public_holiday':
         return (
-          <div className="px-2 py-0.5 bg-green-100 text-green-700 text-[10px] rounded-sm font-medium">
+          <div className="px-2 py-0.5 bg-[#FFF9C4] text-[#FDD835] text-[10px] rounded-sm font-medium border border-[#FDD835]">
             {label}
           </div>
         );
       case 'study_break':
         return (
-          <div className="px-2 py-0.5 bg-orange-100 text-orange-700 text-[10px] rounded-sm font-medium">
+          <div className="px-2 py-0.5 bg-[#FFEBEE] text-[#E53935] text-[10px] rounded-sm font-medium border border-[#E53935]">
             {label}
           </div>
         );

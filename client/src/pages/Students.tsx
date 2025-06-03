@@ -2491,7 +2491,7 @@ export default function Students() {
                     <Input 
                       id="guardian-email" 
                       type="email"
-                      placeholder="naam@voorbeeld.nl" 
+                      placeholder="naam@voorbeeld.be" 
                       className="h-9 text-sm"
                       value={guardianFormData.email || ''}
                       onChange={(e) => setGuardianFormData(prev => ({...prev, email: e.target.value}))}

@@ -9,7 +9,6 @@ import {
   Clock
 } from 'lucide-react';
 import { PageHeader } from '@/components/layout/page-header';
-import { Topbar } from '@/components/layout/topbar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -83,8 +82,6 @@ export default function AcademicYearManagement() {
 
   return (
     <div className="flex flex-col min-h-screen bg-[#f8f9fa]">
-      {/* Header */}
-      <Topbar />
       <PageHeader 
         title="Schooljaar Beheer"
         icon={<Calendar className="h-4 w-4 text-white" />}

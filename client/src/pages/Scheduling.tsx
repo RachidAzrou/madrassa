@@ -687,62 +687,6 @@ export default function Scheduling() {
           </div>
         </div>
 
-        {/* Important Events Section */}
-        {(academicYearEvents.length > 0 || holidayEvents.length > 0) && (
-          <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm mb-6">
-            <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-purple-600" />
-                Belangrijke Schooljaar Events
-              </h3>
-              <p className="text-sm text-gray-600 mt-1">Schooljaar mijlpalen en vakanties</p>
-            </div>
-            <div className="p-4 space-y-3">
-              {/* Academic Year Events */}
-              {academicYearEvents.filter(event => event.timeSlot === 'Hele dag').map((event) => (
-                <div key={event.id} className="bg-gradient-to-r from-purple-100 to-purple-50 p-3 rounded-lg border border-purple-200">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-medium text-purple-900">{event.subjectName}</h4>
-                      <p className="text-sm text-purple-700">
-                        {new Date(event.date || '').toLocaleDateString('nl-NL', { 
-                          weekday: 'long', 
-                          year: 'numeric', 
-                          month: 'long', 
-                          day: 'numeric' 
-                        })}
-                      </p>
-                      <p className="text-xs text-purple-600 mt-1">{event.notes}</p>
-                    </div>
-                    <Badge className="bg-purple-100 text-purple-800">Schooljaar</Badge>
-                  </div>
-                </div>
-              ))}
-              
-              {/* Holiday Events */}
-              {holidayEvents.filter((event, index) => index % 5 === 0).map((event) => (
-                <div key={event.id} className="bg-gradient-to-r from-green-100 to-green-50 p-3 rounded-lg border border-green-200">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-medium text-green-900">{event.subjectName}</h4>
-                      <p className="text-sm text-green-700">
-                        {new Date(event.date || '').toLocaleDateString('nl-NL', { 
-                          weekday: 'long', 
-                          year: 'numeric', 
-                          month: 'long', 
-                          day: 'numeric' 
-                        })}
-                      </p>
-                      <p className="text-xs text-green-600 mt-1">{event.notes}</p>
-                    </div>
-                    <Badge className="bg-green-100 text-green-800">Vakantie</Badge>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
         {/* Weekly Schedule Grid */}
         <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
           <div className="grid grid-cols-6 gap-0">

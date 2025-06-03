@@ -336,7 +336,6 @@ export default function Accounts() {
       <PageHeader
         title="Accountbeheer"
         description="Beheer gebruikersaccounts en toegangsrechten"
-        icon={<Key className="h-8 w-8" />}
       />
 
       {/* Stats Cards */}
@@ -799,8 +798,8 @@ export default function Accounts() {
 
       {/* Delete Confirmation Dialog */}
       <DeleteDialog
-        isOpen={isDeleteDialogOpen}
-        onClose={() => setIsDeleteDialogOpen(false)}
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
         onConfirm={() => {
           if (accountToDelete) {
             deleteAccountMutation.mutate(accountToDelete.id);

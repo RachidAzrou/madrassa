@@ -369,6 +369,294 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // ********************
+  // Accounts Management endpoints
+  // ********************
+  
+  // Get all accounts
+  apiRouter.get("/api/accounts", authenticateToken, async (req: any, res) => {
+    try {
+      const accounts = await db
+        .select({
+          id: userAccounts.id,
+          email: userAccounts.email,
+          role: userAccounts.role,
+          isActive: userAccounts.isActive,
+          lastLogin: userAccounts.lastLogin,
+          createdAt: userAccounts.createdAt,
+          personId: userAccounts.personId,
+          firstName: userAccounts.firstName,
+          lastName: userAccounts.lastName,
+          personType: userAccounts.personType
+        })
+        .from(userAccounts);
+
+      res.json(accounts);
+    } catch (error) {
+      console.error("Error fetching accounts:", error);
+      res.status(500).json({ message: "Failed to fetch accounts" });
+    }
+  });
+
+  // Create bulk accounts
+  apiRouter.post("/api/accounts/bulk", authenticateToken, async (req: any, res) => {
+    try {
+      const { accounts } = req.body;
+
+      if (!accounts || !Array.isArray(accounts)) {
+        return res.status(400).json({ message: "Invalid accounts data" });
+      }
+
+      const createdAccounts = [];
+      const errors = [];
+
+      for (const accountData of accounts) {
+        try {
+          // Check if account already exists
+          const existingAccount = await db
+            .select()
+            .from(userAccounts)
+            .where(eq(userAccounts.email, accountData.email))
+            .limit(1);
+
+          if (existingAccount.length > 0) {
+            errors.push({
+              email: accountData.email,
+              error: "Account already exists"
+            });
+            continue;
+          }
+
+          // Hash password
+          const hashedPassword = await bcrypt.hash(accountData.password, 10);
+
+          // Get person details based on role and personId
+          let firstName = "";
+          let lastName = "";
+          let personType = "";
+
+          if (accountData.role === 'student') {
+            const [student] = await db
+              .select()
+              .from(students)
+              .where(eq(students.id, accountData.personId));
+            if (student) {
+              firstName = student.firstName;
+              lastName = student.lastName;
+              personType = 'student';
+            }
+          } else if (accountData.role === 'teacher') {
+            const [teacher] = await db
+              .select()
+              .from(teachers)
+              .where(eq(teachers.id, accountData.personId));
+            if (teacher) {
+              firstName = teacher.firstName;
+              lastName = teacher.lastName;
+              personType = 'teacher';
+            }
+          } else if (accountData.role === 'guardian') {
+            const [guardian] = await db
+              .select()
+              .from(guardians)
+              .where(eq(guardians.id, accountData.personId));
+            if (guardian) {
+              firstName = guardian.firstName;
+              lastName = guardian.lastName;
+              personType = 'guardian';
+            }
+          }
+
+          // Create account
+          const [newAccount] = await db
+            .insert(userAccounts)
+            .values({
+              email: accountData.email,
+              password: hashedPassword,
+              role: accountData.role,
+              personId: accountData.personId,
+              firstName,
+              lastName,
+              personType,
+              isActive: accountData.isActive,
+              createdAt: new Date(),
+              updatedAt: new Date()
+            })
+            .returning();
+
+          createdAccounts.push({
+            id: newAccount.id,
+            email: newAccount.email,
+            role: newAccount.role,
+            firstName: newAccount.firstName,
+            lastName: newAccount.lastName
+          });
+
+        } catch (error) {
+          console.error(`Error creating account for ${accountData.email}:`, error);
+          errors.push({
+            email: accountData.email,
+            error: "Failed to create account"
+          });
+        }
+      }
+
+      res.json({
+        message: `Created ${createdAccounts.length} accounts successfully`,
+        created: createdAccounts,
+        errors: errors
+      });
+
+    } catch (error) {
+      console.error("Error in bulk account creation:", error);
+      res.status(500).json({ message: "Failed to create accounts" });
+    }
+  });
+
+  // Create single account
+  apiRouter.post("/api/accounts", authenticateToken, async (req: any, res) => {
+    try {
+      const { email, password, role, personId, isActive } = req.body;
+
+      // Check if account already exists
+      const existingAccount = await db
+        .select()
+        .from(userAccounts)
+        .where(eq(userAccounts.email, email))
+        .limit(1);
+
+      if (existingAccount.length > 0) {
+        return res.status(409).json({ message: "Account already exists" });
+      }
+
+      // Hash password
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      // Get person details
+      let firstName = "";
+      let lastName = "";
+      let personType = "";
+
+      if (role === 'student') {
+        const [student] = await db
+          .select()
+          .from(students)
+          .where(eq(students.id, personId));
+        if (student) {
+          firstName = student.firstName;
+          lastName = student.lastName;
+          personType = 'student';
+        }
+      } else if (role === 'teacher') {
+        const [teacher] = await db
+          .select()
+          .from(teachers)
+          .where(eq(teachers.id, personId));
+        if (teacher) {
+          firstName = teacher.firstName;
+          lastName = teacher.lastName;
+          personType = 'teacher';
+        }
+      } else if (role === 'guardian') {
+        const [guardian] = await db
+          .select()
+          .from(guardians)
+          .where(eq(guardians.id, personId));
+        if (guardian) {
+          firstName = guardian.firstName;
+          lastName = guardian.lastName;
+          personType = 'guardian';
+        }
+      }
+
+      const [newAccount] = await db
+        .insert(userAccounts)
+        .values({
+          email,
+          password: hashedPassword,
+          role,
+          personId,
+          firstName,
+          lastName,
+          personType,
+          isActive,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        })
+        .returning();
+
+      res.json({
+        id: newAccount.id,
+        email: newAccount.email,
+        role: newAccount.role,
+        firstName: newAccount.firstName,
+        lastName: newAccount.lastName,
+        isActive: newAccount.isActive
+      });
+
+    } catch (error) {
+      console.error("Error creating account:", error);
+      res.status(500).json({ message: "Failed to create account" });
+    }
+  });
+
+  // Update account
+  apiRouter.put("/api/accounts/:id", authenticateToken, async (req: any, res) => {
+    try {
+      const accountId = parseInt(req.params.id);
+      const { email, role, isActive, password } = req.body;
+
+      const updateData: any = {
+        email,
+        role,
+        isActive,
+        updatedAt: new Date()
+      };
+
+      if (password) {
+        updateData.password = await bcrypt.hash(password, 10);
+      }
+
+      const [updatedAccount] = await db
+        .update(userAccounts)
+        .set(updateData)
+        .where(eq(userAccounts.id, accountId))
+        .returning();
+
+      if (!updatedAccount) {
+        return res.status(404).json({ message: "Account not found" });
+      }
+
+      res.json({
+        id: updatedAccount.id,
+        email: updatedAccount.email,
+        role: updatedAccount.role,
+        isActive: updatedAccount.isActive
+      });
+
+    } catch (error) {
+      console.error("Error updating account:", error);
+      res.status(500).json({ message: "Failed to update account" });
+    }
+  });
+
+  // Delete account
+  apiRouter.delete("/api/accounts/:id", authenticateToken, async (req: any, res) => {
+    try {
+      const accountId = parseInt(req.params.id);
+
+      await db
+        .delete(userAccounts)
+        .where(eq(userAccounts.id, accountId));
+
+      res.json({ message: "Account deleted successfully" });
+
+    } catch (error) {
+      console.error("Error deleting account:", error);
+      res.status(500).json({ message: "Failed to delete account" });
+    }
+  });
+
+  // ********************
   // Authentication endpoints
   // ********************
   apiRouter.get("/api/logout", (_req, res) => {

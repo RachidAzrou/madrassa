@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
@@ -202,54 +202,47 @@ export default function SecretariatDashboard() {
 
       {/* Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Recent Admissions */}
+        {/* Messages Overview */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="flex items-center">
-              <FileText className="h-5 w-5 mr-2 text-blue-600" />
-              Recente Aanmeldingen
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <MessageSquare className="h-5 w-5" />
+              Recente Berichten
             </CardTitle>
-            <Link href="/secretariat/admissions">
-              <Button variant="ghost" size="sm">
-                Alles bekijken <ChevronRight className="h-4 w-4 ml-1" />
-              </Button>
-            </Link>
+            <CardDescription>
+              Overzicht van nieuwe en openstaande berichten
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            {recentAdmissions?.admissions?.length ? (
-              <div className="space-y-3">
-                {recentAdmissions.admissions.slice(0, 4).map((admission) => (
-                  <div key={admission.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <div>
-                      <p className="font-medium text-gray-900">{admission.studentName}</p>
-                      <p className="text-sm text-gray-500">{admission.programName} • {admission.applicationDate}</p>
-                    </div>
-                    <Badge variant={
-                      admission.status === 'pending' ? "secondary" :
-                      admission.status === 'approved' ? "default" : 
-                      "destructive"
-                    }>
-                      {admission.status === 'pending' ? 'In behandeling' :
-                       admission.status === 'approved' ? 'Goedgekeurd' : 'Afgewezen'}
-                    </Badge>
-                  </div>
-                ))}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div>
+                  <p className="font-medium text-gray-900">Welkom bij het nieuwe schooljaar</p>
+                  <p className="text-sm text-gray-500">Van: Administratie • Vandaag</p>
+                </div>
+                <Badge variant="secondary">Nieuw</Badge>
               </div>
-            ) : (
-              <p className="text-gray-500 text-center py-8">
-                Geen recente aanmeldingen
-              </p>
-            )}
+              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div>
+                  <p className="font-medium text-gray-900">Schoolgeld herinnering</p>
+                  <p className="text-sm text-gray-500">Van: Financiën • Gisteren</p>
+                </div>
+                <Badge variant="outline">Gelezen</Badge>
+              </div>
+            </div>
           </CardContent>
         </Card>
 
         {/* Pending Tasks */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="flex items-center">
-              <Bell className="h-5 w-5 mr-2 text-orange-600" />
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Bell className="h-5 w-5" />
               Openstaande Taken
             </CardTitle>
+            <CardDescription>
+              Overzicht van belangrijke taken en deadlines
+            </CardDescription>
           </CardHeader>
           <CardContent>
             {pendingTasks?.tasks?.length ? (
@@ -284,16 +277,14 @@ export default function SecretariatDashboard() {
       {/* Upcoming Appointments */}
       {upcomingAppointments?.appointments && upcomingAppointments.appointments.length > 0 && (
         <Card className="mt-6">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="flex items-center">
-              <Clock className="h-5 w-5 mr-2 text-green-600" />
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Clock className="h-5 w-5" />
               Komende Afspraken
             </CardTitle>
-            <Link href="/secretariat/schedule">
-              <Button variant="ghost" size="sm">
-                Agenda bekijken <ChevronRight className="h-4 w-4 ml-1" />
-              </Button>
-            </Link>
+            <CardDescription>
+              Overzicht van geplande vergaderingen en afspraken
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">

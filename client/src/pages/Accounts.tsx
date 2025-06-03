@@ -97,6 +97,7 @@ export default function Accounts() {
     classId: '',
     defaultPassword: 'Welkom123!'
   });
+  const [showPassword, setShowPassword] = useState(false);
 
   // Queries
   const { data: accountsData = [], isLoading: isAccountsLoading } = useQuery({
@@ -782,14 +783,29 @@ export default function Accounts() {
               <Label htmlFor="bulk-password" className="text-sm font-medium text-gray-700">
                 Standaard Wachtwoord
               </Label>
-              <Input
-                id="bulk-password"
-                type="password"
-                value={bulkCreateOptions.defaultPassword}
-                onChange={(e) => setBulkCreateOptions(prev => ({ ...prev, defaultPassword: e.target.value }))}
-                placeholder="Voer wachtwoord in voor alle accounts"
-                className="h-9 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-              />
+              <div className="relative">
+                <Input
+                  id="bulk-password"
+                  type={showPassword ? "text" : "password"}
+                  value={bulkCreateOptions.defaultPassword}
+                  onChange={(e) => setBulkCreateOptions(prev => ({ ...prev, defaultPassword: e.target.value }))}
+                  placeholder="Voer wachtwoord in voor alle accounts"
+                  className="h-9 border-gray-300 focus:border-blue-500 focus:ring-blue-500 pr-10"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-0 top-0 h-9 w-9 px-0 hover:bg-transparent"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4 text-gray-500" />
+                  ) : (
+                    <Eye className="h-4 w-4 text-gray-500" />
+                  )}
+                </Button>
+              </div>
               <p className="text-xs text-gray-500">
                 Dit wachtwoord wordt gebruikt voor alle nieuwe accounts
               </p>

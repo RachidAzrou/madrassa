@@ -272,7 +272,7 @@ export default function Login() {
           {!resetSent ? (
             <div className="px-6 py-8">
               <div className="text-center mb-6">
-                <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg" style={{ backgroundColor: '#1e40afe6' }}>
                   <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-3a1 1 0 011-1h2.586l6.243-6.243C11.978 9.628 12 9.315 12 9a6 6 0 016-6z" />
                   </svg>
@@ -315,7 +315,8 @@ export default function Login() {
                   <Button
                     type="submit"
                     disabled={isResetLoading}
-                    className="flex-1 h-12 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200"
+                    className="flex-1 h-12 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200"
+                    style={{ backgroundColor: '#1e40afe6' }}
                   >
                     {isResetLoading ? (
                       <div className="flex items-center justify-center space-x-2">
@@ -390,7 +391,8 @@ export default function Login() {
                   setResetEmail('');
                   setResetSent(false);
                 }}
-                className="w-full h-12 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200"
+                className="w-full h-12 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200"
+                style={{ backgroundColor: '#1e40afe6' }}
               >
                 Terug naar Inloggen
               </Button>

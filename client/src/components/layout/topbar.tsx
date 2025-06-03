@@ -95,12 +95,14 @@ export function Topbar({ onMenuClick }: TopbarProps = {}) {
   const getUserDisplayData = () => {
     if (!user) return { name: 'Gebruiker', role: 'Onbekend', avatar: 'G' };
     
-    const name = `${user.firstName} ${user.lastName}`;
+    const name = `${user.firstName || ''} ${user.lastName || ''}`.trim();
     const roleMap = {
       'administrator': 'Beheerder',
-      'docent': 'Docent',
+      'docent': 'Docent', 
+      'teacher': 'Docent',
       'student': 'Student',
       'voogd': 'Voogd',
+      'guardian': 'Voogd',
       'secretariaat': 'Secretariaat'
     };
     const role = roleMap[user.role] || user.role;

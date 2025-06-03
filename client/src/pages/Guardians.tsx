@@ -411,17 +411,19 @@ export default function Guardians() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Premium header component */}
-      <PremiumHeader 
-        title="Voogden" 
-        icon={UserCheck}
-        description="Beheer ouders en voogden van studenten, inclusief contactgegevens en noodcontacten"
-        breadcrumbs={{
-          parent: "Beheer",
-          current: "Voogden"
-        }}
-      />
+    <div className="flex-1 flex flex-col h-full">
+      <div className="fixed top-0 left-64 right-0 z-30">
+        <PremiumHeader 
+          title="Voogden" 
+          icon={UserCheck}
+          description="Beheer ouders en voogden van studenten, inclusief contactgegevens en noodcontacten"
+          breadcrumbs={{
+            parent: "Beheer",
+            current: "Voogden"
+          }}
+        />
+      </div>
+      <div className="mt-[115px] flex-1 overflow-auto bg-gray-50">
       {/* Main content area */}
       <div className="px-6 py-6 flex-1">
         {/* Zoek- en actiebalk - Desktop style */}
@@ -1562,6 +1564,7 @@ export default function Guardians() {
           </form>
         </DialogContent>
       </Dialog>
+      </div>
     </div>
   );
 }

@@ -432,14 +432,16 @@ export default function Programs() {
   const isIndeterminate = selectedPrograms.size > 0 && selectedPrograms.size < programs.length;
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Premium header component */}
-      <PremiumHeader 
-        title="Vakken" 
-        path="Evaluatie > Vakken" 
-        icon={BookText}
-        description="Beheer alle vakken binnen het curriculum, inclusief toewijzing aan docenten en klassen"
-      />
+    <div className="flex-1 flex flex-col h-full">
+      <div className="fixed top-0 left-64 right-0 z-30">
+        <PremiumHeader 
+          title="Vakken" 
+          path="Evaluatie > Vakken" 
+          icon={BookText}
+          description="Beheer alle vakken binnen het curriculum, inclusief toewijzing aan docenten en klassen"
+        />
+      </div>
+      <div className="mt-[115px] flex-1 overflow-auto bg-gray-50">
       
       {/* Main content area */}
       <div className="px-6 py-6 flex-1 space-y-6">
@@ -1315,6 +1317,7 @@ export default function Programs() {
         description={`Weet je zeker dat je het vak "${deleteConfirmation.program?.name}" wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.`}
         isLoading={deleteProgramMutation.isPending}
       />
+      </div>
     </div>
   );
 }

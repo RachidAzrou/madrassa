@@ -371,29 +371,29 @@ export default function Reports() {
 
       yPos += 20;
 
-      // General Comments section on first page
-      yPos += 30;
+      // General Comments section on first page - simplified
+      yPos += 20;
       
-      pdf.setFillColor(233, 243, 250);
-      pdf.roundedRect(20, yPos, pageWidth - 40, 80, 3, 3, 'F');
+      pdf.setFillColor(248, 249, 250);
+      pdf.rect(20, yPos, pageWidth - 40, 60, 'F');
       pdf.setDrawColor(33, 107, 169);
-      pdf.setLineWidth(1);
-      pdf.roundedRect(20, yPos, pageWidth - 40, 80, 3, 3, 'D');
+      pdf.setLineWidth(0.5);
+      pdf.rect(20, yPos, pageWidth - 40, 60, 'D');
       
-      pdf.setFontSize(14);
+      pdf.setFontSize(12);
       pdf.setFont('helvetica', 'bold');
       pdf.setTextColor(33, 107, 169);
-      pdf.text('ALGEMENE OPMERKINGEN', 30, yPos + 20);
+      pdf.text('ALGEMENE OPMERKINGEN', 25, yPos + 15);
       
       pdf.setFont('helvetica', 'normal');
-      pdf.setFontSize(11);
+      pdf.setFontSize(10);
       pdf.setTextColor(64, 75, 105);
       
       if (generalComments[report.student.id]) {
-        const commentLines = pdf.splitTextToSize(generalComments[report.student.id], pageWidth - 80);
-        pdf.text(commentLines, 30, yPos + 40);
+        const commentLines = pdf.splitTextToSize(generalComments[report.student.id], pageWidth - 60);
+        pdf.text(commentLines, 25, yPos + 30);
       } else {
-        pdf.text('Leerling toont goede vooruitgang in alle aspecten van het onderwijs.', 30, yPos + 40);
+        pdf.text('Leerling toont goede vooruitgang in alle aspecten van het onderwijs.', 25, yPos + 30);
       }
 
       // Footer with timestamp on first page
@@ -427,57 +427,57 @@ export default function Reports() {
 
       yPos += 45;
 
-      // Behavior section - optimized layout
-      pdf.setFillColor(240, 253, 244);
-      pdf.roundedRect(20, yPos, pageWidth - 40, 120, 3, 3, 'F');
-      pdf.setDrawColor(34, 139, 34);
-      pdf.setLineWidth(1);
-      pdf.roundedRect(20, yPos, pageWidth - 40, 120, 3, 3, 'D');
+      // Behavior section - simplified layout
+      pdf.setFillColor(248, 249, 250);
+      pdf.rect(20, yPos, pageWidth - 40, 80, 'F');
+      pdf.setDrawColor(33, 107, 169);
+      pdf.setLineWidth(0.5);
+      pdf.rect(20, yPos, pageWidth - 40, 80, 'D');
       
-      pdf.setFontSize(14);
+      pdf.setFontSize(12);
       pdf.setFont('helvetica', 'bold');
-      pdf.setTextColor(34, 139, 34);
-      pdf.text('GEDRAGSBEOORDELING', 30, yPos + 25);
+      pdf.setTextColor(33, 107, 169);
+      pdf.text('GEDRAGSBEOORDELING', 25, yPos + 15);
       
       pdf.setFont('helvetica', 'normal');
-      pdf.setFontSize(13);
+      pdf.setFontSize(10);
       pdf.setTextColor(64, 75, 105);
-      pdf.text(`Gedragscijfer: ${behaviorGrades[report.student.id]?.grade || 7}/10`, 30, yPos + 50);
+      pdf.text(`Gedragscijfer: ${behaviorGrades[report.student.id]?.grade || 7}/10`, 25, yPos + 30);
       
       if (behaviorGrades[report.student.id]?.comments) {
-        const behaviorComments = pdf.splitTextToSize(behaviorGrades[report.student.id]?.comments, pageWidth - 80);
-        pdf.text(behaviorComments, 30, yPos + 70);
+        const behaviorComments = pdf.splitTextToSize(behaviorGrades[report.student.id]?.comments, pageWidth - 60);
+        pdf.text(behaviorComments, 25, yPos + 45);
       } else {
-        pdf.text('De leerling toont respectvol en positief gedrag tijdens alle lessen en activiteiten.', 30, yPos + 70);
-        pdf.text('Samenwerking met medeleerlingen verloopt harmonieus en constructief.', 30, yPos + 85);
+        pdf.text('De leerling toont respectvol en positief gedrag tijdens alle lessen.', 25, yPos + 45);
+        pdf.text('Samenwerking met medeleerlingen verloopt goed.', 25, yPos + 55);
       }
       
-      yPos += 140;
+      yPos += 90;
       
-      // Attendance section - optimized layout
-      pdf.setFillColor(240, 248, 255);
-      pdf.roundedRect(20, yPos, pageWidth - 40, 100, 3, 3, 'F');
-      pdf.setDrawColor(52, 152, 219);
-      pdf.setLineWidth(1);
-      pdf.roundedRect(20, yPos, pageWidth - 40, 100, 3, 3, 'D');
+      // Attendance section - simplified layout
+      pdf.setFillColor(248, 249, 250);
+      pdf.rect(20, yPos, pageWidth - 40, 70, 'F');
+      pdf.setDrawColor(33, 107, 169);
+      pdf.setLineWidth(0.5);
+      pdf.rect(20, yPos, pageWidth - 40, 70, 'D');
       
-      pdf.setFontSize(14);
+      pdf.setFontSize(12);
       pdf.setFont('helvetica', 'bold');
-      pdf.setTextColor(52, 152, 219);
-      pdf.text('AANWEZIGHEID', 30, yPos + 25);
+      pdf.setTextColor(33, 107, 169);
+      pdf.text('AANWEZIGHEID', 25, yPos + 15);
       
       pdf.setFont('helvetica', 'normal');
-      pdf.setFontSize(12);
+      pdf.setFontSize(10);
       pdf.setTextColor(64, 75, 105);
-      pdf.text(`Aantal keer afwezig: ${report.attendance.absent} dagen`, 30, yPos + 50);
-      pdf.text(`Aantal keer te laat: ${report.attendance.late} keer`, 30, yPos + 70);
+      pdf.text(`Aantal keer afwezig: ${report.attendance.absent} dagen`, 25, yPos + 30);
+      pdf.text(`Aantal keer te laat: ${report.attendance.late} keer`, 25, yPos + 45);
       
       // Calculate attendance percentage
       const totalDays = 180; // Approximate school days
       const attendancePercentage = ((totalDays - report.attendance.absent) / totalDays * 100).toFixed(1);
-      pdf.text(`Aanwezigheidspercentage: ${attendancePercentage}%`, 30, yPos + 85);
+      pdf.text(`Aanwezigheidspercentage: ${attendancePercentage}%`, 25, yPos + 60);
 
-      yPos += 120;
+      yPos += 80;
 
       // Final signature section on second page
       const finalSigWidth = (pageWidth - 60) / 2;

@@ -502,154 +502,164 @@ export default function Accounts() {
 
       {/* Create Account Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Nieuw Account</DialogTitle>
-            <DialogDescription>
-              Maak een nieuw account aan voor een gebruiker.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="role">Rol</Label>
-              <Select
-                value={accountFormData.role}
-                onValueChange={(value: 'student' | 'teacher' | 'guardian' | 'secretariat' | 'admin') => 
-                  setAccountFormData(prev => ({ ...prev, role: value, personId: 0 }))
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecteer rol" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="student">Student</SelectItem>
-                  <SelectItem value="teacher">Docent</SelectItem>
-                  <SelectItem value="guardian">Voogd</SelectItem>
-                  <SelectItem value="secretariat">Secretariaat</SelectItem>
-                  <SelectItem value="admin">Administrator</SelectItem>
-                </SelectContent>
-              </Select>
+        <div className="bg-[#1e40af] text-white px-6 py-4">
+          <div className="flex items-center gap-3">
+            <div className="flex-shrink-0">
+              <div className="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center">
+                <Key className="h-5 w-5 text-white" />
+              </div>
             </div>
-            <div>
-              <Label htmlFor="person">Persoon</Label>
-              <Select
-                value={accountFormData.personId.toString()}
-                onValueChange={(value) => {
-                  const personId = parseInt(value);
-                  const person = getPersonOptions(accountFormData.role).find((p: any) => p.id === personId);
-                  setAccountFormData(prev => ({ 
-                    ...prev, 
-                    personId,
-                    email: person?.email || ''
-                  }));
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecteer persoon" />
-                </SelectTrigger>
-                <SelectContent>
-                  {getPersonOptions(accountFormData.role).map((person: any) => (
-                    <SelectItem key={person.id} value={person.id.toString()}>
-                      {person.firstName} {person.lastName} ({person.email})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={accountFormData.email}
-                onChange={(e) => setAccountFormData(prev => ({ ...prev, email: e.target.value }))}
-                placeholder="email@voorbeeld.nl"
-                disabled
-              />
-            </div>
-            <div>
-              <Label htmlFor="password">Wachtwoord</Label>
-              <Input
-                id="password"
-                type="password"
-                value={accountFormData.password}
-                onChange={(e) => setAccountFormData(prev => ({ ...prev, password: e.target.value }))}
-                placeholder={`Standaard: ${generateDefaultPassword()}`}
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                Laat leeg voor standaard wachtwoord: {generateDefaultPassword()}
-              </p>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox 
-                id="isActive"
-                checked={accountFormData.isActive}
-                onCheckedChange={(checked) => setAccountFormData(prev => ({ ...prev, isActive: !!checked }))}
-              />
-              <Label htmlFor="isActive">Account is actief</Label>
+            <div className="flex-1 min-w-0">
+              <h2 className="text-lg font-semibold text-white">Nieuw Account</h2>
+              <p className="text-sm text-blue-100 mt-1">Maak een nieuw account aan voor een gebruiker</p>
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
-              Annuleren
-            </Button>
-            <Button 
-              onClick={handleCreateAccount}
-              disabled={!accountFormData.email || !accountFormData.personId}
+        </div>
+        <div className="p-6 space-y-4">
+          <div>
+            <Label htmlFor="role">Rol</Label>
+            <Select
+              value={accountFormData.role}
+              onValueChange={(value: 'student' | 'teacher' | 'guardian' | 'secretariat' | 'admin') => 
+                setAccountFormData(prev => ({ ...prev, role: value, personId: 0 }))
+              }
             >
-              Account Aanmaken
-            </Button>
-          </DialogFooter>
-        </DialogContent>
+              <SelectTrigger>
+                <SelectValue placeholder="Selecteer rol" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="student">Student</SelectItem>
+                <SelectItem value="teacher">Docent</SelectItem>
+                <SelectItem value="guardian">Voogd</SelectItem>
+                <SelectItem value="secretariat">Secretariaat</SelectItem>
+                <SelectItem value="admin">Administrator</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label htmlFor="person">Persoon</Label>
+            <Select
+              value={accountFormData.personId.toString()}
+              onValueChange={(value) => {
+                const personId = parseInt(value);
+                const person = getPersonOptions(accountFormData.role).find((p: any) => p.id === personId);
+                setAccountFormData(prev => ({ 
+                  ...prev, 
+                  personId,
+                  email: person?.email || ''
+                }));
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Selecteer persoon" />
+              </SelectTrigger>
+              <SelectContent>
+                {getPersonOptions(accountFormData.role).map((person: any) => (
+                  <SelectItem key={person.id} value={person.id.toString()}>
+                    {person.firstName} {person.lastName} ({person.email})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              value={accountFormData.email}
+              onChange={(e) => setAccountFormData(prev => ({ ...prev, email: e.target.value }))}
+              placeholder="email@voorbeeld.nl"
+              disabled
+            />
+          </div>
+          <div>
+            <Label htmlFor="password">Wachtwoord</Label>
+            <Input
+              id="password"
+              type="password"
+              value={accountFormData.password}
+              onChange={(e) => setAccountFormData(prev => ({ ...prev, password: e.target.value }))}
+              placeholder={`Standaard: ${generateDefaultPassword()}`}
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Laat leeg voor standaard wachtwoord: {generateDefaultPassword()}
+            </p>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox 
+              id="isActive"
+              checked={accountFormData.isActive}
+              onCheckedChange={(checked) => setAccountFormData(prev => ({ ...prev, isActive: !!checked }))}
+            />
+            <Label htmlFor="isActive">Account is actief</Label>
+          </div>
+        </div>
+        <div className="px-6 py-4 bg-gray-50 border-t flex items-center justify-end gap-3">
+          <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
+            Annuleren
+          </Button>
+          <Button 
+            onClick={handleCreateAccount}
+            disabled={!accountFormData.email || !accountFormData.personId}
+          >
+            Account Aanmaken
+          </Button>
+        </div>
       </Dialog>
 
       {/* Edit Account Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Account Bewerken</DialogTitle>
-            <DialogDescription>
-              Wijzig de accountgegevens.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="edit-email">Email</Label>
-              <Input
-                id="edit-email"
-                type="email"
-                value={accountFormData.email}
-                onChange={(e) => setAccountFormData(prev => ({ ...prev, email: e.target.value }))}
-              />
+        <div className="bg-[#16a34a] text-white px-6 py-4">
+          <div className="flex items-center gap-3">
+            <div className="flex-shrink-0">
+              <div className="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center">
+                <Edit className="h-5 w-5 text-white" />
+              </div>
             </div>
-            <div>
-              <Label htmlFor="edit-password">Wachtwoord</Label>
-              <Input
-                id="edit-password"
-                type="password"
-                value={accountFormData.password}
-                onChange={(e) => setAccountFormData(prev => ({ ...prev, password: e.target.value }))}
-                placeholder="Nieuw wachtwoord"
-              />
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox 
-                id="edit-isActive"
-                checked={accountFormData.isActive}
-                onCheckedChange={(checked) => setAccountFormData(prev => ({ ...prev, isActive: !!checked }))}
-              />
-              <Label htmlFor="edit-isActive">Account is actief</Label>
+            <div className="flex-1 min-w-0">
+              <h2 className="text-lg font-semibold text-white">Account Bewerken</h2>
+              <p className="text-sm text-green-100 mt-1">Wijzig de accountgegevens</p>
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
-              Annuleren
-            </Button>
-            <Button onClick={handleUpdateAccount}>
-              Wijzigingen Opslaan
-            </Button>
-          </DialogFooter>
-        </DialogContent>
+        </div>
+        <div className="p-6 space-y-4">
+          <div>
+            <Label htmlFor="edit-email">Email</Label>
+            <Input
+              id="edit-email"
+              type="email"
+              value={accountFormData.email}
+              onChange={(e) => setAccountFormData(prev => ({ ...prev, email: e.target.value }))}
+            />
+          </div>
+          <div>
+            <Label htmlFor="edit-password">Wachtwoord</Label>
+            <Input
+              id="edit-password"
+              type="password"
+              value={accountFormData.password}
+              onChange={(e) => setAccountFormData(prev => ({ ...prev, password: e.target.value }))}
+              placeholder="Nieuw wachtwoord"
+            />
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox 
+              id="edit-isActive"
+              checked={accountFormData.isActive}
+              onCheckedChange={(checked) => setAccountFormData(prev => ({ ...prev, isActive: !!checked }))}
+            />
+            <Label htmlFor="edit-isActive">Account is actief</Label>
+          </div>
+        </div>
+        <div className="px-6 py-4 bg-gray-50 border-t flex items-center justify-end gap-3">
+          <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+            Annuleren
+          </Button>
+          <Button onClick={handleUpdateAccount}>
+            Wijzigingen Opslaan
+          </Button>
+        </div>
       </Dialog>
 
       {/* Delete Account Dialog */}

@@ -259,16 +259,89 @@ export default function AcademicYearManagement() {
   });
 
   return (
-    <div className="bg-[#f7f9fc] min-h-screen">
+    <div className="bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20 min-h-screen">
       <PremiumHeader 
         title="Schooljaar Beheer" 
-        description="Beheer schooljaren, academische periodes en schoolvakanties"
+        description="Beheer schooljaren, academische periodes en schoolvakanties met een intuïtieve interface"
         icon={Calendar}
         breadcrumbs={{
           parent: "Beheer",
           current: "Schooljaar Beheer"
         }}
       />
+
+      {/* Enhanced Statistics Dashboard */}
+      <div className="max-w-[1400px] mx-auto px-6 py-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+          <Card className="bg-gradient-to-br from-blue-500 to-blue-600 border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group overflow-hidden relative">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 to-transparent"></div>
+            <CardContent className="p-6 relative z-10">
+              <div className="flex items-center justify-between">
+                <div className="text-white">
+                  <p className="text-sm font-medium text-blue-100 mb-2">Totaal Schooljaren</p>
+                  <p className="text-3xl font-bold">{filteredYears.length}</p>
+                  <p className="text-xs text-blue-200 mt-1">Actief beheerd</p>
+                </div>
+                <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl group-hover:bg-white/30 transition-all duration-300">
+                  <Calendar className="h-7 w-7 text-white" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-emerald-500 to-emerald-600 border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group overflow-hidden relative">
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/20 to-transparent"></div>
+            <CardContent className="p-6 relative z-10">
+              <div className="flex items-center justify-between">
+                <div className="text-white">
+                  <p className="text-sm font-medium text-emerald-100 mb-2">Actieve Schooljaren</p>
+                  <p className="text-3xl font-bold">
+                    {academicYearsData.filter((y: any) => y.isActive).length}
+                  </p>
+                  <p className="text-xs text-emerald-200 mt-1">Momenteel lopend</p>
+                </div>
+                <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl group-hover:bg-white/30 transition-all duration-300">
+                  <Settings className="h-7 w-7 text-white" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-purple-500 to-purple-600 border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group overflow-hidden relative">
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-400/20 to-transparent"></div>
+            <CardContent className="p-6 relative z-10">
+              <div className="flex items-center justify-between">
+                <div className="text-white">
+                  <p className="text-sm font-medium text-purple-100 mb-2">Schoolvakanties</p>
+                  <p className="text-3xl font-bold">{filteredHolidays.length}</p>
+                  <p className="text-xs text-purple-200 mt-1">Gepland dit jaar</p>
+                </div>
+                <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl group-hover:bg-white/30 transition-all duration-300">
+                  <Calendar className="h-7 w-7 text-white" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-amber-500 to-amber-600 border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group overflow-hidden relative">
+            <div className="absolute inset-0 bg-gradient-to-br from-amber-400/20 to-transparent"></div>
+            <CardContent className="p-6 relative z-10">
+              <div className="flex items-center justify-between">
+                <div className="text-white">
+                  <p className="text-sm font-medium text-amber-100 mb-2">Komende Vakanties</p>
+                  <p className="text-3xl font-bold">
+                    {holidaysData.filter((h: any) => new Date(h.startDate) > new Date()).length}
+                  </p>
+                  <p className="text-xs text-amber-200 mt-1">Nog te komen</p>
+                </div>
+                <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl group-hover:bg-white/30 transition-all duration-300">
+                  <Clock className="h-7 w-7 text-white" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
 
       <DataTableContainer>
         <SearchActionBar>

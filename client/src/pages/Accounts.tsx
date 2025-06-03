@@ -73,6 +73,7 @@ export default function Accounts() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isBulkCreateDialogOpen, setIsBulkCreateDialogOpen] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState<UserAccount | null>(null);
   const [accountToDelete, setAccountToDelete] = useState<UserAccount | null>(null);
   const [selectedAccounts, setSelectedAccounts] = useState<number[]>([]);
@@ -90,6 +91,16 @@ export default function Accounts() {
     format: 'excel',
     includePasswords: false,
     roleFilter: 'all'
+  });
+
+  const [bulkCreateFormData, setBulkCreateFormData] = useState({
+    type: 'all' as 'all' | 'class' | 'program',
+    role: 'student' as 'student' | 'teacher' | 'guardian',
+    classId: 0,
+    programId: 0,
+    generateDefaultPasswords: true,
+    defaultPassword: 'myMadrassa2024!',
+    sendEmailNotifications: false
   });
 
   // Data queries
@@ -111,6 +122,16 @@ export default function Accounts() {
   const { data: guardiansData = [] } = useQuery({
     queryKey: ['/api/guardians'],
     select: (data: any) => Array.isArray(data) ? data : []
+  });
+
+  const { data: studentGroupsData = [] } = useQuery({
+    queryKey: ['/api/student-groups'],
+    select: (data: any) => Array.isArray(data) ? data : []
+  });
+
+  const { data: programsData = [] } = useQuery({
+    queryKey: ['/api/programs'],
+    select: (data: any) => data?.programs || []
   });
 
   // Mutations
@@ -377,10 +398,10 @@ export default function Accounts() {
   };
 
   return (
-    <div className="bg-[#f7f9fc] min-h-screen">
+    <div className="bg-gradient-to-br from-gray-50 via-indigo-50/30 to-cyan-50/20 min-h-screen">
       <PremiumHeader 
         title="Accounts" 
-        description="Beheer login accounts voor studenten, docenten en voogden"
+        description="Beheer login accounts voor studenten, docenten en voogden met geavanceerde beveiligingsopties"
         icon={Key}
         breadcrumbs={{
           parent: "Beheer",
@@ -388,74 +409,84 @@ export default function Accounts() {
         }}
       />
 
-      {/* Statistics Cards */}
-      <div className="max-w-[1400px] mx-auto px-6 py-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-          <Card className="bg-white border-0 shadow-sm">
-            <CardContent className="p-4">
+      {/* Enhanced Statistics Dashboard */}
+      <div className="max-w-[1400px] mx-auto px-6 py-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-10">
+          <Card className="bg-gradient-to-br from-slate-600 to-slate-700 border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group overflow-hidden relative">
+            <div className="absolute inset-0 bg-gradient-to-br from-slate-500/20 to-transparent"></div>
+            <CardContent className="p-6 relative z-10">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Totaal Accounts</p>
-                  <p className="text-2xl font-bold text-gray-900">{accountStats.total}</p>
+                <div className="text-white">
+                  <p className="text-sm font-medium text-slate-200 mb-2">Totaal Accounts</p>
+                  <p className="text-3xl font-bold">{accountStats.total}</p>
+                  <p className="text-xs text-slate-300 mt-1">Alle gebruikers</p>
                 </div>
-                <div className="p-2 bg-blue-100 rounded-lg">
-                  <Key className="h-5 w-5 text-blue-600" />
+                <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl group-hover:bg-white/30 transition-all duration-300">
+                  <Key className="h-7 w-7 text-white" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-white border-0 shadow-sm">
-            <CardContent className="p-4">
+          <Card className="bg-gradient-to-br from-blue-500 to-blue-600 border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group overflow-hidden relative">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 to-transparent"></div>
+            <CardContent className="p-6 relative z-10">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Studenten</p>
-                  <p className="text-2xl font-bold text-gray-900">{accountStats.students}</p>
+                <div className="text-white">
+                  <p className="text-sm font-medium text-blue-100 mb-2">Student Accounts</p>
+                  <p className="text-3xl font-bold">{accountStats.students}</p>
+                  <p className="text-xs text-blue-200 mt-1">Leerling toegang</p>
                 </div>
-                <div className="p-2 bg-blue-100 rounded-lg">
-                  <Users className="h-5 w-5 text-blue-600" />
+                <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl group-hover:bg-white/30 transition-all duration-300">
+                  <Users className="h-7 w-7 text-white" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-white border-0 shadow-sm">
-            <CardContent className="p-4">
+          <Card className="bg-gradient-to-br from-emerald-500 to-emerald-600 border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group overflow-hidden relative">
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/20 to-transparent"></div>
+            <CardContent className="p-6 relative z-10">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Docenten</p>
-                  <p className="text-2xl font-bold text-gray-900">{accountStats.teachers}</p>
+                <div className="text-white">
+                  <p className="text-sm font-medium text-emerald-100 mb-2">Docent Accounts</p>
+                  <p className="text-3xl font-bold">{accountStats.teachers}</p>
+                  <p className="text-xs text-emerald-200 mt-1">Onderwijzer toegang</p>
                 </div>
-                <div className="p-2 bg-green-100 rounded-lg">
-                  <GraduationCap className="h-5 w-5 text-green-600" />
+                <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl group-hover:bg-white/30 transition-all duration-300">
+                  <GraduationCap className="h-7 w-7 text-white" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-white border-0 shadow-sm">
-            <CardContent className="p-4">
+          <Card className="bg-gradient-to-br from-purple-500 to-purple-600 border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group overflow-hidden relative">
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-400/20 to-transparent"></div>
+            <CardContent className="p-6 relative z-10">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Voogden</p>
-                  <p className="text-2xl font-bold text-gray-900">{accountStats.guardians}</p>
+                <div className="text-white">
+                  <p className="text-sm font-medium text-purple-100 mb-2">Voogd Accounts</p>
+                  <p className="text-3xl font-bold">{accountStats.guardians}</p>
+                  <p className="text-xs text-purple-200 mt-1">Ouder toegang</p>
                 </div>
-                <div className="p-2 bg-purple-100 rounded-lg">
-                  <UserCheck className="h-5 w-5 text-purple-600" />
+                <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl group-hover:bg-white/30 transition-all duration-300">
+                  <UserCheck className="h-7 w-7 text-white" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-white border-0 shadow-sm">
-            <CardContent className="p-4">
+          <Card className="bg-gradient-to-br from-teal-500 to-teal-600 border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group overflow-hidden relative">
+            <div className="absolute inset-0 bg-gradient-to-br from-teal-400/20 to-transparent"></div>
+            <CardContent className="p-6 relative z-10">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Actief</p>
-                  <p className="text-2xl font-bold text-gray-900">{accountStats.active}</p>
+                <div className="text-white">
+                  <p className="text-sm font-medium text-teal-100 mb-2">Actieve Accounts</p>
+                  <p className="text-3xl font-bold">{accountStats.active}</p>
+                  <p className="text-xs text-teal-200 mt-1">Momenteel ingelogd</p>
                 </div>
-                <div className="p-2 bg-green-100 rounded-lg">
-                  <UserCheck className="h-5 w-5 text-green-600" />
+                <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl group-hover:bg-white/30 transition-all duration-300">
+                  <UserCheck className="h-7 w-7 text-white" />
                 </div>
               </div>
             </CardContent>
@@ -555,39 +586,73 @@ export default function Accounts() {
           </div>
         )}
 
-        <div className="px-6 py-4 border-b border-gray-200">
+        <div className="px-6 py-6 border-b border-gray-200 bg-white/70 backdrop-blur-sm">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-semibold text-gray-900">Account Overzicht</h2>
-              <p className="text-sm text-gray-600">{filteredAccounts.length} accounts beheerd</p>
+              <h2 className="text-xl font-bold text-gray-900 mb-1">Account Overzicht</h2>
+              <p className="text-sm text-gray-600">{filteredAccounts.length} accounts beheerd met veilige toegangscontrole</p>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-3">
+              <div className="flex items-center gap-2 bg-gradient-to-r from-indigo-50 to-indigo-100 px-4 py-2 rounded-lg border border-indigo-200">
+                <Users className="h-4 w-4 text-indigo-600" />
+                <span className="text-sm font-medium text-indigo-700">Bulk Accounts:</span>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsBulkCreateDialogOpen(true)}
+                className="h-9 px-4 text-xs bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200 text-blue-700 hover:from-blue-100 hover:to-blue-200 hover:border-blue-300 transition-all duration-200"
+              >
+                <Plus className="h-3.5 w-3.5 mr-2" />
+                Geavanceerd Aanmaken
+              </Button>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => handleBulkCreateAccounts('student')}
-                className="text-xs"
+                className="h-9 px-4 text-xs bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100 hover:border-blue-300 transition-all duration-200"
               >
-                <Plus className="h-3.5 w-3.5 mr-1" />
-                Student Accounts
+                <Users className="h-3.5 w-3.5 mr-2" />
+                Alle Studenten
+                <Badge className="ml-2 bg-blue-200 text-blue-800 text-xs">
+                  {studentsData.filter((student: any) => 
+                    student.email && !accountsData.some((account: UserAccount) => 
+                      account.personId === student.id && account.role === 'student'
+                    )
+                  ).length}
+                </Badge>
               </Button>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => handleBulkCreateAccounts('teacher')}
-                className="text-xs"
+                className="h-9 px-4 text-xs bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100 hover:border-emerald-300 transition-all duration-200"
               >
-                <Plus className="h-3.5 w-3.5 mr-1" />
-                Docent Accounts
+                <GraduationCap className="h-3.5 w-3.5 mr-2" />
+                Alle Docenten
+                <Badge className="ml-2 bg-emerald-200 text-emerald-800 text-xs">
+                  {teachersData.filter((teacher: any) => 
+                    teacher.email && !accountsData.some((account: UserAccount) => 
+                      account.personId === teacher.id && account.role === 'teacher'
+                    )
+                  ).length}
+                </Badge>
               </Button>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => handleBulkCreateAccounts('guardian')}
-                className="text-xs"
+                className="h-9 px-4 text-xs bg-purple-50 border-purple-200 text-purple-700 hover:bg-purple-100 hover:border-purple-300 transition-all duration-200"
               >
-                <Plus className="h-3.5 w-3.5 mr-1" />
-                Voogd Accounts
+                <UserCheck className="h-3.5 w-3.5 mr-2" />
+                Alle Voogden
+                <Badge className="ml-2 bg-purple-200 text-purple-800 text-xs">
+                  {guardiansData.filter((guardian: any) => 
+                    guardian.email && !accountsData.some((account: UserAccount) => 
+                      account.personId === guardian.id && account.role === 'guardian'
+                    )
+                  ).length}
+                </Badge>
               </Button>
             </div>
           </div>

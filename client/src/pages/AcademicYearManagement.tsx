@@ -46,8 +46,12 @@ export default function AcademicYearManagement() {
   const [searchTerm, setSearchTerm] = useState('');
   const [yearDialogOpen, setYearDialogOpen] = useState(false);
   const [holidayDialogOpen, setHolidayDialogOpen] = useState(false);
+  const [deleteYearDialogOpen, setDeleteYearDialogOpen] = useState(false);
+  const [deleteHolidayDialogOpen, setDeleteHolidayDialogOpen] = useState(false);
   const [editingYear, setEditingYear] = useState<AcademicYear | null>(null);
   const [editingHoliday, setEditingHoliday] = useState<Holiday | null>(null);
+  const [yearToDelete, setYearToDelete] = useState<AcademicYear | null>(null);
+  const [holidayToDelete, setHolidayToDelete] = useState<Holiday | null>(null);
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -314,6 +318,49 @@ export default function AcademicYearManagement() {
     return <Badge className="bg-gray-100 text-gray-600 text-xs">Inactief</Badge>;
   };
 
+  const getHolidayTypeLabel = (type: string) => {
+    switch (type) {
+      case 'vacation':
+        return 'Vakantie';
+      case 'public_holiday':
+        return 'Feestdag';
+      case 'study_break':
+        return 'Studiepauze';
+      default:
+        return type;
+    }
+  };
+
+  const getHolidayTypeBadge = (type: string) => {
+    const label = getHolidayTypeLabel(type);
+    switch (type) {
+      case 'vacation':
+        return (
+          <div className="px-2 py-0.5 bg-blue-100 text-blue-700 text-[10px] rounded-sm font-medium">
+            {label}
+          </div>
+        );
+      case 'public_holiday':
+        return (
+          <div className="px-2 py-0.5 bg-green-100 text-green-700 text-[10px] rounded-sm font-medium">
+            {label}
+          </div>
+        );
+      case 'study_break':
+        return (
+          <div className="px-2 py-0.5 bg-orange-100 text-orange-700 text-[10px] rounded-sm font-medium">
+            {label}
+          </div>
+        );
+      default:
+        return (
+          <div className="px-2 py-0.5 bg-gray-100 text-gray-700 text-[10px] rounded-sm font-medium">
+            {label}
+          </div>
+        );
+    }
+  };
+
   // Filter data based on search
   const filteredYears = (academicYearsData as any[]).filter((year: AcademicYear) =>
     year.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -468,9 +515,7 @@ export default function AcademicYearManagement() {
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
                         <h4 className="text-sm font-medium text-gray-800">{holiday.name}</h4>
-                        <div className="px-2 py-0.5 bg-blue-100 text-blue-700 text-[10px] rounded-sm">
-                          {holiday.type}
-                        </div>
+                        {getHolidayTypeBadge(holiday.type)}
                       </div>
                       <p className="text-xs text-gray-500 mt-1">
                         {new Date(holiday.startDate).toLocaleDateString('nl-NL')} - {new Date(holiday.endDate).toLocaleDateString('nl-NL')}

@@ -522,11 +522,11 @@ export default function StudentDossier() {
                           </div>
                         ))}
                         
-                        {studentSiblings.length > 0 && (
+                        {(studentSiblings as any[]).length > 0 && (
                           <div className="mt-6">
                             <h4 className="font-semibold mb-3">Broers & Zussen</h4>
                             <div className="space-y-2">
-                              {studentSiblings.map((sibling: any) => (
+                              {(studentSiblings as any[]).map((sibling: any) => (
                                 <div key={sibling.id} className="p-3 bg-gray-50 rounded-lg">
                                   <p className="font-medium">{sibling.firstName} {sibling.lastName}</p>
                                   <p className="text-sm text-gray-600">Student ID: {sibling.studentId}</p>

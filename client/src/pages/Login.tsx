@@ -42,20 +42,28 @@ export default function Login() {
     <div 
       className="min-h-screen flex relative overflow-hidden"
       style={{
-        backgroundColor: '#e0f2fe',
-        backgroundImage: `
-          linear-gradient(45deg, #dbeafe 25%, transparent 25%), 
-          linear-gradient(-45deg, #dbeafe 25%, transparent 25%), 
-          linear-gradient(45deg, transparent 75%, #f0f9ff 75%), 
-          linear-gradient(-45deg, transparent 75%, #f0f9ff 75%),
-          radial-gradient(circle at 30% 40%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
-          radial-gradient(circle at 70% 60%, rgba(16, 185, 129, 0.08) 0%, transparent 50%),
-          linear-gradient(135deg, rgba(219, 234, 254, 0.8) 0%, rgba(224, 242, 254, 0.9) 100%)
-        `,
-        backgroundSize: '20px 20px, 20px 20px, 20px 20px, 20px 20px, 200px 200px, 300px 300px, 100% 100%',
-        backgroundPosition: '0 0, 0 10px, 10px -10px, -10px 0px, 0 0, 0 0, 0 0'
+        backgroundImage: `url(${backgroundPath})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
       }}
     >
+      {/* Blue overlay for better readability */}
+      <div 
+        className="absolute inset-0"
+        style={{
+          backgroundColor: 'rgba(59, 130, 246, 0.15)'
+        }}
+      ></div>
+      
+      {/* Blur overlay for modern effect */}
+      <div 
+        className="absolute inset-0"
+        style={{
+          backdropFilter: 'blur(1px)',
+          background: 'linear-gradient(135deg, rgba(219, 234, 254, 0.2) 0%, rgba(147, 197, 253, 0.1) 100%)'
+        }}
+      ></div>
       {/* Enhanced Educational Pattern Overlay */}
       <div className="absolute inset-0 z-5" style={{ opacity: 0.08 }}>
         <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">

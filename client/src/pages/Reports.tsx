@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
+import { PremiumHeader } from '@/components/layout/premium-header';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 
@@ -66,23 +67,15 @@ export default function Reports() {
     : (students as any[]);
 
   return (
-    <div className="p-4 md:p-6 space-y-6">
-      {/* Page header */}
-      <div className="flex flex-col md:flex-row md:items-center gap-4 border-b pb-4">
-        <div>
-          <div className="flex items-center">
-            <div className="mr-3 text-[#1e3a8a] bg-blue-100 rounded-lg p-2">
-              <FileText className="h-6 w-6" />
-            </div>
-            <h1 className="text-2xl font-semibold text-[#1e3a8a]">Rapportage</h1>
-          </div>
-          <p className="text-gray-500 text-sm mt-1 ml-11">
-            Genereer professionele schoolrapporten met cijfers en beoordeling
-          </p>
-        </div>
-      </div>
+    <div className="min-h-screen bg-gray-50">
+      <PremiumHeader 
+        title="Rapportage"
+        icon={FileText}
+        description="Genereer professionele schoolrapporten met cijfers en beoordeling"
+      />
       
-      {/* Acties onder de streep */}
+      <div className="p-4 md:p-6 space-y-6">
+        {/* Acties onder de streep */}
       <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-4">
         <Button variant="outline" className="flex items-center w-full md:w-auto">
           <Download className="mr-2 h-4 w-4" />
@@ -320,6 +313,7 @@ export default function Reports() {
         </TabsContent>
 
       </Tabs>
+      </div>
     </div>
   );
 }

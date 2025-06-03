@@ -390,14 +390,15 @@ export default function ReEnrollment() {
           </div>
         )}
 
-        <div className="px-6 py-6 border-b border-gray-200 bg-white">
-          <div className="flex justify-between items-center">
-            <div>
-              <h2 className="text-xl font-bold text-gray-900 mb-1">Herinschrijvingen Overzicht</h2>
-              <p className="text-sm text-gray-600">
-                {filteredStudents.length} studenten geschikt voor herinschrijving
-              </p>
-            </div>
+        <div className="px-6 py-4 border-b border-gray-200 bg-white">
+          <PremiumHeader 
+            title="Herinschrijvingen Overzicht"
+            icon={RefreshCw}
+          />
+          <div className="flex justify-between items-center mt-4">
+            <p className="text-sm text-gray-600">
+              {filteredStudents.length} studenten geschikt voor herinschrijving
+            </p>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
                 <div className="h-3 w-3 rounded-full bg-green-500"></div>

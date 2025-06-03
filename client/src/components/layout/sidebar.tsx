@@ -327,26 +327,7 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
             </div>
           </div>
         </div>
-        
-        {/* Afmelden knop aan einde van de sidebar */}
-        <div className="px-3 mt-auto border-t border-gray-200 py-4 bg-white w-full">
-          <div
-            onClick={() => {
-              // Verwijder authenticatie gegevens
-              localStorage.removeItem("isAuthenticated");
-              localStorage.removeItem("user");
-              // Direct naar login pagina navigeren
-              window.location.href = "/login";
-              if (onClose) onClose();
-            }}
-            className="flex items-center gap-2 px-2 py-1.5 text-xs rounded-md transition-colors cursor-pointer text-gray-600 hover:text-red-600 hover:bg-red-50"
-          >
-            <div className="flex-shrink-0">
-              <LogOut className="h-4 w-4" />
-            </div>
-            <span className="truncate whitespace-nowrap font-medium">Afmelden</span>
-          </div>
-        </div>
+
       </nav>
     </aside>
   );

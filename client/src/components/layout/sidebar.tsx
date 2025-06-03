@@ -28,6 +28,7 @@ import {
   Clock,
   Coins,
   BookMarked,
+  RefreshCw,
   MessageSquare,
 } from "lucide-react";
 
@@ -284,6 +285,13 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
                   icon={<UserRound className="h-4 w-4" />}
                   label="Leerlingendossier"
                   isActive={location.startsWith("/student-dossier")}
+                  onClick={handleLinkClick}
+                />
+                <SidebarLink
+                  href="/re-enrollment"
+                  icon={<RefreshCw className="h-4 w-4" />}
+                  label="Herinschrijvingen"
+                  isActive={location.startsWith("/re-enrollment")}
                   onClick={handleLinkClick}
                 />
               </div>

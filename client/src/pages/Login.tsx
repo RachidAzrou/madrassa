@@ -39,21 +39,26 @@ export default function Login() {
   };
 
   return (
-    <div 
-      className="min-h-screen flex relative overflow-hidden"
-      style={{
-        backgroundColor: '#93c5fd',
-        backgroundImage: `url("${backgroundImageUrl}")`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
-      }}
-    >
+    <div className="min-h-screen flex relative overflow-hidden">
+      {/* Blurred background image */}
+      <div 
+        className="absolute inset-0"
+        style={{
+          backgroundColor: '#93c5fd',
+          backgroundImage: `url("${backgroundImageUrl}")`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          filter: 'blur(8px)',
+          transform: 'scale(1.1)'
+        }}
+      ></div>
+      
       {/* Educational overlay for better contrast */}
       <div 
         className="absolute inset-0"
         style={{
-          background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(147, 197, 253, 0.1) 100%)'
+          background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(147, 197, 253, 0.3) 100%)'
         }}
       ></div>
 

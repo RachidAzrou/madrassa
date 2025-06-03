@@ -297,19 +297,17 @@ export default function Courses() {
 
   // Render the page
   return (
-    <div className="flex-1 flex flex-col h-full">
-      <div className="fixed top-0 left-64 right-0 z-30">
-        <PremiumHeader 
-          title="Curriculum" 
-          icon={BookOpen}
-          description="Beheer alle vakken, leerdoelen en lesmateriaal voor de verschillende programma's"
-          breadcrumbs={{
-            parent: "Evaluatie",
-            current: "Curriculum"
-          }}
-        />
-      </div>
-      <div className="mt-[115px] flex-1 overflow-auto bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      {/* Premium header component */}
+      <PremiumHeader 
+        title="Curriculum" 
+        icon={BookOpen}
+        description="Beheer alle vakken, leerdoelen en lesmateriaal voor de verschillende programma's"
+        breadcrumbs={{
+          parent: "Evaluatie",
+          current: "Curriculum"
+        }}
+      />
 
       {/* Main content area */}
       <div className="px-6 py-6 flex-1">
@@ -803,7 +801,6 @@ export default function Courses() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      </div>
     </div>
   );
 }

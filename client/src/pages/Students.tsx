@@ -863,19 +863,16 @@ export default function Students() {
   const studentGroups = studentGroupsData || [];
 
   return (
-    <div className="flex-1 flex flex-col h-full">
-      <div className="fixed top-0 left-64 right-0 z-30">
-        <PremiumHeader 
-          title="Studenten" 
-          description="Bekijk en beheer alle studentgegevens, inclusief persoonlijke informatie en inschrijvingsdetails"
-          icon={Users}
-          breadcrumbs={{
-            parent: "Beheer",
-            current: "Studenten"
-          }}
-        />
-      </div>
-      <div className="mt-[91px] flex-1 overflow-auto bg-[#f7f9fc]">
+    <div className="bg-[#f7f9fc] min-h-screen">
+      <PremiumHeader 
+        title="Studenten" 
+        description="Bekijk en beheer alle studentgegevens, inclusief persoonlijke informatie en inschrijvingsdetails"
+        icon={Users}
+        breadcrumbs={{
+          parent: "Beheer",
+          current: "Studenten"
+        }}
+      />
       
       <DataTableContainer>
         <SearchActionBar>
@@ -2907,7 +2904,6 @@ export default function Students() {
           </div>
         </DialogContent>
       </Dialog>
-      </div>
     </div>
   );
 }

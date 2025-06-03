@@ -385,6 +385,9 @@ export default function StudentDossier() {
                         <User className="h-5 w-5" />
                         Persoonlijke informatie
                       </CardTitle>
+                      <CardDescription>
+                        Basis gegevens en contactinformatie van de student
+                      </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div className="grid grid-cols-2 gap-4">
@@ -451,6 +454,9 @@ export default function StudentDossier() {
                         <GraduationCap className="h-5 w-5" />
                         Inschrijving
                       </CardTitle>
+                      <CardDescription>
+                        Academische informatie en inschrijvingsdetails
+                      </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div>
@@ -523,6 +529,9 @@ export default function StudentDossier() {
                       <Users className="h-5 w-5" />
                       Voogden & Familie
                     </CardTitle>
+                    <CardDescription>
+                      Overzicht van voogden, familie en contactpersonen
+                    </CardDescription>
                   </CardHeader>
                   <CardContent>
                     {(studentGuardians as any[]).length > 0 ? (
@@ -583,6 +592,9 @@ export default function StudentDossier() {
                       <Calculator className="h-5 w-5" />
                       Cijfers overzicht
                     </CardTitle>
+                    <CardDescription>
+                      Academische prestaties en beoordelingen
+                    </CardDescription>
                   </CardHeader>
                   <CardContent>
                     {/* Geen cijfers data beschikbaar in huidige systeem */}
@@ -616,6 +628,9 @@ export default function StudentDossier() {
                       <Clock className="h-5 w-5" />
                       Aanwezigheid
                     </CardTitle>
+                    <CardDescription>
+                      Presentie registratie en absentie overzicht
+                    </CardDescription>
                   </CardHeader>
                   <CardContent>
                     {/* Geen aanwezigheidsdata beschikbaar in huidige systeem */}
@@ -646,6 +661,9 @@ export default function StudentDossier() {
                       <CreditCard className="h-5 w-5" />
                       Betalingen
                     </CardTitle>
+                    <CardDescription>
+                      Schoolgeld en financiële transacties
+                    </CardDescription>
                   </CardHeader>
                   <CardContent>
                     {/* Geen betalingsdata beschikbaar in huidige systeem */}
@@ -678,6 +696,9 @@ export default function StudentDossier() {
                       <MessageSquare className="h-5 w-5" />
                       Notities & Opmerkingen
                     </CardTitle>
+                    <CardDescription>
+                      Belangrijke aantekeningen en observaties
+                    </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">

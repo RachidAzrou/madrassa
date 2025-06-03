@@ -414,63 +414,10 @@ export default function Reports() {
 
       yPos += 20;
 
-      // Modern comment section
-      pdf.setFillColor(...lightBlue);
-      pdf.roundedRect(20, yPos, tableWidth, 50, 3, 3, 'F');
-      
-      pdf.setFontSize(12);
-      pdf.setFont('helvetica', 'bold');
-      pdf.setTextColor(...primaryBlue);
-      pdf.text('💭 Algemene opmerkingen', 30, yPos + 15);
-      
-      pdf.setFont('helvetica', 'normal');
-      pdf.setFontSize(10);
-      pdf.setTextColor(...darkGray);
-      
-      if (generalComments[report.student.id]) {
-        const commentLines = pdf.splitTextToSize(generalComments[report.student.id], tableWidth - 20);
-        pdf.text(commentLines, 30, yPos + 28);
-      } else {
-        pdf.text('Leerling toont goede vooruitgang in alle aspecten.', 30, yPos + 28);
-      }
-      
-      yPos += 70;
-
-      // Modern signature section on first page
-      const sigCardWidth = (pageWidth - 60) / 2;
-      
-      // Parent signature card
-      pdf.setFillColor(248, 250, 252);
-      pdf.roundedRect(20, yPos, sigCardWidth, 40, 3, 3, 'F');
-      pdf.setDrawColor(52, 152, 219);
-      pdf.setLineWidth(1);
-      pdf.roundedRect(20, yPos, sigCardWidth, 40, 3, 3, 'D');
-      
-      pdf.setFontSize(10);
-      pdf.setFont('helvetica', 'bold');
-      pdf.setTextColor(33, 107, 169);
-      pdf.text('✍️ Handtekening ouders/verzorgers', 30, yPos + 15);
-      
-      pdf.setDrawColor(33, 107, 169);
-      pdf.setLineWidth(1);
-      pdf.line(30, yPos + 25, 30 + sigCardWidth - 20, yPos + 25);
-      
-      // Teacher signature card
-      pdf.setFillColor(248, 250, 252);
-      pdf.roundedRect(30 + sigCardWidth, yPos, sigCardWidth, 40, 3, 3, 'F');
-      pdf.setDrawColor(52, 152, 219);
-      pdf.setLineWidth(1);
-      pdf.roundedRect(30 + sigCardWidth, yPos, sigCardWidth, 40, 3, 3, 'D');
-      
-      pdf.text('👨‍🏫 Handtekening klassenmentor', 40 + sigCardWidth, yPos + 15);
-      pdf.line(40 + sigCardWidth, yPos + 25, 40 + sigCardWidth + sigCardWidth - 20, yPos + 25);
-
-      yPos += 60;
-
       // Footer with timestamp on first page
       pdf.setFontSize(8);
       pdf.setTextColor(150, 150, 150);
-      pdf.text(`Pagina 1 van 2 - Gegenereerd op ${new Date().toLocaleDateString('nl-NL')}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
+      pdf.text(`Pagina 1 van 2 - Cijfers - Gegenereerd op ${new Date().toLocaleDateString('nl-NL')}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
 
       // Start new page for behavior and attendance
       pdf.addPage();
@@ -524,12 +471,37 @@ export default function Reports() {
 
       yPos += 45;
 
+      // General Comments section on second page
+      pdf.setFillColor(233, 243, 250);
+      pdf.roundedRect(20, yPos, pageWidth - 40, 60, 3, 3, 'F');
+      pdf.setDrawColor(33, 107, 169);
+      pdf.setLineWidth(1);
+      pdf.roundedRect(20, yPos, pageWidth - 40, 60, 3, 3, 'D');
+      
+      pdf.setFontSize(16);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(33, 107, 169);
+      pdf.text('💭 Algemene opmerkingen', 30, yPos + 20);
+      
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(11);
+      pdf.setTextColor(64, 75, 105);
+      
+      if (generalComments[report.student.id]) {
+        const commentLines = pdf.splitTextToSize(generalComments[report.student.id], pageWidth - 80);
+        pdf.text(commentLines, 30, yPos + 35);
+      } else {
+        pdf.text('Leerling toont goede vooruitgang in alle aspecten.', 30, yPos + 35);
+      }
+      
+      yPos += 80;
+
       // Behavior section - full width
       pdf.setFillColor(240, 253, 244);
-      pdf.roundedRect(20, yPos, pageWidth - 40, 80, 3, 3, 'F');
+      pdf.roundedRect(20, yPos, pageWidth - 40, 60, 3, 3, 'F');
       pdf.setDrawColor(34, 139, 34);
       pdf.setLineWidth(1);
-      pdf.roundedRect(20, yPos, pageWidth - 40, 80, 3, 3, 'D');
+      pdf.roundedRect(20, yPos, pageWidth - 40, 60, 3, 3, 'D');
       
       pdf.setFontSize(16);
       pdf.setFont('helvetica', 'bold');
@@ -537,25 +509,25 @@ export default function Reports() {
       pdf.text('😊 GEDRAG', 30, yPos + 20);
       
       pdf.setFont('helvetica', 'normal');
-      pdf.setFontSize(12);
+      pdf.setFontSize(11);
       pdf.setTextColor(64, 75, 105);
-      pdf.text(`Gedragscijfer: ${behaviorGrades[report.student.id]?.grade || 7}/10`, 30, yPos + 40);
+      pdf.text(`Gedragscijfer: ${behaviorGrades[report.student.id]?.grade || 7}/10`, 30, yPos + 35);
       
       if (behaviorGrades[report.student.id]?.comments) {
         const behaviorComments = pdf.splitTextToSize(behaviorGrades[report.student.id]?.comments, pageWidth - 80);
-        pdf.text(behaviorComments, 30, yPos + 55);
+        pdf.text(behaviorComments, 30, yPos + 45);
       } else {
-        pdf.text('Leerling toont respectvol en positief gedrag in de klas.', 30, yPos + 55);
+        pdf.text('Leerling toont respectvol en positief gedrag in de klas.', 30, yPos + 45);
       }
       
-      yPos += 100;
+      yPos += 80;
       
       // Attendance section - full width
       pdf.setFillColor(240, 248, 255);
-      pdf.roundedRect(20, yPos, pageWidth - 40, 80, 3, 3, 'F');
+      pdf.roundedRect(20, yPos, pageWidth - 40, 60, 3, 3, 'F');
       pdf.setDrawColor(52, 152, 219);
       pdf.setLineWidth(1);
-      pdf.roundedRect(20, yPos, pageWidth - 40, 80, 3, 3, 'D');
+      pdf.roundedRect(20, yPos, pageWidth - 40, 60, 3, 3, 'D');
       
       pdf.setFontSize(16);
       pdf.setFont('helvetica', 'bold');
@@ -563,13 +535,12 @@ export default function Reports() {
       pdf.text('📅 AANWEZIGHEID', 30, yPos + 20);
       
       pdf.setFont('helvetica', 'normal');
-      pdf.setFontSize(12);
+      pdf.setFontSize(11);
       pdf.setTextColor(64, 75, 105);
-      pdf.text(`❌ Aantal keer afwezig: ${report.attendance.absent}`, 30, yPos + 40);
-      pdf.text(`⏰ Aantal keer te laat: ${report.attendance.late}`, 30, yPos + 50);
-      pdf.text('📈 Opmerkingen: Uitstekende aanwezigheid en punctualiteit getoond', 30, yPos + 65);
+      pdf.text(`❌ Aantal keer afwezig: ${report.attendance.absent}`, 30, yPos + 35);
+      pdf.text(`⏰ Aantal keer te laat: ${report.attendance.late}`, 30, yPos + 45);
 
-      yPos += 100;
+      yPos += 80;
 
       // Final signature section on second page
       const finalSigWidth = (pageWidth - 60) / 2;
@@ -877,10 +848,11 @@ export default function Reports() {
                 <h2 className="text-2xl font-bold">PDF Voorvertoning</h2>
                 
                 {reportData.map((report, index) => (
-                  <Card key={index} className="border-2 border-gray-300 shadow-lg">
-                    <CardContent className="p-0">
-                      {/* PDF Preview - Modern Madrassa styling */}
-                      <div className="bg-white min-h-[600px] w-full mx-auto shadow-xl border border-blue-100 p-6 font-sans text-sm rounded-lg" style={{ aspectRatio: '297/210' }}>
+                  <div key={index} className="space-y-6">
+                    {/* PAGE 1 - CIJFERS */}
+                    <Card className="border-2 border-gray-300 shadow-lg">
+                      <CardContent className="p-0">
+                        <div className="bg-white min-h-[600px] w-full mx-auto shadow-xl border border-blue-100 p-6 font-sans text-sm rounded-lg" style={{ aspectRatio: '297/210' }}>
                         {/* Modern header with Madrassa colors */}
                         <div className="relative mb-6">
                           <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-t-lg p-4 -m-6 mb-6">
@@ -1119,9 +1091,136 @@ export default function Reports() {
                             </div>
                           </div>
                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                        
+                        {/* Footer Page 1 */}
+                        <div className="mt-6 pt-4 border-t border-gray-200 text-center">
+                          <p className="text-xs text-gray-500">
+                            Pagina 1 van 2 - Cijfers - Gegenereerd op {new Date().toLocaleDateString('nl-NL')}
+                          </p>
+                        </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* PAGE 2 - GEDRAG & AANWEZIGHEID */}
+                    <Card className="border-2 border-gray-300 shadow-lg">
+                      <CardContent className="p-0">
+                        <div className="bg-white min-h-[600px] w-full mx-auto shadow-xl border border-blue-100 p-6 font-sans text-sm rounded-lg" style={{ aspectRatio: '297/210' }}>
+                          {/* Page 2 Header */}
+                          <div className="relative mb-6">
+                            <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-t-lg p-4 -m-6 mb-6">
+                              <div className="h-1 bg-blue-400 rounded mb-4"></div>
+                              <div className="flex justify-between items-center">
+                                <div className="flex items-center space-x-4">
+                                  {schoolLogo ? (
+                                    <img src={schoolLogo} alt="School logo" className="h-12 w-auto" />
+                                  ) : (
+                                    <div className="h-12 w-16 bg-white/20 backdrop-blur rounded-lg flex items-center justify-center text-white text-xs border border-white/30">
+                                      <span>📚 Logo</span>
+                                    </div>
+                                  )}
+                                </div>
+                                <div className="text-right">
+                                  <h1 className="text-2xl font-bold text-white tracking-wide">GEDRAG & AANWEZIGHEID</h1>
+                                  <p className="text-blue-100 text-sm">{report.student.firstName} {report.student.lastName}</p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Student Info Reminder */}
+                          <div className="mb-6 bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg border border-blue-200">
+                            <div className="grid grid-cols-2 gap-6 text-sm">
+                              <div className="space-y-3">
+                                <div className="flex items-center space-x-3">
+                                  <span className="text-blue-600">👤</span>
+                                  <span className="font-semibold text-blue-800">Naam:</span>
+                                  <span className="text-gray-800">{report.student.firstName} {report.student.lastName}</span>
+                                </div>
+                                <div className="flex items-center space-x-3">
+                                  <span className="text-blue-600">🆔</span>
+                                  <span className="font-semibold text-blue-800">StudentID:</span>
+                                  <span className="text-gray-800">{report.student.studentId}</span>
+                                </div>
+                              </div>
+                              <div className="space-y-3">
+                                <div className="flex items-center space-x-3">
+                                  <span className="text-blue-600">🏫</span>
+                                  <span className="font-semibold text-blue-800">Klas:</span>
+                                  <span className="text-gray-800">1A</span>
+                                </div>
+                                <div className="flex items-center space-x-3">
+                                  <span className="text-blue-600">📅</span>
+                                  <span className="font-semibold text-blue-800">Datum:</span>
+                                  <span className="text-gray-800">{new Date().toLocaleDateString('nl-NL')}</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* General Comments Section */}
+                          <div className="mb-6 bg-blue-50 rounded-lg p-4 border border-blue-200">
+                            <div className="flex items-center space-x-2 mb-3">
+                              <span className="text-xl">💭</span>
+                              <h4 className="text-lg font-bold text-blue-700">Algemene opmerkingen</h4>
+                            </div>
+                            <p className="text-gray-700">
+                              {generalComments[report.student.id] || 'Leerling toont goede vooruitgang in alle aspecten.'}
+                            </p>
+                          </div>
+
+                          {/* Behavior Section */}
+                          <div className="mb-6 bg-green-50 rounded-lg p-4 border border-green-200">
+                            <div className="flex items-center space-x-2 mb-3">
+                              <span className="text-xl">😊</span>
+                              <h4 className="text-lg font-bold text-green-700">GEDRAG</h4>
+                            </div>
+                            <div className="space-y-2">
+                              <p className="text-sm">
+                                <span className="font-medium">Gedragscijfer:</span> {behaviorGrades[report.student.id]?.grade || 7}/10
+                              </p>
+                              <p className="text-sm text-gray-600">
+                                {behaviorGrades[report.student.id]?.comments || 'Leerling toont respectvol en positief gedrag in de klas.'}
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Attendance Section */}
+                          <div className="mb-6 bg-blue-50 rounded-lg p-4 border border-blue-200">
+                            <div className="flex items-center space-x-2 mb-3">
+                              <span className="text-xl">📅</span>
+                              <h4 className="text-lg font-bold text-blue-700">AANWEZIGHEID</h4>
+                            </div>
+                            <div className="space-y-1">
+                              <p className="text-sm">❌ Aantal keer afwezig: {report.attendance.absent}</p>
+                              <p className="text-sm">⏰ Aantal keer te laat: {report.attendance.late}</p>
+                            </div>
+                          </div>
+
+                          {/* Signature Section */}
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                              <h5 className="font-bold text-blue-600 mb-2">✍️ Handtekening ouders/verzorgers</h5>
+                              <div className="border-b-2 border-blue-300 h-8 mb-2"></div>
+                              <p className="text-xs text-gray-500">Datum: _______________</p>
+                            </div>
+                            <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                              <h5 className="font-bold text-blue-600 mb-2">👨‍🏫 Handtekening klassenmentor</h5>
+                              <div className="border-b-2 border-blue-300 h-8 mb-2"></div>
+                              <p className="text-xs text-gray-500">Datum: _______________</p>
+                            </div>
+                          </div>
+
+                          {/* Footer Page 2 */}
+                          <div className="mt-6 pt-4 border-t border-gray-200 text-center">
+                            <p className="text-xs text-gray-500">
+                              Pagina 2 van 2
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
                 ))}
               </div>
             </div>

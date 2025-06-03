@@ -38,6 +38,8 @@ import TeacherLayout from "@/components/TeacherLayout";
 import TeacherDashboard from "@/pages/teacher/TeacherDashboard";
 import StudentLayout from "@/components/StudentLayout";
 import StudentDashboard from "@/pages/student/StudentDashboard";
+import GuardianLayout from "@/components/GuardianLayout";
+import GuardianDashboard from "@/pages/guardian/GuardianDashboard";
 
 // Authentication wrapper with RBAC
 function AuthenticatedRoute({ component: Component, ...rest }: any) {
@@ -65,6 +67,27 @@ function AuthenticatedRoute({ component: Component, ...rest }: any) {
 function AuthenticatedRouter() {
   const { user } = useAuth();
   
+  // Guardian routes
+  if (user?.role === 'guardian') {
+    return (
+      <GuardianLayout>
+        <Switch>
+          <Route path="/" component={() => <AuthenticatedRoute component={GuardianDashboard} />} />
+          <Route path="/guardian/children" component={() => <AuthenticatedRoute component={Students} />} />
+          <Route path="/guardian/attendance" component={() => <AuthenticatedRoute component={Attendance} />} />
+          <Route path="/guardian/grades" component={() => <AuthenticatedRoute component={Cijfers} />} />
+          <Route path="/guardian/reports" component={() => <AuthenticatedRoute component={Reports} />} />
+          <Route path="/guardian/student-file" component={() => <AuthenticatedRoute component={StudentDossier} />} />
+          <Route path="/guardian/payments" component={() => <AuthenticatedRoute component={Fees} />} />
+          <Route path="/notifications" component={() => <AuthenticatedRoute component={Notifications} />} />
+          <Route path="/messages" component={() => <AuthenticatedRoute component={Messages} />} />
+          <Route path="/mijn-account" component={() => <AuthenticatedRoute component={MyAccount} />} />
+          <Route component={NotFound} />
+        </Switch>
+      </GuardianLayout>
+    );
+  }
+
   // Student routes
   if (user?.role === 'student') {
     return (

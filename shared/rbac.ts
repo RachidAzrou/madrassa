@@ -91,9 +91,10 @@ export const ROLE_PERMISSIONS: RolePermissions[] = [
     role: 'guardian',
     permissions: [
       { resource: RESOURCES.STUDENTS, action: 'read' }, // Only own children
-      { resource: RESOURCES.PAYMENTS, action: 'read' }, // Only own payments
-      { resource: RESOURCES.ATTENDANCE, action: 'read' }, // Only own children
-      { resource: RESOURCES.GRADES, action: 'read' }, // Only own children
+      { resource: RESOURCES.ATTENDANCE, action: 'read' }, // Own children only
+      { resource: RESOURCES.GRADES, action: 'read' }, // Own children only
+      { resource: RESOURCES.REPORTS, action: 'read' }, // Own children only
+      { resource: RESOURCES.PAYMENTS, action: 'manage' }, // Can make payments for children
       { resource: RESOURCES.DASHBOARD, action: 'read' },
       { resource: RESOURCES.NOTIFICATIONS, action: 'read' }
     ]

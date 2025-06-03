@@ -42,6 +42,7 @@ import GuardianLayout from "@/components/GuardianLayout";
 import GuardianDashboard from "@/pages/guardian/GuardianDashboard";
 import SecretariatLayout from "@/components/SecretariatLayout";
 import SecretariatDashboard from "@/pages/secretariat/SecretariatDashboard";
+import Scheduling from "@/pages/Scheduling";
 
 // Authentication wrapper with RBAC
 function AuthenticatedRoute({ component: Component, ...rest }: any) {
@@ -172,6 +173,7 @@ function AuthenticatedRouter() {
         <Route path="/courses" component={() => <AuthenticatedRoute component={Courses} />} />
         <Route path="/programs" component={() => <AuthenticatedRoute component={Programs} />} />
         <Route path="/planning" component={() => <AuthenticatedRoute component={Planning} />} />
+        <Route path="/scheduling" component={() => <AuthenticatedRoute component={Scheduling} />} />
         <Route path="/rooms" component={() => <AuthenticatedRoute component={Rooms} />} />
         <Route path="/calendar" component={() => <AuthenticatedRoute component={Calendar} />} />
         <Route path="/attendance" component={() => <AuthenticatedRoute component={Attendance} />} />

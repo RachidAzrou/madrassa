@@ -436,85 +436,183 @@ export default function Reports() {
       
       yPos += 70;
 
-      // Modern signature section
-      const cardWidth = (pageWidth - 60) / 2;
+      // Modern signature section on first page
+      const sigCardWidth = (pageWidth - 60) / 2;
       
       // Parent signature card
       pdf.setFillColor(248, 250, 252);
-      pdf.roundedRect(20, yPos, cardWidth, 40, 3, 3, 'F');
-      pdf.setDrawColor(...accentBlue);
+      pdf.roundedRect(20, yPos, sigCardWidth, 40, 3, 3, 'F');
+      pdf.setDrawColor(52, 152, 219);
       pdf.setLineWidth(1);
-      pdf.roundedRect(20, yPos, cardWidth, 40, 3, 3, 'D');
+      pdf.roundedRect(20, yPos, sigCardWidth, 40, 3, 3, 'D');
       
       pdf.setFontSize(10);
       pdf.setFont('helvetica', 'bold');
-      pdf.setTextColor(...primaryBlue);
+      pdf.setTextColor(33, 107, 169);
       pdf.text('✍️ Handtekening ouders/verzorgers', 30, yPos + 15);
       
-      pdf.setDrawColor(...primaryBlue);
+      pdf.setDrawColor(33, 107, 169);
       pdf.setLineWidth(1);
-      pdf.line(30, yPos + 25, 30 + cardWidth - 20, yPos + 25);
+      pdf.line(30, yPos + 25, 30 + sigCardWidth - 20, yPos + 25);
       
       // Teacher signature card
       pdf.setFillColor(248, 250, 252);
-      pdf.roundedRect(30 + cardWidth, yPos, cardWidth, 40, 3, 3, 'F');
-      pdf.setDrawColor(...accentBlue);
+      pdf.roundedRect(30 + sigCardWidth, yPos, sigCardWidth, 40, 3, 3, 'F');
+      pdf.setDrawColor(52, 152, 219);
       pdf.setLineWidth(1);
-      pdf.roundedRect(30 + cardWidth, yPos, cardWidth, 40, 3, 3, 'D');
+      pdf.roundedRect(30 + sigCardWidth, yPos, sigCardWidth, 40, 3, 3, 'D');
       
-      pdf.text('👨‍🏫 Handtekening klassenmentor', 40 + cardWidth, yPos + 15);
-      pdf.line(40 + cardWidth, yPos + 25, 40 + cardWidth + cardWidth - 20, yPos + 25);
+      pdf.text('👨‍🏫 Handtekening klassenmentor', 40 + sigCardWidth, yPos + 15);
+      pdf.line(40 + sigCardWidth, yPos + 25, 40 + sigCardWidth + sigCardWidth - 20, yPos + 25);
 
       yPos += 60;
 
-      // Second page sections side by side
-      const sectionWidth = (pageWidth - 60) / 2;
-      
-      // Behavior section
-      pdf.setFillColor(240, 253, 244);
-      pdf.roundedRect(20, yPos, sectionWidth, 60, 3, 3, 'F');
-      pdf.setDrawColor(...successGreen);
-      pdf.setLineWidth(1);
-      pdf.roundedRect(20, yPos, sectionWidth, 60, 3, 3, 'D');
-      
-      pdf.setFontSize(12);
-      pdf.setFont('helvetica', 'bold');
-      pdf.setTextColor(...successGreen);
-      pdf.text('😊 GEDRAG', 30, yPos + 15);
-      
-      pdf.setFont('helvetica', 'normal');
-      pdf.setFontSize(11);
-      pdf.setTextColor(...darkGray);
-      pdf.text(`Gedragscijfer: ${behaviorGrades[report.student.id]?.grade || 7}/10`, 30, yPos + 30);
-      
-      if (behaviorGrades[report.student.id]?.comments) {
-        const behaviorComments = pdf.splitTextToSize(behaviorGrades[report.student.id]?.comments, sectionWidth - 20);
-        pdf.text(behaviorComments, 30, yPos + 42);
-      }
-      
-      // Attendance section
-      pdf.setFillColor(240, 248, 255);
-      pdf.roundedRect(30 + sectionWidth, yPos, sectionWidth, 60, 3, 3, 'F');
-      pdf.setDrawColor(...accentBlue);
-      pdf.setLineWidth(1);
-      pdf.roundedRect(30 + sectionWidth, yPos, sectionWidth, 60, 3, 3, 'D');
-      
-      pdf.setFontSize(12);
-      pdf.setFont('helvetica', 'bold');
-      pdf.setTextColor(...accentBlue);
-      pdf.text('📅 AANWEZIGHEID', 40 + sectionWidth, yPos + 15);
-      
-      pdf.setFont('helvetica', 'normal');
-      pdf.setFontSize(10);
-      pdf.setTextColor(...darkGray);
-      pdf.text(`❌ Afwezig: ${report.attendance.absent} keer`, 40 + sectionWidth, yPos + 30);
-      pdf.text(`⏰ Te laat: ${report.attendance.late} keer`, 40 + sectionWidth, yPos + 42);
-      pdf.text('📈 Uitstekende aanwezigheid', 40 + sectionWidth, yPos + 54);
-
-      // Footer with timestamp
+      // Footer with timestamp on first page
       pdf.setFontSize(8);
       pdf.setTextColor(150, 150, 150);
-      pdf.text(`Gegenereerd op ${new Date().toLocaleDateString('nl-NL')} om ${new Date().toLocaleTimeString('nl-NL')}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
+      pdf.text(`Pagina 1 van 2 - Gegenereerd op ${new Date().toLocaleDateString('nl-NL')}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
+
+      // Start new page for behavior and attendance
+      pdf.addPage();
+      yPos = 20;
+
+      // Second page header
+      pdf.setFillColor(233, 243, 250);
+      pdf.rect(0, 0, pageWidth, 50, 'F');
+      
+      // Top accent line
+      pdf.setFillColor(33, 107, 169);
+      pdf.rect(0, 0, pageWidth, 3, 'F');
+
+      // Logo and title section for second page
+      if (schoolLogo) {
+        try {
+          pdf.addImage(schoolLogo, 'JPEG', 20, 12, 40, 25);
+        } catch (error) {
+          console.warn('Could not add logo to PDF:', error);
+        }
+      }
+
+      // Title for second page
+      pdf.setFontSize(24);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(33, 107, 169);
+      pdf.text('GEDRAG & AANWEZIGHEID', pageWidth - 20, 25, { align: 'right' });
+      
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(64, 75, 105);
+      pdf.text(`${report.student.firstName} ${report.student.lastName}`, pageWidth - 20, 35, { align: 'right' });
+
+      yPos = 75;
+
+      // Student info reminder on second page
+      pdf.setFillColor(248, 249, 250);
+      pdf.roundedRect(20, yPos, pageWidth - 40, 25, 3, 3, 'F');
+      
+      pdf.setDrawColor(33, 107, 169);
+      pdf.setLineWidth(0.5);
+      pdf.roundedRect(20, yPos, pageWidth - 40, 25, 3, 3, 'D');
+
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(33, 107, 169);
+      pdf.text('👤 ' + `${report.student.firstName} ${report.student.lastName}`, 30, yPos + 10);
+      pdf.text('🆔 ' + report.student.studentId, 30, yPos + 18);
+      pdf.text('🏫 Klas 1A', pageWidth - 120, yPos + 10);
+      pdf.text('📅 ' + new Date().toLocaleDateString('nl-NL'), pageWidth - 120, yPos + 18);
+
+      yPos += 45;
+
+      // Behavior section - full width
+      pdf.setFillColor(240, 253, 244);
+      pdf.roundedRect(20, yPos, pageWidth - 40, 80, 3, 3, 'F');
+      pdf.setDrawColor(34, 139, 34);
+      pdf.setLineWidth(1);
+      pdf.roundedRect(20, yPos, pageWidth - 40, 80, 3, 3, 'D');
+      
+      pdf.setFontSize(16);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(34, 139, 34);
+      pdf.text('😊 GEDRAG', 30, yPos + 20);
+      
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(12);
+      pdf.setTextColor(64, 75, 105);
+      pdf.text(`Gedragscijfer: ${behaviorGrades[report.student.id]?.grade || 7}/10`, 30, yPos + 40);
+      
+      if (behaviorGrades[report.student.id]?.comments) {
+        const behaviorComments = pdf.splitTextToSize(behaviorGrades[report.student.id]?.comments, pageWidth - 80);
+        pdf.text(behaviorComments, 30, yPos + 55);
+      } else {
+        pdf.text('Leerling toont respectvol en positief gedrag in de klas.', 30, yPos + 55);
+      }
+      
+      yPos += 100;
+      
+      // Attendance section - full width
+      pdf.setFillColor(240, 248, 255);
+      pdf.roundedRect(20, yPos, pageWidth - 40, 80, 3, 3, 'F');
+      pdf.setDrawColor(52, 152, 219);
+      pdf.setLineWidth(1);
+      pdf.roundedRect(20, yPos, pageWidth - 40, 80, 3, 3, 'D');
+      
+      pdf.setFontSize(16);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(52, 152, 219);
+      pdf.text('📅 AANWEZIGHEID', 30, yPos + 20);
+      
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(12);
+      pdf.setTextColor(64, 75, 105);
+      pdf.text(`❌ Aantal keer afwezig: ${report.attendance.absent}`, 30, yPos + 40);
+      pdf.text(`⏰ Aantal keer te laat: ${report.attendance.late}`, 30, yPos + 50);
+      pdf.text('📈 Opmerkingen: Uitstekende aanwezigheid en punctualiteit getoond', 30, yPos + 65);
+
+      yPos += 100;
+
+      // Final signature section on second page
+      const finalSigWidth = (pageWidth - 60) / 2;
+      
+      // Parent signature card
+      pdf.setFillColor(248, 250, 252);
+      pdf.roundedRect(20, yPos, finalSigWidth, 50, 3, 3, 'F');
+      pdf.setDrawColor(52, 152, 219);
+      pdf.setLineWidth(1);
+      pdf.roundedRect(20, yPos, finalSigWidth, 50, 3, 3, 'D');
+      
+      pdf.setFontSize(12);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(33, 107, 169);
+      pdf.text('✍️ Handtekening ouders/verzorgers', 30, yPos + 20);
+      
+      pdf.setDrawColor(33, 107, 169);
+      pdf.setLineWidth(1);
+      pdf.line(30, yPos + 30, 30 + finalSigWidth - 20, yPos + 30);
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'normal');
+      pdf.text('Datum: _______________', 30, yPos + 42);
+      
+      // Teacher signature card
+      pdf.setFillColor(248, 250, 252);
+      pdf.roundedRect(30 + finalSigWidth, yPos, finalSigWidth, 50, 3, 3, 'F');
+      pdf.setDrawColor(52, 152, 219);
+      pdf.setLineWidth(1);
+      pdf.roundedRect(30 + finalSigWidth, yPos, finalSigWidth, 50, 3, 3, 'D');
+      
+      pdf.setFontSize(12);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(33, 107, 169);
+      pdf.text('👨‍🏫 Handtekening klassenmentor', 40 + finalSigWidth, yPos + 20);
+      pdf.line(40 + finalSigWidth, yPos + 30, 40 + finalSigWidth + finalSigWidth - 20, yPos + 30);
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'normal');
+      pdf.text('Datum: _______________', 40 + finalSigWidth, yPos + 42);
+
+      // Footer on second page
+      pdf.setFontSize(8);
+      pdf.setTextColor(150, 150, 150);
+      pdf.text(`Pagina 2 van 2`, pageWidth / 2, pageHeight - 10, { align: 'center' });
     });
 
     // Save PDF

@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Eye, EyeOff, LogIn, GraduationCap, Users, CreditCard, Shield, BookOpen } from 'lucide-react';
 import logoPath from '@assets/myMadrassa.png';
 import backgroundImageUrl from '@assets/top-view-items-blue-background.jpg';
@@ -17,6 +18,10 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [isResetLoading, setIsResetLoading] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,6 +41,39 @@ export default function Login() {
         variant: "destructive",
       });
       setIsLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsResetLoading(true);
+
+    try {
+      const response = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: resetEmail }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send reset email');
+      }
+
+      setResetSent(true);
+      toast({
+        title: "Reset link verzonden",
+        description: "Controleer uw e-mail voor de wachtwoord reset link.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Fout bij verzenden",
+        description: "Er is een fout opgetreden. Probeer opnieuw.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsResetLoading(false);
     }
   };
 
@@ -211,37 +249,104 @@ export default function Login() {
                   </div>
                 )}
               </Button>
-            </form>
 
-            {/* Test Accounts Info */}
-            <div className="mt-8 p-4 bg-slate-50 rounded-lg border border-slate-200">
-              <h3 className="text-sm font-semibold text-slate-700 mb-3">Test Accounts:</h3>
-              <div className="space-y-2 text-xs text-slate-600">
-                <div className="flex justify-between">
-                  <span className="font-medium text-red-600">Administrator:</span>
-                  <span>admin@mymadrassa.nl / admin123</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="font-medium text-orange-600">Secretariaat:</span>
-                  <span>secretariaat@mymadrassa.nl / admin123</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="font-medium text-green-600">Docent:</span>
-                  <span>docent@mymadrassa.nl / admin123</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="font-medium text-purple-600">Voogd:</span>
-                  <span>voogd@mymadrassa.nl / admin123</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="font-medium text-blue-600">Student:</span>
-                  <span>student@mymadrassa.nl / admin123</span>
-                </div>
+              {/* Wachtwoord vergeten link */}
+              <div className="text-center mt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowForgotPassword(true)}
+                  className="text-sm text-blue-600 hover:text-blue-800 underline"
+                >
+                  Wachtwoord vergeten?
+                </button>
               </div>
-            </div>
+            </form>
           </CardContent>
         </Card>
       </div>
+
+      {/* Wachtwoord Vergeten Modal */}
+      <Dialog open={showForgotPassword} onOpenChange={setShowForgotPassword}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Wachtwoord Vergeten</DialogTitle>
+            <DialogDescription>
+              Voer uw e-mailadres in om een wachtwoord reset link te ontvangen.
+            </DialogDescription>
+          </DialogHeader>
+          
+          {!resetSent ? (
+            <form onSubmit={handleForgotPassword} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="resetEmail">E-mailadres</Label>
+                <Input
+                  id="resetEmail"
+                  type="email"
+                  value={resetEmail}
+                  onChange={(e) => setResetEmail(e.target.value)}
+                  placeholder="uw.email@voorbeeld.nl"
+                  required
+                  className="h-11"
+                />
+              </div>
+              
+              <div className="flex gap-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setShowForgotPassword(false);
+                    setResetEmail('');
+                    setResetSent(false);
+                  }}
+                  className="flex-1"
+                >
+                  Annuleren
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isResetLoading}
+                  className="flex-1 bg-[#3a5b9a] hover:bg-[#3a5b9a]/90"
+                >
+                  {isResetLoading ? (
+                    <div className="flex items-center space-x-2">
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <span>Verzenden...</span>
+                    </div>
+                  ) : (
+                    'Reset Link Verzenden'
+                  )}
+                </Button>
+              </div>
+            </form>
+          ) : (
+            <div className="text-center py-4">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-slate-800 mb-2">E-mail Verzonden!</h3>
+              <p className="text-slate-600 mb-4">
+                We hebben een wachtwoord reset link verzonden naar <strong>{resetEmail}</strong>
+              </p>
+              <p className="text-sm text-slate-500 mb-6">
+                Controleer uw inbox en spam folder. De link is 24 uur geldig.
+              </p>
+              <Button
+                onClick={() => {
+                  setShowForgotPassword(false);
+                  setResetEmail('');
+                  setResetSent(false);
+                }}
+                className="w-full bg-[#3a5b9a] hover:bg-[#3a5b9a]/90"
+              >
+                Sluiten
+              </Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

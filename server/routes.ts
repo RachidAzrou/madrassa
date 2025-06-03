@@ -126,6 +126,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ message: "Logged out successfully" });
   });
 
+  // Forgot password endpoint
+  apiRouter.post("/api/auth/forgot-password", async (req, res) => {
+    try {
+      const { email } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ message: "E-mailadres is vereist" });
+      }
+
+      // Check if user exists
+      const [userAccount] = await db
+        .select()
+        .from(userAccounts)
+        .where(eq(userAccounts.email, email))
+        .limit(1);
+
+      if (!userAccount) {
+        // For security, don't reveal if email exists or not
+        return res.json({ message: "Als het e-mailadres bestaat, is er een reset link verzonden." });
+      }
+
+      // Generate reset token (in production, use crypto.randomBytes and store in database with expiration)
+      const resetToken = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+      
+      // In a production environment, you would:
+      // 1. Store the reset token in database with expiration
+      // 2. Send actual email using a service like SendGrid, AWS SES, or Nodemailer
+      // 3. Include the reset link in the email
+      
+      console.log(`Password reset requested for ${email}. Reset token: ${resetToken}`);
+      console.log(`Reset link would be: ${req.protocol}://${req.get('host')}/reset-password?token=${resetToken}`);
+
+      res.json({ message: "Als het e-mailadres bestaat, is er een reset link verzonden." });
+    } catch (error) {
+      console.error("Forgot password error:", error);
+      res.status(500).json({ message: "Er is een fout opgetreden. Probeer opnieuw." });
+    }
+  });
+
   // ********************
   // Health check endpoint
   // ********************

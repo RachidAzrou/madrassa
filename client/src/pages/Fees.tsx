@@ -290,6 +290,26 @@ export default function Fees() {
     window.open(`/api/payments/export?${params}`, '_blank');
   };
 
+  // Calculate statistics
+  const totalRevenue = paymentsData
+    .filter((p: any) => p.status === 'betaald')
+    .reduce((sum: number, p: any) => sum + parseFloat(p.amount || 0), 0);
+
+  const outstandingAmount = paymentsData
+    .filter((p: any) => p.status === 'openstaand')
+    .reduce((sum: number, p: any) => sum + parseFloat(p.amount || 0), 0);
+
+  const pendingCount = paymentsData.filter((p: any) => p.status === 'openstaand').length;
+
+  const monthlyRevenue = paymentsData
+    .filter((p: any) => {
+      if (p.status !== 'betaald' || !p.paidAt) return false;
+      const paidDate = new Date(p.paidAt);
+      const now = new Date();
+      return paidDate.getMonth() === now.getMonth() && paidDate.getFullYear() === now.getFullYear();
+    })
+    .reduce((sum: number, p: any) => sum + parseFloat(p.amount || 0), 0);
+
   // Filter payments
   const filteredPayments = paymentsData.filter((payment: any) => {
     const matchesSearch = !searchQuery || 
@@ -303,6 +323,9 @@ export default function Fees() {
     
     return matchesSearch && matchesStatus && matchesYear && matchesClass;
   });
+
+  // All payments for history and activity
+  const allPayments = paymentsData || [];
 
   const getStatusBadge = (status: string) => {
     switch (status) {

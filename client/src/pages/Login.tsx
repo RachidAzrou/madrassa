@@ -39,19 +39,66 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex relative overflow-hidden">
-      {/* Educational Background Pattern */}
-      <div 
-        className="absolute inset-0 z-0"
-        style={{
-          background: `
-            linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 25%, #ecfeff 50%, #e0f7fa 75%, #f1f8e9 100%),
-            radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
-            radial-gradient(circle at 80% 80%, rgba(16, 185, 129, 0.1) 0%, transparent 50%),
-            radial-gradient(circle at 60% 40%, rgba(139, 92, 246, 0.08) 0%, transparent 50%)
-          `
-        }}
-      ></div>
+    <div 
+      className="min-h-screen flex relative overflow-hidden"
+      style={{
+        backgroundColor: '#e0f2fe',
+        backgroundImage: `
+          linear-gradient(45deg, #dbeafe 25%, transparent 25%), 
+          linear-gradient(-45deg, #dbeafe 25%, transparent 25%), 
+          linear-gradient(45deg, transparent 75%, #f0f9ff 75%), 
+          linear-gradient(-45deg, transparent 75%, #f0f9ff 75%),
+          radial-gradient(circle at 30% 40%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+          radial-gradient(circle at 70% 60%, rgba(16, 185, 129, 0.08) 0%, transparent 50%),
+          linear-gradient(135deg, rgba(219, 234, 254, 0.8) 0%, rgba(224, 242, 254, 0.9) 100%)
+        `,
+        backgroundSize: '20px 20px, 20px 20px, 20px 20px, 20px 20px, 200px 200px, 300px 300px, 100% 100%',
+        backgroundPosition: '0 0, 0 10px, 10px -10px, -10px 0px, 0 0, 0 0, 0 0'
+      }}
+    >
+      {/* Enhanced Educational Pattern Overlay */}
+      <div className="absolute inset-0 z-5" style={{ opacity: 0.08 }}>
+        <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="school-pattern" x="0" y="0" width="150" height="150" patternUnits="userSpaceOnUse">
+              <g fill="none" stroke="#1e40af" strokeWidth="0.8" opacity="0.6">
+                {/* Notebook paper */}
+                <rect x="20" y="20" width="60" height="80" fill="rgba(255,255,255,0.1)" stroke="#3b82f6"/>
+                <line x1="25" y1="30" x2="75" y2="30"/>
+                <line x1="25" y1="40" x2="75" y2="40"/>
+                <line x1="25" y1="50" x2="75" y2="50"/>
+                <line x1="25" y1="60" x2="75" y2="60"/>
+                <line x1="25" y1="70" x2="75" y2="70"/>
+                <line x1="25" y1="80" x2="75" y2="80"/>
+                <line x1="25" y1="90" x2="75" y2="90"/>
+                <line x1="30" y1="20" x2="30" y2="100" stroke="#ef4444" strokeWidth="0.5"/>
+                
+                {/* Pencil */}
+                <rect x="90" y="30" width="3" height="25" fill="#fbbf24"/>
+                <polygon points="90,30 93,30 91.5,25" fill="#f59e0b"/>
+                <rect x="90" y="55" width="3" height="8" fill="#ec4899"/>
+                
+                {/* Calculator */}
+                <rect x="100" y="70" width="30" height="40" fill="rgba(31,41,55,0.1)" stroke="#374151"/>
+                <rect x="103" y="73" width="24" height="8" fill="rgba(75,85,99,0.2)"/>
+                <circle cx="107" cy="85" r="2" fill="#6b7280"/>
+                <circle cx="113" cy="85" r="2" fill="#6b7280"/>
+                <circle cx="119" cy="85" r="2" fill="#6b7280"/>
+                <circle cx="125" cy="85" r="2" fill="#6b7280"/>
+                <circle cx="107" cy="92" r="2" fill="#6b7280"/>
+                <circle cx="113" cy="92" r="2" fill="#6b7280"/>
+                <circle cx="119" cy="92" r="2" fill="#6b7280"/>
+                <circle cx="125" cy="92" r="2" fill="#6b7280"/>
+                <circle cx="107" cy="99" r="2" fill="#6b7280"/>
+                <circle cx="113" cy="99" r="2" fill="#6b7280"/>
+                <circle cx="119" cy="99" r="2" fill="#6b7280"/>
+                <rect x="122" y="96" width="6" height="6" fill="#6b7280"/>
+              </g>
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#school-pattern)"/>
+        </svg>
+      </div>
 
       {/* Educational Pattern Overlay */}
       <div className="absolute inset-0 z-5" style={{ opacity: 0.15 }}>

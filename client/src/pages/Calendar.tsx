@@ -88,11 +88,25 @@ export default function Calendar() {
     staleTime: 300000,
   });
 
+  // Fetch academic years data
+  const { data: academicYearsData = [] } = useQuery({
+    queryKey: ['/api/academic-years'],
+    staleTime: 300000,
+  });
+
+  // Fetch holidays data
+  const { data: holidaysData = [] } = useQuery({
+    queryKey: ['/api/holidays'],
+    staleTime: 300000,
+  });
+
   // Extract data voor dropdowns
   const programs = programsData?.programs || [];
   const courses = coursesData?.courses || [];
   const teachers = teachersData?.teachers || [];
   const studentGroups = Array.isArray(studentGroupsData) ? studentGroupsData : studentGroupsData?.studentGroups || [];
+  const academicYears = Array.isArray(academicYearsData) ? academicYearsData : [];
+  const holidays = Array.isArray(holidaysData) ? holidaysData : [];
 
 
 
@@ -181,12 +195,29 @@ export default function Calendar() {
   // Gebruik alleen server data
   const events: CalendarEvent[] = data?.events || [];
   
+  // Convert holidays to calendar events
+  const holidayEvents: CalendarEvent[] = holidays.map((holiday: any) => ({
+    id: `holiday-${holiday.id}`,
+    title: holiday.name,
+    date: holiday.startDate,
+    startTime: '00:00',
+    endTime: '23:59',
+    location: '',
+    type: 'holiday' as const,
+    description: holiday.description || '',
+    isRecurring: false
+  }));
+
+  // Combine events and holidays
+  const allEvents = [...events, ...holidayEvents];
+  
   // Debug logging om te zien welke events we krijgen
   console.log("Events received:", events);
+  console.log("Holidays converted:", holidayEvents);
   console.log("Current date:", currentDate.toISOString().split('T')[0]);
   
   // Filter evenementen gebaseerd op filter en zoekterm
-  const filteredEvents = events.filter(event => {
+  const filteredEvents = allEvents.filter(event => {
     // Eerst filteren op type
     const typeMatch = filter === 'all' || event.type === filter;
     

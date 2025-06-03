@@ -38,33 +38,99 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-blue-50 to-cyan-50 flex relative overflow-hidden">
+    <div 
+      className="min-h-screen flex relative overflow-hidden"
+      style={{
+        background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #ecfeff 100%)'
+      }}
+    >
       {/* Background Pattern - Educational Theme */}
-      <div className="absolute inset-0 opacity-10">
+      <div className="absolute inset-0">
         {/* Geometric shapes representing knowledge and learning */}
-        <div className="absolute top-20 left-20 w-32 h-32 bg-gradient-to-br from-blue-300 to-indigo-300 rounded-full blur-xl"></div>
-        <div className="absolute top-40 right-40 w-24 h-24 bg-gradient-to-br from-green-300 to-emerald-300 rounded-lg rotate-45 blur-lg"></div>
-        <div className="absolute bottom-32 left-32 w-40 h-40 bg-gradient-to-br from-purple-300 to-violet-300 rounded-full blur-xl"></div>
-        <div className="absolute bottom-20 right-20 w-28 h-28 bg-gradient-to-br from-orange-300 to-red-300 rounded-lg rotate-12 blur-lg"></div>
+        <div 
+          className="absolute top-20 left-20 w-32 h-32 rounded-full"
+          style={{
+            background: 'linear-gradient(135deg, #93c5fd, #6366f1)',
+            filter: 'blur(40px)',
+            opacity: 0.3
+          }}
+        ></div>
+        <div 
+          className="absolute top-40 right-40 w-24 h-24 rounded-lg transform rotate-45"
+          style={{
+            background: 'linear-gradient(135deg, #86efac, #10b981)',
+            filter: 'blur(30px)',
+            opacity: 0.3
+          }}
+        ></div>
+        <div 
+          className="absolute bottom-32 left-32 w-40 h-40 rounded-full"
+          style={{
+            background: 'linear-gradient(135deg, #c4b5fd, #8b5cf6)',
+            filter: 'blur(50px)',
+            opacity: 0.3
+          }}
+        ></div>
+        <div 
+          className="absolute bottom-20 right-20 w-28 h-28 rounded-lg transform rotate-12"
+          style={{
+            background: 'linear-gradient(135deg, #fdba74, #f97316)',
+            filter: 'blur(35px)',
+            opacity: 0.3
+          }}
+        ></div>
+        <div 
+          className="absolute top-1/2 left-1/2 w-60 h-60 rounded-full transform -translate-x-1/2 -translate-y-1/2"
+          style={{
+            background: 'linear-gradient(135deg, #e0e7ff, #c7d2fe)',
+            filter: 'blur(60px)',
+            opacity: 0.2
+          }}
+        ></div>
         
-        {/* Subtle educational icons pattern */}
-        <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <pattern id="educational-pattern" x="0" y="0" width="200" height="200" patternUnits="userSpaceOnUse">
-              <g opacity="0.05" fill="currentColor">
-                <path d="M100 50 L120 70 L100 90 L80 70 Z" className="text-blue-600"/>
-                <circle cx="150" cy="100" r="8" className="text-green-600"/>
-                <rect x="45" y="145" width="10" height="10" className="text-purple-600"/>
-                <path d="M170 160 L180 150 L190 160 L180 170 Z" className="text-orange-600"/>
-              </g>
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#educational-pattern)"/>
-        </svg>
+        {/* Floating educational elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div 
+            className="absolute top-1/4 left-1/4 w-4 h-4 rounded-full"
+            style={{
+              background: '#3b82f6',
+              opacity: 0.2,
+              animation: 'float 6s ease-in-out infinite'
+            }}
+          ></div>
+          <div 
+            className="absolute top-3/4 right-1/4 w-3 h-3 rounded-full"
+            style={{
+              background: '#10b981',
+              opacity: 0.3,
+              animation: 'float 8s ease-in-out infinite reverse'
+            }}
+          ></div>
+          <div 
+            className="absolute top-1/2 right-1/3 w-2 h-2 rounded-full"
+            style={{
+              background: '#8b5cf6',
+              opacity: 0.25,
+              animation: 'float 7s ease-in-out infinite'
+            }}
+          ></div>
+        </div>
       </div>
 
+      <style jsx>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-20px); }
+        }
+      `}</style>
+
       {/* Left side - Brand */}
-      <div className="hidden lg:flex lg:w-1/2 items-center justify-center p-12 relative z-10 bg-gradient-to-br from-blue-600/90 via-indigo-600/90 to-purple-600/90">
+      <div 
+        className="hidden lg:flex lg:w-1/2 items-center justify-center p-12 relative z-10"
+        style={{
+          background: 'linear-gradient(135deg, rgba(37, 99, 235, 0.95) 0%, rgba(79, 70, 229, 0.95) 50%, rgba(139, 92, 246, 0.95) 100%)'
+        }}
+      >
         {/* Islamic geometric pattern overlay */}
         <div className="absolute inset-0 opacity-10">
           <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
@@ -147,7 +213,13 @@ export default function Login() {
       </div>
 
       {/* Right side - Login form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 lg:p-12 bg-white/95 backdrop-blur-sm">
+      <div 
+        className="w-full lg:w-1/2 flex items-center justify-center p-8 lg:p-12"
+        style={{
+          background: 'rgba(255, 255, 255, 0.95)',
+          backdropFilter: 'blur(10px)'
+        }}
+      >
         <div className="w-full max-w-md">
           {/* Mobile Logo */}
           <div className="text-center mb-8 lg:hidden">

@@ -190,10 +190,15 @@ export default function StudentDossier() {
     enabled: !!selectedStudent
   });
 
-  // Gebruik bestaande programma's voor vakken die student volgt
-  const studentPrograms = selectedStudent ? subjects.filter((program: any) => 
-    selectedStudent.programId === program.id
-  ) : [];
+  // Vind het programma waar de student bij hoort
+  const studentProgram = selectedStudent ? subjects.find((program: any) => 
+    program.id === selectedStudent.programId
+  ) : null;
+
+  // Vind de klas waar de student bij hoort
+  const studentClass = selectedStudent ? classes.find((cls: any) => 
+    cls.students?.some((s: any) => s.id === selectedStudent.id)
+  ) : null;
 
   // Bereken geboorteleeftijd
   const calculateAge = (birthDate: string | null) => {
@@ -448,13 +453,23 @@ export default function StudentDossier() {
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div>
-                        <label className="text-sm font-medium text-gray-600">Eerste inschrijving</label>
-                        <p className="font-medium">{formatDate(selectedStudent.enrollmentDate)}</p>
+                        <label className="text-sm font-medium text-gray-600">Inschrijfdatum</label>
+                        <p className="font-medium">{selectedStudent.enrollmentDate ? formatDate(selectedStudent.enrollmentDate) : 'Niet opgegeven'}</p>
                       </div>
                       
                       <div>
                         <label className="text-sm font-medium text-gray-600">Academisch jaar</label>
                         <p className="font-medium">{selectedStudent.academicYear || 'Niet opgegeven'}</p>
+                      </div>
+
+                      <div>
+                        <label className="text-sm font-medium text-gray-600">Programma</label>
+                        <p className="font-medium">{studentProgram?.name || 'Niet toegewezen'}</p>
+                      </div>
+
+                      <div>
+                        <label className="text-sm font-medium text-gray-600">Klas</label>
+                        <p className="font-medium">{studentClass?.name || 'Niet toegewezen'}</p>
                       </div>
                       
                       <div>
@@ -466,18 +481,35 @@ export default function StudentDossier() {
                       
                       <Separator />
                       
-                      <div>
-                        <label className="text-sm font-medium text-gray-600 flex items-center gap-1">
-                          <Heart className="h-4 w-4" />
-                          Medische informatie
-                        </label>
-                        <p className="font-medium">{selectedStudent.medicalInfo || 'Geen bijzonderheden'}</p>
-                      </div>
+                      {selectedStudent.emergencyContact && (
+                        <div>
+                          <label className="text-sm font-medium text-gray-600 flex items-center gap-1">
+                            <Shield className="h-4 w-4" />
+                            Noodcontact
+                          </label>
+                          <p className="font-medium">{selectedStudent.emergencyContact}</p>
+                          {selectedStudent.emergencyPhone && (
+                            <p className="text-sm text-gray-600">{selectedStudent.emergencyPhone}</p>
+                          )}
+                        </div>
+                      )}
                       
-                      <div>
-                        <label className="text-sm font-medium text-gray-600">Notities</label>
-                        <p className="font-medium">{selectedStudent.notes || 'Geen notities'}</p>
-                      </div>
+                      {selectedStudent.medicalInfo && (
+                        <div>
+                          <label className="text-sm font-medium text-gray-600 flex items-center gap-1">
+                            <Heart className="h-4 w-4" />
+                            Medische informatie
+                          </label>
+                          <p className="font-medium">{selectedStudent.medicalInfo}</p>
+                        </div>
+                      )}
+                      
+                      {selectedStudent.notes && (
+                        <div>
+                          <label className="text-sm font-medium text-gray-600">Algemene notities</label>
+                          <p className="font-medium">{selectedStudent.notes}</p>
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                 </div>

@@ -17,9 +17,21 @@ export async function apiRequest(
   const method = options?.method || 'GET';
   const data = options?.body;
   
+  // Get token from localStorage for authentication
+  const token = localStorage.getItem('authToken');
+  const headers: Record<string, string> = {};
+  
+  if (data) {
+    headers["Content-Type"] = "application/json";
+  }
+  
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+  
   const res = await fetch(url, {
     method,
-    headers: data ? { "Content-Type": "application/json" } : {},
+    headers,
     body: typeof data === 'string' ? data : data ? JSON.stringify(data) : undefined,
     credentials: "include",
   });
@@ -62,7 +74,16 @@ export const getQueryFn: <T>(options: {
       }
     }
     
+    // Get token from localStorage for authentication
+    const token = localStorage.getItem('authToken');
+    const headers: Record<string, string> = {};
+    
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+    
     const res = await fetch(fullUrl, {
+      headers,
       credentials: "include",
     });
 

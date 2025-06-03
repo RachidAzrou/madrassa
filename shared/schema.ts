@@ -1215,3 +1215,50 @@ export const reEnrollmentsRelations = relations(reEnrollments, ({ one }) => ({
     references: [teachers.id],
   }),
 }));
+
+// User Accounts (for RBAC authentication)
+export const userAccounts = pgTable("user_accounts", {
+  id: serial("id").primaryKey(),
+  email: text("email").notNull().unique(),
+  password: text("password").notNull(), // Hashed password
+  role: text("role").notNull(), // student, teacher, guardian, secretariat, admin
+  isActive: boolean("is_active").default(true),
+  lastLogin: timestamp("last_login"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+  // Link to person records
+  personId: integer("person_id").notNull(),
+  personType: text("person_type").notNull(), // student, teacher, guardian
+  // Additional fields for RBAC
+  firstName: text("first_name").notNull(),
+  lastName: text("last_name").notNull(),
+});
+
+export const insertUserAccountSchema = createInsertSchema(userAccounts).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  lastLogin: true
+});
+
+export type InsertUserAccount = z.infer<typeof insertUserAccountSchema>;
+export type UserAccount = typeof userAccounts.$inferSelect;
+
+// User Account Relations
+export const userAccountsRelations = relations(userAccounts, ({ one }) => ({
+  student: one(students, {
+    fields: [userAccounts.personId],
+    references: [students.id],
+    relationName: "studentAccount"
+  }),
+  teacher: one(teachers, {
+    fields: [userAccounts.personId],
+    references: [teachers.id],
+    relationName: "teacherAccount"
+  }),
+  guardian: one(guardians, {
+    fields: [userAccounts.personId],
+    references: [guardians.id],
+    relationName: "guardianAccount"
+  })
+}));

@@ -10,6 +10,10 @@ import { eq, and, sql, inArray } from "drizzle-orm";
 const globalCalendarEventsStore = new Map();
 import { z } from "zod";
 import { createMollieClient } from '@mollie/api-client';
+import bcrypt from "bcryptjs";
+import { authenticateToken, requireRole, requirePermission, requireAdmin, generateToken, AuthUser } from "./middleware/auth";
+import { UserRole, RESOURCES } from "@shared/rbac";
+import { userAccounts, insertUserAccountSchema } from "@shared/schema";
 import { 
   insertStudentSchema, 
   insertProgramSchema, 
@@ -55,6 +59,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // prefix all routes with /api
   const apiRouter = app;
   
+  // ********************
+  // RBAC Authentication Endpoints
+  // ********************
+  
+  // Login endpoint
+  apiRouter.post("/api/auth/login", async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      
+      if (!email || !password) {
+        return res.status(400).json({ message: "Email and password are required" });
+      }
+
+      // Find user account by email
+      const [userAccount] = await db
+        .select()
+        .from(userAccounts)
+        .where(eq(userAccounts.email, email));
+
+      if (!userAccount || !userAccount.isActive) {
+        return res.status(401).json({ message: "Invalid credentials or account disabled" });
+      }
+
+      // Verify password
+      const validPassword = await bcrypt.compare(password, userAccount.password);
+      if (!validPassword) {
+        return res.status(401).json({ message: "Invalid credentials" });
+      }
+
+      // Update last login
+      await db
+        .update(userAccounts)
+        .set({ lastLogin: new Date() })
+        .where(eq(userAccounts.id, userAccount.id));
+
+      // Generate JWT token
+      const authUser: AuthUser = {
+        id: userAccount.id,
+        email: userAccount.email,
+        role: userAccount.role as UserRole,
+        firstName: userAccount.firstName,
+        lastName: userAccount.lastName,
+        isActive: userAccount.isActive
+      };
+
+      const token = generateToken(authUser);
+
+      res.json({
+        user: authUser,
+        token
+      });
+    } catch (error) {
+      console.error("Login error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get current user endpoint
+  apiRouter.get("/api/auth/me", authenticateToken, async (req, res) => {
+    res.json(req.user);
+  });
+
+  // Logout endpoint (client-side token removal)
+  apiRouter.post("/api/auth/logout", authenticateToken, async (req, res) => {
+    res.json({ message: "Logged out successfully" });
+  });
+
   // ********************
   // Health check endpoint
   // ********************

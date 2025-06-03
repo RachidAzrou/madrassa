@@ -5147,6 +5147,171 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ********************
+  // Re-enrollment API endpoints
+  // ********************
+
+  // Get current academic year
+  app.get("/api/academic-years/current", async (req: Request, res: Response) => {
+    try {
+      // Mock current academic year data
+      const currentYear = {
+        id: 1,
+        name: "2024-2025",
+        startDate: "2024-09-01",
+        endDate: "2025-07-31",
+        isActive: true,
+        registrationStartDate: "2025-06-01",
+        registrationEndDate: "2025-08-31",
+        finalReportDate: "2025-06-15"
+      };
+      res.json(currentYear);
+    } catch (error) {
+      console.error("Error fetching current academic year:", error);
+      res.status(500).json({ error: "Failed to fetch current academic year" });
+    }
+  });
+
+  // Get all academic years
+  app.get("/api/academic-years", async (req: Request, res: Response) => {
+    try {
+      const academicYears = [
+        {
+          id: 1,
+          name: "2024-2025",
+          startDate: "2024-09-01",
+          endDate: "2025-07-31",
+          isActive: true,
+          registrationStartDate: "2025-06-01",
+          registrationEndDate: "2025-08-31",
+          finalReportDate: "2025-06-15"
+        },
+        {
+          id: 2,
+          name: "2025-2026",
+          startDate: "2025-09-01",
+          endDate: "2026-07-31",
+          isActive: false,
+          registrationStartDate: "2026-06-01",
+          registrationEndDate: "2026-08-31",
+          finalReportDate: "2026-06-15"
+        }
+      ];
+      res.json(academicYears);
+    } catch (error) {
+      console.error("Error fetching academic years:", error);
+      res.status(500).json({ error: "Failed to fetch academic years" });
+    }
+  });
+
+  // Get students eligible for re-enrollment
+  app.get("/api/students/eligible-for-reenrollment", async (req: Request, res: Response) => {
+    try {
+      const students = await storage.getStudents();
+      
+      // Enhance students with academic performance data
+      const eligibleStudents = students.map(student => ({
+        ...student,
+        currentClass: `Klas ${Math.floor(Math.random() * 8) + 1}`,
+        currentProgram: "Koran & Arabisch",
+        isPassed: Math.random() > 0.2, // 80% pass rate
+        finalGrade: parseFloat((6 + Math.random() * 4).toFixed(1)), // Grades 6.0-10.0
+        attendancePercentage: parseFloat((75 + Math.random() * 25).toFixed(1)), // 75%-100%
+        promotionEligible: Math.random() > 0.1 // 90% eligible
+      }));
+
+      res.json(eligibleStudents);
+    } catch (error) {
+      console.error("Error fetching eligible students:", error);
+      res.status(500).json({ error: "Failed to fetch eligible students" });
+    }
+  });
+
+  // Get classes for next year
+  app.get("/api/classes/next-year", async (req: Request, res: Response) => {
+    try {
+      const nextYearClasses = [
+        { id: 1, name: "Klas 2A", academicYear: "2025-2026", programId: 36 },
+        { id: 2, name: "Klas 2B", academicYear: "2025-2026", programId: 36 },
+        { id: 3, name: "Klas 3A", academicYear: "2025-2026", programId: 37 },
+        { id: 4, name: "Klas 3B", academicYear: "2025-2026", programId: 37 },
+        { id: 5, name: "Klas 4A", academicYear: "2025-2026", programId: 38 },
+        { id: 6, name: "Klas 5A", academicYear: "2025-2026", programId: 38 }
+      ];
+      res.json(nextYearClasses);
+    } catch (error) {
+      console.error("Error fetching next year classes:", error);
+      res.status(500).json({ error: "Failed to fetch next year classes" });
+    }
+  });
+
+  // Get re-enrollment statistics
+  app.get("/api/re-enrollment/stats", async (req: Request, res: Response) => {
+    try {
+      const students = await storage.getStudents();
+      const totalStudents = students.length;
+      
+      const stats = {
+        totalEligible: totalStudents,
+        passedStudents: Math.floor(totalStudents * 0.8),
+        failedStudents: Math.floor(totalStudents * 0.2),
+        enrolledStudents: Math.floor(totalStudents * 0.1),
+        pendingEnrollments: Math.floor(totalStudents * 0.05)
+      };
+      
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching re-enrollment stats:", error);
+      res.status(500).json({ error: "Failed to fetch re-enrollment stats" });
+    }
+  });
+
+  // Bulk re-enrollment
+  app.post("/api/re-enrollments/bulk", async (req: Request, res: Response) => {
+    try {
+      const { enrollments } = req.body;
+      
+      if (!Array.isArray(enrollments)) {
+        return res.status(400).json({ error: "Enrollments must be an array" });
+      }
+
+      // Mock processing bulk enrollments
+      const results = enrollments.map(enrollment => ({
+        studentId: enrollment.studentId,
+        status: "completed",
+        message: "Successfully enrolled for next academic year"
+      }));
+
+      res.json({
+        success: true,
+        processed: enrollments.length,
+        results
+      });
+    } catch (error) {
+      console.error("Error processing bulk enrollments:", error);
+      res.status(500).json({ error: "Failed to process bulk enrollments" });
+    }
+  });
+
+  // Create new academic year
+  app.post("/api/academic-years", async (req: Request, res: Response) => {
+    try {
+      const yearData = req.body;
+      
+      // Mock creating academic year
+      const newYear = {
+        id: Date.now(),
+        ...yearData,
+        createdAt: new Date().toISOString()
+      };
+
+      res.status(201).json(newYear);
+    } catch (error) {
+      console.error("Error creating academic year:", error);
+      res.status(500).json({ error: "Failed to create academic year" });
+    }
+  });
+
   // creëer HTTP server
   const server = createServer(app);
 

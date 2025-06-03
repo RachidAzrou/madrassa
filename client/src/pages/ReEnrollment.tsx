@@ -191,10 +191,10 @@ export default function ReEnrollment() {
 
   return (
     <div className="space-y-6">
-      <PageHeader 
-        title="Herinschrijvingen" 
-        description="Beheer herinschrijvingen voor het nieuwe schooljaar"
-      />
+      <div className="space-y-1">
+        <h1 className="text-3xl font-bold tracking-tight">Herinschrijvingen</h1>
+        <p className="text-muted-foreground">Beheer herinschrijvingen voor het nieuwe schooljaar</p>
+      </div>
 
       {/* Registration Status Alert */}
       {!canStartRegistration && (

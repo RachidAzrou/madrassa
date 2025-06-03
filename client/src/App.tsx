@@ -66,6 +66,7 @@ function AuthenticatedRouter() {
         <Route path="/attendance" component={() => <AuthenticatedRoute component={Attendance} />} />
         <Route path="/grading" component={() => <AuthenticatedRoute component={Cijfers} />} />
         <Route path="/fees" component={() => <AuthenticatedRoute component={Fees} />} />
+        <Route path="/re-enrollment" component={() => <AuthenticatedRoute component={ReEnrollment} />} />
         <Route path="/student-dossier" component={() => <AuthenticatedRoute component={StudentDossier} />} />
 
         <Route path="/reports" component={() => <AuthenticatedRoute component={Reports} />} />

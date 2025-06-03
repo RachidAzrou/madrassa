@@ -31,6 +31,7 @@ import {
   BookMarked,
   ChevronLeft,
   ChevronRight,
+  RefreshCw,
 } from "lucide-react";
 
 // Aangepast ChalkboardTeacher icoon
@@ -341,6 +342,13 @@ const Sidebar = ({ isMobile = false, onClose, className = "", defaultCollapsed =
                   icon={<Coins className="h-4.5 w-4.5" />}
                   label="Betalingsbeheer"
                   isActive={location.startsWith("/fees")}
+                  onClick={handleLinkClick}
+                />
+                <SidebarLink
+                  href="/re-enrollment"
+                  icon={<RefreshCw className="h-4.5 w-4.5" />}
+                  label="Herinschrijvingen"
+                  isActive={location.startsWith("/re-enrollment")}
                   onClick={handleLinkClick}
                 />
               </div>

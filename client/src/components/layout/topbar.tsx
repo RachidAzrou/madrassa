@@ -142,11 +142,9 @@ export function Topbar({ onMenuClick }: TopbarProps = {}) {
       )}
       
       {/* Logo sectie - links */}
-      <div className="flex items-center h-full">
-        <Link href="/dashboard" className="flex items-center">
-          <img src={myMadrassaLogo} alt="myMadrassa Logo" className="h-10 sm:h-11" />
-        </Link>
-      </div>
+      <Link href="/dashboard" className="flex items-center h-full">
+        <img src={myMadrassaLogo} alt="myMadrassa Logo" className="h-10 sm:h-11" />
+      </Link>
 
       {/* Zoekbalk - midden (optioneel) */}
       {showSearch && (

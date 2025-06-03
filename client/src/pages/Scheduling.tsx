@@ -316,27 +316,35 @@ export default function Scheduling() {
     });
   }
 
-  // Convert holidays to calendar events
-  const holidayEvents: ScheduleEntry[] = holidays.map((holiday: any) => ({
-    id: `holiday-${holiday.id}`,
-    dayOfWeek: new Date(holiday.startDate).toLocaleDateString('nl-NL', { weekday: 'long' }),
-    timeSlot: 'Hele dag',
-    startTime: '00:00',
-    endTime: '23:59',
-    className: 'Alle klassen',
-    classId: 0,
-    subjectName: holiday.name,
-    subjectId: 0,
-    teacherName: 'Vakantie',
-    teacherId: 0,
-    roomName: '-',
-    roomId: 0,
-    type: 'special' as const,
-    status: 'active' as const,
-    notes: holiday.description || `${holiday.name} van ${new Date(holiday.startDate).toLocaleDateString('nl-NL')} tot ${new Date(holiday.endDate).toLocaleDateString('nl-NL')}`,
-    date: holiday.startDate,
-    holidayType: holiday.type
-  }));
+  // Convert holidays to calendar events - spread across all time slots for visibility
+  const holidayEvents: ScheduleEntry[] = [];
+  const timeSlots = ['08:30 - 10:00', '10:15 - 11:45', '12:30 - 14:00', '14:15 - 15:45', '16:00 - 17:30'];
+  
+  holidays.forEach((holiday: any) => {
+    // Add holiday event for each time slot to ensure visibility
+    timeSlots.forEach(timeSlot => {
+      holidayEvents.push({
+        id: `holiday-${holiday.id}-${timeSlot}`,
+        dayOfWeek: new Date(holiday.startDate).toLocaleDateString('nl-NL', { weekday: 'long' }),
+        timeSlot: timeSlot,
+        startTime: timeSlot.split(' - ')[0],
+        endTime: timeSlot.split(' - ')[1],
+        className: 'Alle klassen',
+        classId: 0,
+        subjectName: holiday.name,
+        subjectId: 0,
+        teacherName: 'Vakantie',
+        teacherId: 0,
+        roomName: '-',
+        roomId: 0,
+        type: 'special' as const,
+        status: 'active' as const,
+        notes: holiday.description || `${holiday.name} van ${new Date(holiday.startDate).toLocaleDateString('nl-NL')} tot ${new Date(holiday.endDate).toLocaleDateString('nl-NL')}`,
+        date: holiday.startDate,
+        holidayType: holiday.type
+      });
+    });
+  });
 
   // Combine all schedules and events
   const allScheduleEntries = [...schedules, ...academicYearEvents, ...holidayEvents];

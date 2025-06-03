@@ -349,7 +349,6 @@ export default function Accounts() {
             <div className="flex items-center gap-2">
               <span className="text-xs text-gray-500">{filteredAccounts.length} accounts</span>
               <Button 
-                onClick={() => setIsCreateDialogOpen(true)}
                 className="bg-[#1e40af] hover:bg-[#1d4ed8] text-white h-8 text-xs px-3 rounded-sm"
               >
                 <Plus className="h-3.5 w-3.5 mr-1.5" />
@@ -441,7 +440,6 @@ export default function Accounts() {
                 </div>
                 <p className="text-xs text-gray-500 mb-2">Geen accounts beschikbaar</p>
                 <Button 
-                  onClick={() => setIsCreateDialogOpen(true)}
                   variant="outline" 
                   size="sm" 
                   className="text-xs h-6 border-[#e5e7eb] text-gray-600 hover:bg-gray-50 rounded-sm"
@@ -466,17 +464,6 @@ export default function Accounts() {
                         variant="ghost" 
                         size="sm"
                         className="h-7 w-7 p-0 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
-                        onClick={() => {
-                          setSelectedAccount(account);
-                          setAccountFormData({
-                            email: account.email,
-                            password: '',
-                            role: account.role,
-                            personId: account.personId,
-                            isActive: account.isActive
-                          });
-                          setIsEditDialogOpen(true);
-                        }}
                       >
                         <Edit className="h-3.5 w-3.5" />
                       </Button>

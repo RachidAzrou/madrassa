@@ -85,6 +85,8 @@ export default function Reports() {
   const [schoolName, setSchoolName] = useState<string>('myMadrassa');
   const [generalComments, setGeneralComments] = useState<{[key: number]: string}>({});
   const [behaviorGrades, setBehaviorGrades] = useState<{[key: number]: BehaviorGrade}>({});
+  const [attendanceComments, setAttendanceComments] = useState<{[key: number]: string}>({});
+  const [reportPreview, setReportPreview] = useState<ReportData[]>([]);
 
   // Fetch classes
   const { data: classesData } = useQuery({
@@ -116,7 +118,84 @@ export default function Reports() {
     },
   });
 
-  // No longer needed - removed logo upload functionality
+  // Generate preview data without PDF
+  const generatePreviewData = async () => {
+    try {
+      let targetStudents: Student[] = [];
+
+      if (selectedReportType === 'class' && selectedClass) {
+        const classResponse = await fetch(`/api/students/class/${selectedClass}`);
+        if (!classResponse.ok) throw new Error('Failed to fetch class students');
+        targetStudents = await classResponse.json();
+      } else if (selectedReportType === 'individual' && selectedStudent) {
+        const student = studentsData?.find((s: Student) => s.id.toString() === selectedStudent);
+        if (student) targetStudents = [student];
+      }
+
+      const reports: ReportData[] = [];
+
+      for (const student of targetStudents) {
+        const attendanceResponse = await fetch(`/api/attendance/student/${student.id}`);
+        const attendanceData: AttendanceRecord[] = attendanceResponse.ok ? await attendanceResponse.json() : [];
+
+        const total = attendanceData.length;
+        const present = attendanceData.filter(a => a.status === 'present').length;
+        const absent = attendanceData.filter(a => a.status === 'absent').length;
+        const late = attendanceData.filter(a => a.status === 'late').length;
+        const percentage = total > 0 ? Math.round((present / total) * 100) : 0;
+
+        const gradesResponse = await fetch(`/api/grades/student/${student.id}`);
+        const gradesData: Grade[] = gradesResponse.ok ? await gradesResponse.json() : [];
+
+        const gradesBySubject: {[subject: string]: {tests: Grade[], tasks: Grade[], homework: Grade[], average: number}} = {};
+        
+        gradesData.forEach(grade => {
+          const subject = grade.programName || `Vak ${grade.programId}`;
+          if (!gradesBySubject[subject]) {
+            gradesBySubject[subject] = { tests: [], tasks: [], homework: [], average: 0 };
+          }
+          
+          switch (grade.gradeType.toLowerCase()) {
+            case 'test':
+            case 'toets':
+              gradesBySubject[subject].tests.push(grade);
+              break;
+            case 'taak':
+            case 'opdracht':
+              gradesBySubject[subject].tasks.push(grade);
+              break;
+            case 'huiswerk':
+              gradesBySubject[subject].homework.push(grade);
+              break;
+            default:
+              gradesBySubject[subject].tests.push(grade);
+          }
+        });
+
+        Object.keys(gradesBySubject).forEach(subject => {
+          const subjectGrades = gradesBySubject[subject];
+          const allGrades = [...subjectGrades.tests, ...subjectGrades.tasks, ...subjectGrades.homework];
+          if (allGrades.length > 0) {
+            const weightedSum = allGrades.reduce((sum, grade) => sum + (grade.score / grade.maxScore) * 10 * grade.weight, 0);
+            const totalWeight = allGrades.reduce((sum, grade) => sum + grade.weight, 0);
+            subjectGrades.average = totalWeight > 0 ? weightedSum / totalWeight : 0;
+          }
+        });
+
+        reports.push({
+          student,
+          attendance: { total, present, absent, late, percentage },
+          grades: gradesBySubject,
+          behavior: behaviorGrades[student.id] || { studentId: student.id, grade: 7, comments: '' },
+          generalComments: generalComments[student.id] || ''
+        });
+      }
+
+      setReportPreview(reports);
+    } catch (error) {
+      console.error('Error generating preview data:', error);
+    }
+  };
 
   const generateReportData = async () => {
     try {
@@ -482,34 +561,24 @@ export default function Reports() {
 
       yPos += 80;
 
-      // Signature section at bottom of page
-      const signatureYPos = pageHeight - 80; // Fixed position near bottom
+      // Simple signature section at bottom
+      const signatureYPos = pageHeight - 50;
       
-      pdf.setFillColor(248, 249, 250);
-      pdf.rect(20, signatureYPos, pageWidth - 40, 60, 'F');
-      pdf.setDrawColor(33, 107, 169);
-      pdf.setLineWidth(0.5);
-      pdf.rect(20, signatureYPos, pageWidth - 40, 60, 'D');
-      
-      pdf.setFontSize(12);
-      pdf.setFont('helvetica', 'bold');
-      pdf.setTextColor(33, 107, 169);
-      pdf.text('HANDTEKENINGEN', 25, signatureYPos + 15);
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(64, 75, 105);
       
       const sigWidth = (pageWidth - 60) / 2;
       
       // Parent signature
-      pdf.setFontSize(10);
-      pdf.setFont('helvetica', 'normal');
-      pdf.setTextColor(64, 75, 105);
-      pdf.text('Ouder/Voogd:', 25, signatureYPos + 35);
-      pdf.setDrawColor(150, 150, 150);
-      pdf.setLineWidth(0.3);
-      pdf.line(65, signatureYPos + 50, 25 + sigWidth - 10, signatureYPos + 50);
+      pdf.text('Handtekening Ouder/Voogd:', 25, signatureYPos);
+      pdf.setDrawColor(100, 100, 100);
+      pdf.setLineWidth(0.5);
+      pdf.line(25, signatureYPos + 15, 25 + sigWidth - 10, signatureYPos + 15);
       
-      // School signature
-      pdf.text('School:', pageWidth / 2 + 15, signatureYPos + 35);
-      pdf.line(pageWidth / 2 + 45, signatureYPos + 50, pageWidth - 35, signatureYPos + 50);
+      // School signature  
+      pdf.text('Handtekening School:', pageWidth / 2 + 15, signatureYPos);
+      pdf.line(pageWidth / 2 + 15, signatureYPos + 15, pageWidth - 35, signatureYPos + 15);
 
       // Footer on second page
       pdf.setFontSize(8);
@@ -670,6 +739,20 @@ export default function Reports() {
                   />
                 </div>
               </div>
+
+              {/* Attendance Comments */}
+              <div className="space-y-2">
+                <Label>Aanwezigheidsopmerkingen</Label>
+                <Textarea
+                  value={attendanceComments[parseInt(selectedStudent)] || ''}
+                  onChange={(e) => setAttendanceComments(prev => ({
+                    ...prev,
+                    [parseInt(selectedStudent) || 0]: e.target.value
+                  }))}
+                  placeholder="Voeg opmerkingen toe over aanwezigheid..."
+                  className="min-h-[80px]"
+                />
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -681,6 +764,16 @@ export default function Reports() {
             </CardHeader>
             <CardContent className="space-y-4">
               <Button 
+                onClick={generatePreviewData}
+                disabled={!selectedClass && !selectedStudent}
+                className="w-full"
+                variant="outline"
+              >
+                <FileText className="h-4 w-4 mr-2" />
+                Bekijk Rapportoverzicht
+              </Button>
+
+              <Button 
                 onClick={generateReportData}
                 disabled={!selectedClass && !selectedStudent}
                 className="w-full"
@@ -691,16 +784,61 @@ export default function Reports() {
               </Button>
               
               <div className="text-sm text-gray-600 space-y-1">
-                <p>📋 Rapport bevat:</p>
+                <p>Rapport bevat:</p>
                 <ul className="list-disc list-inside text-xs space-y-1 ml-2">
                   <li>Pagina 1: Cijfertabel en algemene opmerkingen</li>
                   <li>Pagina 2: Gedragsbeoordeling en aanwezigheid</li>
-                  <li>Professionele layout met school logo</li>
                   <li>Handtekeningvelden voor ouders en school</li>
                 </ul>
               </div>
             </CardContent>
           </Card>
+
+          {/* Report Preview */}
+          {reportPreview.length > 0 && (
+            <Card className="mt-4">
+              <CardHeader>
+                <CardTitle>Rapportoverzicht</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {reportPreview.map((report) => (
+                  <div key={report.student.id} className="border rounded-lg p-4 space-y-3">
+                    <div className="font-medium text-lg">
+                      {report.student.firstName} {report.student.lastName} ({report.student.studentId})
+                    </div>
+                    
+                    {/* Grades Summary */}
+                    <div className="space-y-2">
+                      <h4 className="font-medium text-sm text-gray-700">Cijfers:</h4>
+                      <div className="grid grid-cols-2 gap-2 text-sm">
+                        {Object.entries(report.grades).map(([subject, grades]) => {
+                          const testAvg = grades.tests.length > 0 ? (grades.tests.reduce((sum, g) => sum + (g.score/g.maxScore)*10, 0) / grades.tests.length).toFixed(1) : '-';
+                          const taskAvg = grades.tasks.length > 0 ? (grades.tasks.reduce((sum, g) => sum + (g.score/g.maxScore)*10, 0) / grades.tasks.length).toFixed(1) : '-';
+                          return (
+                            <div key={subject} className="flex justify-between">
+                              <span>{subject}:</span>
+                              <span>T:{testAvg} / O:{taskAvg}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Attendance Summary */}
+                    <div className="space-y-2">
+                      <h4 className="font-medium text-sm text-gray-700">Aanwezigheid:</h4>
+                      <div className="text-sm grid grid-cols-2 gap-2">
+                        <div>Afwezig: {report.attendance.absent} dagen</div>
+                        <div>Te laat: {report.attendance.late} keer</div>
+                        <div>Percentage: {report.attendance.percentage}%</div>
+                        <div>Gedrag: {report.behavior.grade}/10</div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </div>

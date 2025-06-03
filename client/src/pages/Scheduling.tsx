@@ -34,7 +34,7 @@ import { PremiumHeader } from '@/components/layout/premium-header';
 
 // Types
 interface ScheduleEntry {
-  id: number;
+  id: number | string;
   dayOfWeek: string;
   timeSlot: string;
   startTime: string;
@@ -50,6 +50,8 @@ interface ScheduleEntry {
   type: 'regular' | 'exam' | 'special';
   status: 'active' | 'cancelled' | 'rescheduled';
   notes?: string;
+  date?: string;
+  holidayType?: string;
 }
 
 interface Teacher {
@@ -247,14 +249,106 @@ export default function Scheduling() {
   // Get current academic year
   const currentAcademicYear = academicYears.find((year: any) => year.isActive) || academicYears[0] || null;
 
+  // Convert academic year dates to calendar events
+  const academicYearEvents: ScheduleEntry[] = [];
+  if (currentAcademicYear) {
+    // Start of academic year
+    academicYearEvents.push({
+      id: `academic-start-${currentAcademicYear.id}`,
+      dayOfWeek: new Date(currentAcademicYear.startDate).toLocaleDateString('nl-NL', { weekday: 'long' }),
+      timeSlot: 'Hele dag',
+      startTime: '00:00',
+      endTime: '23:59',
+      className: 'Alle klassen',
+      classId: 0,
+      subjectName: 'Start Schooljaar',
+      subjectId: 0,
+      teacherName: 'Schoolleiding',
+      teacherId: 0,
+      roomName: 'School',
+      roomId: 0,
+      type: 'special' as const,
+      status: 'active' as const,
+      notes: `Begin van schooljaar ${currentAcademicYear.name}`,
+      date: currentAcademicYear.startDate
+    });
+
+    // End of academic year
+    academicYearEvents.push({
+      id: `academic-end-${currentAcademicYear.id}`,
+      dayOfWeek: new Date(currentAcademicYear.endDate).toLocaleDateString('nl-NL', { weekday: 'long' }),
+      timeSlot: 'Hele dag',
+      startTime: '00:00',
+      endTime: '23:59',
+      className: 'Alle klassen',
+      classId: 0,
+      subjectName: 'Einde Schooljaar',
+      subjectId: 0,
+      teacherName: 'Schoolleiding',
+      teacherId: 0,
+      roomName: 'School',
+      roomId: 0,
+      type: 'special' as const,
+      status: 'active' as const,
+      notes: `Einde van schooljaar ${currentAcademicYear.name}`,
+      date: currentAcademicYear.endDate
+    });
+
+    // Final report date
+    academicYearEvents.push({
+      id: `final-report-${currentAcademicYear.id}`,
+      dayOfWeek: new Date(currentAcademicYear.finalReportDate).toLocaleDateString('nl-NL', { weekday: 'long' }),
+      timeSlot: 'Hele dag',
+      startTime: '00:00',
+      endTime: '23:59',
+      className: 'Alle klassen',
+      classId: 0,
+      subjectName: 'Eindrapport',
+      subjectId: 0,
+      teacherName: 'Schoolleiding',
+      teacherId: 0,
+      roomName: 'School',
+      roomId: 0,
+      type: 'special' as const,
+      status: 'active' as const,
+      notes: `Eindrapport uitreiking ${currentAcademicYear.name}`,
+      date: currentAcademicYear.finalReportDate
+    });
+  }
+
+  // Convert holidays to calendar events
+  const holidayEvents: ScheduleEntry[] = holidays.map((holiday: any) => ({
+    id: `holiday-${holiday.id}`,
+    dayOfWeek: new Date(holiday.startDate).toLocaleDateString('nl-NL', { weekday: 'long' }),
+    timeSlot: 'Hele dag',
+    startTime: '00:00',
+    endTime: '23:59',
+    className: 'Alle klassen',
+    classId: 0,
+    subjectName: holiday.name,
+    subjectId: 0,
+    teacherName: 'Vakantie',
+    teacherId: 0,
+    roomName: '-',
+    roomId: 0,
+    type: 'special' as const,
+    status: 'active' as const,
+    notes: holiday.description || `${holiday.name} van ${new Date(holiday.startDate).toLocaleDateString('nl-NL')} tot ${new Date(holiday.endDate).toLocaleDateString('nl-NL')}`,
+    date: holiday.startDate,
+    holidayType: holiday.type
+  }));
+
+  // Combine all schedules and events
+  const allScheduleEntries = [...schedules, ...academicYearEvents, ...holidayEvents];
+
   // Get unique values for filters
-  const uniqueClasses = Array.from(new Set(schedules.map((s: ScheduleEntry) => s.className)));
-  const uniqueTeachers = Array.from(new Set(schedules.map((s: ScheduleEntry) => s.teacherName)));
-  const uniqueSubjects = Array.from(new Set(schedules.map((s: ScheduleEntry) => s.subjectName)));
+  const uniqueClasses = Array.from(new Set(allScheduleEntries.map((s: ScheduleEntry) => s.className)));
+  const uniqueTeachers = Array.from(new Set(allScheduleEntries.map((s: ScheduleEntry) => s.teacherName)));
+  const uniqueSubjects = Array.from(new Set(allScheduleEntries.map((s: ScheduleEntry) => s.subjectName)));
   const uniqueDays = ['Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag'];
 
   // Filter schedules based on search and filter criteria
-  const filteredSchedules = schedules.filter((schedule: ScheduleEntry) => {
+  const filteredSchedules = allScheduleEntries.filter((schedule: ScheduleEntry) => {
     const matchesSearch = 
       schedule.className.toLowerCase().includes(searchTerm.toLowerCase()) ||
       schedule.subjectName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -281,8 +375,23 @@ export default function Scheduling() {
     return colors[day as keyof typeof colors] || 'bg-gray-50 text-gray-700';
   };
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
+  const getStatusBadge = (schedule: ScheduleEntry) => {
+    // Special handling for academic year and holiday events
+    if (schedule.subjectName === 'Start Schooljaar') {
+      return <Badge className="bg-blue-100 text-blue-800">Schooljaar Start</Badge>;
+    }
+    if (schedule.subjectName === 'Einde Schooljaar') {
+      return <Badge className="bg-purple-100 text-purple-800">Schooljaar Einde</Badge>;
+    }
+    if (schedule.subjectName === 'Eindrapport') {
+      return <Badge className="bg-orange-100 text-orange-800">Eindrapport</Badge>;
+    }
+    if (schedule.teacherName === 'Vakantie') {
+      return <Badge className="bg-green-100 text-green-800">Vakantie</Badge>;
+    }
+
+    // Regular status badges
+    switch (schedule.status) {
       case 'active':
         return <Badge variant="default" className="bg-green-100 text-green-800">Actief</Badge>;
       case 'cancelled':
@@ -290,7 +399,7 @@ export default function Scheduling() {
       case 'rescheduled':
         return <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">Verplaatst</Badge>;
       default:
-        return <Badge variant="outline">{status}</Badge>;
+        return <Badge variant="outline">{schedule.status}</Badge>;
     }
   };
 
@@ -609,7 +718,13 @@ export default function Scheduling() {
                           {daySchedules.map((schedule: ScheduleEntry) => (
                             <div
                               key={schedule.id}
-                              className="bg-gradient-to-br from-blue-100 to-blue-50 hover:from-blue-200 hover:to-blue-100 p-3 rounded-lg text-xs cursor-pointer transition-all duration-200 group shadow-sm border border-blue-200"
+                              className={`${
+                                schedule.subjectName === 'Start Schooljaar' || schedule.subjectName === 'Einde Schooljaar' || schedule.subjectName === 'Eindrapport'
+                                  ? 'bg-gradient-to-br from-purple-100 to-purple-50 hover:from-purple-200 hover:to-purple-100 border-purple-200'
+                                  : schedule.teacherName === 'Vakantie'
+                                  ? 'bg-gradient-to-br from-green-100 to-green-50 hover:from-green-200 hover:to-green-100 border-green-200'
+                                  : 'bg-gradient-to-br from-blue-100 to-blue-50 hover:from-blue-200 hover:to-blue-100 border-blue-200'
+                              } p-3 rounded-lg text-xs cursor-pointer transition-all duration-200 group shadow-sm border`}
                               onClick={() => handleViewSchedule(schedule)}
                             >
                               <div className="font-semibold text-blue-900 mb-1 flex items-center gap-1">
@@ -627,6 +742,9 @@ export default function Scheduling() {
                               <div className="text-blue-500 flex items-center gap-1">
                                 <MapPin className="w-3 h-3" />
                                 {schedule.roomName}
+                              </div>
+                              <div className="mt-2">
+                                {getStatusBadge(schedule)}
                               </div>
                               
                               {/* Action buttons that appear on hover */}

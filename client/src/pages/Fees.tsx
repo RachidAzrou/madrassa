@@ -1328,40 +1328,36 @@ export default function Fees() {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Applied Discounts */}
-              <Card className="bg-white rounded-md border shadow-sm">
-                <div className="pt-6 px-6 pb-6">
-                  <div className="space-y-4">
-                    <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h4 className="font-semibold text-blue-800">Familiekorting</h4>
-                          <p className="text-sm text-blue-600">10% korting voor families met 2+ kinderen</p>
-                        </div>
-                        <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-                          Automatisch
-                        </Badge>
-                      </div>
+              <Card className="bg-white rounded-md border shadow-sm space-y-4 pt-6 px-6 pb-6">
+                <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-semibold text-blue-800">Familiekorting</h4>
+                      <p className="text-sm text-blue-600">10% korting voor families met 2+ kinderen</p>
                     </div>
-                    
-                    {/* Show families with automatic discounts */}
-                    <div className="space-y-2">
-                      <h5 className="font-medium text-gray-900">Actieve Familiekortingen:</h5>
-                      {discountApplicationsData
-                        .filter((app: any) => app.isAutomatic && app.isActive)
-                        .map((app: any) => (
-                          <div key={app.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                            <div>
-                              <p className="font-medium">{app.studentName}</p>
-                              <p className="text-sm text-gray-600">Familie: {app.familyName}</p>
-                            </div>
-                            <div className="text-right">
-                              <p className="font-bold text-green-600">-10%</p>
-                              <p className="text-sm text-gray-500">Auto toegepast</p>
-                            </div>
-                          </div>
-                        ))}
-                    </div>
+                    <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                      Automatisch
+                    </Badge>
                   </div>
+                </div>
+                
+                {/* Show families with automatic discounts */}
+                <div className="space-y-2">
+                  <h5 className="font-medium text-gray-900">Actieve Familiekortingen:</h5>
+                  {discountApplicationsData
+                    .filter((app: any) => app.isAutomatic && app.isActive)
+                    .map((app: any) => (
+                      <div key={app.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                        <div>
+                          <p className="font-medium">{app.studentName}</p>
+                          <p className="text-sm text-gray-600">Familie: {app.familyName}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold text-green-600">-10%</p>
+                          <p className="text-sm text-gray-500">Auto toegepast</p>
+                        </div>
+                      </div>
+                    ))}
                 </div>
               </Card>
 

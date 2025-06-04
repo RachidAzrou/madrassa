@@ -5401,43 +5401,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Payment already completed" });
       }
 
-      // Create new Mollie payment if needed or reuse existing one
-      let molliePayment;
-      if (payment.molliePaymentId && payment.status === 'pending') {
+      // Demo mode for development environment
+      const demoCheckoutUrl = `${req.protocol}://${req.get('host')}/demo-payment?id=${id}&amount=${payment.amount}&description=${encodeURIComponent(payment.description)}`;
+      
+      // Update payment status to indicate payment link created
+      await storage.updatePayment(id, {
+        status: 'openstaand',
+        checkoutUrl: demoCheckoutUrl
+      });
+
+      res.json({ checkoutUrl: demoCheckoutUrl });
+      
+      /*
+      // Disabled for development - enable for production with proper webhook URL
+      if (false) {
+        // Production mode: use real Mollie API
         try {
-          molliePayment = await mollieClient.payments.get(payment.molliePaymentId);
-          if (molliePayment.status === 'open') {
-            return res.json({ checkoutUrl: molliePayment._links.checkout?.href });
+          // Create new Mollie payment if needed or reuse existing one
+          let molliePayment;
+          if (payment.molliePaymentId && payment.status === 'pending') {
+            try {
+              molliePayment = await mollieClient.payments.get(payment.molliePaymentId);
+              if (molliePayment.status === 'open') {
+                return res.json({ checkoutUrl: molliePayment._links.checkout?.href });
+              }
+            } catch (error) {
+              console.log("Existing Mollie payment not found or expired, creating new one");
+            }
           }
-        } catch (error) {
-          console.log("Existing Mollie payment not found or expired, creating new one");
+
+          // Create new Mollie payment
+          molliePayment = await mollieClient.payments.create({
+            amount: {
+              currency: 'EUR',
+              value: payment.amount
+            },
+            description: payment.description,
+            redirectUrl: `${req.protocol}://${req.get('host')}/fees?payment=success`,
+            metadata: {
+              paymentId: id.toString(),
+              studentId: payment.studentId.toString()
+            }
+          });
+
+          // Update payment with new Mollie ID
+          await storage.updatePayment(id, {
+            molliePaymentId: molliePayment.id,
+            checkoutUrl: molliePayment._links.checkout?.href || null,
+            status: 'openstaand',
+            mollieStatus: molliePayment.status
+          });
+
+          res.json({ checkoutUrl: molliePayment._links.checkout?.href });
+        } catch (mollieError) {
+          console.error("Mollie API error:", mollieError);
+          // Fallback to demo mode if Mollie fails
+          const demoCheckoutUrl = `${req.protocol}://${req.get('host')}/demo-payment?id=${id}&amount=${payment.amount}&description=${encodeURIComponent(payment.description)}`;
+          
+          await storage.updatePayment(id, {
+            status: 'openstaand',
+            checkoutUrl: demoCheckoutUrl
+          });
+
+          res.json({ checkoutUrl: demoCheckoutUrl });
         }
       }
-
-      // Create new Mollie payment
-      molliePayment = await mollieClient.payments.create({
-        amount: {
-          currency: 'EUR',
-          value: payment.amount
-        },
-        description: payment.description,
-        redirectUrl: `${req.protocol}://${req.get('host')}/fees?payment=success`,
-        webhookUrl: `${req.protocol}://${req.get('host')}/api/payments/webhook`,
-        metadata: {
-          paymentId: id.toString(),
-          studentId: payment.studentId.toString()
-        }
-      });
-
-      // Update payment with new Mollie ID
-      await storage.updatePayment(id, {
-        molliePaymentId: molliePayment.id,
-        checkoutUrl: molliePayment._links.checkout?.href || null,
-        status: 'openstaand',
-        mollieStatus: molliePayment.status
-      });
-
-      res.json({ checkoutUrl: molliePayment._links.checkout?.href });
+      */
     } catch (error) {
       console.error("Error creating payment link:", error);
       res.status(500).json({ error: "Failed to create payment link" });

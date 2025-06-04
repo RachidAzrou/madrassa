@@ -5443,7 +5443,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const doc = new jsPDF();
 
       // Color scheme matching the app
-      const primaryColor = [37, 99, 235]; // Blue-600
+      const primaryColor = [30, 64, 175]; // #1e40af (matching dialog headers)
       const secondaryColor = [75, 85, 99]; // Gray-600
       const accentColor = [16, 185, 129]; // Green-500
       const backgroundColor = [249, 250, 251]; // Gray-50

@@ -5384,6 +5384,189 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Create payment link (start payment process for existing payment)
+  app.post("/api/payments/:id/pay", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ error: "Invalid payment ID" });
+      }
+
+      const payment = await storage.getPayment(id);
+      if (!payment) {
+        return res.status(404).json({ error: "Payment not found" });
+      }
+
+      if (payment.status === 'betaald' || payment.status === 'paid') {
+        return res.status(400).json({ error: "Payment already completed" });
+      }
+
+      // Create new Mollie payment if needed or reuse existing one
+      let molliePayment;
+      if (payment.molliePaymentId && payment.status === 'pending') {
+        try {
+          molliePayment = await mollieClient.payments.get(payment.molliePaymentId);
+          if (molliePayment.status === 'open') {
+            return res.json({ checkoutUrl: molliePayment._links.checkout?.href });
+          }
+        } catch (error) {
+          console.log("Existing Mollie payment not found or expired, creating new one");
+        }
+      }
+
+      // Create new Mollie payment
+      molliePayment = await mollieClient.payments.create({
+        amount: {
+          currency: 'EUR',
+          value: payment.amount
+        },
+        description: payment.description,
+        redirectUrl: `${req.protocol}://${req.get('host')}/fees?payment=success`,
+        webhookUrl: `${req.protocol}://${req.get('host')}/api/payments/webhook`,
+        metadata: {
+          paymentId: id.toString(),
+          studentId: payment.studentId.toString()
+        }
+      });
+
+      // Update payment with new Mollie ID
+      await storage.updatePayment(id, {
+        molliePaymentId: molliePayment.id,
+        checkoutUrl: molliePayment._links.checkout?.href || null,
+        status: 'openstaand',
+        mollieStatus: molliePayment.status
+      });
+
+      res.json({ checkoutUrl: molliePayment._links.checkout?.href });
+    } catch (error) {
+      console.error("Error creating payment link:", error);
+      res.status(500).json({ error: "Failed to create payment link" });
+    }
+  });
+
+  // Generate and download invoice PDF
+  app.get("/api/payments/:id/invoice.pdf", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ error: "Invalid payment ID" });
+      }
+
+      const payment = await storage.getPayment(id);
+      if (!payment) {
+        return res.status(404).json({ error: "Payment not found" });
+      }
+
+      if (payment.status !== 'betaald' && payment.status !== 'paid') {
+        return res.status(400).json({ error: "Invoice only available for paid payments" });
+      }
+
+      const student = await storage.getStudent(payment.studentId);
+      if (!student) {
+        return res.status(404).json({ error: "Student not found" });
+      }
+
+      // Generate PDF invoice (simplified version)
+      const invoiceContent = `
+        FACTUUR
+        
+        Factuurnummer: ${payment.invoiceId || `INV-${payment.id}`}
+        Datum: ${new Date(payment.paidAt || payment.createdAt).toLocaleDateString('nl-NL')}
+        
+        Student: ${student.firstName} ${student.lastName}
+        Student ID: ${student.studentId}
+        
+        Beschrijving: ${payment.description}
+        Bedrag: €${payment.amount}
+        Status: Betaald
+        
+        Betalingsmethode: ${payment.paymentMethod || 'Online'}
+        Betaald op: ${payment.paidAt ? new Date(payment.paidAt).toLocaleDateString('nl-NL') : 'N/A'}
+      `;
+
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="factuur-${payment.id}.pdf"`);
+      res.send(Buffer.from(invoiceContent, 'utf-8'));
+    } catch (error) {
+      console.error("Error generating invoice:", error);
+      res.status(500).json({ error: "Failed to generate invoice" });
+    }
+  });
+
+  // Export payments data
+  app.get("/api/payments/export", async (req, res) => {
+    try {
+      const { status, year, search } = req.query;
+      
+      let payments = await storage.getPayments();
+      
+      // Apply filters
+      if (status && status !== 'alle') {
+        payments = payments.filter(p => p.status === status);
+      }
+      
+      if (year && year !== 'alle') {
+        payments = payments.filter(p => {
+          const paymentYear = new Date(p.createdAt).getFullYear().toString();
+          return paymentYear === year;
+        });
+      }
+      
+      if (search) {
+        payments = payments.filter(p => 
+          p.description.toLowerCase().includes(search.toString().toLowerCase())
+        );
+      }
+      
+      // Get additional data for each payment
+      const paymentsWithDetails = await Promise.all(
+        payments.map(async (payment) => {
+          try {
+            const student = await storage.getStudent(payment.studentId);
+            return {
+              'Factuur ID': payment.invoiceId || `INV-${payment.id}`,
+              'Student': student ? `${student.firstName} ${student.lastName}` : 'Onbekend',
+              'Student ID': student?.studentId || 'Onbekend',
+              'Beschrijving': payment.description,
+              'Bedrag': `€${payment.amount}`,
+              'Vervaldatum': new Date(payment.dueDate).toLocaleDateString('nl-NL'),
+              'Status': payment.status,
+              'Betaald op': payment.paidAt ? new Date(payment.paidAt).toLocaleDateString('nl-NL') : '',
+              'Betalingsmethode': payment.paymentMethod || ''
+            };
+          } catch (error) {
+            return {
+              'Factuur ID': payment.invoiceId || `INV-${payment.id}`,
+              'Student': 'Onbekend',
+              'Student ID': 'Onbekend',
+              'Beschrijving': payment.description,
+              'Bedrag': `€${payment.amount}`,
+              'Vervaldatum': new Date(payment.dueDate).toLocaleDateString('nl-NL'),
+              'Status': payment.status,
+              'Betaald op': payment.paidAt ? new Date(payment.paidAt).toLocaleDateString('nl-NL') : '',
+              'Betalingsmethode': payment.paymentMethod || ''
+            };
+          }
+        })
+      );
+      
+      // Convert to CSV
+      const csv = [
+        Object.keys(paymentsWithDetails[0] || {}).join(','),
+        ...paymentsWithDetails.map(payment => 
+          Object.values(payment).map(value => `"${value}"`).join(',')
+        )
+      ].join('\n');
+      
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', 'attachment; filename="betalingen-export.csv"');
+      res.send(csv);
+    } catch (error) {
+      console.error("Error exporting payments:", error);
+      res.status(500).json({ error: "Failed to export payments" });
+    }
+  });
+
   // Get payment history with filters (for Fees page)
   app.get("/api/payments/history", async (req, res) => {
     try {

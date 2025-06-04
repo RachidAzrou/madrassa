@@ -485,18 +485,22 @@ export default function Fees() {
     }
   };
 
-  const handleDeleteTuitionFee = (fee: any) => {
-    setDeleteItem({ type: 'tuition-fee', id: fee.id, name: fee.description });
-    setShowDeleteConfirmDialog(true);
+  const handleDeleteTuitionFee = (id: number) => {
+    if (window.confirm('Weet je zeker dat je dit collegegeld wilt verwijderen?')) {
+      deleteTuitionFeeMutation.mutate(id);
+    }
   };
 
-  const handleDeleteDiscount = (discount: any) => {
-    setDeleteItem({ type: 'discount', id: discount.id, name: discount.name });
-    setShowDeleteConfirmDialog(true);
+  const handleDeleteDiscount = (id: number) => {
+    if (window.confirm('Weet je zeker dat je deze korting wilt verwijderen?')) {
+      deleteDiscountMutation.mutate(id);
+    }
   };
 
   const handleDeleteDiscountApplication = (id: number) => {
-    deleteDiscountApplicationMutation.mutate(id);
+    if (window.confirm('Weet je zeker dat je deze kortingstoepassing wilt verwijderen?')) {
+      deleteDiscountApplicationMutation.mutate(id);
+    }
   };
 
   // Edit handlers
@@ -537,8 +541,28 @@ export default function Fees() {
     setShowEditDiscountDialog(true);
   };
 
-  const handlePayOnline = (payment: any) => {
-    window.location.href = `/api/payments/${payment.id}/pay`;
+  const handlePayOnline = async (payment: any) => {
+    try {
+      const response = await apiRequest('POST', `/api/payments/${payment.id}/pay`, {});
+      const data = await response.json();
+      
+      if (data.checkoutUrl) {
+        // Redirect to Mollie/Stripe checkout
+        window.location.href = data.checkoutUrl;
+      } else {
+        toast({
+          title: "Fout",
+          description: "Kon betaallink niet genereren",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Fout",
+        description: "Er is een fout opgetreden bij het verwerken van de betaling",
+        variant: "destructive",
+      });
+    }
   };
 
   // Edit form submit handlers

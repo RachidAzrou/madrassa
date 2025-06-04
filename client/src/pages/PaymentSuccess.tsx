@@ -13,6 +13,7 @@ export default function PaymentSuccess() {
   const [paymentData, setPaymentData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [paymentStatus, setPaymentStatus] = useState<string>('checking');
+  const [countdown, setCountdown] = useState(3);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -50,6 +51,23 @@ export default function PaymentSuccess() {
   const handleBackToFees = () => {
     setLocation("/fees");
   };
+
+  // Auto redirect to fees page after successful payment
+  useEffect(() => {
+    if (paymentStatus === 'paid' || paymentStatus === 'betaald') {
+      const countdownTimer = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            setLocation("/fees");
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      return () => clearInterval(countdownTimer);
+    }
+  }, [paymentStatus, setLocation]);
 
   if (isLoading) {
     return (
@@ -114,6 +132,11 @@ export default function PaymentSuccess() {
              isPending ? 'Even geduld, uw betaling wordt nog verwerkt' : 
              'Er is een probleem opgetreden met uw betaling'}
           </p>
+          {isSuccess && countdown > 0 && (
+            <p className="text-sm text-blue-600 font-medium">
+              Automatisch doorsturen naar betalingsbeheer in {countdown} seconden...
+            </p>
+          )}
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="bg-gray-50 p-4 rounded-lg space-y-2">

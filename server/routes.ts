@@ -5439,7 +5439,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Generate PDF invoice with enhanced styling
       const { jsPDF } = await import('jspdf');
-      const QRCode = require('qrcode');
+      const QRCode = await import('qrcode');
       const doc = new jsPDF();
 
       // Color scheme matching the app
@@ -5545,7 +5545,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         try {
           // Generate QR code for Mollie payment
           const paymentUrl = payment.checkoutUrl || `${req.protocol}://${req.get('host')}/demo-payment?id=${payment.id}`;
-          const qrCodeDataUrl = await QRCode.toDataURL(paymentUrl, {
+          const qrCodeDataUrl = await QRCode.default.toDataURL(paymentUrl, {
             errorCorrectionLevel: 'M',
             type: 'image/png',
             quality: 0.92,

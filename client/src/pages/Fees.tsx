@@ -1327,84 +1327,59 @@ export default function Fees() {
             </Card>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Applied Discounts */}
-              <Card className="bg-white rounded-md border shadow-sm space-y-4 pt-6 px-6 pb-6">
-                <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-semibold text-blue-800">Familiekorting</h4>
-                      <p className="text-sm text-blue-600">10% korting voor families met 2+ kinderen</p>
-                    </div>
-                    <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-                      Automatisch
-                    </Badge>
-                  </div>
-                </div>
-                
-                {/* Show families with automatic discounts */}
-                <div className="space-y-2">
-                  <h5 className="font-medium text-gray-900">Actieve Familiekortingen:</h5>
-                  {discountApplicationsData
-                    .filter((app: any) => app.isAutomatic && app.isActive)
-                    .map((app: any) => (
-                      <div key={app.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                        <div>
-                          <p className="font-medium">{app.studentName}</p>
-                          <p className="text-sm text-gray-600">Familie: {app.familyName}</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-bold text-green-600">-10%</p>
-                          <p className="text-sm text-gray-500">Auto toegepast</p>
-                        </div>
+              {/* Applied Discounts - Familiekorting */}
+              
+              {/* Show families with automatic discounts */}
+              <div className="space-y-2">
+                {discountApplicationsData
+                  .filter((app: any) => app.isAutomatic && app.isActive)
+                  .map((app: any) => (
+                    <div key={app.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                      <div>
+                        <p className="font-medium">{app.studentName}</p>
+                        <p className="text-sm text-gray-600">Familie: {app.familyName}</p>
                       </div>
-                    ))}
-                </div>
-              </Card>
+                      <div className="text-right">
+                        <p className="font-bold text-green-600">-10%</p>
+                        <p className="text-sm text-gray-500">Auto toegepast</p>
+                      </div>
+                    </div>
+                  ))}
+              </div>
 
               {/* Manual Discounts */}
-              <Card className="bg-white rounded-md border shadow-sm">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <User className="h-5 w-5 text-orange-600" />
-                    Handmatige Kortingen
-                  </CardTitle>
-                  <CardDescription>
-                    Specifieke kortingen toegekend door administratie
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <Button className="w-full bg-orange-600 hover:bg-orange-700" onClick={() => setShowDiscountDialog(true)}>
-                      <Plus className="h-4 w-4 mr-2" />
-                      Korting Toekennen
-                    </Button>
-                    
-                    <div className="space-y-2">
-                      {discountApplicationsData
-                        .filter((app: any) => !app.isAutomatic && app.isActive)
-                        .map((app: any) => (
-                          <div key={app.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                            <div>
-                              <p className="font-medium">{app.studentName}</p>
-                              <p className="text-sm text-gray-600">{app.discountName}</p>
-                            </div>
-                            <div className="text-right">
-                              <p className="font-bold text-orange-600">-{app.discountPercentage}%</p>
-                              <Button 
-                                size="sm" 
-                                variant="outline" 
-                                className="mt-1 text-red-600 hover:text-red-700"
-                                onClick={() => handleDeleteDiscountApplication(app.id)}
-                                title="Verwijderen"
-                              >
-                                <Trash2 className="h-3 w-3" />
-                              </Button>
-                            </div>
+              <Card className="bg-white rounded-md border shadow-sm p-6">
+                <div className="space-y-4">
+                  <Button className="w-full bg-orange-600 hover:bg-orange-700" onClick={() => setShowDiscountDialog(true)}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Korting Toekennen
+                  </Button>
+                  
+                  <div className="space-y-2">
+                    {discountApplicationsData
+                      .filter((app: any) => !app.isAutomatic && app.isActive)
+                      .map((app: any) => (
+                        <div key={app.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                          <div>
+                            <p className="font-medium">{app.studentName}</p>
+                            <p className="text-sm text-gray-600">{app.discountName}</p>
                           </div>
-                        ))}
-                    </div>
+                          <div className="text-right">
+                            <p className="font-bold text-orange-600">-{app.discountPercentage}%</p>
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              className="mt-1 text-red-600 hover:text-red-700"
+                              onClick={() => handleDeleteDiscountApplication(app.id)}
+                              title="Verwijderen"
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
                   </div>
-                </CardContent>
+                </div>
               </Card>
             </div>
           </TabsContent>

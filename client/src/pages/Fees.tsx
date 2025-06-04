@@ -201,6 +201,10 @@ export default function Fees() {
       value: 0,
       isAutomatic: false,
       rule: '',
+      ruleCondition: '',
+      ruleOperator: '',
+      ruleValue: '',
+      ruleDescription: '',
       isActive: true,
     },
   });

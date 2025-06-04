@@ -2925,7 +2925,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   apiRouter.post("/api/discounts", async (req, res) => {
     try {
-      const { name, type, value, isAutomatic, rule, isActive = true } = req.body;
+      const { 
+        name, 
+        type, 
+        value, 
+        isAutomatic, 
+        rule, 
+        ruleCondition,
+        ruleOperator,
+        ruleValue,
+        ruleDescription,
+        isActive = true 
+      } = req.body;
       
       const discount = await storage.createDiscount({
         name,
@@ -2933,6 +2944,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         value: parseFloat(value),
         isAutomatic: Boolean(isAutomatic),
         rule: rule || null,
+        ruleCondition: ruleCondition || null,
+        ruleOperator: ruleOperator || null,
+        ruleValue: ruleValue || null,
+        ruleDescription: ruleDescription || null,
         isActive: Boolean(isActive)
       });
       

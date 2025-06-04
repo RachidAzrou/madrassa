@@ -25,7 +25,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { toast } from '@/hooks/use-toast';
+import { DeleteDialog } from '@/components/ui/delete-dialog';
 import { PremiumHeader } from '@/components/layout/premium-header';
 
 // Component voor cijfergemiddelde per vak
@@ -990,68 +990,21 @@ export default function Cijfers() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      {/* Delete Confirmation Dialog */}
-      <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
-        <DialogContent className="sm:max-w-[500px]" noPadding>
-          <DialogHeader variant="premium" className="bg-blue-900">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center">
-                <Trash2 className="h-5 w-5 text-white" />
-              </div>
-              <div>
-                <DialogTitle className="text-lg font-semibold text-white">
-                  Beoordeling verwijderen
-                </DialogTitle>
-                <DialogDescription className="text-blue-100 mt-1">
-                  Deze actie kan niet ongedaan worden gemaakt
-                </DialogDescription>
-              </div>
-            </div>
-          </DialogHeader>
-
-          <div className="p-6">
-            <div className="flex items-start gap-4">
-              <div className="flex-shrink-0 w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-                <Trash2 className="h-6 w-6 text-blue-600" />
-              </div>
-              <div className="flex-1">
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  Weet je het zeker?
-                </h3>
-                <p className="text-gray-600 mb-4">
-                  Je staat op het punt om de beoordeling{' '}
-                  <span className="font-semibold text-gray-900">"{deletingAssessment?.name}"</span>{' '}
-                  permanent te verwijderen. Alle gekoppelde cijfers en resultaten gaan verloren.
-                </p>
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                    <span className="text-sm font-medium text-blue-800">
-                      Deze actie kan niet ongedaan worden gemaakt
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-              {/* Delete Assessment Dialog */}
-        <DeleteDialog
-          open={showDeleteModal}
-          onOpenChange={setShowDeleteModal}
-          onConfirm={confirmDeleteAssessment}
-          title="Beoordeling Verwijderen"
-          description="Weet je zeker dat je deze beoordeling wilt verwijderen?"
-          item={{
-            name: deletingAssessment?.title || "",
-            id: deletingAssessment?.studentName || ""
-          }}
-          warningText="Deze actie kan niet ongedaan worden gemaakt. De beoordeling wordt permanent verwijderd."
-          isLoading={deleteAssessmentMutation.isPending}
-          confirmButtonText="Definitief Verwijderen"
-        />
-        </DialogContent>
-      </Dialog>
+      {/* Delete Assessment Dialog */}
+      <DeleteDialog
+        open={showDeleteModal}
+        onOpenChange={setShowDeleteModal}
+        onConfirm={confirmDeleteAssessment}
+        title="Beoordeling Verwijderen"
+        description="Weet je zeker dat je deze beoordeling wilt verwijderen?"
+        item={{
+          name: deletingAssessment?.title || "",
+          id: deletingAssessment?.studentName || ""
+        }}
+        warningText="Deze actie kan niet ongedaan worden gemaakt. De beoordeling wordt permanent verwijderd."
+        isLoading={deleteAssessmentMutation.isPending}
+        confirmButtonText="Definitief Verwijderen"
+      />
     </div>
   );
 }

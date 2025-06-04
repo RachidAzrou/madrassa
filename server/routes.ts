@@ -5367,13 +5367,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get latest status from Mollie
       const molliePayment = await mollieClient.payments.get(payment.molliePaymentId);
       
+      // Map Mollie status to our Dutch status system
+      let newStatus = 'openstaand';
+      switch (molliePayment.status) {
+        case 'paid':
+          newStatus = 'betaald';
+          break;
+        case 'canceled':
+        case 'expired':
+        case 'failed':
+          newStatus = 'geannuleerd';
+          break;
+        case 'pending':
+        case 'open':
+          newStatus = 'openstaand';
+          break;
+      }
+
       // Update local payment status
       const updateData: any = {
         mollieStatus: molliePayment.status,
-        status: molliePayment.status === 'paid' ? 'paid' : 
-                molliePayment.status === 'failed' ? 'failed' :
-                molliePayment.status === 'canceled' ? 'canceled' :
-                molliePayment.status === 'expired' ? 'expired' : 'pending'
+        status: newStatus,
+        updatedAt: new Date()
       };
 
       if (molliePayment.status === 'paid' && molliePayment.paidAt) {

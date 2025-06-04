@@ -1721,28 +1721,37 @@ export default function Fees() {
                   )}
                 />
                 
-                <DialogFooter>
-                  <Button type="button" variant="outline" onClick={() => setShowTuitionFeeDialog(false)}>
+                <div className="bg-gray-50 px-6 py-3 flex justify-end gap-2 border-t">
+                  <Button type="button" variant="outline" onClick={() => setShowTuitionFeeDialog(false)} className="h-8 text-xs rounded-sm">
                     Annuleren
                   </Button>
-                  <Button type="submit" disabled={tuitionFeeMutation.isPending}>
+                  <Button type="submit" disabled={tuitionFeeMutation.isPending} className="h-8 text-xs rounded-sm bg-[#1e40af] hover:bg-[#1e3a8a]">
                     {tuitionFeeMutation.isPending ? 'Opslaan...' : 'Collegegeld Instellen'}
                   </Button>
-                </DialogFooter>
+                </div>
               </form>
             </Form>
-          </CustomDialogContent>
+            </div>
+          </DialogContent>
         </Dialog>
 
         {/* Create Discount Dialog */}
         <Dialog open={showCreateDiscountDialog} onOpenChange={setShowCreateDiscountDialog}>
-          <CustomDialogContent>
-            <DialogHeader variant="branded">
-              <DialogTitle>Nieuwe Korting Aanmaken</DialogTitle>
-              <DialogDescription>
-                Maak een nieuwe korting aan die toegepast kan worden
-              </DialogDescription>
-            </DialogHeader>
+          <DialogContent className="sm:max-w-[600px] p-0 overflow-hidden">
+            <div className="bg-[#1e40af] py-4 px-6 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="bg-white/20 p-2 rounded-full">
+                  <Gift className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <DialogTitle className="text-white text-lg font-semibold m-0">Nieuwe Korting Aanmaken</DialogTitle>
+                  <DialogDescription className="text-white/70 text-sm m-0">
+                    Maak een nieuwe korting aan die toegepast kan worden
+                  </DialogDescription>
+                </div>
+              </div>
+            </div>
+            <div className="p-6 overflow-y-auto" style={{ maxHeight: 'calc(90vh - 150px)' }}>
             <Form {...createDiscountForm}>
               <form onSubmit={createDiscountForm.handleSubmit(handleCreateDiscount)} className="space-y-4">
                 <FormField
@@ -1839,28 +1848,37 @@ export default function Fees() {
                   )}
                 </div>
                 
-                <DialogFooter>
-                  <Button type="button" variant="outline" onClick={() => setShowCreateDiscountDialog(false)}>
+                <div className="bg-gray-50 px-6 py-3 flex justify-end gap-2 border-t">
+                  <Button type="button" variant="outline" onClick={() => setShowCreateDiscountDialog(false)} className="h-8 text-xs rounded-sm">
                     Annuleren
                   </Button>
-                  <Button type="submit" disabled={createDiscountMutation.isPending}>
+                  <Button type="submit" disabled={createDiscountMutation.isPending} className="h-8 text-xs rounded-sm bg-[#1e40af] hover:bg-[#1e3a8a]">
                     {createDiscountMutation.isPending ? 'Aanmaken...' : 'Korting Aanmaken'}
                   </Button>
-                </DialogFooter>
+                </div>
               </form>
             </Form>
-          </CustomDialogContent>
+            </div>
+          </DialogContent>
         </Dialog>
 
         {/* Edit Payment Dialog */}
         <Dialog open={showEditPaymentDialog} onOpenChange={setShowEditPaymentDialog}>
-          <CustomDialogContent>
-            <DialogHeader variant="branded">
-              <DialogTitle>Betaling Bewerken</DialogTitle>
-              <DialogDescription>
-                Wijzig de gegevens van de betaling.
-              </DialogDescription>
-            </DialogHeader>
+          <DialogContent className="sm:max-w-[600px] p-0 overflow-hidden">
+            <div className="bg-[#1e40af] py-4 px-6 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="bg-white/20 p-2 rounded-full">
+                  <Pencil className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <DialogTitle className="text-white text-lg font-semibold m-0">Betaling Bewerken</DialogTitle>
+                  <DialogDescription className="text-white/70 text-sm m-0">
+                    Wijzig de gegevens van de betaling.
+                  </DialogDescription>
+                </div>
+              </div>
+            </div>
+            <div className="p-6 overflow-y-auto" style={{ maxHeight: 'calc(90vh - 150px)' }}>
               <Form {...editPaymentForm}>
                 <form onSubmit={editPaymentForm.handleSubmit(onSubmitEditPayment)} className="space-y-4">
                 <FormField
@@ -1983,17 +2001,18 @@ export default function Fees() {
                   />
                 </div>
                 
-                <DialogFooter>
-                  <Button type="button" variant="outline" onClick={() => setShowEditPaymentDialog(false)}>
+                <div className="bg-gray-50 px-6 py-3 flex justify-end gap-2 border-t">
+                  <Button type="button" variant="outline" onClick={() => setShowEditPaymentDialog(false)} className="h-8 text-xs rounded-sm">
                     Annuleren
                   </Button>
-                  <Button type="submit" disabled={editPaymentMutation.isPending}>
+                  <Button type="submit" disabled={editPaymentMutation.isPending} className="h-8 text-xs rounded-sm bg-[#1e40af] hover:bg-[#1e3a8a]">
                     {editPaymentMutation.isPending ? 'Bijwerken...' : 'Betaling Bijwerken'}
                   </Button>
-                </DialogFooter>
+                </div>
               </form>
             </Form>
-          </CustomDialogContent>
+            </div>
+          </DialogContent>
         </Dialog>
 
         {/* Edit Tuition Fee Dialog */}

@@ -304,20 +304,31 @@ export default function ReEnrollment() {
 
         {/* Registration Status Alert */}
         {!canStartRegistration && (
-          <Card className="border-amber-300 bg-gradient-to-r from-amber-50 to-yellow-50 mb-6 shadow-sm">
+          <Card className="border-l-4 border-l-blue-500 border-gray-200 bg-gradient-to-r from-blue-50 to-gray-50 mb-6 shadow-sm">
             <CardContent className="p-5">
-              <div className="flex items-start gap-4">
+              <div className="flex items-start gap-3">
                 <div className="flex-shrink-0">
-                  <AlertTriangle className="h-6 w-6 text-amber-600 mt-0.5" />
+                  <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
+                    <AlertTriangle className="h-4 w-4 text-blue-600" />
+                  </div>
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-semibold text-amber-900 text-base mb-1">
+                  <h3 className="font-semibold text-gray-900 text-base mb-2 flex items-center gap-2">
                     Herinschrijving Nog Niet Beschikbaar
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-700">
+                      Wachten
+                    </span>
                   </h3>
-                  <p className="text-sm text-amber-800 leading-relaxed">
-                    Herinschrijvingen worden beschikbaar na de eindrapport datum: 
-                    <span className="font-medium ml-1">{currentAcademicYear?.finalReportDate}</span>
+                  <p className="text-sm text-gray-700 leading-relaxed mb-3">
+                    Herinschrijvingen worden automatisch beschikbaar na de eindrapport datum. 
+                    Students kunnen dan worden ingeschreven voor het nieuwe schooljaar.
                   </p>
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className="font-medium text-gray-700">Beschikbaar vanaf:</span>
+                    <span className="font-semibold text-blue-700 bg-blue-50 px-2 py-1 rounded text-xs">
+                      {currentAcademicYear?.finalReportDate}
+                    </span>
+                  </div>
                 </div>
               </div>
             </CardContent>
@@ -368,12 +379,12 @@ export default function ReEnrollment() {
 
         {/* Filter Options */}
         {showFilterOptions && (
-          <div className="px-6 py-5 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100">
+          <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
             <div className="flex flex-wrap items-center gap-6">
               <div className="flex items-center gap-3">
-                <label className="text-sm font-semibold text-gray-700">Status:</label>
+                <label className="text-sm font-medium text-gray-700">Status:</label>
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-48 h-9 text-sm rounded-lg border-gray-200 shadow-sm">
+                  <SelectTrigger className="w-48 h-9 text-sm rounded border-gray-300 bg-white">
                     <SelectValue placeholder="Selecteer status" />
                   </SelectTrigger>
                   <SelectContent>
@@ -521,47 +532,70 @@ export default function ReEnrollment() {
               {studentsLoading ? (
                 <TableLoadingState />
               ) : failedStudents.length === 0 ? (
-                <div className="text-center py-12">
-                  <div className="flex justify-center mb-4">
-                    <XCircle className="h-12 w-12 text-gray-400" />
+                <div className="text-center py-16 bg-gradient-to-b from-red-50 to-orange-50">
+                  <div className="flex justify-center mb-6">
+                    <div className="h-16 w-16 rounded-full bg-red-100 flex items-center justify-center">
+                      <XCircle className="h-8 w-8 text-red-500" />
+                    </div>
                   </div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">Geen gezakte studenten</h3>
-                  <p className="text-gray-500">Er zijn momenteel geen studenten die gezakt zijn en individuele behandeling nodig hebben.</p>
+                  <h3 className="text-xl font-bold text-gray-900 mb-3">Geen gezakte studenten</h3>
+                  <p className="text-gray-600 max-w-md mx-auto leading-relaxed">
+                    Er zijn momenteel geen studenten die gezakt zijn en individuele behandeling nodig hebben.
+                  </p>
+                  <div className="mt-6 inline-flex items-center px-4 py-2 bg-green-100 text-green-800 rounded-lg text-sm font-medium">
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                    Alle studenten zijn geslaagd
+                  </div>
                 </div>
               ) : (
                 <Table>
                   <TableHeader>
-                    <TableRow>
-                      <TableHead>Student</TableHead>
-                      <TableHead>Huidige Klas</TableHead>
-                      <TableHead>Programma</TableHead>
-                      <TableHead>Eindcijfer</TableHead>
-                      <TableHead>Aanwezigheid</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="text-right">Acties</TableHead>
+                    <TableRow className="border-b border-gray-200 bg-red-50/30">
+                      <TableHead className="py-4 font-semibold text-gray-900">Student</TableHead>
+                      <TableHead className="py-4 font-semibold text-gray-900">Huidige Klas</TableHead>
+                      <TableHead className="py-4 font-semibold text-gray-900">Programma</TableHead>
+                      <TableHead className="py-4 font-semibold text-gray-900">Eindcijfer</TableHead>
+                      <TableHead className="py-4 font-semibold text-gray-900">Aanwezigheid</TableHead>
+                      <TableHead className="py-4 font-semibold text-gray-900">Status</TableHead>
+                      <TableHead className="text-right py-4 font-semibold text-gray-900">Acties</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {failedStudents.map((student: Student) => (
-                      <TableRow key={student.id}>
-                        <TableCell>
-                          <div>
-                            <div className="font-medium">{student.firstName} {student.lastName}</div>
-                            <div className="text-sm text-gray-500">{student.studentId}</div>
+                      <TableRow key={student.id} className="border-b border-gray-100 hover:bg-red-50/30 transition-colors">
+                        <TableCell className="py-4">
+                          <div className="flex items-center gap-3">
+                            <div className="h-8 w-8 rounded-full bg-red-100 flex items-center justify-center">
+                              <span className="text-xs font-medium text-red-700">
+                                {student.firstName?.[0]}{student.lastName?.[0]}
+                              </span>
+                            </div>
+                            <div>
+                              <div className="font-medium text-gray-900">{student.firstName} {student.lastName}</div>
+                              <div className="text-sm text-gray-500">{student.studentId}</div>
+                            </div>
                           </div>
                         </TableCell>
-                        <TableCell>{student.currentClass}</TableCell>
-                        <TableCell>{student.currentProgram}</TableCell>
-                        <TableCell>{student.finalGrade}/10</TableCell>
-                        <TableCell>{student.attendancePercentage}%</TableCell>
-                        <TableCell>{getStatusBadge(student)}</TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end gap-1">
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                              <Eye className="h-4 w-4" />
+                        <TableCell className="py-4 text-gray-700">{student.currentClass}</TableCell>
+                        <TableCell className="py-4 text-gray-700">{student.currentProgram}</TableCell>
+                        <TableCell className="py-4">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                            {student.finalGrade}/10
+                          </span>
+                        </TableCell>
+                        <TableCell className="py-4">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                            {student.attendancePercentage}%
+                          </span>
+                        </TableCell>
+                        <TableCell className="py-4">{getStatusBadge(student)}</TableCell>
+                        <TableCell className="text-right py-4">
+                          <div className="flex justify-end gap-2">
+                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-red-50 rounded-md">
+                              <Eye className="h-4 w-4 text-gray-600" />
                             </Button>
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                              <Edit className="h-4 w-4" />
+                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-red-50 rounded-md">
+                              <Edit className="h-4 w-4 text-gray-600" />
                             </Button>
                           </div>
                         </TableCell>
@@ -577,42 +611,84 @@ export default function ReEnrollment() {
 
       {/* Bulk Enrollment Dialog */}
       <Dialog open={showBulkDialog} onOpenChange={setShowBulkDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Bulk Herinschrijving</DialogTitle>
-            <DialogDescription>
-              Schrijf {selectedStudents.length} geselecteerde studenten in voor het nieuwe schooljaar.
-            </DialogDescription>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6 -m-6 mb-6 rounded-t-lg">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center">
+                <Users className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <DialogTitle className="text-xl font-bold text-white">Bulk Herinschrijving</DialogTitle>
+                <DialogDescription className="text-blue-100 mt-1">
+                  Schrijf {selectedStudents.length} geselecteerde studenten in voor het nieuwe schooljaar
+                </DialogDescription>
+              </div>
+            </div>
           </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <label className="text-sm font-medium">Nieuwe Klas</label>
+          
+          <div className="space-y-6">
+            {/* Selected Students Preview */}
+            <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+              <h4 className="font-semibold text-blue-900 mb-3 flex items-center gap-2">
+                <CheckCircle className="h-4 w-4" />
+                Geselecteerde Studenten ({selectedStudents.length})
+              </h4>
+              <div className="text-sm text-blue-800">
+                Alle geselecteerde studenten worden automatisch ingeschreven in de nieuwe klas.
+              </div>
+            </div>
+
+            {/* Class Selection */}
+            <div className="space-y-3">
+              <label className="text-sm font-bold text-gray-800 flex items-center gap-2">
+                <div className="h-2 w-2 rounded-full bg-blue-500"></div>
+                Nieuwe Klas Selecteren
+              </label>
               <Select 
                 value={bulkEnrollmentData.toClassId?.toString()} 
                 onValueChange={(value) => setBulkEnrollmentData(prev => ({ ...prev, toClassId: parseInt(value) }))}
               >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecteer nieuwe klas" />
+                <SelectTrigger className="h-12 rounded-lg border-gray-300 shadow-sm hover:border-blue-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all">
+                  <SelectValue placeholder="Selecteer de nieuwe klas voor alle studenten" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="rounded-lg shadow-lg border-gray-200">
                   {classesData.map((cls: Class) => (
-                    <SelectItem key={cls.id} value={cls.id.toString()}>
-                      {cls.name}
+                    <SelectItem key={cls.id} value={cls.id.toString()} className="hover:bg-blue-50">
+                      <div className="flex items-center gap-3">
+                        <div className="h-2 w-2 rounded-full bg-blue-500"></div>
+                        <span className="font-medium">{cls.name}</span>
+                      </div>
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
+
+            {/* Warning Notice */}
+            <div className="bg-amber-50 border-l-4 border-l-amber-500 p-4 rounded-r-lg">
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5" />
+                <div className="text-sm">
+                  <p className="font-semibold text-amber-900 mb-1">Let op</p>
+                  <p className="text-amber-800">
+                    Deze actie kan niet ongedaan worden gemaakt. Alle geselecteerde studenten worden permanent ingeschreven in de nieuwe klas.
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowBulkDialog(false)}>
+
+          <DialogFooter className="gap-3 pt-6">
+            <Button variant="outline" onClick={() => setShowBulkDialog(false)} className="px-6">
               Annuleren
             </Button>
             <Button 
               onClick={confirmBulkEnrollment} 
               disabled={!bulkEnrollmentData.toClassId}
+              className="px-6 bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
             >
-              Inschrijven
+              <Plus className="h-4 w-4 mr-2" />
+              Inschrijven ({selectedStudents.length})
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -535,9 +535,14 @@ export default function Fees() {
       console.log('Payment response:', data);
       
       if (data && data.checkoutUrl) {
-        console.log('Redirecting to:', data.checkoutUrl);
-        // Redirect to payment checkout
-        window.location.href = data.checkoutUrl;
+        console.log('Opening checkout in new tab:', data.checkoutUrl);
+        // Open payment checkout in new tab to avoid connection issues in development
+        window.open(data.checkoutUrl, '_blank');
+        
+        toast({
+          title: "Betaling gestart",
+          description: "De betaalpagina is geopend in een nieuw tabblad",
+        });
       } else {
         console.log('No checkout URL received:', data);
         toast({

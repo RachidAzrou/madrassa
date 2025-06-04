@@ -7,7 +7,7 @@ import {
   Search, Plus, Download, Filter, Eye, Edit, Trash2,
   Euro, Clock, AlertCircle, Calendar, CreditCard,
   Users, User, Gift, Shield, Activity, Receipt,
-  Tag, Settings, History, GraduationCap
+  Tag, Settings, History, GraduationCap, Pencil
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { PremiumHeader } from '@/components/layout/premium-header';
@@ -1946,15 +1946,15 @@ export default function Fees() {
                     )}
                   />
                 </div>
-
-                <DialogFooter>
-                  <Button type="button" variant="outline" onClick={() => setShowEditPaymentDialog(false)}>
+                
+                <div className="bg-gray-50 px-6 py-3 flex justify-end gap-2 border-t">
+                  <Button type="button" variant="outline" onClick={() => setShowEditPaymentDialog(false)} className="h-8 text-xs rounded-sm">
                     Annuleren
                   </Button>
-                  <Button type="submit" disabled={editPaymentMutation.isPending}>
+                  <Button type="submit" disabled={editPaymentMutation.isPending} className="h-8 text-xs rounded-sm">
                     {editPaymentMutation.isPending ? 'Bijwerken...' : 'Betaling Bijwerken'}
                   </Button>
-                </DialogFooter>
+                </div>
               </form>
             </Form>
           </CustomDialogContent>

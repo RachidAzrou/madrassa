@@ -214,8 +214,7 @@ export default function Fees() {
 
   const createDiscountMutation = useMutation({
     mutationFn: async (data: z.infer<typeof createDiscountSchema>) => {
-      const response = await apiRequest('POST', '/api/discounts', data);
-      return response.json();
+      return await apiRequest('POST', '/api/discounts', data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/discounts'] });
@@ -235,6 +234,87 @@ export default function Fees() {
     },
   });
 
+  // Delete mutations
+  const deletePaymentMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return await apiRequest('DELETE', `/api/payments/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/payments'] });
+      toast({
+        title: 'Betaling verwijderd',
+        description: 'De betaling is succesvol verwijderd.',
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Fout',
+        description: error.message || 'Er is een fout opgetreden bij het verwijderen van de betaling.',
+        variant: 'destructive',
+      });
+    },
+  });
+
+  const deleteTuitionFeeMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return await apiRequest('DELETE', `/api/tuition-fees/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/tuition-fees'] });
+      toast({
+        title: 'Collegegeld verwijderd',
+        description: 'Het collegegeld is succesvol verwijderd.',
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Fout',
+        description: error.message || 'Er is een fout opgetreden bij het verwijderen van het collegegeld.',
+        variant: 'destructive',
+      });
+    },
+  });
+
+  const deleteDiscountMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return await apiRequest('DELETE', `/api/discounts/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/discounts'] });
+      toast({
+        title: 'Korting verwijderd',
+        description: 'De korting is succesvol verwijderd.',
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Fout',
+        description: error.message || 'Er is een fout opgetreden bij het verwijderen van de korting.',
+        variant: 'destructive',
+      });
+    },
+  });
+
+  const deleteDiscountApplicationMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return await apiRequest('DELETE', `/api/discount-applications/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/discount-applications'] });
+      toast({
+        title: 'Kortingtoekenning verwijderd',
+        description: 'De kortingtoekenning is succesvol verwijderd.',
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Fout',
+        description: error.message || 'Er is een fout opgetreden bij het verwijderen van de kortingtoekenning.',
+        variant: 'destructive',
+      });
+    },
+  });
+
   // Event handlers
   const handleNewPayment = () => {
     setShowAddPaymentDialog(true);
@@ -244,7 +324,7 @@ export default function Fees() {
     addPaymentMutation.mutate(data);
   };
 
-  const handleAddDiscount = async (data: z.infer<typeof addDiscountSchema>) => {
+  const handleAddDiscount = async (data: any) => {
     discountMutation.mutate(data);
   };
 
@@ -254,6 +334,47 @@ export default function Fees() {
 
   const handleCreateDiscount = async (data: z.infer<typeof createDiscountSchema>) => {
     createDiscountMutation.mutate(data);
+  };
+
+  // Delete handlers
+  const handleDeletePayment = (id: number) => {
+    if (window.confirm('Weet je zeker dat je deze betaling wilt verwijderen?')) {
+      deletePaymentMutation.mutate(id);
+    }
+  };
+
+  const handleDeleteTuitionFee = (id: number) => {
+    if (window.confirm('Weet je zeker dat je dit collegegeld wilt verwijderen?')) {
+      deleteTuitionFeeMutation.mutate(id);
+    }
+  };
+
+  const handleDeleteDiscount = (id: number) => {
+    if (window.confirm('Weet je zeker dat je deze korting wilt verwijderen?')) {
+      deleteDiscountMutation.mutate(id);
+    }
+  };
+
+  const handleDeleteDiscountApplication = (id: number) => {
+    if (window.confirm('Weet je zeker dat je deze kortingtoekenning wilt verwijderen?')) {
+      deleteDiscountApplicationMutation.mutate(id);
+    }
+  };
+
+  // Edit handlers (placeholder for future implementation)
+  const handleEditPayment = (payment: any) => {
+    // TODO: Implement edit functionality
+    console.log('Edit payment:', payment);
+  };
+
+  const handleEditTuitionFee = (fee: any) => {
+    // TODO: Implement edit functionality
+    console.log('Edit tuition fee:', fee);
+  };
+
+  const handleEditDiscount = (discount: any) => {
+    // TODO: Implement edit functionality
+    console.log('Edit discount:', discount);
   };
 
   const handlePayOnline = (payment: any) => {
@@ -698,15 +819,19 @@ export default function Fees() {
                               variant="ghost" 
                               size="icon"
                               className="h-8 w-8"
-                            >
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                            <Button 
-                              variant="ghost" 
-                              size="icon"
-                              className="h-8 w-8"
+                              onClick={() => handleEditPayment(payment)}
+                              title="Bewerken"
                             >
                               <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost" 
+                              size="icon"
+                              className="h-8 w-8 text-red-600 hover:text-red-700"
+                              onClick={() => handleDeletePayment(payment.id)}
+                              title="Verwijderen"
+                            >
+                              <Trash2 className="h-4 w-4" />
                             </Button>
                             {payment.status === 'betaald' && (
                               <Button
@@ -714,8 +839,20 @@ export default function Fees() {
                                 size="icon"
                                 className="h-8 w-8"
                                 onClick={() => handleDownloadInvoice(payment)}
+                                title="Download factuur"
                               >
                                 <Download className="h-4 w-4" />
+                              </Button>
+                            )}
+                            {payment.status === 'openstaand' && (
+                              <Button
+                                variant="ghost" 
+                                size="icon"
+                                className="h-8 w-8 text-blue-600 hover:text-blue-700"
+                                onClick={() => handlePayOnline(payment)}
+                                title="Online betalen"
+                              >
+                                <CreditCard className="h-4 w-4" />
                               </Button>
                             )}
                           </div>
@@ -959,13 +1096,21 @@ export default function Fees() {
                         </TableCell>
                         <TableCell className="px-6 py-4 text-right">
                           <div className="flex items-center gap-2 justify-end">
-                            <Button variant="ghost" size="sm">
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                            <Button variant="ghost" size="sm">
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => handleEditDiscount(discount)}
+                              title="Bewerken"
+                            >
                               <Edit className="h-4 w-4" />
                             </Button>
-                            <Button variant="ghost" size="sm">
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              className="text-red-600 hover:text-red-700"
+                              onClick={() => handleDeleteDiscount(discount.id)}
+                              title="Verwijderen"
+                            >
                               <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>

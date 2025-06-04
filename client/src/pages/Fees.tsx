@@ -242,8 +242,7 @@ export default function Fees() {
 
   const tuitionFeeMutation = useMutation({
     mutationFn: async (data: z.infer<typeof tuitionFeeSchema>) => {
-      const response = await apiRequest('POST', '/api/tuition-fees', data);
-      return response.json();
+      return await apiRequest('/api/tuition-fees', { method: 'POST', body: data });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/tuition-fees'] });

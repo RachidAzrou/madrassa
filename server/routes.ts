@@ -5437,27 +5437,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Student not found" });
       }
 
-      // Generate PDF invoice (simplified version)
-      const invoiceContent = `
-        FACTUUR
-        
-        Factuurnummer: ${payment.invoiceId || `INV-${payment.id}`}
-        Datum: ${new Date(payment.paidAt || payment.createdAt).toLocaleDateString('nl-NL')}
-        
-        Student: ${student.firstName} ${student.lastName}
-        Student ID: ${student.studentId}
-        
-        Beschrijving: ${payment.description}
-        Bedrag: €${payment.amount}
-        Status: Betaald
-        
-        Betalingsmethode: ${payment.paymentMethod || 'Online'}
-        Betaald op: ${payment.paidAt ? new Date(payment.paidAt).toLocaleDateString('nl-NL') : 'N/A'}
-      `;
+      // Generate PDF invoice using jsPDF
+      const jsPDF = require('jspdf').jsPDF;
+      const doc = new jsPDF();
 
+      // Header
+      doc.setFontSize(20);
+      doc.setFont(undefined, 'bold');
+      doc.text('FACTUUR', 20, 30);
+
+      // Invoice details
+      doc.setFontSize(12);
+      doc.setFont(undefined, 'normal');
+      doc.text(`Factuurnummer: ${payment.invoiceId || `INV-${payment.id}`}`, 20, 50);
+      doc.text(`Datum: ${new Date(payment.paidAt || payment.createdAt).toLocaleDateString('nl-NL')}`, 20, 60);
+
+      // Institution details
+      doc.text('myMadrassa', 20, 80);
+      doc.text('Islamitisch Onderwijs Nederland', 20, 90);
+
+      // Student information
+      doc.setFont(undefined, 'bold');
+      doc.text('Student informatie:', 20, 110);
+      doc.setFont(undefined, 'normal');
+      doc.text(`Naam: ${student.firstName} ${student.lastName}`, 20, 120);
+      doc.text(`Student ID: ${student.studentId}`, 20, 130);
+
+      // Payment details
+      doc.setFont(undefined, 'bold');
+      doc.text('Betaling details:', 20, 150);
+      doc.setFont(undefined, 'normal');
+      doc.text(`Beschrijving: ${payment.description}`, 20, 160);
+      doc.text(`Bedrag: €${payment.amount}`, 20, 170);
+      
+      // Status with color coding
+      const statusText = payment.status === 'betaald' || payment.status === 'paid' ? 'Betaald' : 
+                        payment.status === 'openstaand' ? 'Openstaand' :
+                        payment.status === 'achterstallig' ? 'Achterstallig' : 
+                        payment.status === 'geannuleerd' ? 'Geannuleerd' : payment.status;
+      
+      if (payment.status === 'betaald' || payment.status === 'paid') {
+        doc.setTextColor(0, 128, 0); // Green for paid
+      } else if (payment.status === 'achterstallig') {
+        doc.setTextColor(255, 0, 0); // Red for overdue
+      } else if (payment.status === 'openstaand') {
+        doc.setTextColor(255, 165, 0); // Orange for outstanding
+      } else {
+        doc.setTextColor(128, 128, 128); // Gray for cancelled
+      }
+      
+      doc.text(`Status: ${statusText}`, 20, 180);
+      doc.setTextColor(0, 0, 0); // Reset to black
+
+      // Payment method and date
+      doc.text(`Betalingsmethode: ${payment.paymentMethod || 'Online'}`, 20, 190);
+      if (payment.paidAt) {
+        doc.text(`Betaald op: ${new Date(payment.paidAt).toLocaleDateString('nl-NL')}`, 20, 200);
+      }
+
+      // Footer
+      doc.setFontSize(10);
+      doc.text('Bedankt voor uw betaling', 20, 250);
+      doc.text(`Gegenereerd op: ${new Date().toLocaleDateString('nl-NL')}`, 20, 270);
+
+      const pdfBuffer = Buffer.from(doc.output('arraybuffer'));
+      
       res.setHeader('Content-Type', 'application/pdf');
       res.setHeader('Content-Disposition', `attachment; filename="factuur-${payment.id}.pdf"`);
-      res.send(Buffer.from(invoiceContent, 'utf-8'));
+      res.send(pdfBuffer);
     } catch (error) {
       console.error("Error generating invoice:", error);
       res.status(500).json({ error: "Failed to generate invoice" });

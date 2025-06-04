@@ -530,11 +530,17 @@ export default function Fees() {
 
   const handlePayOnline = async (payment: any) => {
     try {
-      const response = await apiRequest('POST', `/api/payments/${payment.id}/pay`, {});
+      const response = await apiRequest('POST', `/api/payments/${payment.id}/payment-link`);
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to create payment link');
+      }
+      
       const data = await response.json();
       
       if (data.checkoutUrl) {
-        // Redirect to Mollie/Stripe checkout
+        // Redirect to payment checkout
         window.location.href = data.checkoutUrl;
       } else {
         toast({
@@ -543,10 +549,11 @@ export default function Fees() {
           variant: "destructive",
         });
       }
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Payment error:', error);
       toast({
-        title: "Fout",
-        description: "Er is een fout opgetreden bij het verwerken van de betaling",
+        title: "Betaalfout",
+        description: error.message || "Er is een fout opgetreden bij het verwerken van de betaling",
         variant: "destructive",
       });
     }

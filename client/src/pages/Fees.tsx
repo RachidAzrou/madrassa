@@ -242,7 +242,7 @@ export default function Fees() {
 
   const tuitionFeeMutation = useMutation({
     mutationFn: async (data: z.infer<typeof tuitionFeeSchema>) => {
-      return await apiRequest('/api/tuition-fees', { method: 'POST', body: data });
+      return await apiRequest('POST', '/api/tuition-fees', data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/tuition-fees'] });
@@ -1351,57 +1351,42 @@ export default function Fees() {
               </CardContent>
             </Card>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Applied Discounts - Familiekorting */}
-              
-              {/* Show families with automatic discounts */}
-              <div className="space-y-2">
-                {discountApplicationsData
-                  .filter((app: any) => app.isAutomatic && app.isActive)
-                  .map((app: any) => (
-                    <div key={app.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                      <div>
-                        <p className="font-medium">{app.studentName}</p>
-                        <p className="text-sm text-gray-600">Familie: {app.familyName}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-bold text-green-600">-10%</p>
-                        <p className="text-sm text-gray-500">Auto toegepast</p>
-                      </div>
-                    </div>
-                  ))}
-              </div>
-
-              {/* Manual Discounts */}
-              <Button className="w-full bg-orange-600 hover:bg-orange-700" onClick={() => setShowDiscountDialog(true)}>
+            {/* Manual Discount Assignment */}
+            <div className="flex justify-end mb-4">
+              <Button className="bg-orange-600 hover:bg-orange-700" onClick={() => setShowDiscountDialog(true)}>
                 <Plus className="h-4 w-4 mr-2" />
                 Korting Toekennen
               </Button>
-              
-              <div className="space-y-2">
-                {discountApplicationsData
-                  .filter((app: any) => !app.isAutomatic && app.isActive)
-                  .map((app: any) => (
-                    <div key={app.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                      <div>
-                        <p className="font-medium">{app.studentName}</p>
-                        <p className="text-sm text-gray-600">{app.discountName}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-bold text-orange-600">-{app.discountPercentage}%</p>
-                        <Button 
-                          size="sm" 
-                          variant="outline" 
-                          className="mt-1 text-red-600 hover:text-red-700"
-                          onClick={() => handleDeleteDiscountApplication(app.id)}
-                          title="Verwijderen"
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
-                      </div>
+            </div>
+
+            {/* Active Discount Applications */}
+            <div className="space-y-2">
+              {discountApplicationsData
+                .filter((app: any) => app.isActive)
+                .map((app: any) => (
+                  <div key={app.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                    <div>
+                      <p className="font-medium">{app.studentName}</p>
+                      <p className="text-sm text-gray-600">
+                        {app.discountName} {app.isAutomatic && "(Automatisch toegepast)"}
+                      </p>
                     </div>
-                  ))}
-              </div>
+                    <div className="text-right">
+                      <p className={`font-bold ${app.isAutomatic ? 'text-green-600' : 'text-orange-600'}`}>
+                        -{app.discountPercentage}%
+                      </p>
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className="mt-1 text-red-600 hover:text-red-700"
+                        onClick={() => handleDeleteDiscountApplication(app.id)}
+                        title="Verwijderen"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
             </div>
           </TabsContent>
         </Tabs>

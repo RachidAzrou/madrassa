@@ -857,11 +857,18 @@ export class DatabaseStorage implements IStorage {
     try {
       const receivers: { id: number; role: string; name: string }[] = [];
 
-      // Role-based communication rules
-      switch (senderRole) {
+      // Communication rules according to specifications:
+      // - Docent: can message other teachers, their students, guardians of students, and secretariat
+      // - Ouder (guardian): can message their children, children's teachers, directeur and secretariat
+      // - Student: can message teachers, secretariat, and classmates
+      // - Secretariaat: can message everyone
+      // - Admin/Directeur: can message everyone
+
+      switch (senderRole.toLowerCase()) {
         case 'admin':
+        case 'directeur':
         case 'secretariaat':
-          // Admin and secretariaat can message everyone
+          // Admin, directeur and secretariaat can message everyone
           const allStudents = await db.select().from(students);
           const allTeachers = await db.select().from(teachers);
           const allGuardians = await db.select().from(guardians);
@@ -881,10 +888,36 @@ export class DatabaseStorage implements IStorage {
             role: 'voogd', 
             name: `${g.firstName} ${g.lastName}` 
           })));
+          
+          // Add admin/secretariat users
+          const adminUsers = await db.select().from(users).where(inArray(users.role, ['admin', 'directeur', 'secretariaat']));
+          receivers.push(...adminUsers.map(u => ({ 
+            id: u.id, 
+            role: u.role || 'user', 
+            name: `${u.firstName} ${u.lastName}` 
+          })));
           break;
 
         case 'docent':
-          // Teachers can message their students, guardians of their students, other teachers, and admin/secretariaat
+          // Teachers can message other teachers, their students, guardians of students, and secretariat
+          
+          // Add secretariat and admin
+          const secretariatUsers = await db.select().from(users).where(inArray(users.role, ['admin', 'directeur', 'secretariaat']));
+          receivers.push(...secretariatUsers.map(u => ({ 
+            id: u.id, 
+            role: u.role || 'user', 
+            name: `${u.firstName} ${u.lastName}` 
+          })));
+
+          // Add other teachers
+          const otherTeachers = await db.select().from(teachers).where(sql`${teachers.id} != ${senderId}`);
+          receivers.push(...otherTeachers.map(t => ({ 
+            id: t.id, 
+            role: 'docent', 
+            name: `${t.firstName} ${t.lastName}` 
+          })));
+
+          // Add their students (students in courses they teach)
           const teacherStudents = await db.select({ 
             student: students 
           })
@@ -915,49 +948,21 @@ export class DatabaseStorage implements IStorage {
               });
             }
           }
-
-          // Add other teachers
-          const otherTeachers = await db.select().from(teachers).where(sql`${teachers.id} != ${senderId}`);
-          receivers.push(...otherTeachers.map(t => ({ 
-            id: t.id, 
-            role: 'docent', 
-            name: `${t.firstName} ${t.lastName}` 
-          })));
-          break;
-
-        case 'student':
-          // Students can message their teachers and classmates
-          const studentTeachers = await db.select({ teacher: teachers })
-            .from(teachers)
-            .innerJoin(teacherCourseAssignments, eq(teachers.id, teacherCourseAssignments.teacherId))
-            .innerJoin(courses, eq(teacherCourseAssignments.courseId, courses.id))
-            .innerJoin(enrollments, eq(courses.id, enrollments.courseId))
-            .where(eq(enrollments.studentId, senderId));
-
-          receivers.push(...studentTeachers.map(({ teacher }) => ({ 
-            id: teacher.id, 
-            role: 'docent', 
-            name: `${teacher.firstName} ${teacher.lastName}` 
-          })));
-
-          // Add classmates
-          const classmates = await db.select({ student: students })
-            .from(students)
-            .innerJoin(enrollments, eq(students.id, enrollments.studentId))
-            .where(and(
-              eq(enrollments.courseId, sql`(SELECT course_id FROM enrollments WHERE student_id = ${senderId} LIMIT 1)`),
-              sql`${students.id} != ${senderId}`
-            ));
-
-          receivers.push(...classmates.map(({ student }) => ({ 
-            id: student.id, 
-            role: 'student', 
-            name: `${student.firstName} ${student.lastName}` 
-          })));
           break;
 
         case 'voogd':
-          // Guardians can message their children, children's teachers, admin, and secretariaat
+        case 'ouder':
+          // Guardians can message their children, children's teachers, directeur and secretariat
+          
+          // Add directeur and secretariat
+          const dirSecUsers = await db.select().from(users).where(inArray(users.role, ['admin', 'directeur', 'secretariaat']));
+          receivers.push(...dirSecUsers.map(u => ({ 
+            id: u.id, 
+            role: u.role || 'user', 
+            name: `${u.firstName} ${u.lastName}` 
+          })));
+
+          // Add their children
           const guardianChildren = await db.select({ student: students })
             .from(students)
             .innerJoin(studentGuardians, eq(students.id, studentGuardians.studentId))
@@ -984,6 +989,55 @@ export class DatabaseStorage implements IStorage {
               name: `${teacher.firstName} ${teacher.lastName}` 
             })));
           }
+          break;
+
+        case 'student':
+          // Students can message teachers, secretariat, and classmates
+          
+          // Add secretariat and admin
+          const studentAdminUsers = await db.select().from(users).where(inArray(users.role, ['admin', 'directeur', 'secretariaat']));
+          receivers.push(...studentAdminUsers.map(u => ({ 
+            id: u.id, 
+            role: u.role || 'user', 
+            name: `${u.firstName} ${u.lastName}` 
+          })));
+
+          // Add all teachers
+          const allTeachersForStudent = await db.select().from(teachers);
+          receivers.push(...allTeachersForStudent.map(t => ({ 
+            id: t.id, 
+            role: 'docent', 
+            name: `${t.firstName} ${t.lastName}` 
+          })));
+
+          // Add classmates (students in same courses)
+          const classmates = await db.select({ student: students })
+            .from(students)
+            .innerJoin(enrollments, eq(students.id, enrollments.studentId))
+            .where(and(
+              inArray(enrollments.courseId, 
+                db.select({ courseId: enrollments.courseId })
+                  .from(enrollments)
+                  .where(eq(enrollments.studentId, senderId))
+              ),
+              sql`${students.id} != ${senderId}`
+            ));
+
+          receivers.push(...classmates.map(({ student }) => ({ 
+            id: student.id, 
+            role: 'student', 
+            name: `${student.firstName} ${student.lastName}` 
+          })));
+          break;
+
+        default:
+          // Default: can only message admin and secretariat
+          const defaultUsers = await db.select().from(users).where(inArray(users.role, ['admin', 'directeur', 'secretariaat']));
+          receivers.push(...defaultUsers.map(u => ({ 
+            id: u.id, 
+            role: u.role || 'user', 
+            name: `${u.firstName} ${u.lastName}` 
+          })));
           break;
       }
 

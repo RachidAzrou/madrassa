@@ -1219,45 +1219,53 @@ export default function Fees() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {tuitionFeesData?.map((fee: any) => (
-                      <TableRow key={fee.id} className="border-b border-gray-50 hover:bg-gray-50/50">
-                        <TableCell className="px-6 py-4">
-                          <div className="text-sm font-medium text-gray-900">{fee.academicYear?.name}</div>
-                        </TableCell>
-                        <TableCell className="px-6 py-4">
-                          <div className="text-sm text-gray-900">€{parseFloat(fee.amount).toFixed(2)}</div>
-                        </TableCell>
-                        <TableCell className="px-6 py-4">
-                          <div className="text-sm text-gray-900">{fee.description}</div>
-                        </TableCell>
-                        <TableCell className="px-6 py-4">
-                          <Badge variant={fee.isActive ? "default" : "secondary"} className="w-16 justify-center">
-                            {fee.isActive ? 'Actief' : 'Inactief'}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="px-6 py-4 text-right">
-                          <div className="flex items-center gap-2 justify-end">
-                            <Button 
-                              variant="ghost" 
-                              size="sm"
-                              onClick={() => handleEditTuitionFee(fee)}
-                              title="Bewerken"
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button 
-                              variant="ghost" 
-                              size="sm"
-                              className="text-red-600 hover:text-red-700"
-                              onClick={() => handleDeleteTuitionFee(fee.id, fee.description)}
-                              title="Verwijderen"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
+                    {(!tuitionFeesData || tuitionFeesData.length === 0) ? (
+                      <TableRow>
+                        <TableCell colSpan={5} className="text-center py-8 text-gray-500">
+                          Geen collegegeld ingesteld. Gebruik de knop "Collegegeld Instellen" om te beginnen.
                         </TableCell>
                       </TableRow>
-                    ))}
+                    ) : (
+                      tuitionFeesData.map((fee: any) => (
+                        <TableRow key={fee.id} className="border-b border-gray-50 hover:bg-gray-50/50">
+                          <TableCell className="px-6 py-4">
+                            <div className="text-sm font-medium text-gray-900">{fee.academicYear?.name}</div>
+                          </TableCell>
+                          <TableCell className="px-6 py-4">
+                            <div className="text-sm text-gray-900">€{parseFloat(fee.amount).toFixed(2)}</div>
+                          </TableCell>
+                          <TableCell className="px-6 py-4">
+                            <div className="text-sm text-gray-900">{fee.description}</div>
+                          </TableCell>
+                          <TableCell className="px-6 py-4">
+                            <Badge variant={fee.isActive ? "default" : "secondary"} className="w-16 justify-center">
+                              {fee.isActive ? 'Actief' : 'Inactief'}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="px-6 py-4 text-right">
+                            <div className="flex items-center gap-2 justify-end">
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                onClick={() => handleEditTuitionFee(fee)}
+                                title="Bewerken"
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                className="text-red-600 hover:text-red-700"
+                                onClick={() => handleDeleteTuitionFee(fee.id, fee.description)}
+                                title="Verwijderen"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
                   </TableBody>
                 </Table>
               </CardContent>

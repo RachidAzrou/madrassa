@@ -5577,15 +5577,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         doc.text(`Betaald op: ${new Date(payment.paidAt).toLocaleDateString('nl-NL')}`, 20, 270);
       }
 
-      // Footer with styling
+      // Footer with styling (minimal)
       doc.setFillColor(...primaryColor);
       doc.rect(0, 280, 210, 17, 'F');
-      
-      doc.setTextColor(255, 255, 255);
-      doc.setFontSize(10);
-      doc.setFont('helvetica', 'normal');
-      doc.text('Bedankt voor uw vertrouwen in myMadrassa', 20, 290);
-      doc.text(`Gegenereerd op: ${new Date().toLocaleDateString('nl-NL')} om ${new Date().toLocaleTimeString('nl-NL')}`, 20, 294);
 
       const pdfBuffer = Buffer.from(doc.output('arraybuffer'));
       

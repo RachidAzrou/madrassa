@@ -69,6 +69,14 @@ export default function Fees() {
   const [showDiscountDialog, setShowDiscountDialog] = useState(false);
   const [showTuitionFeeDialog, setShowTuitionFeeDialog] = useState(false);
   const [showCreateDiscountDialog, setShowCreateDiscountDialog] = useState(false);
+  const [showEditPaymentDialog, setShowEditPaymentDialog] = useState(false);
+  const [showEditTuitionFeeDialog, setShowEditTuitionFeeDialog] = useState(false);
+  const [showEditDiscountDialog, setShowEditDiscountDialog] = useState(false);
+  const [showDeleteConfirmDialog, setShowDeleteConfirmDialog] = useState(false);
+  const [editingPayment, setEditingPayment] = useState<any>(null);
+  const [editingTuitionFee, setEditingTuitionFee] = useState<any>(null);
+  const [editingDiscount, setEditingDiscount] = useState<any>(null);
+  const [deleteItem, setDeleteItem] = useState<{type: string, id: number, name: string} | null>(null);
 
   // Check if user is parent
   const isParent = user?.role === 'ouder' as any;
@@ -136,7 +144,42 @@ export default function Fees() {
     resolver: zodResolver(createDiscountSchema),
     defaultValues: {
       name: '',
-      type: 'percentage',
+      type: 'percentage' as const,
+      value: 0,
+      isAutomatic: false,
+      rule: '',
+      isActive: true,
+    },
+  });
+
+  // Edit forms
+  const editPaymentForm = useForm<z.infer<typeof addPaymentSchema> & { status: string }>({
+    resolver: zodResolver(addPaymentSchema.extend({ status: z.string() })),
+    defaultValues: {
+      studentId: 0,
+      description: '',
+      amount: '',
+      dueDate: '',
+      type: '',
+      status: '',
+    },
+  });
+
+  const editTuitionFeeForm = useForm<z.infer<typeof tuitionFeeSchema> & { isActive: boolean }>({
+    resolver: zodResolver(tuitionFeeSchema.extend({ isActive: z.boolean() })),
+    defaultValues: {
+      academicYearId: 0,
+      amount: '',
+      description: '',
+      isActive: true,
+    },
+  });
+
+  const editDiscountForm = useForm<z.infer<typeof createDiscountSchema>>({
+    resolver: zodResolver(createDiscountSchema),
+    defaultValues: {
+      name: '',
+      type: 'percentage' as const,
       value: 0,
       isAutomatic: false,
       rule: '',
@@ -315,6 +358,93 @@ export default function Fees() {
     },
   });
 
+  // Edit mutations
+  const editPaymentMutation = useMutation({
+    mutationFn: async (data: any) => {
+      return await apiRequest('PUT', `/api/payments/${editingPayment?.id}`, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/payments'] });
+      setShowEditPaymentDialog(false);
+      setEditingPayment(null);
+      toast({
+        title: 'Betaling bijgewerkt',
+        description: 'De betaling is succesvol bijgewerkt.',
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Fout',
+        description: error.message || 'Er is een fout opgetreden bij het bijwerken van de betaling.',
+        variant: 'destructive',
+      });
+    },
+  });
+
+  const editTuitionFeeMutation = useMutation({
+    mutationFn: async (data: any) => {
+      return await apiRequest('PUT', `/api/tuition-fees/${editingTuitionFee?.id}`, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/tuition-fees'] });
+      setShowEditTuitionFeeDialog(false);
+      setEditingTuitionFee(null);
+      toast({
+        title: 'Collegegeld bijgewerkt',
+        description: 'Het collegegeld is succesvol bijgewerkt.',
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Fout',
+        description: error.message || 'Er is een fout opgetreden bij het bijwerken van het collegegeld.',
+        variant: 'destructive',
+      });
+    },
+  });
+
+  const editDiscountMutation = useMutation({
+    mutationFn: async (data: any) => {
+      return await apiRequest('PUT', `/api/discounts/${editingDiscount?.id}`, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/discounts'] });
+      setShowEditDiscountDialog(false);
+      setEditingDiscount(null);
+      toast({
+        title: 'Korting bijgewerkt',
+        description: 'De korting is succesvol bijgewerkt.',
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Fout',
+        description: error.message || 'Er is een fout opgetreden bij het bijwerken van de korting.',
+        variant: 'destructive',
+      });
+    },
+  });
+
+  // Delete confirmation handler
+  const handleDeleteConfirm = () => {
+    if (!deleteItem) return;
+    
+    switch (deleteItem.type) {
+      case 'payment':
+        deletePaymentMutation.mutate(deleteItem.id);
+        break;
+      case 'tuition-fee':
+        deleteTuitionFeeMutation.mutate(deleteItem.id);
+        break;
+      case 'discount':
+        deleteDiscountMutation.mutate(deleteItem.id);
+        break;
+    }
+    
+    setDeleteItem(null);
+    setShowDeleteConfirmDialog(false);
+  };
+
   // Event handlers
   const handleNewPayment = () => {
     setShowAddPaymentDialog(true);
@@ -361,20 +491,42 @@ export default function Fees() {
     }
   };
 
-  // Edit handlers (placeholder for future implementation)
+  // Edit handlers
   const handleEditPayment = (payment: any) => {
-    // TODO: Implement edit functionality
-    console.log('Edit payment:', payment);
+    setEditingPayment(payment);
+    editPaymentForm.reset({
+      studentId: payment.studentId,
+      description: payment.description,
+      amount: payment.amount,
+      dueDate: payment.dueDate.split('T')[0],
+      type: payment.type,
+      status: payment.status
+    });
+    setShowEditPaymentDialog(true);
   };
 
   const handleEditTuitionFee = (fee: any) => {
-    // TODO: Implement edit functionality
-    console.log('Edit tuition fee:', fee);
+    setEditingTuitionFee(fee);
+    editTuitionFeeForm.reset({
+      academicYearId: fee.academicYearId,
+      amount: fee.amount,
+      description: fee.description,
+      isActive: fee.isActive
+    });
+    setShowEditTuitionFeeDialog(true);
   };
 
   const handleEditDiscount = (discount: any) => {
-    // TODO: Implement edit functionality
-    console.log('Edit discount:', discount);
+    setEditingDiscount(discount);
+    editDiscountForm.reset({
+      name: discount.name,
+      type: discount.type,
+      value: discount.value,
+      isAutomatic: discount.isAutomatic,
+      rule: discount.rule || '',
+      isActive: discount.isActive
+    });
+    setShowEditDiscountDialog(true);
   };
 
   const handlePayOnline = (payment: any) => {

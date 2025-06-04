@@ -331,7 +331,28 @@ export interface IStorage {
   updateTuitionRate(id: number, rate: Partial<any>): Promise<any | undefined>;
   deleteTuitionRate(id: number): Promise<boolean>;
 
-  // Discount system operations
+  // Tuition Fees operations
+  getTuitionFees(): Promise<TuitionFee[]>;
+  getTuitionFee(id: number): Promise<TuitionFee | undefined>;
+  createTuitionFee(tuitionFee: InsertTuitionFee): Promise<TuitionFee>;
+  updateTuitionFee(id: number, tuitionFee: Partial<TuitionFee>): Promise<TuitionFee | undefined>;
+  deleteTuitionFee(id: number): Promise<boolean>;
+
+  // Enhanced Discounts operations
+  getDiscounts(): Promise<Discount[]>;
+  getDiscount(id: number): Promise<Discount | undefined>;
+  createDiscount(discount: InsertDiscount): Promise<Discount>;
+  updateDiscount(id: number, discount: Partial<Discount>): Promise<Discount | undefined>;
+  deleteDiscount(id: number): Promise<boolean>;
+
+  // Discount Applications operations
+  getDiscountApplications(): Promise<DiscountApplication[]>;
+  getDiscountApplicationsByStudent(studentId: number): Promise<DiscountApplication[]>;
+  createDiscountApplication(application: InsertDiscountApplication): Promise<DiscountApplication>;
+  updateDiscountApplication(id: number, application: Partial<DiscountApplication>): Promise<DiscountApplication | undefined>;
+  deleteDiscountApplication(id: number): Promise<boolean>;
+
+  // Discount system operations (legacy)
   getDiscountTypes(): Promise<any[]>;
   getStudentDiscounts(studentId: number, academicYear?: string): Promise<any[]>;
   createStudentDiscount(discount: any): Promise<any>;

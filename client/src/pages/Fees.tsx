@@ -71,7 +71,7 @@ export default function Fees() {
   const [showCreateDiscountDialog, setShowCreateDiscountDialog] = useState(false);
 
   // Check if user is parent
-  const isParent = user?.role === 'ouder';
+  const isParent = user?.role === 'ouder' as any;
 
   // Data fetching
   const { data: paymentsData = [], isLoading: paymentsLoading } = useQuery({

@@ -2841,7 +2841,223 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // ********************
-  // Fee Discounts API endpoints
+  // Tuition Fees API endpoints (Collegegeld)
+  // ********************
+  apiRouter.get("/api/tuition-fees", async (_req, res) => {
+    try {
+      const tuitionFees = await storage.getTuitionFees();
+      res.json(tuitionFees);
+    } catch (error) {
+      console.error("Error fetching tuition fees:", error);
+      res.status(500).json({ message: "Error fetching tuition fees" });
+    }
+  });
+
+  apiRouter.post("/api/tuition-fees", async (req, res) => {
+    try {
+      const { academicYearId, amount, description } = req.body;
+      
+      const tuitionFee = await storage.createTuitionFee({
+        academicYearId,
+        amount: amount.toString(),
+        description,
+        isActive: true
+      });
+      
+      res.status(201).json(tuitionFee);
+    } catch (error) {
+      console.error("Error creating tuition fee:", error);
+      res.status(500).json({ message: "Error creating tuition fee" });
+    }
+  });
+
+  apiRouter.put("/api/tuition-fees/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const { academicYearId, amount, description, isActive } = req.body;
+      
+      const tuitionFee = await storage.updateTuitionFee(id, {
+        academicYearId,
+        amount: amount?.toString(),
+        description,
+        isActive
+      });
+      
+      if (!tuitionFee) {
+        return res.status(404).json({ message: "Tuition fee not found" });
+      }
+      
+      res.json(tuitionFee);
+    } catch (error) {
+      console.error("Error updating tuition fee:", error);
+      res.status(500).json({ message: "Error updating tuition fee" });
+    }
+  });
+
+  apiRouter.delete("/api/tuition-fees/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const success = await storage.deleteTuitionFee(id);
+      
+      if (!success) {
+        return res.status(404).json({ message: "Tuition fee not found" });
+      }
+      
+      res.status(204).end();
+    } catch (error) {
+      console.error("Error deleting tuition fee:", error);
+      res.status(500).json({ message: "Error deleting tuition fee" });
+    }
+  });
+
+  // ********************
+  // Enhanced Discounts API endpoints
+  // ********************
+  apiRouter.get("/api/discounts", async (_req, res) => {
+    try {
+      const discounts = await storage.getDiscounts();
+      res.json(discounts);
+    } catch (error) {
+      console.error("Error fetching discounts:", error);
+      res.status(500).json({ message: "Error fetching discounts" });
+    }
+  });
+
+  apiRouter.post("/api/discounts", async (req, res) => {
+    try {
+      const { name, type, value, isAutomatic, rule, isActive = true } = req.body;
+      
+      const discount = await storage.createDiscount({
+        name,
+        type,
+        value: parseFloat(value),
+        isAutomatic: Boolean(isAutomatic),
+        rule: rule || null,
+        isActive: Boolean(isActive)
+      });
+      
+      res.status(201).json(discount);
+    } catch (error) {
+      console.error("Error creating discount:", error);
+      res.status(500).json({ message: "Error creating discount" });
+    }
+  });
+
+  apiRouter.put("/api/discounts/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const { name, type, value, isAutomatic, rule, isActive } = req.body;
+      
+      const discount = await storage.updateDiscount(id, {
+        name,
+        type,
+        value: value ? parseFloat(value) : undefined,
+        isAutomatic: isAutomatic !== undefined ? Boolean(isAutomatic) : undefined,
+        rule,
+        isActive: isActive !== undefined ? Boolean(isActive) : undefined
+      });
+      
+      if (!discount) {
+        return res.status(404).json({ message: "Discount not found" });
+      }
+      
+      res.json(discount);
+    } catch (error) {
+      console.error("Error updating discount:", error);
+      res.status(500).json({ message: "Error updating discount" });
+    }
+  });
+
+  apiRouter.delete("/api/discounts/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const success = await storage.deleteDiscount(id);
+      
+      if (!success) {
+        return res.status(404).json({ message: "Discount not found" });
+      }
+      
+      res.status(204).end();
+    } catch (error) {
+      console.error("Error deleting discount:", error);
+      res.status(500).json({ message: "Error deleting discount" });
+    }
+  });
+
+  // ********************
+  // Discount Applications API endpoints
+  // ********************
+  apiRouter.get("/api/discount-applications", async (_req, res) => {
+    try {
+      const applications = await storage.getDiscountApplications();
+      res.json(applications);
+    } catch (error) {
+      console.error("Error fetching discount applications:", error);
+      res.status(500).json({ message: "Error fetching discount applications" });
+    }
+  });
+
+  apiRouter.post("/api/discount-applications", async (req, res) => {
+    try {
+      const { studentId, discountId, applicationDate, reason } = req.body;
+      
+      const application = await storage.createDiscountApplication({
+        studentId,
+        discountId,
+        applicationDate,
+        reason: reason || null,
+        isActive: true
+      });
+      
+      res.status(201).json(application);
+    } catch (error) {
+      console.error("Error creating discount application:", error);
+      res.status(500).json({ message: "Error creating discount application" });
+    }
+  });
+
+  apiRouter.put("/api/discount-applications/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const { studentId, discountId, applicationDate, reason, isActive } = req.body;
+      
+      const application = await storage.updateDiscountApplication(id, {
+        studentId,
+        discountId,
+        applicationDate,
+        reason,
+        isActive
+      });
+      
+      if (!application) {
+        return res.status(404).json({ message: "Discount application not found" });
+      }
+      
+      res.json(application);
+    } catch (error) {
+      console.error("Error updating discount application:", error);
+      res.status(500).json({ message: "Error updating discount application" });
+    }
+  });
+
+  apiRouter.delete("/api/discount-applications/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const success = await storage.deleteDiscountApplication(id);
+      
+      if (!success) {
+        return res.status(404).json({ message: "Discount application not found" });
+      }
+      
+      res.status(204).end();
+    } catch (error) {
+      console.error("Error deleting discount application:", error);
+      res.status(500).json({ message: "Error deleting discount application" });
+    }
+  });
+
+  // ********************
+  // Fee Discounts API endpoints (legacy)
   // ********************
   apiRouter.get("/api/fee-discounts", async (_req, res) => {
     try {

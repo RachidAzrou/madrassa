@@ -259,7 +259,10 @@ export default function Fees() {
       return await apiRequest('POST', '/api/tuition-fees', data);
     },
     onSuccess: () => {
+      // Force refresh both specific and related queries
       queryClient.invalidateQueries({ queryKey: ['/api/tuition-fees'] });
+      queryClient.refetchQueries({ queryKey: ['/api/tuition-fees'] });
+      
       setShowTuitionFeeDialog(false);
       tuitionFeeForm.reset();
       toast({

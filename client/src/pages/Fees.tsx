@@ -22,6 +22,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { DeleteDialog } from '@/components/ui/delete-dialog';
+import { CustomDialogContent } from '@/components/ui/custom-dialog-content';
 import { Switch } from '@/components/ui/switch';
 import { FormDescription } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
@@ -1703,7 +1704,7 @@ export default function Fees() {
 
         {/* Create Discount Dialog */}
         <Dialog open={showCreateDiscountDialog} onOpenChange={setShowCreateDiscountDialog}>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <CustomDialogContent>
             <DialogHeader>
               <DialogTitle>Nieuwe Korting Aanmaken</DialogTitle>
               <DialogDescription>
@@ -1821,7 +1822,7 @@ export default function Fees() {
 
         {/* Edit Payment Dialog */}
         <Dialog open={showEditPaymentDialog} onOpenChange={setShowEditPaymentDialog}>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <CustomDialogContent>
             <DialogHeader>
               <DialogTitle>Betaling Bewerken</DialogTitle>
               <DialogDescription>
@@ -1960,12 +1961,12 @@ export default function Fees() {
                 </DialogFooter>
               </form>
             </Form>
-          </DialogContent>
+          </CustomDialogContent>
         </Dialog>
 
         {/* Edit Tuition Fee Dialog */}
         <Dialog open={showEditTuitionFeeDialog} onOpenChange={setShowEditTuitionFeeDialog}>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <CustomDialogContent>
             <DialogHeader>
               <DialogTitle>Collegegeld Bewerken</DialogTitle>
               <DialogDescription>
@@ -2058,12 +2059,12 @@ export default function Fees() {
                 </DialogFooter>
               </form>
             </Form>
-          </DialogContent>
+          </CustomDialogContent>
         </Dialog>
 
         {/* Edit Discount Dialog */}
         <Dialog open={showEditDiscountDialog} onOpenChange={setShowEditDiscountDialog}>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <CustomDialogContent>
             <DialogHeader>
               <DialogTitle>Korting Bewerken</DialogTitle>
               <DialogDescription>
@@ -2192,7 +2193,7 @@ export default function Fees() {
                 </DialogFooter>
               </form>
             </Form>
-          </DialogContent>
+          </CustomDialogContent>
         </Dialog>
 
         {/* Delete Confirmation Dialog */}

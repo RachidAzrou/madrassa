@@ -28,7 +28,7 @@ export default function Login() {
     setIsLoading(true);
 
     try {
-      await login(email, password);
+      await login({ email, password });
       toast({
         title: "Inloggen gelukt",
         description: "Welkom terug bij myMadrassa!",

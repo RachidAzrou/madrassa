@@ -1748,7 +1748,7 @@ export default function Fees() {
                     <FormItem>
                       <FormLabel>Naam</FormLabel>
                       <FormControl>
-                        <Input placeholder="Bijvoorbeeld: Sociale korting" {...field} />
+                        <Input placeholder="Naam van de korting" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -2239,7 +2239,7 @@ export default function Fees() {
                     <FormItem>
                       <FormLabel>Naam</FormLabel>
                       <FormControl>
-                        <Input placeholder="Bijvoorbeeld: Sociale korting" {...field} />
+                        <Input placeholder="Naam van de korting" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

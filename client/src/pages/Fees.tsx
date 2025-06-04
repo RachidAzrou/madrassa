@@ -1026,10 +1026,9 @@ export default function Fees() {
                             <Button
                               variant="ghost" 
                               size="icon"
-                              className={`h-8 w-8 ${payment.status !== 'betaald' ? 'text-gray-400 cursor-not-allowed' : ''}`}
-                              onClick={payment.status === 'betaald' ? () => handleDownloadInvoice(payment) : undefined}
-                              disabled={payment.status !== 'betaald'}
-                              title={payment.status === 'betaald' ? "Download factuur" : "Alleen beschikbaar voor betaalde items"}
+                              className="h-8 w-8"
+                              onClick={() => handleDownloadInvoice(payment)}
+                              title="Download factuur"
                             >
                               <Download className="h-4 w-4" />
                             </Button>
@@ -1111,16 +1110,14 @@ export default function Fees() {
                           <TableCell>{getStatusBadge(payment.status)}</TableCell>
                           <TableCell className="text-right">
                             <div className="flex justify-end gap-2">
-                              {payment.status === 'betaald' && (
-                                <Button
-                                  variant="ghost" 
-                                  size="icon"
-                                  className="h-8 w-8"
-                                  onClick={() => handleDownloadInvoice(payment)}
-                                >
-                                  <Download className="h-4 w-4" />
-                                </Button>
-                              )}
+                              <Button
+                                variant="ghost" 
+                                size="icon"
+                                className="h-8 w-8"
+                                onClick={() => handleDownloadInvoice(payment)}
+                              >
+                                <Download className="h-4 w-4" />
+                              </Button>
                             </div>
                           </TableCell>
                         </TableRow>

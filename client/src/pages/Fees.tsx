@@ -7,7 +7,8 @@ import {
   Search, Plus, Download, Filter, Eye, Edit, Trash2,
   Euro, Clock, AlertCircle, Calendar, CreditCard,
   Users, User, Gift, Shield, Activity, Receipt,
-  Tag, Settings, History, GraduationCap, Pencil, Percent
+  Tag, Settings, History, GraduationCap, Pencil, Percent,
+  FileText
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { PremiumHeader } from '@/components/layout/premium-header';
@@ -2264,112 +2265,139 @@ export default function Fees() {
                 </div>
               </div>
             </div>
-            <div className="p-6 space-y-6">
+            <div className="p-0">
               {selectedPayment && (
                 <>
-                  {/* Basic Information */}
-                  <div className="grid grid-cols-2 gap-6">
-                    <div className="space-y-3">
-                      <div>
-                        <label className="text-sm font-medium text-gray-600">Student</label>
-                        <p className="text-base font-semibold">{selectedPayment.studentName}</p>
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-600">Student ID</label>
-                        <p className="text-base">{selectedPayment.studentId}</p>
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-600">Omschrijving</label>
-                        <p className="text-base">{selectedPayment.description}</p>
-                      </div>
-                    </div>
-                    <div className="space-y-3">
-                      <div>
-                        <label className="text-sm font-medium text-gray-600">Bedrag</label>
-                        <p className="text-xl font-bold text-blue-600">{formatCurrency(selectedPayment.amount)}</p>
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-600">Status</label>
-                        <div className="mt-1">{getStatusBadge(selectedPayment.status)}</div>
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-600">Type</label>
-                        <p className="text-base capitalize">{selectedPayment.type}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Dates */}
-                  <div className="border-t pt-4">
-                    <h3 className="font-semibold text-gray-800 mb-3">Datums</h3>
-                    <div className="grid grid-cols-3 gap-4">
-                      <div>
-                        <label className="text-sm font-medium text-gray-600">Aangemaakt</label>
-                        <p className="text-base">{formatDate(selectedPayment.createdAt)}</p>
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-600">Vervaldatum</label>
-                        <p className="text-base">{formatDate(selectedPayment.dueDate)}</p>
-                      </div>
-                      {selectedPayment.paidAt && (
-                        <div>
-                          <label className="text-sm font-medium text-gray-600">Betaald op</label>
-                          <p className="text-base">{formatDate(selectedPayment.paidAt)}</p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Payment Information */}
-                  {selectedPayment.molliePaymentId && (
-                    <div className="border-t pt-4">
-                      <h3 className="font-semibold text-gray-800 mb-3">Betalingsinformatie</h3>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="text-sm font-medium text-gray-600">Betaling ID</label>
-                          <p className="text-base font-mono text-sm">{selectedPayment.molliePaymentId}</p>
-                        </div>
-                        {selectedPayment.paymentMethod && (
-                          <div>
-                            <label className="text-sm font-medium text-gray-600">Betaalmethode</label>
-                            <p className="text-base capitalize">{selectedPayment.paymentMethod}</p>
+                  {/* Main Content Area */}
+                  <div className="p-6">
+                    {/* Student and Amount Hero Section */}
+                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-6 mb-6">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <div className="bg-white p-3 rounded-full shadow-sm">
+                            <User className="h-6 w-6 text-blue-600" />
                           </div>
-                        )}
+                          <div>
+                            <h3 className="text-lg font-semibold text-gray-900">{selectedPayment.studentName}</h3>
+                            <p className="text-sm text-gray-600">Student ID: {selectedPayment.studentId}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-2xl font-bold text-blue-600">{formatCurrency(selectedPayment.amount)}</p>
+                          <div className="mt-1">{getStatusBadge(selectedPayment.status)}</div>
+                        </div>
                       </div>
                     </div>
-                  )}
 
-                  {/* Actions */}
-                  <div className="border-t pt-4 flex justify-end gap-3">
-                    {selectedPayment.status !== 'betaald' && (
+                    {/* Payment Details Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                      {/* Left Column - Basic Information */}
+                      <div className="bg-gray-50 rounded-lg p-4">
+                        <h4 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                          <Receipt className="h-4 w-4 text-blue-600" />
+                          Betalingsgegevens
+                        </h4>
+                        <div className="space-y-3">
+                          <div className="flex justify-between items-start">
+                            <span className="text-sm font-medium text-gray-600">Omschrijving:</span>
+                            <span className="text-sm text-gray-900 text-right max-w-[200px]">{selectedPayment.description}</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm font-medium text-gray-600">Type:</span>
+                            <span className="text-sm text-gray-900 capitalize">{selectedPayment.type}</span>
+                          </div>
+                          {selectedPayment.paymentMethod && (
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm font-medium text-gray-600">Betaalmethode:</span>
+                              <span className="text-sm text-gray-900 capitalize">{selectedPayment.paymentMethod}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Right Column - Date Information */}
+                      <div className="bg-gray-50 rounded-lg p-4">
+                        <h4 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                          <Calendar className="h-4 w-4 text-blue-600" />
+                          Datums & Planning
+                        </h4>
+                        <div className="space-y-3">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm font-medium text-gray-600">Aangemaakt:</span>
+                            <span className="text-sm text-gray-900">{formatDate(selectedPayment.createdAt)}</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm font-medium text-gray-600">Vervaldatum:</span>
+                            <span className="text-sm text-gray-900">{formatDate(selectedPayment.dueDate)}</span>
+                          </div>
+                          {selectedPayment.paidAt && (
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm font-medium text-gray-600">Betaald op:</span>
+                              <span className="text-sm text-green-700 font-medium">{formatDate(selectedPayment.paidAt)}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Technical Information */}
+                    {selectedPayment.molliePaymentId && (
+                      <div className="bg-gray-50 rounded-lg p-4 mb-6">
+                        <h4 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                          <CreditCard className="h-4 w-4 text-blue-600" />
+                          Technische Informatie
+                        </h4>
+                        <div className="space-y-2">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm font-medium text-gray-600">Payment ID:</span>
+                            <span className="text-xs font-mono bg-white px-2 py-1 rounded border text-gray-700">
+                              {selectedPayment.molliePaymentId}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Action Footer */}
+                  <div className="bg-gray-50 px-6 py-4 border-t flex justify-between items-center">
+                    <div className="text-sm text-gray-600">
+                      Laatste update: {formatDate(selectedPayment.updatedAt || selectedPayment.createdAt)}
+                    </div>
+                    <div className="flex gap-3">
+                      {selectedPayment.status !== 'betaald' && (
+                        <Button
+                          onClick={() => {
+                            setShowPaymentDetailDialog(false);
+                            handlePayOnline(selectedPayment);
+                          }}
+                          className="bg-[#1e40af] hover:bg-[#1e3a8a] text-white"
+                          size="sm"
+                        >
+                          <CreditCard className="h-4 w-4 mr-2" />
+                          Online Betalen
+                        </Button>
+                      )}
                       <Button
+                        variant="outline"
                         onClick={() => {
                           setShowPaymentDetailDialog(false);
-                          handlePayOnline(selectedPayment);
+                          handleEditPayment(selectedPayment);
                         }}
-                        className="bg-blue-600 hover:bg-blue-700"
+                        size="sm"
                       >
-                        <CreditCard className="h-4 w-4 mr-2" />
-                        Online Betalen
+                        <Edit className="h-4 w-4 mr-2" />
+                        Bewerken
                       </Button>
-                    )}
-                    <Button
-                      variant="outline"
-                      onClick={() => {
-                        setShowPaymentDetailDialog(false);
-                        handleEditPayment(selectedPayment);
-                      }}
-                    >
-                      <Edit className="h-4 w-4 mr-2" />
-                      Bewerken
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={() => handleDownloadInvoice(selectedPayment)}
-                    >
-                      <Download className="h-4 w-4 mr-2" />
-                      Factuur
-                    </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => handleDownloadInvoice(selectedPayment)}
+                        size="sm"
+                      >
+                        <Download className="h-4 w-4 mr-2" />
+                        Factuur
+                      </Button>
+                    </div>
                   </div>
                 </>
               )}

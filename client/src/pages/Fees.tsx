@@ -530,12 +530,16 @@ export default function Fees() {
 
   const handlePayOnline = async (payment: any) => {
     try {
+      console.log('Starting payment for:', payment);
       const data = await apiRequest(`/api/payments/${payment.id}/payment-link`, { method: 'POST' });
+      console.log('Payment response:', data);
       
       if (data && data.checkoutUrl) {
+        console.log('Redirecting to:', data.checkoutUrl);
         // Redirect to payment checkout
         window.location.href = data.checkoutUrl;
       } else {
+        console.log('No checkout URL received:', data);
         toast({
           title: "Fout",
           description: data?.error || "Kon betaallink niet genereren",

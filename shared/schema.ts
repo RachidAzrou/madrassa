@@ -1305,7 +1305,47 @@ export const tuitionRatesRelations = relations(tuitionRates, ({ one }) => ({
   }),
 }));
 
-// Kortingssysteem - Automatische en handmatige kortingen
+// Tuition Fees (Collegegeld) - Standaard bedragen per schooljaar
+export const tuitionFees = pgTable("tuition_fees", {
+  id: serial("id").primaryKey(),
+  academicYearId: integer("academic_year_id").notNull().references(() => academicYears.id),
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  description: text("description").notNull(),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => {
+  return {
+    unq: unique().on(table.academicYearId),
+  };
+});
+
+// Enhanced Discounts System - Nieuwe korting aanmaken functionaliteit
+export const discounts = pgTable("discounts", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  type: text("type").notNull(), // percentage of amount
+  value: decimal("value", { precision: 10, scale: 2 }).notNull(),
+  isAutomatic: boolean("is_automatic").default(false),
+  rule: text("rule"), // Regel voor automatische toekenning
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Discount Applications - Kortingen toekennen aan studenten
+export const discountApplications = pgTable("discount_applications", {
+  id: serial("id").primaryKey(),
+  studentId: integer("student_id").notNull().references(() => students.id),
+  discountId: integer("discount_id").notNull().references(() => discounts.id),
+  applicationDate: date("application_date").notNull(),
+  reason: text("reason"),
+  appliedBy: integer("applied_by").references(() => users.id),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Kortingssysteem - Automatische en handmatige kortingen (legacy)
 export const discountTypes = pgTable("discount_types", {
   id: serial("id").primaryKey(),
   code: text("code").notNull().unique(),
@@ -1336,7 +1376,25 @@ export const studentDiscounts = pgTable("student_discounts", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// Insert schemas voor kortingen
+// Insert schemas voor nieuwe tabellen
+export const insertTuitionFeeSchema = createInsertSchema(tuitionFees).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true
+});
+
+export const insertDiscountSchema = createInsertSchema(discounts).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true
+});
+
+export const insertDiscountApplicationSchema = createInsertSchema(discountApplications).omit({
+  id: true,
+  createdAt: true
+});
+
+// Insert schemas voor kortingen (legacy)
 export const insertDiscountTypeSchema = createInsertSchema(discountTypes).omit({
   id: true,
   createdAt: true
@@ -1348,7 +1406,17 @@ export const insertStudentDiscountSchema = createInsertSchema(studentDiscounts).
   updatedAt: true
 });
 
-// Type exports voor kortingen
+// Type exports voor nieuwe tabellen
+export type InsertTuitionFee = z.infer<typeof insertTuitionFeeSchema>;
+export type TuitionFee = typeof tuitionFees.$inferSelect;
+
+export type InsertDiscount = z.infer<typeof insertDiscountSchema>;
+export type Discount = typeof discounts.$inferSelect;
+
+export type InsertDiscountApplication = z.infer<typeof insertDiscountApplicationSchema>;
+export type DiscountApplication = typeof discountApplications.$inferSelect;
+
+// Type exports voor kortingen (legacy)
 export type InsertDiscountType = z.infer<typeof insertDiscountTypeSchema>;
 export type DiscountType = typeof discountTypes.$inferSelect;
 

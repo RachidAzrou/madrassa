@@ -25,7 +25,10 @@ import {
   type FeeSettings, type InsertFeeSettings,
   type FeeDiscount, type InsertFeeDiscount,
   type Notification, type InsertNotification,
-  type Message, type InsertMessage
+  type Message, type InsertMessage,
+  type TuitionFee, type InsertTuitionFee,
+  type Discount, type InsertDiscount,
+  type DiscountApplication, type InsertDiscountApplication
 } from "@shared/schema";
 
 // Storage interface for CRUD operations

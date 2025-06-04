@@ -475,10 +475,9 @@ export default function Fees() {
 
   // Delete handlers are now handled by the standardized delete dialog
 
-  const handleDeleteTuitionFee = (id: number) => {
-    if (window.confirm('Weet je zeker dat je dit collegegeld wilt verwijderen?')) {
-      deleteTuitionFeeMutation.mutate(id);
-    }
+  const handleDeleteTuitionFee = (id: number, description: string) => {
+    setDeleteItem({ id, name: description, type: 'tuition-fee' });
+    setShowDeleteConfirmDialog(true);
   };
 
   const handleDeleteDiscount = (id: number) => {
@@ -1232,7 +1231,7 @@ export default function Fees() {
                               variant="ghost" 
                               size="sm"
                               className="text-red-600 hover:text-red-700"
-                              onClick={() => handleDeleteTuitionFee(fee.id)}
+                              onClick={() => handleDeleteTuitionFee(fee.id, fee.description)}
                               title="Verwijderen"
                             >
                               <Trash2 className="h-4 w-4" />

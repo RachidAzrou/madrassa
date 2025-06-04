@@ -5455,11 +5455,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       doc.setTextColor(255, 255, 255);
       doc.setFontSize(24);
       doc.setFont('helvetica', 'bold');
-      doc.text('myMadrassa', 20, 25);
-      
-      doc.setFontSize(12);
-      doc.setFont('helvetica', 'normal');
-      doc.text('Islamitisch Onderwijs Nederland', 20, 35);
+      doc.text('myMadrassa', 20, 30);
 
       // Invoice title
       doc.setTextColor(...primaryColor);
@@ -5583,8 +5579,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const pdfBuffer = Buffer.from(doc.output('arraybuffer'));
       
+      // Create filename with student name, ID, and date
+      const currentDate = new Date().toLocaleDateString('nl-NL').replace(/\//g, '-');
+      const studentName = `${student.firstName}_${student.lastName}`.replace(/\s+/g, '_');
+      const filename = `factuur_${studentName}_${student.studentId}_${currentDate}.pdf`;
+      
       res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', `attachment; filename="factuur-${payment.id}.pdf"`);
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
       res.send(pdfBuffer);
     } catch (error) {
       console.error("Error generating invoice:", error);

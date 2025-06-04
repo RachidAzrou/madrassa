@@ -165,7 +165,7 @@ export default function Fees() {
   });
 
   const discountMutation = useMutation({
-    mutationFn: async (data: z.infer<typeof discountSchema>) => {
+    mutationFn: async (data: z.infer<typeof addDiscountSchema>) => {
       const response = await apiRequest('POST', '/api/discount-applications', data);
       return response.json();
     },
@@ -187,6 +187,52 @@ export default function Fees() {
     },
   });
 
+  const tuitionFeeMutation = useMutation({
+    mutationFn: async (data: z.infer<typeof tuitionFeeSchema>) => {
+      const response = await apiRequest('POST', '/api/tuition-fees', data);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/tuition-fees'] });
+      setShowTuitionFeeDialog(false);
+      tuitionFeeForm.reset();
+      toast({
+        title: 'Collegegeld ingesteld',
+        description: 'Het collegegeld is succesvol ingesteld.',
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Fout',
+        description: error.message || 'Er is een fout opgetreden bij het instellen van het collegegeld.',
+        variant: 'destructive',
+      });
+    },
+  });
+
+  const createDiscountMutation = useMutation({
+    mutationFn: async (data: z.infer<typeof createDiscountSchema>) => {
+      const response = await apiRequest('POST', '/api/discounts', data);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/discounts'] });
+      setShowCreateDiscountDialog(false);
+      createDiscountForm.reset();
+      toast({
+        title: 'Korting aangemaakt',
+        description: 'De nieuwe korting is succesvol aangemaakt.',
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Fout',
+        description: error.message || 'Er is een fout opgetreden bij het aanmaken van de korting.',
+        variant: 'destructive',
+      });
+    },
+  });
+
   // Event handlers
   const handleNewPayment = () => {
     setShowAddPaymentDialog(true);
@@ -196,8 +242,16 @@ export default function Fees() {
     addPaymentMutation.mutate(data);
   };
 
-  const handleAddDiscount = async (data: z.infer<typeof discountSchema>) => {
+  const handleAddDiscount = async (data: z.infer<typeof addDiscountSchema>) => {
     discountMutation.mutate(data);
+  };
+
+  const handleAddTuitionFee = async (data: z.infer<typeof tuitionFeeSchema>) => {
+    tuitionFeeMutation.mutate(data);
+  };
+
+  const handleCreateDiscount = async (data: z.infer<typeof createDiscountSchema>) => {
+    createDiscountMutation.mutate(data);
   };
 
   const handlePayOnline = (payment: any) => {
@@ -748,6 +802,79 @@ export default function Fees() {
                     </TableBody>
                   </Table>
                 </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="tuition" className="space-y-6">
+            {/* Tuition Fee Management */}
+            <Card className="bg-white rounded-md border shadow-sm">
+              <CardHeader className="border-b border-gray-100 pb-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-lg font-semibold text-gray-900">Collegegeld Beheer</CardTitle>
+                    <CardDescription className="text-gray-600">
+                      Stel standaard collegegeldbedragen in per schooljaar
+                    </CardDescription>
+                  </div>
+                  <Button onClick={() => setShowTuitionFeeDialog(true)} className="bg-[#1e40af] hover:bg-[#1e40af]/90">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Collegegeld Instellen
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="p-0">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="border-b border-gray-100">
+                      <TableHead className="text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-3">
+                        Schooljaar
+                      </TableHead>
+                      <TableHead className="text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-3">
+                        Bedrag
+                      </TableHead>
+                      <TableHead className="text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-3">
+                        Omschrijving
+                      </TableHead>
+                      <TableHead className="text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-3">
+                        Status
+                      </TableHead>
+                      <TableHead className="text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-3 text-right">
+                        Acties
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {tuitionFeesData?.map((fee: any) => (
+                      <TableRow key={fee.id} className="border-b border-gray-50 hover:bg-gray-50/50">
+                        <TableCell className="px-6 py-4">
+                          <div className="text-sm font-medium text-gray-900">{fee.academicYear?.name}</div>
+                        </TableCell>
+                        <TableCell className="px-6 py-4">
+                          <div className="text-sm text-gray-900">€{parseFloat(fee.amount).toFixed(2)}</div>
+                        </TableCell>
+                        <TableCell className="px-6 py-4">
+                          <div className="text-sm text-gray-900">{fee.description}</div>
+                        </TableCell>
+                        <TableCell className="px-6 py-4">
+                          <Badge variant={fee.isActive ? "default" : "secondary"} className="w-16 justify-center">
+                            {fee.isActive ? 'Actief' : 'Inactief'}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="px-6 py-4 text-right">
+                          <div className="flex items-center gap-2 justify-end">
+                            <Button variant="ghost" size="sm">
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="sm">
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </CardContent>
             </Card>
           </TabsContent>

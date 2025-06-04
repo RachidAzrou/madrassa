@@ -81,6 +81,9 @@ export default function Fees() {
   const [editingTuitionFee, setEditingTuitionFee] = useState<any>(null);
   const [editingDiscount, setEditingDiscount] = useState<any>(null);
   const [deleteItem, setDeleteItem] = useState<{type: string, id: number, name: string} | null>(null);
+  const [showPaymentDetailDialog, setShowPaymentDetailDialog] = useState(false);
+  const [selectedPayment, setSelectedPayment] = useState<any>(null);
+  const [hoveredRowId, setHoveredRowId] = useState<number | null>(null);
 
   // Check if user is parent
   const isParent = user?.role === 'ouder' as any;
@@ -622,6 +625,12 @@ export default function Fees() {
     }
   };
 
+  // Handle row click to show payment details
+  const handleRowClick = (payment: any) => {
+    setSelectedPayment(payment);
+    setShowPaymentDetailDialog(true);
+  };
+
   // Filter payments
   const filteredPayments = paymentsData.filter((payment: any) => {
     const matchesSearch = !searchQuery || 
@@ -1001,7 +1010,13 @@ export default function Fees() {
                     </TableRow>
                   ) : (
                     filteredPayments.map((payment: any) => (
-                      <TableRow key={payment.id}>
+                      <TableRow 
+                        key={payment.id}
+                        className="cursor-pointer hover:bg-gray-50 transition-colors"
+                        onMouseEnter={() => setHoveredRowId(payment.id)}
+                        onMouseLeave={() => setHoveredRowId(null)}
+                        onClick={() => handleRowClick(payment)}
+                      >
                         <TableCell className="font-medium">{payment.studentId}</TableCell>
                         <TableCell>{payment.studentName}</TableCell>
                         <TableCell>{payment.description}</TableCell>
@@ -1009,12 +1024,15 @@ export default function Fees() {
                         <TableCell>{formatDate(payment.dueDate)}</TableCell>
                         <TableCell>{getStatusBadge(payment.status)}</TableCell>
                         <TableCell className="text-right">
-                          <div className="flex justify-end gap-2">
+                          <div className={`flex justify-end gap-2 transition-opacity duration-200 ${hoveredRowId === payment.id ? 'opacity-100' : 'opacity-0'}`}>
                             <Button
                               variant="ghost" 
                               size="icon"
                               className={`h-8 w-8 ${payment.status === 'betaald' ? 'text-gray-400 cursor-not-allowed' : 'text-blue-600 hover:text-blue-700'}`}
-                              onClick={payment.status === 'betaald' ? undefined : () => handlePayOnline(payment)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (payment.status !== 'betaald') handlePayOnline(payment);
+                              }}
                               disabled={payment.status === 'betaald'}
                               title={payment.status === 'betaald' ? "Reeds betaald" : "Online betalen"}
                             >
@@ -1024,7 +1042,10 @@ export default function Fees() {
                               variant="ghost" 
                               size="icon"
                               className="h-8 w-8"
-                              onClick={() => handleEditPayment(payment)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEditPayment(payment);
+                              }}
                               title="Bewerken"
                             >
                               <Edit className="h-4 w-4" />
@@ -1033,7 +1054,10 @@ export default function Fees() {
                               variant="ghost" 
                               size="icon"
                               className="h-8 w-8"
-                              onClick={() => handleDownloadInvoice(payment)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDownloadInvoice(payment);
+                              }}
                               title="Download factuur"
                             >
                               <Download className="h-4 w-4" />
@@ -1042,7 +1066,8 @@ export default function Fees() {
                               variant="ghost" 
                               size="icon"
                               className="h-8 w-8 text-red-600 hover:text-red-700"
-                              onClick={() => {
+                              onClick={(e) => {
+                                e.stopPropagation();
                                 setDeleteItem({ id: payment.id, name: payment.description, type: 'payment' });
                                 setShowDeleteConfirmDialog(true);
                               }}
@@ -2219,6 +2244,135 @@ export default function Fees() {
                 </div>
               </form>
             </Form>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Payment Detail Dialog */}
+        <Dialog open={showPaymentDetailDialog} onOpenChange={setShowPaymentDetailDialog}>
+          <DialogContent className="sm:max-w-[700px] p-0 overflow-hidden">
+            <div className="bg-[#1e40af] py-4 px-6 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="bg-white/20 p-2 rounded-full">
+                  <Eye className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <DialogTitle className="text-white text-lg font-semibold m-0">Betalingsdetails</DialogTitle>
+                  <DialogDescription className="text-white/70 text-sm m-0">
+                    Volledige informatie over deze betaling
+                  </DialogDescription>
+                </div>
+              </div>
+            </div>
+            <div className="p-6 space-y-6">
+              {selectedPayment && (
+                <>
+                  {/* Basic Information */}
+                  <div className="grid grid-cols-2 gap-6">
+                    <div className="space-y-3">
+                      <div>
+                        <label className="text-sm font-medium text-gray-600">Student</label>
+                        <p className="text-base font-semibold">{selectedPayment.studentName}</p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-gray-600">Student ID</label>
+                        <p className="text-base">{selectedPayment.studentId}</p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-gray-600">Omschrijving</label>
+                        <p className="text-base">{selectedPayment.description}</p>
+                      </div>
+                    </div>
+                    <div className="space-y-3">
+                      <div>
+                        <label className="text-sm font-medium text-gray-600">Bedrag</label>
+                        <p className="text-xl font-bold text-blue-600">{formatCurrency(selectedPayment.amount)}</p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-gray-600">Status</label>
+                        <div className="mt-1">{getStatusBadge(selectedPayment.status)}</div>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-gray-600">Type</label>
+                        <p className="text-base capitalize">{selectedPayment.type}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Dates */}
+                  <div className="border-t pt-4">
+                    <h3 className="font-semibold text-gray-800 mb-3">Datums</h3>
+                    <div className="grid grid-cols-3 gap-4">
+                      <div>
+                        <label className="text-sm font-medium text-gray-600">Aangemaakt</label>
+                        <p className="text-base">{formatDate(selectedPayment.createdAt)}</p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-gray-600">Vervaldatum</label>
+                        <p className="text-base">{formatDate(selectedPayment.dueDate)}</p>
+                      </div>
+                      {selectedPayment.paidAt && (
+                        <div>
+                          <label className="text-sm font-medium text-gray-600">Betaald op</label>
+                          <p className="text-base">{formatDate(selectedPayment.paidAt)}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Payment Information */}
+                  {selectedPayment.molliePaymentId && (
+                    <div className="border-t pt-4">
+                      <h3 className="font-semibold text-gray-800 mb-3">Betalingsinformatie</h3>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-sm font-medium text-gray-600">Betaling ID</label>
+                          <p className="text-base font-mono text-sm">{selectedPayment.molliePaymentId}</p>
+                        </div>
+                        {selectedPayment.paymentMethod && (
+                          <div>
+                            <label className="text-sm font-medium text-gray-600">Betaalmethode</label>
+                            <p className="text-base capitalize">{selectedPayment.paymentMethod}</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Actions */}
+                  <div className="border-t pt-4 flex justify-end gap-3">
+                    {selectedPayment.status !== 'betaald' && (
+                      <Button
+                        onClick={() => {
+                          setShowPaymentDetailDialog(false);
+                          handlePayOnline(selectedPayment);
+                        }}
+                        className="bg-blue-600 hover:bg-blue-700"
+                      >
+                        <CreditCard className="h-4 w-4 mr-2" />
+                        Online Betalen
+                      </Button>
+                    )}
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setShowPaymentDetailDialog(false);
+                        handleEditPayment(selectedPayment);
+                      }}
+                    >
+                      <Edit className="h-4 w-4 mr-2" />
+                      Bewerken
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => handleDownloadInvoice(selectedPayment)}
+                    >
+                      <Download className="h-4 w-4 mr-2" />
+                      Factuur
+                    </Button>
+                  </div>
+                </>
+              )}
             </div>
           </DialogContent>
         </Dialog>

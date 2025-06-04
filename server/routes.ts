@@ -5401,8 +5401,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Payment already completed" });
       }
 
-      // Demo mode for development environment
-      const demoCheckoutUrl = `${req.protocol}://${req.get('host')}/demo-payment?id=${id}&amount=${payment.amount}&description=${encodeURIComponent(payment.description)}`;
+      // Demo mode for development environment - force HTTPS for security
+      const protocol = req.get('host')?.includes('replit.dev') ? 'https' : req.protocol;
+      const demoCheckoutUrl = `${protocol}://${req.get('host')}/demo-payment?id=${id}&amount=${payment.amount}&description=${encodeURIComponent(payment.description)}`;
       
       // Update payment status to indicate payment link created
       await storage.updatePayment(id, {
@@ -5434,8 +5435,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Payment already completed" });
       }
 
-      // Demo mode for development environment
-      const demoCheckoutUrl = `${req.protocol}://${req.get('host')}/demo-payment?id=${id}&amount=${payment.amount}&description=${encodeURIComponent(payment.description)}`;
+      // Demo mode for development environment - force HTTPS for security
+      const protocol = req.get('host')?.includes('replit.dev') ? 'https' : req.protocol;
+      const demoCheckoutUrl = `${protocol}://${req.get('host')}/demo-payment?id=${id}&amount=${payment.amount}&description=${encodeURIComponent(payment.description)}`;
       
       // Update payment status to indicate payment link created
       await storage.updatePayment(id, {

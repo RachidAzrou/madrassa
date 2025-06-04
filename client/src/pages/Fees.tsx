@@ -1329,16 +1329,7 @@ export default function Fees() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Applied Discounts */}
               <Card className="bg-white rounded-md border shadow-sm">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Users className="h-5 w-5 text-blue-600" />
-                    Automatische Kortingen
-                  </CardTitle>
-                  <CardDescription>
-                    Familiereductie voor families met meerdere kinderen
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
+                <div className="pt-6 px-6 pb-6">
                   <div className="space-y-4">
                     <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
                       <div className="flex items-center justify-between">
@@ -1371,7 +1362,7 @@ export default function Fees() {
                         ))}
                     </div>
                   </div>
-                </CardContent>
+                </div>
               </Card>
 
               {/* Manual Discounts */}

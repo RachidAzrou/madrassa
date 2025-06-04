@@ -43,6 +43,7 @@ import GuardianDashboard from "@/pages/guardian/GuardianDashboard";
 import SecretariatLayout from "@/components/SecretariatLayout";
 import SecretariatDashboard from "@/pages/secretariat/SecretariatDashboard";
 import DemoPayment from "@/pages/DemoPayment";
+import PaymentSuccess from "@/pages/PaymentSuccess";
 
 // Authentication wrapper with RBAC
 function AuthenticatedRoute({ component: Component, ...rest }: any) {
@@ -197,6 +198,7 @@ function Router() {
     <Switch>
       <Route path="/login" component={Login} />
       <Route path="/demo-payment" component={DemoPayment} />
+      <Route path="/payment-success" component={PaymentSuccess} />
       <Route>
         <AuthenticatedRouter />
       </Route>

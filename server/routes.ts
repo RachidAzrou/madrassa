@@ -5290,13 +5290,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get payment details from Mollie
       const molliePayment = await mollieClient.payments.get(paymentId);
       
+      // Map Mollie status to our Dutch status system
+      let newStatus = 'openstaand';
+      switch (molliePayment.status) {
+        case 'paid':
+          newStatus = 'betaald';
+          break;
+        case 'canceled':
+        case 'expired':
+        case 'failed':
+          newStatus = 'geannuleerd';
+          break;
+        case 'pending':
+        case 'open':
+          newStatus = 'openstaand';
+          break;
+      }
+
       // Update payment in database
       const updateData: any = {
         mollieStatus: molliePayment.status,
-        status: molliePayment.status === 'paid' ? 'paid' : 
-                molliePayment.status === 'failed' ? 'failed' :
-                molliePayment.status === 'canceled' ? 'canceled' :
-                molliePayment.status === 'expired' ? 'expired' : 'pending'
+        status: newStatus,
+        updatedAt: new Date()
       };
 
       if (molliePayment.status === 'paid' && molliePayment.paidAt) {
@@ -5304,11 +5319,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         updateData.paymentMethod = molliePayment.method;
       }
 
-      if (molliePayment.status === 'failed' && molliePayment.details) {
-        updateData.failureReason = molliePayment.details.failureReason;
+      if (molliePayment.status === 'failed') {
+        updateData.failureReason = `Payment ${molliePayment.status}`;
       }
 
       await storage.updatePaymentByMollieId(paymentId, updateData);
+
+      console.log(`Webhook: Payment ${paymentId} updated to status: ${newStatus}`);
 
       res.status(200).json({ success: true });
     } catch (error) {
@@ -5435,17 +5452,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Payment already completed" });
       }
 
-      // Demo mode for development environment - force HTTPS for security
-      const protocol = req.get('host')?.includes('replit.dev') ? 'https' : req.protocol;
-      const demoCheckoutUrl = `${protocol}://${req.get('host')}/demo-payment?id=${id}&amount=${payment.amount}&description=${encodeURIComponent(payment.description)}`;
-      
-      // Update payment status to indicate payment link created
-      await storage.updatePayment(id, {
-        status: 'openstaand',
-        checkoutUrl: demoCheckoutUrl
+      // Create Mollie payment
+      const molliePayment = await mollieClient.payments.create({
+        amount: {
+          currency: 'EUR',
+          value: parseFloat(payment.amount).toFixed(2)
+        },
+        description: payment.description,
+        redirectUrl: `${req.protocol}://${req.get('host')}/payment-success?id=${id}`,
+        webhookUrl: `${req.protocol}://${req.get('host')}/api/payments/webhook`,
+        metadata: {
+          paymentId: id.toString(),
+          studentId: payment.studentId.toString()
+        }
       });
 
-      res.json({ checkoutUrl: demoCheckoutUrl });
+      // Update payment with Mollie data
+      await storage.updatePayment(id, {
+        molliePaymentId: molliePayment.id,
+        checkoutUrl: molliePayment._links.checkout?.href || null,
+        status: 'pending',
+        mollieStatus: molliePayment.status,
+        expiresAt: molliePayment.expiresAt ? new Date(molliePayment.expiresAt) : null
+      });
+
+      res.json({ checkoutUrl: molliePayment._links.checkout?.href });
     } catch (error) {
       console.error("Error creating payment link:", error);
       res.status(500).json({ error: "Failed to create payment link" });

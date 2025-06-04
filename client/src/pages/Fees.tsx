@@ -531,12 +531,6 @@ export default function Fees() {
   const handlePayOnline = async (payment: any) => {
     try {
       const response = await apiRequest('POST', `/api/payments/${payment.id}/payment-link`);
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to create payment link');
-      }
-      
       const data = await response.json();
       
       if (data.checkoutUrl) {
@@ -545,7 +539,7 @@ export default function Fees() {
       } else {
         toast({
           title: "Fout",
-          description: "Kon betaallink niet genereren",
+          description: data.error || "Kon betaallink niet genereren",
           variant: "destructive",
         });
       }

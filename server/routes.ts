@@ -5438,17 +5438,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Generate PDF invoice using jsPDF
-      const jsPDF = require('jspdf').jsPDF;
+      const { jsPDF } = await import('jspdf');
       const doc = new jsPDF();
 
       // Header
       doc.setFontSize(20);
-      doc.setFont(undefined, 'bold');
+      doc.setFont('helvetica', 'bold');
       doc.text('FACTUUR', 20, 30);
 
       // Invoice details
       doc.setFontSize(12);
-      doc.setFont(undefined, 'normal');
+      doc.setFont('helvetica', 'normal');
       doc.text(`Factuurnummer: ${payment.invoiceId || `INV-${payment.id}`}`, 20, 50);
       doc.text(`Datum: ${new Date(payment.paidAt || payment.createdAt).toLocaleDateString('nl-NL')}`, 20, 60);
 
@@ -5457,16 +5457,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       doc.text('Islamitisch Onderwijs Nederland', 20, 90);
 
       // Student information
-      doc.setFont(undefined, 'bold');
+      doc.setFont('helvetica', 'bold');
       doc.text('Student informatie:', 20, 110);
-      doc.setFont(undefined, 'normal');
+      doc.setFont('helvetica', 'normal');
       doc.text(`Naam: ${student.firstName} ${student.lastName}`, 20, 120);
       doc.text(`Student ID: ${student.studentId}`, 20, 130);
 
       // Payment details
-      doc.setFont(undefined, 'bold');
+      doc.setFont('helvetica', 'bold');
       doc.text('Betaling details:', 20, 150);
-      doc.setFont(undefined, 'normal');
+      doc.setFont('helvetica', 'normal');
       doc.text(`Beschrijving: ${payment.description}`, 20, 160);
       doc.text(`Bedrag: €${payment.amount}`, 20, 170);
       

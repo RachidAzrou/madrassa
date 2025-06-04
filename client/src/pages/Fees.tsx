@@ -98,6 +98,10 @@ export default function Fees() {
     queryKey: ['/api/discount-applications'],
   });
 
+  const { data: tuitionFeesData = [] } = useQuery({
+    queryKey: ['/api/tuition-fees'],
+  });
+
   // Forms
   const addPaymentForm = useForm<z.infer<typeof addPaymentSchema>>({
     resolver: zodResolver(addPaymentSchema),
@@ -880,8 +884,103 @@ export default function Fees() {
           </TabsContent>
 
           <TabsContent value="discounts" className="space-y-6">
+            {/* Enhanced Discount Management */}
+            <Card className="bg-white rounded-md border shadow-sm">
+              <CardHeader className="border-b border-gray-100 pb-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-lg font-semibold text-gray-900">Kortingen Beheer</CardTitle>
+                    <CardDescription className="text-gray-600">
+                      Maak nieuwe kortingen aan en beheer bestaande kortingen
+                    </CardDescription>
+                  </div>
+                  <div className="flex gap-3">
+                    <Button onClick={() => setShowCreateDiscountDialog(true)} className="bg-[#1e40af] hover:bg-[#1e40af]/90">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Nieuwe Korting Aanmaken
+                    </Button>
+                    <Button variant="outline" onClick={() => setShowDiscountDialog(true)}>
+                      <Tag className="h-4 w-4 mr-2" />
+                      Korting Toekennen
+                    </Button>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="p-0">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="border-b border-gray-100">
+                      <TableHead className="text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-3">
+                        Naam
+                      </TableHead>
+                      <TableHead className="text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-3">
+                        Type
+                      </TableHead>
+                      <TableHead className="text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-3">
+                        Waarde
+                      </TableHead>
+                      <TableHead className="text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-3">
+                        Automatisch
+                      </TableHead>
+                      <TableHead className="text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-3">
+                        Status
+                      </TableHead>
+                      <TableHead className="text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-3 text-right">
+                        Acties
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {(discounts as any[])?.map((discount: any) => (
+                      <TableRow key={discount.id} className="border-b border-gray-50 hover:bg-gray-50/50">
+                        <TableCell className="px-6 py-4">
+                          <div className="text-sm font-medium text-gray-900">{discount.name}</div>
+                        </TableCell>
+                        <TableCell className="px-6 py-4">
+                          <div className="text-sm text-gray-900">
+                            {discount.type === 'percentage' ? 'Percentage' : 'Vast bedrag'}
+                          </div>
+                        </TableCell>
+                        <TableCell className="px-6 py-4">
+                          <div className="text-sm text-gray-900">
+                            {discount.type === 'percentage' 
+                              ? `${discount.value}%` 
+                              : `€${parseFloat(discount.value).toFixed(2)}`
+                            }
+                          </div>
+                        </TableCell>
+                        <TableCell className="px-6 py-4">
+                          <Badge variant={discount.isAutomatic ? "default" : "secondary"} className="w-16 justify-center">
+                            {discount.isAutomatic ? 'Ja' : 'Nee'}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="px-6 py-4">
+                          <Badge variant={discount.isActive ? "default" : "secondary"} className="w-16 justify-center">
+                            {discount.isActive ? 'Actief' : 'Inactief'}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="px-6 py-4 text-right">
+                          <div className="flex items-center gap-2 justify-end">
+                            <Button variant="ghost" size="sm">
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="sm">
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="sm">
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Automatic Discounts */}
+              {/* Applied Discounts */}
               <Card className="bg-white rounded-md border shadow-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">

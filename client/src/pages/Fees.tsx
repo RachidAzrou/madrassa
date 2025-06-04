@@ -1523,7 +1523,7 @@ export default function Fees() {
 
         {/* Discount Dialog */}
         <Dialog open={showDiscountDialog} onOpenChange={setShowDiscountDialog}>
-          <DialogContent className="sm:max-w-[500px]">
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Korting Toekennen</DialogTitle>
               <DialogDescription>
@@ -1613,7 +1613,7 @@ export default function Fees() {
 
         {/* Add Tuition Fee Dialog */}
         <Dialog open={showTuitionFeeDialog} onOpenChange={setShowTuitionFeeDialog}>
-          <DialogContent className="sm:max-w-[500px]">
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Collegegeld Instellen</DialogTitle>
               <DialogDescription>
@@ -1690,7 +1690,7 @@ export default function Fees() {
 
         {/* Create Discount Dialog */}
         <Dialog open={showCreateDiscountDialog} onOpenChange={setShowCreateDiscountDialog}>
-          <DialogContent className="sm:max-w-[500px]">
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Nieuwe Korting Aanmaken</DialogTitle>
               <DialogDescription>

@@ -1416,7 +1416,7 @@ export default function Fees() {
         {/* Add Payment Dialog */}
         <Dialog open={showAddPaymentDialog} onOpenChange={setShowAddPaymentDialog}>
           <CustomDialogContent>
-            <DialogHeader>
+            <DialogHeader variant="branded">
               <DialogTitle>Nieuwe Betaling Toevoegen</DialogTitle>
               <DialogDescription>
                 Voeg een nieuwe betaling toe voor een student
@@ -1534,7 +1534,7 @@ export default function Fees() {
         {/* Discount Dialog */}
         <Dialog open={showDiscountDialog} onOpenChange={setShowDiscountDialog}>
           <CustomDialogContent>
-            <DialogHeader>
+            <DialogHeader variant="branded">
               <DialogTitle>Korting Toekennen</DialogTitle>
               <DialogDescription>
                 Ken een speciale korting toe aan een student
@@ -1624,7 +1624,7 @@ export default function Fees() {
         {/* Add Tuition Fee Dialog */}
         <Dialog open={showTuitionFeeDialog} onOpenChange={setShowTuitionFeeDialog}>
           <CustomDialogContent>
-            <DialogHeader>
+            <DialogHeader variant="branded">
               <DialogTitle>Collegegeld Instellen</DialogTitle>
               <DialogDescription>
                 Stel het standaard collegegeld in voor een schooljaar
@@ -1701,7 +1701,7 @@ export default function Fees() {
         {/* Create Discount Dialog */}
         <Dialog open={showCreateDiscountDialog} onOpenChange={setShowCreateDiscountDialog}>
           <CustomDialogContent>
-            <DialogHeader>
+            <DialogHeader variant="branded">
               <DialogTitle>Nieuwe Korting Aanmaken</DialogTitle>
               <DialogDescription>
                 Maak een nieuwe korting aan die toegepast kan worden
@@ -1819,7 +1819,7 @@ export default function Fees() {
         {/* Edit Payment Dialog */}
         <Dialog open={showEditPaymentDialog} onOpenChange={setShowEditPaymentDialog}>
           <CustomDialogContent>
-            <DialogHeader>
+            <DialogHeader variant="branded">
               <DialogTitle>Betaling Bewerken</DialogTitle>
               <DialogDescription>
                 Wijzig de gegevens van de betaling.
@@ -1963,7 +1963,7 @@ export default function Fees() {
         {/* Edit Tuition Fee Dialog */}
         <Dialog open={showEditTuitionFeeDialog} onOpenChange={setShowEditTuitionFeeDialog}>
           <CustomDialogContent>
-            <DialogHeader>
+            <DialogHeader variant="branded">
               <DialogTitle>Collegegeld Bewerken</DialogTitle>
               <DialogDescription>
                 Wijzig de gegevens van het collegegeld.
@@ -2061,7 +2061,7 @@ export default function Fees() {
         {/* Edit Discount Dialog */}
         <Dialog open={showEditDiscountDialog} onOpenChange={setShowEditDiscountDialog}>
           <CustomDialogContent>
-            <DialogHeader>
+            <DialogHeader variant="branded">
               <DialogTitle>Korting Bewerken</DialogTitle>
               <DialogDescription>
                 Wijzig de gegevens van de korting.

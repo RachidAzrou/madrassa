@@ -259,22 +259,21 @@ export default function Fees() {
       return await apiRequest('POST', '/api/tuition-fees', data);
     },
     onSuccess: async () => {
-      // Multiple approaches to ensure data refresh
-      await queryClient.invalidateQueries({ queryKey: ['/api/tuition-fees'] });
-      await queryClient.refetchQueries({ queryKey: ['/api/tuition-fees'] });
-      queryClient.removeQueries({ queryKey: ['/api/tuition-fees'] });
-      
-      // Force a brief delay then refresh data
-      setTimeout(() => {
-        queryClient.invalidateQueries({ queryKey: ['/api/tuition-fees'] });
-      }, 100);
+      // Force complete cache clear and page refresh
+      queryClient.clear();
       
       setShowTuitionFeeDialog(false);
       tuitionFeeForm.reset();
+      
       toast({
         title: 'Collegegeld ingesteld',
-        description: 'Het collegegeld is succesvol ingesteld.',
+        description: 'Het collegegeld is succesvol ingesteld. Pagina wordt ververst...',
       });
+      
+      // Force page refresh to ensure data is updated
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
     },
     onError: (error: any) => {
       toast({

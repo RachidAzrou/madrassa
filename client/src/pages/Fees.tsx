@@ -530,22 +530,15 @@ export default function Fees() {
 
   const handlePayOnline = async (payment: any) => {
     try {
-      const response = await apiRequest('POST', `/api/payments/${payment.id}/payment-link`);
+      const data = await apiRequest(`/api/payments/${payment.id}/payment-link`, { method: 'POST' });
       
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`HTTP ${response.status}: ${errorText}`);
-      }
-      
-      const data = await response.json();
-      
-      if (data.checkoutUrl) {
+      if (data && data.checkoutUrl) {
         // Redirect to payment checkout
         window.location.href = data.checkoutUrl;
       } else {
         toast({
           title: "Fout",
-          description: data.error || "Kon betaallink niet genereren",
+          description: data?.error || "Kon betaallink niet genereren",
           variant: "destructive",
         });
       }

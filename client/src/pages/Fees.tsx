@@ -258,10 +258,16 @@ export default function Fees() {
     mutationFn: async (data: z.infer<typeof tuitionFeeSchema>) => {
       return await apiRequest('POST', '/api/tuition-fees', data);
     },
-    onSuccess: () => {
-      // Force refresh both specific and related queries
-      queryClient.invalidateQueries({ queryKey: ['/api/tuition-fees'] });
-      queryClient.refetchQueries({ queryKey: ['/api/tuition-fees'] });
+    onSuccess: async () => {
+      // Multiple approaches to ensure data refresh
+      await queryClient.invalidateQueries({ queryKey: ['/api/tuition-fees'] });
+      await queryClient.refetchQueries({ queryKey: ['/api/tuition-fees'] });
+      queryClient.removeQueries({ queryKey: ['/api/tuition-fees'] });
+      
+      // Force a brief delay then refresh data
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ['/api/tuition-fees'] });
+      }, 100);
       
       setShowTuitionFeeDialog(false);
       tuitionFeeForm.reset();

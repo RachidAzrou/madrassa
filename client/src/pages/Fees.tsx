@@ -260,14 +260,9 @@ export default function Fees() {
       return response;
     },
     onSuccess: async (newTuitionFee) => {
-      // Immediately update the cache with the new data
-      queryClient.setQueryData(['/api/tuition-fees'], (oldData: any) => {
-        if (!oldData || !Array.isArray(oldData)) return [newTuitionFee];
-        return [newTuitionFee, ...oldData];
-      });
-      
-      // Also invalidate to ensure consistency
-      queryClient.invalidateQueries({ queryKey: ['/api/tuition-fees'] });
+      // Force refresh the tuition fees data
+      await queryClient.invalidateQueries({ queryKey: ['/api/tuition-fees'] });
+      await queryClient.refetchQueries({ queryKey: ['/api/tuition-fees'] });
       
       setShowTuitionFeeDialog(false);
       tuitionFeeForm.reset();
@@ -1899,7 +1894,7 @@ export default function Fees() {
                                 <FormItem>
                                   <FormControl>
                                     <Input 
-                                      placeholder="Bijvoorbeeld: 1, 30000, 2024-09-01" 
+                                      placeholder="Waarde voor vergelijking" 
                                       className="border-gray-300 focus:border-blue-500 focus:ring-blue-200"
                                       {...field} 
                                     />
@@ -1923,7 +1918,7 @@ export default function Fees() {
                                 <FormItem>
                                   <FormControl>
                                     <Input 
-                                      placeholder="Bijvoorbeeld: Voor gezinnen met meerdere kinderen" 
+                                      placeholder="Beschrijving van de regel" 
                                       className="border-gray-300 focus:border-blue-500 focus:ring-blue-200"
                                       {...field} 
                                     />

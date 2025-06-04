@@ -2917,13 +2917,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   apiRouter.delete("/api/tuition-fees/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const success = await storage.deleteTuitionFee(id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid tuition fee ID" });
+      }
+
+      // Direct database deletion using the tuitionRates table
+      const deletedRows = await db.delete(tuitionRates).where(eq(tuitionRates.id, id)).returning();
       
-      if (!success) {
+      if (deletedRows.length === 0) {
         return res.status(404).json({ message: "Tuition fee not found" });
       }
       
-      res.status(204).end();
+      res.status(200).json({ message: "Tuition fee deleted successfully" });
     } catch (error) {
       console.error("Error deleting tuition fee:", error);
       res.status(500).json({ message: "Error deleting tuition fee" });
@@ -5386,6 +5391,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching payment:", error);
       res.status(500).json({ error: "Failed to fetch payment" });
+    }
+  });
+
+  // Delete payment
+  app.delete("/api/payments/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ error: "Invalid payment ID" });
+      }
+      
+      const payment = await storage.getPayment(id);
+      if (!payment) {
+        return res.status(404).json({ error: "Payment not found" });
+      }
+
+      await storage.deletePayment(id);
+      res.status(200).json({ message: "Payment deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting payment:", error);
+      res.status(500).json({ error: "Failed to delete payment" });
     }
   });
 

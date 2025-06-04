@@ -100,6 +100,20 @@ export interface IStorage {
   updateTuitionRate(id: number, rate: Partial<TuitionRate>): Promise<TuitionRate | undefined>;
   deleteTuitionRate(id: number): Promise<boolean>;
 
+  // Tuition Fee operations
+  getTuitionFees(): Promise<any[]>;
+  getTuitionFee(id: number): Promise<any | undefined>;
+  createTuitionFee(fee: any): Promise<any>;
+  updateTuitionFee(id: number, fee: any): Promise<any | undefined>;
+  deleteTuitionFee(id: number): Promise<boolean>;
+
+  // Discount operations
+  getDiscounts(): Promise<any[]>;
+  getDiscount(id: number): Promise<any | undefined>;
+  createDiscount(discount: any): Promise<any>;
+  updateDiscount(id: number, discount: any): Promise<any | undefined>;
+  deleteDiscount(id: number): Promise<boolean>;
+
   // Payment operations (Mollie)
   getPayments(): Promise<Payment[]>;
   getPayment(id: number): Promise<Payment | undefined>;

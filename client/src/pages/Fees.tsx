@@ -988,6 +988,17 @@ export default function Fees() {
                         <TableCell>{getStatusBadge(payment.status)}</TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
+                            {payment.status === 'openstaand' && (
+                              <Button
+                                variant="ghost" 
+                                size="icon"
+                                className="h-8 w-8 text-blue-600 hover:text-blue-700"
+                                onClick={() => handlePayOnline(payment)}
+                                title="Online betalen"
+                              >
+                                <CreditCard className="h-4 w-4" />
+                              </Button>
+                            )}
                             <Button 
                               variant="ghost" 
                               size="icon"
@@ -996,15 +1007,6 @@ export default function Fees() {
                               title="Bewerken"
                             >
                               <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost" 
-                              size="icon"
-                              className="h-8 w-8 text-red-600 hover:text-red-700"
-                              onClick={() => handleDeletePayment(payment.id)}
-                              title="Verwijderen"
-                            >
-                              <Trash2 className="h-4 w-4" />
                             </Button>
                             {payment.status === 'betaald' && (
                               <Button
@@ -1017,17 +1019,15 @@ export default function Fees() {
                                 <Download className="h-4 w-4" />
                               </Button>
                             )}
-                            {payment.status === 'openstaand' && (
-                              <Button
-                                variant="ghost" 
-                                size="icon"
-                                className="h-8 w-8 text-blue-600 hover:text-blue-700"
-                                onClick={() => handlePayOnline(payment)}
-                                title="Online betalen"
-                              >
-                                <CreditCard className="h-4 w-4" />
-                              </Button>
-                            )}
+                            <Button
+                              variant="ghost" 
+                              size="icon"
+                              className="h-8 w-8 text-red-600 hover:text-red-700"
+                              onClick={() => handleDeletePayment(payment.id)}
+                              title="Verwijderen"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
                           </div>
                         </TableCell>
                       </TableRow>

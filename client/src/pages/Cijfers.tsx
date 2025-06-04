@@ -1035,25 +1035,21 @@ export default function Cijfers() {
             </div>
           </div>
 
-          <DialogFooter>
-            <Button 
-              variant="outline" 
-              onClick={() => {
-                setShowDeleteModal(false);
-                setDeletingAssessment(null);
-              }}
-            >
-              Annuleren
-            </Button>
-            <Button 
-              variant="destructive"
-              onClick={confirmDeleteAssessment}
-              disabled={deleteAssessmentMutation.isPending}
-              className="bg-red-600 hover:bg-red-700"
-            >
-              {deleteAssessmentMutation.isPending ? 'Verwijderen...' : 'Definitief verwijderen'}
-            </Button>
-          </DialogFooter>
+              {/* Delete Assessment Dialog */}
+        <DeleteDialog
+          open={showDeleteModal}
+          onOpenChange={setShowDeleteModal}
+          onConfirm={confirmDeleteAssessment}
+          title="Beoordeling Verwijderen"
+          description="Weet je zeker dat je deze beoordeling wilt verwijderen?"
+          item={{
+            name: deletingAssessment?.title || "",
+            id: deletingAssessment?.studentName || ""
+          }}
+          warningText="Deze actie kan niet ongedaan worden gemaakt. De beoordeling wordt permanent verwijderd."
+          isLoading={deleteAssessmentMutation.isPending}
+          confirmButtonText="Definitief Verwijderen"
+        />
         </DialogContent>
       </Dialog>
     </div>

@@ -13,16 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { DeleteDialog } from "@/components/ui/delete-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { ListPlus, Edit, Trash2, Search } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -214,26 +205,20 @@ export default function ProgramsList() {
     <>
       {renderContent()}
       
-      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will permanently delete the program "{programToDelete?.name}".
-              This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              onClick={confirmDelete}
-            >
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <DeleteDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        onConfirm={confirmDelete}
+        title="Programma Verwijderen"
+        description="Weet je zeker dat je dit programma wilt verwijderen?"
+        item={{
+          name: programToDelete?.name || "",
+          id: programToDelete?.code || ""
+        }}
+        warningText="Deze actie kan niet ongedaan worden gemaakt. Het programma wordt permanent verwijderd."
+        confirmButtonText="Definitief Verwijderen"
+        cancelButtonText="Annuleren"
+      />
     </>
   );
 }

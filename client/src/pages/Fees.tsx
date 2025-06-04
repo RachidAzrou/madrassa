@@ -21,16 +21,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+import { DeleteDialog } from '@/components/ui/delete-dialog';
 import { Switch } from '@/components/ui/switch';
 import { FormDescription } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
@@ -2205,26 +2196,19 @@ export default function Fees() {
         </Dialog>
 
         {/* Delete Confirmation Dialog */}
-        <AlertDialog open={showDeleteConfirmDialog} onOpenChange={setShowDeleteConfirmDialog}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Weet je het zeker?</AlertDialogTitle>
-              <AlertDialogDescription>
-                Deze actie kan niet ongedaan worden gemaakt. Dit zal permanent{' '}
-                <strong>{deleteItem?.name}</strong> verwijderen uit het systeem.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Annuleren</AlertDialogCancel>
-              <AlertDialogAction
-                onClick={handleDeleteConfirm}
-                className="bg-red-600 hover:bg-red-700"
-              >
-                Verwijderen
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+        <DeleteDialog
+          open={showDeleteConfirmDialog}
+          onOpenChange={setShowDeleteConfirmDialog}
+          onConfirm={handleDeleteConfirm}
+          title="Item Verwijderen"
+          description="Weet je zeker dat je dit item wilt verwijderen?"
+          item={{
+            name: deleteItem?.name || "",
+            id: deleteItem?.id?.toString() || ""
+          }}
+          warningText="Deze actie kan niet ongedaan worden gemaakt. Dit zal het item permanent uit het systeem verwijderen."
+          confirmButtonText="Definitief Verwijderen"
+        />
       </div>
     </div>
   );

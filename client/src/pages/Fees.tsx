@@ -402,58 +402,66 @@ export default function Fees() {
       </div>
 
       {/* Stats Grid - Dashboard Style */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Totaal Inkomsten</CardTitle>
-            <Euro className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">€{totalRevenue.toFixed(2)}</div>
-            <p className="text-xs text-muted-foreground">
-              Dit schooljaar
-            </p>
-          </CardContent>
-        </Card>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        {/* Totaal Inkomsten kaart */}
+        <div className="bg-white border border-[#e5e7eb] rounded-sm">
+          <div className="flex h-full">
+            <div className="flex items-center justify-center w-14 bg-[#f5f7fc] border-r border-[#e5e7eb]">
+              <Euro className="h-5 w-5 text-[#1e40af]" />
+            </div>
+            <div className="flex-1 p-3">
+              <div className="flex flex-col">
+                <h3 className="text-xs font-medium text-gray-500">Totaal Inkomsten</h3>
+                <p className="text-lg font-medium text-gray-800 mt-1">€{totalRevenue.toFixed(2)}</p>
+              </div>
+            </div>
+          </div>
+        </div>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Openstaande Betalingen</CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{pendingCount}</div>
-            <p className="text-xs text-muted-foreground">
-              Wachtend op betaling
-            </p>
-          </CardContent>
-        </Card>
+        {/* Openstaande Betalingen kaart */}
+        <div className="bg-white border border-[#e5e7eb] rounded-sm">
+          <div className="flex h-full">
+            <div className="flex items-center justify-center w-14 bg-[#f5f7fc] border-r border-[#e5e7eb]">
+              <Clock className="h-5 w-5 text-[#1e40af]" />
+            </div>
+            <div className="flex-1 p-3">
+              <div className="flex flex-col">
+                <h3 className="text-xs font-medium text-gray-500">Openstaand</h3>
+                <p className="text-lg font-medium text-gray-800 mt-1">{pendingCount}</p>
+              </div>
+            </div>
+          </div>
+        </div>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Openstaand Bedrag</CardTitle>
-            <AlertCircle className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">€{outstandingAmount.toFixed(2)}</div>
-            <p className="text-xs text-muted-foreground">
-              Te innen bedrag
-            </p>
-          </CardContent>
-        </Card>
+        {/* Openstaand Bedrag kaart */}
+        <div className="bg-white border border-[#e5e7eb] rounded-sm">
+          <div className="flex h-full">
+            <div className="flex items-center justify-center w-14 bg-[#f5f7fc] border-r border-[#e5e7eb]">
+              <AlertCircle className="h-5 w-5 text-[#1e40af]" />
+            </div>
+            <div className="flex-1 p-3">
+              <div className="flex flex-col">
+                <h3 className="text-xs font-medium text-gray-500">Te Innen</h3>
+                <p className="text-lg font-medium text-gray-800 mt-1">€{outstandingAmount.toFixed(2)}</p>
+              </div>
+            </div>
+          </div>
+        </div>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Deze Maand</CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">€{monthlyRevenue.toFixed(2)}</div>
-            <p className="text-xs text-muted-foreground">
-              Ontvangen betalingen
-            </p>
-          </CardContent>
-        </Card>
+        {/* Deze Maand kaart */}
+        <div className="bg-white border border-[#e5e7eb] rounded-sm">
+          <div className="flex h-full">
+            <div className="flex items-center justify-center w-14 bg-[#f5f7fc] border-r border-[#e5e7eb]">
+              <Calendar className="h-5 w-5 text-[#1e40af]" />
+            </div>
+            <div className="flex-1 p-3">
+              <div className="flex flex-col">
+                <h3 className="text-xs font-medium text-gray-500">Deze Maand</h3>
+                <p className="text-lg font-medium text-gray-800 mt-1">€{monthlyRevenue.toFixed(2)}</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Action Buttons */}

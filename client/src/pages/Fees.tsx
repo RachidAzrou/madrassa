@@ -531,6 +531,12 @@ export default function Fees() {
   const handlePayOnline = async (payment: any) => {
     try {
       const response = await apiRequest('POST', `/api/payments/${payment.id}/payment-link`);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      }
+      
       const data = await response.json();
       
       if (data.checkoutUrl) {

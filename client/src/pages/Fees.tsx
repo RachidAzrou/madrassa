@@ -543,7 +543,7 @@ export default function Fees() {
             </div>
 
             {/* Payments Table */}
-            <Card className="bg-white rounded-md border shadow-sm overflow-hidden">
+            <div className="bg-white rounded-md border shadow-sm overflow-hidden">
               <Table>
                 <TableHeader>
                   <TableRow className="bg-gray-50">
@@ -580,16 +580,25 @@ export default function Fees() {
                         <TableCell>{getStatusBadge(payment.status)}</TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
-                            <Button size="sm" variant="outline">
+                            <Button 
+                              variant="ghost" 
+                              size="icon"
+                              className="h-8 w-8"
+                            >
                               <Eye className="h-4 w-4" />
                             </Button>
-                            <Button size="sm" variant="outline">
+                            <Button 
+                              variant="ghost" 
+                              size="icon"
+                              className="h-8 w-8"
+                            >
                               <Edit className="h-4 w-4" />
                             </Button>
                             {payment.status === 'betaald' && (
                               <Button
-                                size="sm"
-                                variant="outline"
+                                variant="ghost" 
+                                size="icon"
+                                className="h-8 w-8"
                                 onClick={() => handleDownloadInvoice(payment)}
                               >
                                 <Download className="h-4 w-4" />
@@ -602,7 +611,7 @@ export default function Fees() {
                   )}
                 </TableBody>
               </Table>
-            </Card>
+            </div>
           </TabsContent>
 
           <TabsContent value="history" className="space-y-6">
@@ -642,41 +651,45 @@ export default function Fees() {
                   </Select>
                 </div>
 
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Datum</TableHead>
-                      <TableHead>Student</TableHead>
-                      <TableHead>Omschrijving</TableHead>
-                      <TableHead>Bedrag</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Acties</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredPayments.map((payment: any) => (
-                      <TableRow key={payment.id}>
-                        <TableCell>{formatDate(payment.createdAt)}</TableCell>
-                        <TableCell className="font-medium">{payment.studentName}</TableCell>
-                        <TableCell>{payment.description}</TableCell>
-                        <TableCell>{formatCurrency(payment.amount)}</TableCell>
-                        <TableCell>{getStatusBadge(payment.status)}</TableCell>
-                        <TableCell>
-                          {payment.status === 'betaald' && (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleDownloadInvoice(payment)}
-                            >
-                              <Download className="h-4 w-4 mr-2" />
-                              Factuur
-                            </Button>
-                          )}
-                        </TableCell>
+                <div className="bg-white rounded-md border shadow-sm overflow-hidden">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="bg-gray-50">
+                        <TableHead>Datum</TableHead>
+                        <TableHead>Student</TableHead>
+                        <TableHead>Omschrijving</TableHead>
+                        <TableHead>Bedrag</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead className="text-right">Acties</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredPayments.map((payment: any) => (
+                        <TableRow key={payment.id}>
+                          <TableCell>{formatDate(payment.createdAt)}</TableCell>
+                          <TableCell className="font-medium">{payment.studentName}</TableCell>
+                          <TableCell>{payment.description}</TableCell>
+                          <TableCell>{formatCurrency(payment.amount)}</TableCell>
+                          <TableCell>{getStatusBadge(payment.status)}</TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex justify-end gap-2">
+                              {payment.status === 'betaald' && (
+                                <Button
+                                  variant="ghost" 
+                                  size="icon"
+                                  className="h-8 w-8"
+                                  onClick={() => handleDownloadInvoice(payment)}
+                                >
+                                  <Download className="h-4 w-4" />
+                                </Button>
+                              )}
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>

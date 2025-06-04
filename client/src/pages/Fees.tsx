@@ -431,20 +431,22 @@ export default function Fees() {
     );
   }
 
-  // Staff/Admin view - Dashboard UI styling
+  // Staff/Admin view - Students page styling
   return (
-    <div className="p-6">
-      {/* Header - Dashboard Style */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">
-          Betalingsbeheer
-        </h1>
-        <p className="text-gray-600 mt-2">
-          Overzicht van alle betalingen, kortingen en financiële rapportages
-        </p>
-      </div>
+    <div className="bg-[#f7f9fc] min-h-screen">
+      <PremiumHeader 
+        title="Betalingsbeheer" 
+        description="Beheer betalingen, collegegeld en kortingen"
+        icon={Euro}
+        breadcrumbs={{
+          parent: "Beheer",
+          current: "Betalingen"
+        }}
+      />
+      
+        <div className="container mx-auto p-4 max-w-7xl">
 
-      {/* Stats Grid - Dashboard Style */}
+        {/* Stats Grid - Dashboard Style */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {/* Totaal Inkomsten kaart */}
         <div className="bg-white border border-[#e5e7eb] rounded-sm">
@@ -521,12 +523,25 @@ export default function Fees() {
         </div>
       </div>
 
-      {/* Tabs Layout */}
-      <Tabs defaultValue="payments" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="payments">Betalingen</TabsTrigger>
-            <TabsTrigger value="history">Geschiedenis</TabsTrigger>
-            <TabsTrigger value="discounts">Kortingen</TabsTrigger>
+        {/* Tabs Layout */}
+        <Tabs defaultValue="payments" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="payments" className="flex items-center gap-2">
+              <Receipt className="h-4 w-4" />
+              Betalingen
+            </TabsTrigger>
+            <TabsTrigger value="tuition" className="flex items-center gap-2">
+              <GraduationCap className="h-4 w-4" />
+              Collegegeld
+            </TabsTrigger>
+            <TabsTrigger value="discounts" className="flex items-center gap-2">
+              <Tag className="h-4 w-4" />
+              Kortingen
+            </TabsTrigger>
+            <TabsTrigger value="history" className="flex items-center gap-2">
+              <History className="h-4 w-4" />
+              Geschiedenis
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="payments" className="space-y-6">
@@ -1036,6 +1051,202 @@ export default function Fees() {
             </Form>
           </DialogContent>
         </Dialog>
+
+        {/* Add Tuition Fee Dialog */}
+        <Dialog open={showTuitionFeeDialog} onOpenChange={setShowTuitionFeeDialog}>
+          <DialogContent className="sm:max-w-[500px]">
+            <DialogHeader>
+              <DialogTitle>Collegegeld Instellen</DialogTitle>
+              <DialogDescription>
+                Stel het standaard collegegeld in voor een schooljaar
+              </DialogDescription>
+            </DialogHeader>
+            <Form {...tuitionFeeForm}>
+              <form onSubmit={tuitionFeeForm.handleSubmit(handleAddTuitionFee)} className="space-y-4">
+                <FormField
+                  control={tuitionFeeForm.control}
+                  name="academicYearId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Schooljaar</FormLabel>
+                      <Select onValueChange={(value) => field.onChange(Number(value))} value={field.value?.toString()}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecteer schooljaar" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {academicYearsData.map((year: any) => (
+                            <SelectItem key={year.id} value={year.id.toString()}>
+                              {year.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={tuitionFeeForm.control}
+                  name="amount"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Bedrag (€)</FormLabel>
+                      <FormControl>
+                        <Input type="number" step="0.01" placeholder="450.00" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={tuitionFeeForm.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Omschrijving</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Bijvoorbeeld: Schoolgeld 2024-2025" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <DialogFooter>
+                  <Button type="button" variant="outline" onClick={() => setShowTuitionFeeDialog(false)}>
+                    Annuleren
+                  </Button>
+                  <Button type="submit" disabled={tuitionFeeMutation.isPending}>
+                    {tuitionFeeMutation.isPending ? 'Opslaan...' : 'Collegegeld Instellen'}
+                  </Button>
+                </DialogFooter>
+              </form>
+            </Form>
+          </DialogContent>
+        </Dialog>
+
+        {/* Create Discount Dialog */}
+        <Dialog open={showCreateDiscountDialog} onOpenChange={setShowCreateDiscountDialog}>
+          <DialogContent className="sm:max-w-[500px]">
+            <DialogHeader>
+              <DialogTitle>Nieuwe Korting Aanmaken</DialogTitle>
+              <DialogDescription>
+                Maak een nieuwe korting aan die toegepast kan worden
+              </DialogDescription>
+            </DialogHeader>
+            <Form {...createDiscountForm}>
+              <form onSubmit={createDiscountForm.handleSubmit(handleCreateDiscount)} className="space-y-4">
+                <FormField
+                  control={createDiscountForm.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Naam</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Bijvoorbeeld: Sociale korting" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={createDiscountForm.control}
+                    name="type"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Type</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Type korting" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="percentage">Percentage</SelectItem>
+                            <SelectItem value="amount">Vast bedrag</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={createDiscountForm.control}
+                    name="value"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Waarde</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="number" 
+                            step="0.01" 
+                            placeholder={createDiscountForm.watch('type') === 'percentage' ? '25' : '50.00'}
+                            {...field}
+                            onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                
+                <div className="space-y-3">
+                  <FormField
+                    control={createDiscountForm.control}
+                    name="isAutomatic"
+                    render={({ field }) => (
+                      <FormItem className="flex items-center space-x-2">
+                        <FormControl>
+                          <input
+                            type="checkbox"
+                            checked={field.value}
+                            onChange={field.onChange}
+                            className="rounded border-gray-300"
+                          />
+                        </FormControl>
+                        <FormLabel className="mb-0">Automatische korting</FormLabel>
+                      </FormItem>
+                    )}
+                  />
+                  
+                  {createDiscountForm.watch('isAutomatic') && (
+                    <FormField
+                      control={createDiscountForm.control}
+                      name="rule"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Regel</FormLabel>
+                          <FormControl>
+                            <Textarea placeholder="Beschrijf wanneer deze korting automatisch wordt toegepast..." {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
+                </div>
+                
+                <DialogFooter>
+                  <Button type="button" variant="outline" onClick={() => setShowCreateDiscountDialog(false)}>
+                    Annuleren
+                  </Button>
+                  <Button type="submit" disabled={createDiscountMutation.isPending}>
+                    {createDiscountMutation.isPending ? 'Aanmaken...' : 'Korting Aanmaken'}
+                  </Button>
+                </DialogFooter>
+              </form>
+            </Form>
+          </DialogContent>
+        </Dialog>
+      </div>
     </div>
   );
 }

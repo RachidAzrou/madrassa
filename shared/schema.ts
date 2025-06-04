@@ -1327,7 +1327,12 @@ export const discounts = pgTable("discounts", {
   type: text("type").notNull(), // percentage of amount
   value: decimal("value", { precision: 10, scale: 2 }).notNull(),
   isAutomatic: boolean("is_automatic").default(false),
-  rule: text("rule"), // Regel voor automatische toekenning
+  rule: text("rule"), // Legacy regel veld (behouden voor backward compatibility)
+  // Gestructureerde regelvelden voor automatische kortingen
+  ruleCondition: text("rule_condition"), // siblings, income, enrollment_date, student_count
+  ruleOperator: text("rule_operator"), // greater_than, less_than, equal_to, greater_equal, less_equal
+  ruleValue: text("rule_value"), // De waarde om mee te vergelijken
+  ruleDescription: text("rule_description"), // Menselijke beschrijving van de regel
   isActive: boolean("is_active").default(true),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),

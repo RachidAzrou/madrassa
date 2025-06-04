@@ -21,6 +21,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { DeleteDialog } from '@/components/ui/delete-dialog';
 import { CustomDialogContent } from '@/components/ui/custom-dialog-content';
@@ -1799,19 +1800,123 @@ export default function Fees() {
                   />
                   
                   {createDiscountForm.watch('isAutomatic') && (
-                    <FormField
-                      control={createDiscountForm.control}
-                      name="rule"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Regel</FormLabel>
-                          <FormControl>
-                            <Textarea placeholder="Beschrijf wanneer deze korting automatisch wordt toegepast..." {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    <div className="space-y-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                      <div className="border-b border-blue-200 pb-2">
+                        <h4 className="text-sm font-semibold text-blue-900">Automatische Regel Instellen</h4>
+                        <p className="text-xs text-blue-700">Bepaal wanneer deze korting automatisch wordt toegepast</p>
+                      </div>
+                      
+                      <div className="grid gap-4">
+                        <div className="grid grid-cols-4 items-center gap-4">
+                          <Label className="text-xs font-medium text-gray-700 text-right">
+                            Conditie
+                          </Label>
+                          <div className="col-span-3">
+                            <FormField
+                              control={createDiscountForm.control}
+                              name="ruleCondition"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <Select onValueChange={field.onChange} value={field.value}>
+                                    <FormControl>
+                                      <SelectTrigger className="border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-200">
+                                        <SelectValue placeholder="Selecteer conditie" />
+                                      </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                      <SelectItem value="siblings">Aantal broers/zussen</SelectItem>
+                                      <SelectItem value="student_count">Aantal studenten per gezin</SelectItem>
+                                      <SelectItem value="income">Gezinsinkomen (€)</SelectItem>
+                                      <SelectItem value="enrollment_date">Inschrijfdatum</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-4 items-center gap-4">
+                          <Label className="text-xs font-medium text-gray-700 text-right">
+                            Operator
+                          </Label>
+                          <div className="col-span-3">
+                            <FormField
+                              control={createDiscountForm.control}
+                              name="ruleOperator"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <Select onValueChange={field.onChange} value={field.value}>
+                                    <FormControl>
+                                      <SelectTrigger className="border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-200">
+                                        <SelectValue placeholder="Selecteer operator" />
+                                      </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                      <SelectItem value="greater_than">Groter dan</SelectItem>
+                                      <SelectItem value="greater_equal">Groter of gelijk aan</SelectItem>
+                                      <SelectItem value="less_than">Kleiner dan</SelectItem>
+                                      <SelectItem value="less_equal">Kleiner of gelijk aan</SelectItem>
+                                      <SelectItem value="equal_to">Gelijk aan</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-4 items-center gap-4">
+                          <Label className="text-xs font-medium text-gray-700 text-right">
+                            Waarde
+                          </Label>
+                          <div className="col-span-3">
+                            <FormField
+                              control={createDiscountForm.control}
+                              name="ruleValue"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormControl>
+                                    <Input 
+                                      placeholder="Bijvoorbeeld: 1, 30000, 2024-09-01" 
+                                      className="border-gray-300 focus:border-blue-500 focus:ring-blue-200"
+                                      {...field} 
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-4 items-center gap-4">
+                          <Label className="text-xs font-medium text-gray-700 text-right">
+                            Beschrijving
+                          </Label>
+                          <div className="col-span-3">
+                            <FormField
+                              control={createDiscountForm.control}
+                              name="ruleDescription"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormControl>
+                                    <Input 
+                                      placeholder="Bijvoorbeeld: Voor gezinnen met meerdere kinderen" 
+                                      className="border-gray-300 focus:border-blue-500 focus:ring-blue-200"
+                                      {...field} 
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   )}
                 </div>
                 

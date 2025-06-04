@@ -1828,22 +1828,13 @@ export default function Fees() {
 
         {/* Edit Payment Dialog */}
         <Dialog open={showEditPaymentDialog} onOpenChange={setShowEditPaymentDialog}>
-          <DialogContent className="sm:max-w-[600px] p-0 overflow-hidden">
-            <div className="bg-[#1e40af] py-4 px-6 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="bg-white/20 p-2 rounded-full">
-                  <Pencil className="h-5 w-5 text-white" />
-                </div>
-                <div>
-                  <DialogTitle className="text-white text-lg font-semibold m-0">Betaling Bewerken</DialogTitle>
-                  <DialogDescription className="text-white/70 text-sm m-0">
-                    Wijzig de gegevens van de betaling.
-                  </DialogDescription>
-                </div>
-              </div>
-            </div>
-            
-            <div className="p-6 overflow-y-auto" style={{ maxHeight: 'calc(90vh - 150px)' }}>
+          <CustomDialogContent>
+            <DialogHeader variant="branded">
+              <DialogTitle>Betaling Bewerken</DialogTitle>
+              <DialogDescription>
+                Wijzig de gegevens van de betaling.
+              </DialogDescription>
+            </DialogHeader>
               <Form {...editPaymentForm}>
                 <form onSubmit={editPaymentForm.handleSubmit(onSubmitEditPayment)} className="space-y-4">
                 <FormField
@@ -1966,19 +1957,18 @@ export default function Fees() {
                   />
                 </div>
                 
-                <div className="bg-gray-50 px-6 py-3 flex justify-end gap-2 border-t">
-                  <Button type="button" variant="outline" onClick={() => setShowEditPaymentDialog(false)} className="h-8 text-xs rounded-sm">
+                <DialogFooter>
+                  <Button type="button" variant="outline" onClick={() => setShowEditPaymentDialog(false)}>
                     Annuleren
                   </Button>
-                  <Button type="submit" disabled={editPaymentMutation.isPending} className="h-8 text-xs rounded-sm">
+                  <Button type="submit" disabled={editPaymentMutation.isPending}>
                     {editPaymentMutation.isPending ? 'Bijwerken...' : 'Betaling Bijwerken'}
                   </Button>
-                </div>
+                </DialogFooter>
               </form>
             </Form>
-          </div>
-        </DialogContent>
-      </Dialog>
+          </CustomDialogContent>
+        </Dialog>
 
         {/* Edit Tuition Fee Dialog */}
         <Dialog open={showEditTuitionFeeDialog} onOpenChange={setShowEditTuitionFeeDialog}>

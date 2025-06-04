@@ -287,7 +287,7 @@ export default function Fees() {
   // Delete mutations
   const deletePaymentMutation = useMutation({
     mutationFn: async (id: number) => {
-      return await apiRequest('DELETE', `/api/payments/${id}`);
+      return await apiRequest(`/api/payments/${id}`, { method: 'DELETE' });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/payments'] });
@@ -307,7 +307,7 @@ export default function Fees() {
 
   const deleteTuitionFeeMutation = useMutation({
     mutationFn: async (id: number) => {
-      return await apiRequest('DELETE', `/api/tuition-fees/${id}`);
+      return await apiRequest(`/api/tuition-fees/${id}`, { method: 'DELETE' });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/tuition-fees'] });
@@ -327,7 +327,7 @@ export default function Fees() {
 
   const deleteDiscountMutation = useMutation({
     mutationFn: async (id: number) => {
-      return await apiRequest('DELETE', `/api/discounts/${id}`);
+      return await apiRequest(`/api/discounts/${id}`, { method: 'DELETE' });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/discounts'] });
@@ -347,7 +347,7 @@ export default function Fees() {
 
   const deleteDiscountApplicationMutation = useMutation({
     mutationFn: async (id: number) => {
-      return await apiRequest('DELETE', `/api/discount-applications/${id}`);
+      return await apiRequest(`/api/discount-applications/${id}`, { method: 'DELETE' });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/discount-applications'] });

@@ -1405,7 +1405,7 @@ export default function Fees() {
 
         {/* Add Payment Dialog */}
         <Dialog open={showAddPaymentDialog} onOpenChange={setShowAddPaymentDialog}>
-          <DialogContent className="sm:max-w-[600px]">
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Nieuwe Betaling Toevoegen</DialogTitle>
               <DialogDescription>
@@ -1808,7 +1808,7 @@ export default function Fees() {
 
         {/* Edit Payment Dialog */}
         <Dialog open={showEditPaymentDialog} onOpenChange={setShowEditPaymentDialog}>
-          <DialogContent className="max-w-md">
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Betaling Bewerken</DialogTitle>
               <DialogDescription>
@@ -1952,7 +1952,7 @@ export default function Fees() {
 
         {/* Edit Tuition Fee Dialog */}
         <Dialog open={showEditTuitionFeeDialog} onOpenChange={setShowEditTuitionFeeDialog}>
-          <DialogContent className="max-w-md">
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Collegegeld Bewerken</DialogTitle>
               <DialogDescription>
@@ -2050,7 +2050,7 @@ export default function Fees() {
 
         {/* Edit Discount Dialog */}
         <Dialog open={showEditDiscountDialog} onOpenChange={setShowEditDiscountDialog}>
-          <DialogContent className="max-w-md">
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Korting Bewerken</DialogTitle>
               <DialogDescription>

@@ -1461,7 +1461,7 @@ export default function Fees() {
                     <FormItem>
                       <FormLabel>Omschrijving</FormLabel>
                       <FormControl>
-                        <Input placeholder="Bijvoorbeeld: Schoolgeld 2025" {...field} />
+                        <Input placeholder="Beschrijving van de betaling" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -1476,7 +1476,7 @@ export default function Fees() {
                       <FormItem>
                         <FormLabel>Bedrag (€)</FormLabel>
                         <FormControl>
-                          <Input type="number" step="0.01" placeholder="450.00" {...field} />
+                          <Input type="number" step="0.01" placeholder="0.00" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -1615,7 +1615,7 @@ export default function Fees() {
                     <FormItem>
                       <FormLabel>Reden (optioneel)</FormLabel>
                       <FormControl>
-                        <Textarea placeholder="Reden voor korting..." {...field} />
+                        <Textarea placeholder="Reden voor deze korting" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -1687,7 +1687,7 @@ export default function Fees() {
                     <FormItem>
                       <FormLabel>Bedrag (€)</FormLabel>
                       <FormControl>
-                        <Input type="number" step="0.01" placeholder="450.00" {...field} />
+                        <Input type="number" step="0.01" placeholder="0.00" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -1701,7 +1701,7 @@ export default function Fees() {
                     <FormItem>
                       <FormLabel>Omschrijving</FormLabel>
                       <FormControl>
-                        <Input placeholder="Bijvoorbeeld: Schoolgeld 2024-2025" {...field} />
+                        <Input placeholder="Beschrijving van het collegegeld" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

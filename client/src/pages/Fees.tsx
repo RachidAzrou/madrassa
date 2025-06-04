@@ -196,15 +196,18 @@ export default function Fees() {
   };
 
   const getStatusBadge = (status: string) => {
-    const statusConfig = {
-      'openstaand': { variant: 'destructive' as const, label: 'Openstaand' },
-      'betaald': { variant: 'default' as const, label: 'Betaald' },
-      'geannuleerd': { variant: 'secondary' as const, label: 'Geannuleerd' },
-      'verwerking': { variant: 'outline' as const, label: 'Verwerking' },
-    };
-    
-    const config = statusConfig[status as keyof typeof statusConfig] || { variant: 'secondary' as const, label: status };
-    return <Badge variant={config.variant}>{config.label}</Badge>;
+    switch (status.toLowerCase()) {
+      case 'betaald':
+        return <Badge className="w-20 justify-center bg-green-100 text-green-800 border-green-200">Betaald</Badge>;
+      case 'openstaand':
+        return <Badge className="w-20 justify-center bg-orange-100 text-orange-800 border-orange-200">Openstaand</Badge>;
+      case 'achterstallig':
+        return <Badge className="w-20 justify-center bg-red-100 text-red-800 border-red-200">Achterstallig</Badge>;
+      case 'geannuleerd':
+        return <Badge className="w-20 justify-center bg-gray-100 text-gray-800 border-gray-200">Geannuleerd</Badge>;
+      default:
+        return <Badge className="w-20 justify-center bg-gray-100 text-gray-800 border-gray-200">{status}</Badge>;
+    }
   };
 
   // Filter payments

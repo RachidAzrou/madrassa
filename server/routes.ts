@@ -5474,8 +5474,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           value: parseFloat(payment.amount).toFixed(2)
         },
         description: payment.description,
-        redirectUrl: `${req.protocol}://${req.get('host')}/payment-success?id=${id}`,
-        webhookUrl: `${req.protocol}://${req.get('host')}/api/payments/webhook`,
+        redirectUrl: `https://${req.get('host')}/payment-success?id=${id}`,
+        webhookUrl: `https://${req.get('host')}/api/payments/webhook`,
         metadata: {
           paymentId: id.toString(),
           studentId: payment.studentId.toString()

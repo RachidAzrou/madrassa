@@ -606,6 +606,8 @@ export default function Fees() {
         return <Badge className="w-20 justify-center bg-green-100 text-green-800 border-green-200">Betaald</Badge>;
       case 'openstaand':
         return <Badge className="w-20 justify-center bg-orange-100 text-orange-800 border-orange-200">Openstaand</Badge>;
+      case 'pending':
+        return <Badge className="w-24 justify-center bg-blue-100 text-blue-800 border-blue-200">In behandeling</Badge>;
       case 'achterstallig':
         return <Badge className="w-20 justify-center bg-red-100 text-red-800 border-red-200">Achterstallig</Badge>;
       case 'geannuleerd':

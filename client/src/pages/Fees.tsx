@@ -6,9 +6,11 @@ import * as z from 'zod';
 import {
   Search, Plus, Download, Filter, Eye, Edit, Trash2,
   Euro, Clock, AlertCircle, Calendar, CreditCard,
-  Users, User, Gift, Shield, Activity
+  Users, User, Gift, Shield, Activity, Receipt,
+  Tag, Settings, History, GraduationCap
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { PremiumHeader } from '@/components/layout/premium-header';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -38,6 +40,21 @@ const discountSchema = z.object({
   reason: z.string().optional(),
 });
 
+const tuitionFeeSchema = z.object({
+  academicYearId: z.number().min(1, 'Selecteer een schooljaar'),
+  amount: z.string().min(1, 'Bedrag is verplicht'),
+  description: z.string().min(1, 'Omschrijving is verplicht'),
+});
+
+const createDiscountSchema = z.object({
+  name: z.string().min(1, 'Naam is verplicht'),
+  type: z.enum(['percentage', 'amount']),
+  value: z.number().min(0.01, 'Waarde moet groter zijn dan 0'),
+  isAutomatic: z.boolean(),
+  rule: z.string().optional(),
+  isActive: z.boolean().default(true),
+});
+
 export default function Fees() {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -50,6 +67,8 @@ export default function Fees() {
   const [classFilter, setClassFilter] = useState('alle');
   const [showAddPaymentDialog, setShowAddPaymentDialog] = useState(false);
   const [showDiscountDialog, setShowDiscountDialog] = useState(false);
+  const [showTuitionFeeDialog, setShowTuitionFeeDialog] = useState(false);
+  const [showCreateDiscountDialog, setShowCreateDiscountDialog] = useState(false);
 
   // Check if user is parent
   const isParent = user?.role === 'ouder';
@@ -97,6 +116,27 @@ export default function Fees() {
       studentId: 0,
       discountId: 0,
       reason: '',
+    },
+  });
+
+  const tuitionFeeForm = useForm<z.infer<typeof tuitionFeeSchema>>({
+    resolver: zodResolver(tuitionFeeSchema),
+    defaultValues: {
+      academicYearId: 0,
+      amount: '',
+      description: '',
+    },
+  });
+
+  const createDiscountForm = useForm<z.infer<typeof createDiscountSchema>>({
+    resolver: zodResolver(createDiscountSchema),
+    defaultValues: {
+      name: '',
+      type: 'percentage',
+      value: 0,
+      isAutomatic: false,
+      rule: '',
+      isActive: true,
     },
   });
 

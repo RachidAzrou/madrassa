@@ -7,7 +7,7 @@ import {
   Search, Plus, Download, Filter, Eye, Edit, Trash2,
   Euro, Clock, AlertCircle, Calendar, CreditCard,
   Users, User, Gift, Shield, Activity, Receipt,
-  Tag, Settings, History, GraduationCap, Pencil
+  Tag, Settings, History, GraduationCap, Pencil, Percent
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { PremiumHeader } from '@/components/layout/premium-header';
@@ -1425,14 +1425,22 @@ export default function Fees() {
 
         {/* Add Payment Dialog */}
         <Dialog open={showAddPaymentDialog} onOpenChange={setShowAddPaymentDialog}>
-          <CustomDialogContent>
-            <DialogHeader variant="branded">
-              <DialogTitle>Nieuwe Betaling Toevoegen</DialogTitle>
-              <DialogDescription>
-                Voeg een nieuwe betaling toe voor een student
-              </DialogDescription>
-            </DialogHeader>
-            <Form {...addPaymentForm}>
+          <DialogContent className="sm:max-w-[600px] p-0 overflow-hidden">
+            <div className="bg-[#1e40af] py-4 px-6 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="bg-white/20 p-2 rounded-full">
+                  <Plus className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <DialogTitle className="text-white text-lg font-semibold m-0">Nieuwe Betaling Toevoegen</DialogTitle>
+                  <DialogDescription className="text-white/70 text-sm m-0">
+                    Voeg een nieuwe betaling toe voor een student
+                  </DialogDescription>
+                </div>
+              </div>
+            </div>
+            <div className="p-6 overflow-y-auto" style={{ maxHeight: 'calc(90vh - 150px)' }}>
+              <Form {...addPaymentForm}>
               <form onSubmit={addPaymentForm.handleSubmit(handleAddPayment)} className="space-y-4">
                 <FormField
                   control={addPaymentForm.control}
@@ -1528,29 +1536,38 @@ export default function Fees() {
                   )}
                 />
                 
-                <DialogFooter>
-                  <Button type="button" variant="outline" onClick={() => setShowAddPaymentDialog(false)}>
+                <div className="bg-gray-50 px-6 py-3 flex justify-end gap-2 border-t">
+                  <Button type="button" variant="outline" onClick={() => setShowAddPaymentDialog(false)} className="h-8 text-xs rounded-sm">
                     Annuleren
                   </Button>
-                  <Button type="submit" disabled={addPaymentMutation.isPending}>
+                  <Button type="submit" disabled={addPaymentMutation.isPending} className="h-8 text-xs rounded-sm bg-[#1e40af] hover:bg-[#1e3a8a]">
                     {addPaymentMutation.isPending ? 'Toevoegen...' : 'Betaling Toevoegen'}
                   </Button>
-                </DialogFooter>
+                </div>
               </form>
             </Form>
-          </CustomDialogContent>
+            </div>
+          </DialogContent>
         </Dialog>
 
         {/* Discount Dialog */}
         <Dialog open={showDiscountDialog} onOpenChange={setShowDiscountDialog}>
-          <CustomDialogContent>
-            <DialogHeader variant="branded">
-              <DialogTitle>Korting Toekennen</DialogTitle>
-              <DialogDescription>
-                Ken een speciale korting toe aan een student
-              </DialogDescription>
-            </DialogHeader>
-            <Form {...discountForm}>
+          <DialogContent className="sm:max-w-[600px] p-0 overflow-hidden">
+            <div className="bg-[#1e40af] py-4 px-6 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="bg-white/20 p-2 rounded-full">
+                  <Percent className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <DialogTitle className="text-white text-lg font-semibold m-0">Korting Toekennen</DialogTitle>
+                  <DialogDescription className="text-white/70 text-sm m-0">
+                    Ken een speciale korting toe aan een student
+                  </DialogDescription>
+                </div>
+              </div>
+            </div>
+            <div className="p-6 overflow-y-auto" style={{ maxHeight: 'calc(90vh - 150px)' }}>
+              <Form {...discountForm}>
               <form onSubmit={discountForm.handleSubmit(handleAddDiscount)} className="space-y-4">
                 <FormField
                   control={discountForm.control}
@@ -1618,29 +1635,38 @@ export default function Fees() {
                   )}
                 />
                 
-                <DialogFooter>
-                  <Button type="button" variant="outline" onClick={() => setShowDiscountDialog(false)}>
+                <div className="bg-gray-50 px-6 py-3 flex justify-end gap-2 border-t">
+                  <Button type="button" variant="outline" onClick={() => setShowDiscountDialog(false)} className="h-8 text-xs rounded-sm">
                     Annuleren
                   </Button>
-                  <Button type="submit" disabled={discountMutation.isPending}>
+                  <Button type="submit" disabled={discountMutation.isPending} className="h-8 text-xs rounded-sm bg-[#1e40af] hover:bg-[#1e3a8a]">
                     {discountMutation.isPending ? 'Toekennen...' : 'Korting Toekennen'}
                   </Button>
-                </DialogFooter>
+                </div>
               </form>
             </Form>
-          </CustomDialogContent>
+            </div>
+          </DialogContent>
         </Dialog>
 
         {/* Add Tuition Fee Dialog */}
         <Dialog open={showTuitionFeeDialog} onOpenChange={setShowTuitionFeeDialog}>
-          <CustomDialogContent>
-            <DialogHeader variant="branded">
-              <DialogTitle>Collegegeld Instellen</DialogTitle>
-              <DialogDescription>
-                Stel het standaard collegegeld in voor een schooljaar
-              </DialogDescription>
-            </DialogHeader>
-            <Form {...tuitionFeeForm}>
+          <DialogContent className="sm:max-w-[600px] p-0 overflow-hidden">
+            <div className="bg-[#1e40af] py-4 px-6 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="bg-white/20 p-2 rounded-full">
+                  <GraduationCap className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <DialogTitle className="text-white text-lg font-semibold m-0">Collegegeld Instellen</DialogTitle>
+                  <DialogDescription className="text-white/70 text-sm m-0">
+                    Stel het standaard collegegeld in voor een schooljaar
+                  </DialogDescription>
+                </div>
+              </div>
+            </div>
+            <div className="p-6 overflow-y-auto" style={{ maxHeight: 'calc(90vh - 150px)' }}>
+              <Form {...tuitionFeeForm}>
               <form onSubmit={tuitionFeeForm.handleSubmit(handleAddTuitionFee)} className="space-y-4">
                 <FormField
                   control={tuitionFeeForm.control}

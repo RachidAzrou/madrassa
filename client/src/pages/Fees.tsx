@@ -35,7 +35,7 @@ import { useAuth } from '@/contexts/AuthContext';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -562,26 +562,383 @@ export default function Fees() {
 
   // Staff/Admin weergave: "Betalingsbeheer"
   return (
-    <div className="min-h-screen p-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Betalingsbeheer</h1>
-          <p className="text-muted-foreground">
-            Beheer alle betalingen van studenten en ouders
-          </p>
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto p-6">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Betalingsbeheer</h1>
+          <p className="text-gray-600">Beheer alle betalingen, kortingen en financiële rapportages</p>
         </div>
-        <div className="flex gap-2">
-          <Button onClick={handleExportData} variant="outline">
-            <Download className="h-4 w-4 mr-2" />
-            Exporteren
-          </Button>
-          <Dialog open={showAddPaymentDialog} onOpenChange={setShowAddPaymentDialog}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Betaling Toevoegen
-              </Button>
-            </DialogTrigger>
+
+        {/* Action Buttons */}
+        <div className="flex justify-end mb-6">
+          <div className="flex gap-3">
+            <Button onClick={handleNewPayment} className="bg-[#1e40af] hover:bg-[#1e40af]/90">
+              <Plus className="h-4 w-4 mr-2" />
+              Nieuwe Betaling
+            </Button>
+            <Button variant="outline" onClick={handleExportData}>
+              <Download className="h-4 w-4 mr-2" />
+              Exporteren
+            </Button>
+          </div>
+        </div>
+
+        {/* Statistics Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <Card className="bg-gradient-to-r from-green-50 to-green-100 border-green-200">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-green-600 text-sm font-medium">Totaal Inkomsten</p>
+                  <p className="text-2xl font-bold text-green-700">€{totalRevenue.toFixed(2)}</p>
+                  <p className="text-xs text-green-600 mt-1">Dit schooljaar</p>
+                </div>
+                <Euro className="h-8 w-8 text-green-600" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-blue-600 text-sm font-medium">Openstaande Betalingen</p>
+                  <p className="text-2xl font-bold text-blue-700">{pendingCount}</p>
+                  <p className="text-xs text-blue-600 mt-1">Wachtend op betaling</p>
+                </div>
+                <Clock className="h-8 w-8 text-blue-600" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-r from-orange-50 to-orange-100 border-orange-200">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-orange-600 text-sm font-medium">Openstaand Bedrag</p>
+                  <p className="text-2xl font-bold text-orange-700">€{outstandingAmount.toFixed(2)}</p>
+                  <p className="text-xs text-orange-600 mt-1">Te innen bedrag</p>
+                </div>
+                <AlertCircle className="h-8 w-8 text-orange-600" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-r from-purple-50 to-purple-100 border-purple-200">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-purple-600 text-sm font-medium">Deze Maand</p>
+                  <p className="text-2xl font-bold text-purple-700">€{monthlyRevenue.toFixed(2)}</p>
+                  <p className="text-xs text-purple-600 mt-1">Ontvangen betalingen</p>
+                </div>
+                <Calendar className="h-8 w-8 text-purple-600" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Tabs Layout */}
+        <Tabs defaultValue="payments" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="payments">Betalingen</TabsTrigger>
+            <TabsTrigger value="history">Geschiedenis</TabsTrigger>
+            <TabsTrigger value="discounts">Kortingen</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="payments" className="space-y-6">
+            {/* Search and Filters */}
+            <div className="mb-6 flex flex-col md:flex-row gap-4">
+              <div className="relative flex-1">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+                <Input
+                  type="text"
+                  placeholder="Zoek op student, omschrijving of bedrag..."
+                  className="pl-9"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+              <div className="flex-initial w-full md:w-auto flex flex-wrap gap-2">
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="w-full md:w-[150px]">
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="alle">Alle statussen</SelectItem>
+                    <SelectItem value="betaald">Betaald</SelectItem>
+                    <SelectItem value="openstaand">Openstaand</SelectItem>
+                    <SelectItem value="geannuleerd">Geannuleerd</SelectItem>
+                  </SelectContent>
+                </Select>
+                
+                <Select value={classFilter} onValueChange={setClassFilter}>
+                  <SelectTrigger className="w-full md:w-[150px]">
+                    <SelectValue placeholder="Klas" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="alle">Alle klassen</SelectItem>
+                    {studentGroups.map((group: any) => (
+                      <SelectItem key={group.id} value={group.name}>
+                        {group.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Select value={yearFilter} onValueChange={setYearFilter}>
+                  <SelectTrigger className="w-full md:w-[150px]">
+                    <SelectValue placeholder="Schooljaar" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="alle">Alle jaren</SelectItem>
+                    {academicYears.map((year: any) => (
+                      <SelectItem key={year.id} value={year.name}>
+                        {year.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Payments Table */}
+            <Card className="bg-white rounded-md border shadow-sm overflow-hidden">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-gray-50">
+                    <TableHead>Student ID</TableHead>
+                    <TableHead>Naam</TableHead>
+                    <TableHead>Omschrijving</TableHead>
+                    <TableHead>Bedrag</TableHead>
+                    <TableHead>Vervaldatum</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Acties</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {paymentsLoading ? (
+                    <TableRow>
+                      <TableCell colSpan={7} className="text-center py-4">
+                        Betalingen laden...
+                      </TableCell>
+                    </TableRow>
+                  ) : filteredPayments.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={7} className="text-center py-4">
+                        Geen betalingen gevonden.
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    filteredPayments.map((payment: any) => (
+                      <TableRow key={payment.id}>
+                        <TableCell className="font-medium">{payment.studentId}</TableCell>
+                        <TableCell>{payment.studentName}</TableCell>
+                        <TableCell>{payment.description}</TableCell>
+                        <TableCell>{formatCurrency(payment.amount)}</TableCell>
+                        <TableCell>{formatDate(payment.dueDate)}</TableCell>
+                        <TableCell>{getStatusBadge(payment.status)}</TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-2">
+                            <Button size="sm" variant="outline">
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button size="sm" variant="outline">
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            {payment.status === 'betaald' && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleDownloadInvoice(payment)}
+                              >
+                                <Download className="h-4 w-4" />
+                              </Button>
+                            )}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="history" className="space-y-6">
+            <Card className="bg-white rounded-md border shadow-sm">
+              <CardHeader>
+                <CardTitle>Betalingsgeschiedenis</CardTitle>
+                <CardDescription>
+                  Overzicht van alle betalingen en transacties
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="mb-4 flex gap-4">
+                  <Select value={yearFilter} onValueChange={setYearFilter}>
+                    <SelectTrigger className="w-48">
+                      <SelectValue placeholder="Schooljaar" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="alle">Alle jaren</SelectItem>
+                      {academicYears.map((year: any) => (
+                        <SelectItem key={year.id} value={year.name}>
+                          {year.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger className="w-48">
+                      <SelectValue placeholder="Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="alle">Alle statussen</SelectItem>
+                      <SelectItem value="betaald">Betaald</SelectItem>
+                      <SelectItem value="openstaand">Openstaand</SelectItem>
+                      <SelectItem value="geannuleerd">Geannuleerd</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Datum</TableHead>
+                      <TableHead>Student</TableHead>
+                      <TableHead>Omschrijving</TableHead>
+                      <TableHead>Bedrag</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Acties</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredPayments.map((payment: any) => (
+                      <TableRow key={payment.id}>
+                        <TableCell>{formatDate(payment.createdAt)}</TableCell>
+                        <TableCell className="font-medium">{payment.studentName}</TableCell>
+                        <TableCell>{payment.description}</TableCell>
+                        <TableCell>{formatCurrency(payment.amount)}</TableCell>
+                        <TableCell>{getStatusBadge(payment.status)}</TableCell>
+                        <TableCell>
+                          {payment.status === 'betaald' && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleDownloadInvoice(payment)}
+                            >
+                              <Download className="h-4 w-4 mr-2" />
+                              Factuur
+                            </Button>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="discounts" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Automatic Discounts */}
+              <Card className="bg-white rounded-md border shadow-sm">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="h-5 w-5 text-blue-600" />
+                    Automatische Kortingen
+                  </CardTitle>
+                  <CardDescription>
+                    Familiereductie voor families met meerdere kinderen
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="font-semibold text-blue-800">Familiekorting</h4>
+                          <p className="text-sm text-blue-600">10% korting voor families met 2+ kinderen</p>
+                        </div>
+                        <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                          Automatisch
+                        </Badge>
+                      </div>
+                    </div>
+                    
+                    {/* Show families with automatic discounts */}
+                    <div className="space-y-2">
+                      <h5 className="font-medium text-gray-900">Actieve Familiekortingen:</h5>
+                      {discountApplications
+                        .filter((app: any) => app.isAutomatic && app.isActive)
+                        .map((app: any) => (
+                          <div key={app.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                            <div>
+                              <p className="font-medium">{app.studentName}</p>
+                              <p className="text-sm text-gray-600">Familie: {app.familyName}</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="font-bold text-green-600">-10%</p>
+                              <p className="text-sm text-gray-500">Auto toegepast</p>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Manual Discounts */}
+              <Card className="bg-white rounded-md border shadow-sm">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <User className="h-5 w-5 text-orange-600" />
+                    Handmatige Kortingen
+                  </CardTitle>
+                  <CardDescription>
+                    Specifieke kortingen toegekend door administratie
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <Button className="w-full bg-orange-600 hover:bg-orange-700" onClick={() => setShowDiscountDialog(true)}>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Korting Toekennen
+                    </Button>
+                    
+                    <div className="space-y-2">
+                      {discountApplications
+                        .filter((app: any) => !app.isAutomatic && app.isActive)
+                        .map((app: any) => (
+                          <div key={app.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                            <div>
+                              <p className="font-medium">{app.studentName}</p>
+                              <p className="text-sm text-gray-600">{app.discountName}</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="font-bold text-orange-600">-{app.discountPercentage}%</p>
+                              <Button size="sm" variant="outline" className="mt-1">
+                                <Trash2 className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+        </Tabs>
+
+        {/* Add Payment Dialog */}
+        <Dialog open={showAddPaymentDialog} onOpenChange={setShowAddPaymentDialog}>
+          <DialogTrigger asChild>
+            <div />
+          </DialogTrigger>
             <CustomDialogContent>
               <DialogHeader>
                 <DialogTitle>Nieuwe Betaling Toevoegen</DialogTitle>

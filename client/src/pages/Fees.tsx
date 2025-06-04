@@ -494,10 +494,9 @@ export default function Fees() {
     setShowDeleteConfirmDialog(true);
   };
 
-  const handleDeleteDiscount = (id: number) => {
-    if (window.confirm('Weet je zeker dat je deze korting wilt verwijderen?')) {
-      deleteDiscountMutation.mutate(id);
-    }
+  const handleDeleteDiscount = (id: number, name: string) => {
+    setDeleteItem({ id, name, type: 'discount' });
+    setShowDeleteConfirmDialog(true);
   };
 
   const handleDeleteDiscountApplication = (id: number) => {
@@ -1350,7 +1349,10 @@ export default function Fees() {
                               variant="ghost" 
                               size="sm"
                               className="text-red-600 hover:text-red-700"
-                              onClick={() => handleDeleteDiscount(discount.id)}
+                              onClick={() => {
+                                setDeleteItem({ id: discount.id, name: discount.name, type: 'discount' });
+                                setShowDeleteConfirmDialog(true);
+                              }}
                               title="Verwijderen"
                             >
                               <Trash2 className="h-4 w-4" />

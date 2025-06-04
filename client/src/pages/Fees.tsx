@@ -1419,7 +1419,7 @@ export default function Fees() {
 
         {/* Add Payment Dialog */}
         <Dialog open={showAddPaymentDialog} onOpenChange={setShowAddPaymentDialog}>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <CustomDialogContent>
             <DialogHeader>
               <DialogTitle>Nieuwe Betaling Toevoegen</DialogTitle>
               <DialogDescription>
@@ -1532,12 +1532,12 @@ export default function Fees() {
                 </DialogFooter>
               </form>
             </Form>
-          </DialogContent>
+          </CustomDialogContent>
         </Dialog>
 
         {/* Discount Dialog */}
         <Dialog open={showDiscountDialog} onOpenChange={setShowDiscountDialog}>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <CustomDialogContent>
             <DialogHeader>
               <DialogTitle>Korting Toekennen</DialogTitle>
               <DialogDescription>
@@ -1622,12 +1622,12 @@ export default function Fees() {
                 </DialogFooter>
               </form>
             </Form>
-          </DialogContent>
+          </CustomDialogContent>
         </Dialog>
 
         {/* Add Tuition Fee Dialog */}
         <Dialog open={showTuitionFeeDialog} onOpenChange={setShowTuitionFeeDialog}>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <CustomDialogContent>
             <DialogHeader>
               <DialogTitle>Collegegeld Instellen</DialogTitle>
               <DialogDescription>
@@ -1699,7 +1699,7 @@ export default function Fees() {
                 </DialogFooter>
               </form>
             </Form>
-          </DialogContent>
+          </CustomDialogContent>
         </Dialog>
 
         {/* Create Discount Dialog */}
@@ -1817,7 +1817,7 @@ export default function Fees() {
                 </DialogFooter>
               </form>
             </Form>
-          </DialogContent>
+          </CustomDialogContent>
         </Dialog>
 
         {/* Edit Payment Dialog */}

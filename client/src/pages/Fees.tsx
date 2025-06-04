@@ -74,31 +74,31 @@ export default function Fees() {
   const isParent = user?.role === 'ouder' as any;
 
   // Data fetching
-  const { data: paymentsData = [], isLoading: paymentsLoading } = useQuery({
+  const { data: paymentsData = [], isLoading: paymentsLoading } = useQuery<any[]>({
     queryKey: ['/api/payments'],
   });
 
-  const { data: studentsData = [] } = useQuery({
+  const { data: studentsData = [] } = useQuery<any[]>({
     queryKey: ['/api/students'],
   });
 
-  const { data: studentGroupsData = [] } = useQuery({
+  const { data: studentGroupsData = [] } = useQuery<any[]>({
     queryKey: ['/api/student-groups'],
   });
 
-  const { data: academicYearsData = [] } = useQuery({
+  const { data: academicYearsData = [] } = useQuery<any[]>({
     queryKey: ['/api/academic-years'],
   });
 
-  const { data: discounts = [] } = useQuery({
+  const { data: discounts = [] } = useQuery<any[]>({
     queryKey: ['/api/discounts'],
   });
 
-  const { data: discountApplicationsData = [] } = useQuery({
+  const { data: discountApplicationsData = [] } = useQuery<any[]>({
     queryKey: ['/api/discount-applications'],
   });
 
-  const { data: tuitionFeesData = [] } = useQuery({
+  const { data: tuitionFeesData = [] } = useQuery<any[]>({
     queryKey: ['/api/tuition-fees'],
   });
 
@@ -147,8 +147,7 @@ export default function Fees() {
   // Mutations
   const addPaymentMutation = useMutation({
     mutationFn: async (data: z.infer<typeof addPaymentSchema>) => {
-      const response = await apiRequest('POST', '/api/payments', data);
-      return response.json();
+      return await apiRequest('POST', '/api/payments', data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/payments'] });
@@ -169,9 +168,8 @@ export default function Fees() {
   });
 
   const discountMutation = useMutation({
-    mutationFn: async (data: z.infer<typeof addDiscountSchema>) => {
-      const response = await apiRequest('POST', '/api/discount-applications', data);
-      return response.json();
+    mutationFn: async (data: any) => {
+      return await apiRequest('POST', '/api/discount-applications', data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/discount-applications'] });

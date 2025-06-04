@@ -388,88 +388,91 @@ export default function Fees() {
     );
   }
 
-  // Staff/Admin view
+  // Staff/Admin view - Dashboard UI styling
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto p-6">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Betalingsbeheer</h1>
-          <p className="text-gray-600">Beheer alle betalingen, kortingen en financiële rapportages</p>
+    <div className="p-6">
+      {/* Header - Dashboard Style */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">
+          Betalingsbeheer
+        </h1>
+        <p className="text-gray-600 mt-2">
+          Overzicht van alle betalingen, kortingen en financiële rapportages
+        </p>
+      </div>
+
+      {/* Stats Grid - Dashboard Style */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Totaal Inkomsten</CardTitle>
+            <Euro className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">€{totalRevenue.toFixed(2)}</div>
+            <p className="text-xs text-muted-foreground">
+              Dit schooljaar
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Openstaande Betalingen</CardTitle>
+            <Clock className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{pendingCount}</div>
+            <p className="text-xs text-muted-foreground">
+              Wachtend op betaling
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Openstaand Bedrag</CardTitle>
+            <AlertCircle className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">€{outstandingAmount.toFixed(2)}</div>
+            <p className="text-xs text-muted-foreground">
+              Te innen bedrag
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Deze Maand</CardTitle>
+            <Calendar className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">€{monthlyRevenue.toFixed(2)}</div>
+            <p className="text-xs text-muted-foreground">
+              Ontvangen betalingen
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex justify-end mb-6">
+        <div className="flex gap-3">
+          <Button onClick={handleNewPayment} className="bg-[#1e40af] hover:bg-[#1e40af]/90">
+            <Plus className="h-4 w-4 mr-2" />
+            Nieuwe Betaling
+          </Button>
+          <Button variant="outline" onClick={handleExportData}>
+            <Download className="h-4 w-4 mr-2" />
+            Exporteren
+          </Button>
         </div>
+      </div>
 
-        {/* Action Buttons */}
-        <div className="flex justify-end mb-6">
-          <div className="flex gap-3">
-            <Button onClick={handleNewPayment} className="bg-[#1e40af] hover:bg-[#1e40af]/90">
-              <Plus className="h-4 w-4 mr-2" />
-              Nieuwe Betaling
-            </Button>
-            <Button variant="outline" onClick={handleExportData}>
-              <Download className="h-4 w-4 mr-2" />
-              Exporteren
-            </Button>
-          </div>
-        </div>
-
-        {/* Statistics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card className="bg-gradient-to-r from-green-50 to-green-100 border-green-200">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-green-600 text-sm font-medium">Totaal Inkomsten</p>
-                  <p className="text-2xl font-bold text-green-700">€{totalRevenue.toFixed(2)}</p>
-                  <p className="text-xs text-green-600 mt-1">Dit schooljaar</p>
-                </div>
-                <Euro className="h-8 w-8 text-green-600" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-blue-600 text-sm font-medium">Openstaande Betalingen</p>
-                  <p className="text-2xl font-bold text-blue-700">{pendingCount}</p>
-                  <p className="text-xs text-blue-600 mt-1">Wachtend op betaling</p>
-                </div>
-                <Clock className="h-8 w-8 text-blue-600" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-r from-orange-50 to-orange-100 border-orange-200">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-orange-600 text-sm font-medium">Openstaand Bedrag</p>
-                  <p className="text-2xl font-bold text-orange-700">€{outstandingAmount.toFixed(2)}</p>
-                  <p className="text-xs text-orange-600 mt-1">Te innen bedrag</p>
-                </div>
-                <AlertCircle className="h-8 w-8 text-orange-600" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-r from-purple-50 to-purple-100 border-purple-200">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-purple-600 text-sm font-medium">Deze Maand</p>
-                  <p className="text-2xl font-bold text-purple-700">€{monthlyRevenue.toFixed(2)}</p>
-                  <p className="text-xs text-purple-600 mt-1">Ontvangen betalingen</p>
-                </div>
-                <Calendar className="h-8 w-8 text-purple-600" />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Tabs Layout */}
-        <Tabs defaultValue="payments" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
+      {/* Tabs Layout */}
+      <Tabs defaultValue="payments" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="payments">Betalingen</TabsTrigger>
             <TabsTrigger value="history">Geschiedenis</TabsTrigger>
             <TabsTrigger value="discounts">Kortingen</TabsTrigger>
@@ -969,7 +972,6 @@ export default function Fees() {
             </Form>
           </DialogContent>
         </Dialog>
-      </div>
     </div>
   );
 }

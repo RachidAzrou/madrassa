@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage/index";
 import { db, pool } from "./db";
 import * as schema from "@shared/schema";
-import { students, studentGroups, studentGroupEnrollments, programTeachers, teachers, grades, assessments, guardians, enrollments, programs, payments } from "@shared/schema";
+import { students, studentGroups, studentGroupEnrollments, programTeachers, teachers, grades, assessments, guardians, enrollments, programs, payments, tuitionRates, discounts } from "@shared/schema";
 import { eq, and, sql, inArray, desc } from "drizzle-orm";
 
 // Global storage voor calendar events
@@ -3011,13 +3011,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   apiRouter.delete("/api/discounts/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const success = await storage.deleteDiscount(id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid discount ID" });
+      }
+
+      // Direct database deletion using the discounts table
+      const deletedRows = await db.delete(discounts).where(eq(discounts.id, id)).returning();
       
-      if (!success) {
+      if (deletedRows.length === 0) {
         return res.status(404).json({ message: "Discount not found" });
       }
       
-      res.status(204).end();
+      res.status(200).json({ message: "Discount deleted successfully" });
     } catch (error) {
       console.error("Error deleting discount:", error);
       res.status(500).json({ message: "Error deleting discount" });

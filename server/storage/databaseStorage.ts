@@ -1875,4 +1875,121 @@ export class DatabaseStorage implements IStorage {
       throw error;
     }
   }
+
+  // Missing delete methods for payments, tuition fees, and discounts
+  async deletePayment(id: number): Promise<boolean> {
+    try {
+      const result = await db.delete(payments).where(eq(payments.id, id));
+      return result.rowCount ? result.rowCount > 0 : false;
+    } catch (error) {
+      console.error('Error deleting payment:', error);
+      throw error;
+    }
+  }
+
+  async deleteTuitionFee(id: number): Promise<boolean> {
+    try {
+      const result = await db.delete(tuitionRates).where(eq(tuitionRates.id, id));
+      return result.rowCount ? result.rowCount > 0 : false;
+    } catch (error) {
+      console.error('Error deleting tuition fee:', error);
+      throw error;
+    }
+  }
+
+  async deleteDiscount(id: number): Promise<boolean> {
+    try {
+      const result = await db.delete(discounts).where(eq(discounts.id, id));
+      return result.rowCount ? result.rowCount > 0 : false;
+    } catch (error) {
+      console.error('Error deleting discount:', error);
+      throw error;
+    }
+  }
+
+  // Tuition Fee operations
+  async getTuitionFees(): Promise<any[]> {
+    try {
+      return await db.select().from(tuitionRates);
+    } catch (error) {
+      console.error('Error fetching tuition fees:', error);
+      throw error;
+    }
+  }
+
+  async getTuitionFee(id: number): Promise<any | undefined> {
+    try {
+      const [fee] = await db.select().from(tuitionRates).where(eq(tuitionRates.id, id));
+      return fee;
+    } catch (error) {
+      console.error('Error fetching tuition fee:', error);
+      throw error;
+    }
+  }
+
+  async createTuitionFee(fee: any): Promise<any> {
+    try {
+      const [newFee] = await db.insert(tuitionRates).values(fee).returning();
+      return newFee;
+    } catch (error) {
+      console.error('Error creating tuition fee:', error);
+      throw error;
+    }
+  }
+
+  async updateTuitionFee(id: number, fee: any): Promise<any | undefined> {
+    try {
+      const [updatedFee] = await db.update(tuitionRates)
+        .set(fee)
+        .where(eq(tuitionRates.id, id))
+        .returning();
+      return updatedFee;
+    } catch (error) {
+      console.error('Error updating tuition fee:', error);
+      throw error;
+    }
+  }
+
+  // Discount operations
+  async getDiscounts(): Promise<any[]> {
+    try {
+      return await db.select().from(discounts);
+    } catch (error) {
+      console.error('Error fetching discounts:', error);
+      throw error;
+    }
+  }
+
+  async getDiscount(id: number): Promise<any | undefined> {
+    try {
+      const [discount] = await db.select().from(discounts).where(eq(discounts.id, id));
+      return discount;
+    } catch (error) {
+      console.error('Error fetching discount:', error);
+      throw error;
+    }
+  }
+
+  async createDiscount(discount: any): Promise<any> {
+    try {
+      const [newDiscount] = await db.insert(discounts).values(discount).returning();
+      return newDiscount;
+    } catch (error) {
+      console.error('Error creating discount:', error);
+      throw error;
+    }
+  }
+
+  async updateDiscount(id: number, discount: any): Promise<any | undefined> {
+    try {
+      const [updatedDiscount] = await db.update(discounts)
+        .set(discount)
+        .where(eq(discounts.id, id))
+        .returning();
+      return updatedDiscount;
+    } catch (error) {
+      console.error('Error updating discount:', error);
+      throw error;
+    }
+  }
 }

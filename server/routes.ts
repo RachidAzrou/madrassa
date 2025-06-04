@@ -5417,6 +5417,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Create payment link endpoint (alias for /pay endpoint)
+  app.post("/api/payments/:id/payment-link", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ error: "Invalid payment ID" });
+      }
+
+      const payment = await storage.getPayment(id);
+      if (!payment) {
+        return res.status(404).json({ error: "Payment not found" });
+      }
+
+      if (payment.status === 'betaald' || payment.status === 'paid') {
+        return res.status(400).json({ error: "Payment already completed" });
+      }
+
+      // Demo mode for development environment
+      const demoCheckoutUrl = `${req.protocol}://${req.get('host')}/demo-payment?id=${id}&amount=${payment.amount}&description=${encodeURIComponent(payment.description)}`;
+      
+      // Update payment status to indicate payment link created
+      await storage.updatePayment(id, {
+        status: 'openstaand',
+        checkoutUrl: demoCheckoutUrl
+      });
+
+      res.json({ checkoutUrl: demoCheckoutUrl });
+    } catch (error) {
+      console.error("Error creating payment link:", error);
+      res.status(500).json({ error: "Failed to create payment link" });
+    }
+  });
+
   // Generate and download invoice PDF
   app.get("/api/payments/:id/invoice.pdf", async (req, res) => {
     try {

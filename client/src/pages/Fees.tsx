@@ -1364,13 +1364,7 @@ export default function Fees() {
               </CardContent>
             </Card>
 
-            {/* Manual Discount Assignment */}
-            <div className="flex justify-end mb-4">
-              <Button className="bg-orange-600 hover:bg-orange-700" onClick={() => setShowDiscountDialog(true)}>
-                <Plus className="h-4 w-4 mr-2" />
-                Korting Toekennen
-              </Button>
-            </div>
+
 
             {/* Active Discount Applications */}
             <div className="space-y-2">

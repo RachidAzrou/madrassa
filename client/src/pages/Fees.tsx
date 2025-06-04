@@ -308,19 +308,38 @@ export default function Fees() {
     mutationFn: async (id: number) => {
       return await apiRequest(`/api/payments/${id}`, { method: 'DELETE' });
     },
+    onMutate: async (deletedId) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ['/api/payments'] });
+      
+      // Snapshot the previous value
+      const previousPayments = queryClient.getQueryData(['/api/payments']);
+      
+      // Optimistically update to the new value
+      queryClient.setQueryData(['/api/payments'], (old: any[]) => 
+        old ? old.filter(payment => payment.id !== deletedId) : []
+      );
+      
+      return { previousPayments };
+    },
+    onError: (err, deletedId, context) => {
+      // If the mutation fails, use the context returned from onMutate to roll back
+      queryClient.setQueryData(['/api/payments'], context?.previousPayments);
+      toast({
+        title: 'Fout',
+        description: 'Er is een fout opgetreden bij het verwijderen van de betaling.',
+        variant: 'destructive',
+      });
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/payments'] });
       toast({
         title: 'Betaling verwijderd',
         description: 'De betaling is succesvol verwijderd.',
       });
     },
-    onError: (error: any) => {
-      toast({
-        title: 'Fout',
-        description: error.message || 'Er is een fout opgetreden bij het verwijderen van de betaling.',
-        variant: 'destructive',
-      });
+    onSettled: () => {
+      // Always refetch after error or success
+      queryClient.invalidateQueries({ queryKey: ['/api/payments'] });
     },
   });
 
@@ -328,19 +347,32 @@ export default function Fees() {
     mutationFn: async (id: number) => {
       return await apiRequest(`/api/tuition-fees/${id}`, { method: 'DELETE' });
     },
+    onMutate: async (deletedId) => {
+      await queryClient.cancelQueries({ queryKey: ['/api/tuition-fees'] });
+      const previousTuitionFees = queryClient.getQueryData(['/api/tuition-fees']);
+      
+      queryClient.setQueryData(['/api/tuition-fees'], (old: any[]) => 
+        old ? old.filter(fee => fee.id !== deletedId) : []
+      );
+      
+      return { previousTuitionFees };
+    },
+    onError: (err, deletedId, context) => {
+      queryClient.setQueryData(['/api/tuition-fees'], context?.previousTuitionFees);
+      toast({
+        title: 'Fout',
+        description: 'Er is een fout opgetreden bij het verwijderen van het collegegeld.',
+        variant: 'destructive',
+      });
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/tuition-fees'] });
       toast({
         title: 'Collegegeld verwijderd',
         description: 'Het collegegeld is succesvol verwijderd.',
       });
     },
-    onError: (error: any) => {
-      toast({
-        title: 'Fout',
-        description: error.message || 'Er is een fout opgetreden bij het verwijderen van het collegegeld.',
-        variant: 'destructive',
-      });
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/tuition-fees'] });
     },
   });
 
@@ -348,19 +380,32 @@ export default function Fees() {
     mutationFn: async (id: number) => {
       return await apiRequest(`/api/discounts/${id}`, { method: 'DELETE' });
     },
+    onMutate: async (deletedId) => {
+      await queryClient.cancelQueries({ queryKey: ['/api/discounts'] });
+      const previousDiscounts = queryClient.getQueryData(['/api/discounts']);
+      
+      queryClient.setQueryData(['/api/discounts'], (old: any[]) => 
+        old ? old.filter(discount => discount.id !== deletedId) : []
+      );
+      
+      return { previousDiscounts };
+    },
+    onError: (err, deletedId, context) => {
+      queryClient.setQueryData(['/api/discounts'], context?.previousDiscounts);
+      toast({
+        title: 'Fout',
+        description: 'Er is een fout opgetreden bij het verwijderen van de korting.',
+        variant: 'destructive',
+      });
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/discounts'] });
       toast({
         title: 'Korting verwijderd',
         description: 'De korting is succesvol verwijderd.',
       });
     },
-    onError: (error: any) => {
-      toast({
-        title: 'Fout',
-        description: error.message || 'Er is een fout opgetreden bij het verwijderen van de korting.',
-        variant: 'destructive',
-      });
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/discounts'] });
     },
   });
 

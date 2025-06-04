@@ -21,6 +21,18 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { Switch } from '@/components/ui/switch';
+import { FormDescription } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
@@ -473,22 +485,18 @@ export default function Fees() {
     }
   };
 
-  const handleDeleteTuitionFee = (id: number) => {
-    if (window.confirm('Weet je zeker dat je dit collegegeld wilt verwijderen?')) {
-      deleteTuitionFeeMutation.mutate(id);
-    }
+  const handleDeleteTuitionFee = (fee: any) => {
+    setDeleteItem({ type: 'tuition-fee', id: fee.id, name: fee.description });
+    setShowDeleteConfirmDialog(true);
   };
 
-  const handleDeleteDiscount = (id: number) => {
-    if (window.confirm('Weet je zeker dat je deze korting wilt verwijderen?')) {
-      deleteDiscountMutation.mutate(id);
-    }
+  const handleDeleteDiscount = (discount: any) => {
+    setDeleteItem({ type: 'discount', id: discount.id, name: discount.name });
+    setShowDeleteConfirmDialog(true);
   };
 
   const handleDeleteDiscountApplication = (id: number) => {
-    if (window.confirm('Weet je zeker dat je deze kortingtoekenning wilt verwijderen?')) {
-      deleteDiscountApplicationMutation.mutate(id);
-    }
+    deleteDiscountApplicationMutation.mutate(id);
   };
 
   // Edit handlers
@@ -531,6 +539,19 @@ export default function Fees() {
 
   const handlePayOnline = (payment: any) => {
     window.location.href = `/api/payments/${payment.id}/pay`;
+  };
+
+  // Edit form submit handlers
+  const onSubmitEditPayment = (data: any) => {
+    editPaymentMutation.mutate(data);
+  };
+
+  const onSubmitEditTuitionFee = (data: any) => {
+    editTuitionFeeMutation.mutate(data);
+  };
+
+  const onSubmitEditDiscount = (data: any) => {
+    editDiscountMutation.mutate(data);
   };
 
   const handleDownloadInvoice = (payment: any) => {
@@ -1784,6 +1805,404 @@ export default function Fees() {
             </Form>
           </DialogContent>
         </Dialog>
+
+        {/* Edit Payment Dialog */}
+        <Dialog open={showEditPaymentDialog} onOpenChange={setShowEditPaymentDialog}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Betaling Bewerken</DialogTitle>
+              <DialogDescription>
+                Wijzig de gegevens van de betaling.
+              </DialogDescription>
+            </DialogHeader>
+            <Form {...editPaymentForm}>
+              <form onSubmit={editPaymentForm.handleSubmit(onSubmitEditPayment)} className="space-y-4">
+                <FormField
+                  control={editPaymentForm.control}
+                  name="studentId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Student</FormLabel>
+                      <Select onValueChange={(value) => field.onChange(parseInt(value))} value={field.value?.toString()}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecteer een student" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {studentsData.map((student: any) => (
+                            <SelectItem key={student.id} value={student.id.toString()}>
+                              {student.firstName} {student.lastName} ({student.studentId})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={editPaymentForm.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Omschrijving</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Bijvoorbeeld: Collegegeld januari 2024" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={editPaymentForm.control}
+                    name="amount"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Bedrag (€)</FormLabel>
+                        <FormControl>
+                          <Input type="number" step="0.01" placeholder="0.00" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={editPaymentForm.control}
+                    name="dueDate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Vervaldatum</FormLabel>
+                        <FormControl>
+                          <Input type="date" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={editPaymentForm.control}
+                    name="type"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Type</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecteer type" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="collegegeld">Collegegeld</SelectItem>
+                            <SelectItem value="inschrijfgeld">Inschrijfgeld</SelectItem>
+                            <SelectItem value="examengeld">Examengeld</SelectItem>
+                            <SelectItem value="administratiekosten">Administratiekosten</SelectItem>
+                            <SelectItem value="overig">Overig</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={editPaymentForm.control}
+                    name="status"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Status</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecteer status" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="openstaand">Openstaand</SelectItem>
+                            <SelectItem value="betaald">Betaald</SelectItem>
+                            <SelectItem value="achterstallig">Achterstallig</SelectItem>
+                            <SelectItem value="geannuleerd">Geannuleerd</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <DialogFooter>
+                  <Button type="button" variant="outline" onClick={() => setShowEditPaymentDialog(false)}>
+                    Annuleren
+                  </Button>
+                  <Button type="submit" disabled={editPaymentMutation.isPending}>
+                    {editPaymentMutation.isPending ? 'Bijwerken...' : 'Betaling Bijwerken'}
+                  </Button>
+                </DialogFooter>
+              </form>
+            </Form>
+          </DialogContent>
+        </Dialog>
+
+        {/* Edit Tuition Fee Dialog */}
+        <Dialog open={showEditTuitionFeeDialog} onOpenChange={setShowEditTuitionFeeDialog}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Collegegeld Bewerken</DialogTitle>
+              <DialogDescription>
+                Wijzig de gegevens van het collegegeld.
+              </DialogDescription>
+            </DialogHeader>
+            <Form {...editTuitionFeeForm}>
+              <form onSubmit={editTuitionFeeForm.handleSubmit(onSubmitEditTuitionFee)} className="space-y-4">
+                <FormField
+                  control={editTuitionFeeForm.control}
+                  name="academicYearId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Schooljaar</FormLabel>
+                      <Select onValueChange={(value) => field.onChange(parseInt(value))} value={field.value?.toString()}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecteer schooljaar" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {academicYearsData.map((year: any) => (
+                            <SelectItem key={year.id} value={year.id.toString()}>
+                              {year.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={editTuitionFeeForm.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Omschrijving</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Bijvoorbeeld: Collegegeld per maand" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={editTuitionFeeForm.control}
+                  name="amount"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Bedrag (€)</FormLabel>
+                      <FormControl>
+                        <Input type="number" step="0.01" placeholder="0.00" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={editTuitionFeeForm.control}
+                  name="isActive"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                      <div className="space-y-0.5">
+                        <FormLabel>Status</FormLabel>
+                        <FormDescription>
+                          Collegegeld actief maken
+                        </FormDescription>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+
+                <DialogFooter>
+                  <Button type="button" variant="outline" onClick={() => setShowEditTuitionFeeDialog(false)}>
+                    Annuleren
+                  </Button>
+                  <Button type="submit" disabled={editTuitionFeeMutation.isPending}>
+                    {editTuitionFeeMutation.isPending ? 'Bijwerken...' : 'Collegegeld Bijwerken'}
+                  </Button>
+                </DialogFooter>
+              </form>
+            </Form>
+          </DialogContent>
+        </Dialog>
+
+        {/* Edit Discount Dialog */}
+        <Dialog open={showEditDiscountDialog} onOpenChange={setShowEditDiscountDialog}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Korting Bewerken</DialogTitle>
+              <DialogDescription>
+                Wijzig de gegevens van de korting.
+              </DialogDescription>
+            </DialogHeader>
+            <Form {...editDiscountForm}>
+              <form onSubmit={editDiscountForm.handleSubmit(onSubmitEditDiscount)} className="space-y-4">
+                <FormField
+                  control={editDiscountForm.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Naam</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Bijvoorbeeld: Sociale korting" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={editDiscountForm.control}
+                    name="type"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Type</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecteer type" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="percentage">Percentage</SelectItem>
+                            <SelectItem value="amount">Vast bedrag</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={editDiscountForm.control}
+                    name="value"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Waarde</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="number" 
+                            step="0.01" 
+                            placeholder="0.00" 
+                            {...field}
+                            onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <FormField
+                  control={editDiscountForm.control}
+                  name="rule"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Automatische regel (optioneel)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Bijvoorbeeld: siblings > 1" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={editDiscountForm.control}
+                    name="isAutomatic"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                        <div className="space-y-0.5">
+                          <FormLabel>Automatisch</FormLabel>
+                        </div>
+                        <FormControl>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={editDiscountForm.control}
+                    name="isActive"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                        <div className="space-y-0.5">
+                          <FormLabel>Actief</FormLabel>
+                        </div>
+                        <FormControl>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                
+                <DialogFooter>
+                  <Button type="button" variant="outline" onClick={() => setShowEditDiscountDialog(false)}>
+                    Annuleren
+                  </Button>
+                  <Button type="submit" disabled={editDiscountMutation.isPending}>
+                    {editDiscountMutation.isPending ? 'Bijwerken...' : 'Korting Bijwerken'}
+                  </Button>
+                </DialogFooter>
+              </form>
+            </Form>
+          </DialogContent>
+        </Dialog>
+
+        {/* Delete Confirmation Dialog */}
+        <AlertDialog open={showDeleteConfirmDialog} onOpenChange={setShowDeleteConfirmDialog}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Weet je het zeker?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Deze actie kan niet ongedaan worden gemaakt. Dit zal permanent{' '}
+                <strong>{deleteItem?.name}</strong> verwijderen uit het systeem.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Annuleren</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleDeleteConfirm}
+                className="bg-red-600 hover:bg-red-700"
+              >
+                Verwijderen
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   );

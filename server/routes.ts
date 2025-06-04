@@ -5465,7 +5465,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       doc.setTextColor(...primaryColor);
       doc.setFontSize(20);
       doc.setFont('helvetica', 'bold');
-      doc.text('FACTUUR', 20, 70);
+      doc.text('FACTUUR - myMadrassa', 20, 70);
 
       // Invoice details box
       doc.setFillColor(...backgroundColor);
@@ -5480,16 +5480,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       doc.text(`Datum: ${new Date(payment.paidAt || payment.createdAt).toLocaleDateString('nl-NL')}`, 20, 100);
       doc.text(`Vervaldatum: ${new Date(payment.dueDate).toLocaleDateString('nl-NL')}`, 120, 90);
 
-      // Student information section
+      // Student information section with QR code area
       doc.setTextColor(...primaryColor);
       doc.setFontSize(14);
       doc.setFont('helvetica', 'bold');
       doc.text('Student Informatie', 20, 130);
       
       doc.setFillColor(...backgroundColor);
-      doc.rect(15, 135, 180, 25, 'F');
+      doc.rect(15, 135, 180, 50, 'F');
       doc.setDrawColor(...secondaryColor);
-      doc.rect(15, 135, 180, 25);
+      doc.rect(15, 135, 180, 50);
       
       doc.setTextColor(...secondaryColor);
       doc.setFontSize(11);
@@ -5501,23 +5501,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       doc.setTextColor(...primaryColor);
       doc.setFontSize(14);
       doc.setFont('helvetica', 'bold');
-      doc.text('Betaling Details', 20, 180);
+      doc.text('Betaling Details', 20, 205);
       
       doc.setFillColor(...backgroundColor);
-      doc.rect(15, 185, 180, 35, 'F');
+      doc.rect(15, 210, 180, 35, 'F');
       doc.setDrawColor(...secondaryColor);
-      doc.rect(15, 185, 180, 35);
+      doc.rect(15, 210, 180, 35);
       
       doc.setTextColor(...secondaryColor);
       doc.setFontSize(11);
       doc.setFont('helvetica', 'normal');
-      doc.text(`Beschrijving: ${payment.description}`, 20, 195);
+      doc.text(`Beschrijving: ${payment.description}`, 20, 220);
       
       // Amount with emphasis
       doc.setTextColor(...primaryColor);
       doc.setFontSize(16);
       doc.setFont('helvetica', 'bold');
-      doc.text(`Bedrag: €${payment.amount}`, 20, 210);
+      doc.text(`Bedrag: €${payment.amount}`, 20, 235);
       
       // Status with color coding
       const statusText = payment.status === 'betaald' || payment.status === 'paid' ? 'Betaald' : 
@@ -5538,7 +5538,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         doc.setTextColor(...secondaryColor);
       }
       
-      doc.text(`Status: ${statusText}`, 120, 195);
+      doc.text(`Status: ${statusText}`, 120, 220);
 
       // QR Code for payment (if not paid)
       if (payment.status !== 'betaald' && payment.status !== 'paid') {
@@ -5556,13 +5556,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
           });
 
-          // Add QR code to PDF
-          doc.addImage(qrCodeDataUrl, 'PNG', 150, 135, 40, 40);
+          // Add QR code to PDF within student info section
+          doc.addImage(qrCodeDataUrl, 'PNG', 145, 140, 35, 35);
           
           doc.setTextColor(...secondaryColor);
-          doc.setFontSize(10);
+          doc.setFontSize(9);
           doc.setFont('helvetica', 'normal');
-          doc.text('Scan voor betaling', 155, 180);
+          doc.text('Scan voor betaling', 150, 180);
         } catch (error) {
           console.error('QR code generation error:', error);
         }
@@ -5572,20 +5572,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       doc.setTextColor(...secondaryColor);
       doc.setFontSize(11);
       doc.setFont('helvetica', 'normal');
-      doc.text(`Betalingsmethode: ${payment.paymentMethod || 'Online'}`, 20, 240);
+      doc.text(`Betalingsmethode: ${payment.paymentMethod || 'Online'}`, 20, 260);
       if (payment.paidAt) {
-        doc.text(`Betaald op: ${new Date(payment.paidAt).toLocaleDateString('nl-NL')}`, 20, 250);
+        doc.text(`Betaald op: ${new Date(payment.paidAt).toLocaleDateString('nl-NL')}`, 20, 270);
       }
 
       // Footer with styling
       doc.setFillColor(...primaryColor);
-      doc.rect(0, 270, 210, 27, 'F');
+      doc.rect(0, 280, 210, 17, 'F');
       
       doc.setTextColor(255, 255, 255);
       doc.setFontSize(10);
       doc.setFont('helvetica', 'normal');
-      doc.text('Bedankt voor uw vertrouwen in myMadrassa', 20, 285);
-      doc.text(`Gegenereerd op: ${new Date().toLocaleDateString('nl-NL')} om ${new Date().toLocaleTimeString('nl-NL')}`, 20, 292);
+      doc.text('Bedankt voor uw vertrouwen in myMadrassa', 20, 290);
+      doc.text(`Gegenereerd op: ${new Date().toLocaleDateString('nl-NL')} om ${new Date().toLocaleTimeString('nl-NL')}`, 20, 294);
 
       const pdfBuffer = Buffer.from(doc.output('arraybuffer'));
       

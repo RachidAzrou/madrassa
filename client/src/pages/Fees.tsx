@@ -1002,10 +1002,21 @@ export default function Fees() {
                         </TableCell>
                         <TableCell className="px-6 py-4 text-right">
                           <div className="flex items-center gap-2 justify-end">
-                            <Button variant="ghost" size="sm">
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => handleEditTuitionFee(fee)}
+                              title="Bewerken"
+                            >
                               <Edit className="h-4 w-4" />
                             </Button>
-                            <Button variant="ghost" size="sm">
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              className="text-red-600 hover:text-red-700"
+                              onClick={() => handleDeleteTuitionFee(fee.id)}
+                              title="Verwijderen"
+                            >
                               <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>
@@ -1199,7 +1210,13 @@ export default function Fees() {
                             </div>
                             <div className="text-right">
                               <p className="font-bold text-orange-600">-{app.discountPercentage}%</p>
-                              <Button size="sm" variant="outline" className="mt-1">
+                              <Button 
+                                size="sm" 
+                                variant="outline" 
+                                className="mt-1 text-red-600 hover:text-red-700"
+                                onClick={() => handleDeleteDiscountApplication(app.id)}
+                                title="Verwijderen"
+                              >
                                 <Trash2 className="h-3 w-3" />
                               </Button>
                             </div>

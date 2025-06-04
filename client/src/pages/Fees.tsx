@@ -470,12 +470,7 @@ export default function Fees() {
     createDiscountMutation.mutate(data);
   };
 
-  // Delete handlers
-  const handleDeletePayment = (id: number) => {
-    if (window.confirm('Weet je zeker dat je deze betaling wilt verwijderen?')) {
-      deletePaymentMutation.mutate(id);
-    }
-  };
+  // Delete handlers are now handled by the standardized delete dialog
 
   const handleDeleteTuitionFee = (id: number) => {
     if (window.confirm('Weet je zeker dat je dit collegegeld wilt verwijderen?')) {
@@ -1036,7 +1031,10 @@ export default function Fees() {
                               variant="ghost" 
                               size="icon"
                               className="h-8 w-8 text-red-600 hover:text-red-700"
-                              onClick={() => handleDeletePayment(payment.id)}
+                              onClick={() => {
+                                setDeleteItem({ id: payment.id, name: payment.description, type: 'payment' });
+                                setShowDeleteConfirmDialog(true);
+                              }}
                               title="Verwijderen"
                             >
                               <Trash2 className="h-4 w-4" />

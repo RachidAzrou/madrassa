@@ -5430,9 +5430,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Payment not found" });
       }
 
-      if (payment.status !== 'betaald' && payment.status !== 'paid') {
-        return res.status(400).json({ error: "Invoice only available for paid payments" });
-      }
+      // Allow invoice generation for all payment statuses
 
       const student = await storage.getStudent(payment.studentId);
       if (!student) {

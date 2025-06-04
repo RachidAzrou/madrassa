@@ -5437,38 +5437,87 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Student not found" });
       }
 
-      // Generate PDF invoice using jsPDF
+      // Generate PDF invoice with enhanced styling
       const { jsPDF } = await import('jspdf');
+      const QRCode = require('qrcode');
       const doc = new jsPDF();
 
-      // Header
-      doc.setFontSize(20);
-      doc.setFont('helvetica', 'bold');
-      doc.text('FACTUUR', 20, 30);
+      // Color scheme matching the app
+      const primaryColor = [37, 99, 235]; // Blue-600
+      const secondaryColor = [75, 85, 99]; // Gray-600
+      const accentColor = [16, 185, 129]; // Green-500
+      const backgroundColor = [249, 250, 251]; // Gray-50
 
-      // Invoice details
+      // Header with brand styling
+      doc.setFillColor(...primaryColor);
+      doc.rect(0, 0, 210, 50, 'F');
+      
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(24);
+      doc.setFont('helvetica', 'bold');
+      doc.text('myMadrassa', 20, 25);
+      
       doc.setFontSize(12);
       doc.setFont('helvetica', 'normal');
-      doc.text(`Factuurnummer: ${payment.invoiceId || `INV-${payment.id}`}`, 20, 50);
-      doc.text(`Datum: ${new Date(payment.paidAt || payment.createdAt).toLocaleDateString('nl-NL')}`, 20, 60);
+      doc.text('Islamitisch Onderwijs Nederland', 20, 35);
 
-      // Institution details
-      doc.text('myMadrassa', 20, 80);
-      doc.text('Islamitisch Onderwijs Nederland', 20, 90);
-
-      // Student information
+      // Invoice title
+      doc.setTextColor(...primaryColor);
+      doc.setFontSize(20);
       doc.setFont('helvetica', 'bold');
-      doc.text('Student informatie:', 20, 110);
-      doc.setFont('helvetica', 'normal');
-      doc.text(`Naam: ${student.firstName} ${student.lastName}`, 20, 120);
-      doc.text(`Student ID: ${student.studentId}`, 20, 130);
+      doc.text('FACTUUR', 20, 70);
 
-      // Payment details
-      doc.setFont('helvetica', 'bold');
-      doc.text('Betaling details:', 20, 150);
+      // Invoice details box
+      doc.setFillColor(...backgroundColor);
+      doc.rect(15, 80, 180, 30, 'F');
+      doc.setDrawColor(...secondaryColor);
+      doc.rect(15, 80, 180, 30);
+      
+      doc.setTextColor(...secondaryColor);
+      doc.setFontSize(11);
       doc.setFont('helvetica', 'normal');
-      doc.text(`Beschrijving: ${payment.description}`, 20, 160);
-      doc.text(`Bedrag: €${payment.amount}`, 20, 170);
+      doc.text(`Factuurnummer: ${payment.invoiceId || `INV-${payment.id}`}`, 20, 90);
+      doc.text(`Datum: ${new Date(payment.paidAt || payment.createdAt).toLocaleDateString('nl-NL')}`, 20, 100);
+      doc.text(`Vervaldatum: ${new Date(payment.dueDate).toLocaleDateString('nl-NL')}`, 120, 90);
+
+      // Student information section
+      doc.setTextColor(...primaryColor);
+      doc.setFontSize(14);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Student Informatie', 20, 130);
+      
+      doc.setFillColor(...backgroundColor);
+      doc.rect(15, 135, 180, 25, 'F');
+      doc.setDrawColor(...secondaryColor);
+      doc.rect(15, 135, 180, 25);
+      
+      doc.setTextColor(...secondaryColor);
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Naam: ${student.firstName} ${student.lastName}`, 20, 145);
+      doc.text(`Student ID: ${student.studentId}`, 20, 155);
+
+      // Payment details section
+      doc.setTextColor(...primaryColor);
+      doc.setFontSize(14);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Betaling Details', 20, 180);
+      
+      doc.setFillColor(...backgroundColor);
+      doc.rect(15, 185, 180, 35, 'F');
+      doc.setDrawColor(...secondaryColor);
+      doc.rect(15, 185, 180, 35);
+      
+      doc.setTextColor(...secondaryColor);
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Beschrijving: ${payment.description}`, 20, 195);
+      
+      // Amount with emphasis
+      doc.setTextColor(...primaryColor);
+      doc.setFontSize(16);
+      doc.setFont('helvetica', 'bold');
+      doc.text(`Bedrag: €${payment.amount}`, 20, 210);
       
       // Status with color coding
       const statusText = payment.status === 'betaald' || payment.status === 'paid' ? 'Betaald' : 
@@ -5476,29 +5525,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
                         payment.status === 'achterstallig' ? 'Achterstallig' : 
                         payment.status === 'geannuleerd' ? 'Geannuleerd' : payment.status;
       
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'bold');
+      
       if (payment.status === 'betaald' || payment.status === 'paid') {
-        doc.setTextColor(0, 128, 0); // Green for paid
+        doc.setTextColor(...accentColor);
       } else if (payment.status === 'achterstallig') {
-        doc.setTextColor(255, 0, 0); // Red for overdue
+        doc.setTextColor(239, 68, 68); // Red
       } else if (payment.status === 'openstaand') {
-        doc.setTextColor(255, 165, 0); // Orange for outstanding
+        doc.setTextColor(245, 158, 11); // Orange
       } else {
-        doc.setTextColor(128, 128, 128); // Gray for cancelled
+        doc.setTextColor(...secondaryColor);
       }
       
-      doc.text(`Status: ${statusText}`, 20, 180);
-      doc.setTextColor(0, 0, 0); // Reset to black
+      doc.text(`Status: ${statusText}`, 120, 195);
 
-      // Payment method and date
-      doc.text(`Betalingsmethode: ${payment.paymentMethod || 'Online'}`, 20, 190);
-      if (payment.paidAt) {
-        doc.text(`Betaald op: ${new Date(payment.paidAt).toLocaleDateString('nl-NL')}`, 20, 200);
+      // QR Code for payment (if not paid)
+      if (payment.status !== 'betaald' && payment.status !== 'paid') {
+        try {
+          // Generate QR code for Mollie payment
+          const paymentUrl = payment.checkoutUrl || `${req.protocol}://${req.get('host')}/demo-payment?id=${payment.id}`;
+          const qrCodeDataUrl = await QRCode.toDataURL(paymentUrl, {
+            errorCorrectionLevel: 'M',
+            type: 'image/png',
+            quality: 0.92,
+            margin: 1,
+            color: {
+              dark: '#2563eb',
+              light: '#ffffff'
+            }
+          });
+
+          // Add QR code to PDF
+          doc.addImage(qrCodeDataUrl, 'PNG', 150, 135, 40, 40);
+          
+          doc.setTextColor(...secondaryColor);
+          doc.setFontSize(10);
+          doc.setFont('helvetica', 'normal');
+          doc.text('Scan voor betaling', 155, 180);
+        } catch (error) {
+          console.error('QR code generation error:', error);
+        }
       }
 
-      // Footer
+      // Payment method and date
+      doc.setTextColor(...secondaryColor);
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Betalingsmethode: ${payment.paymentMethod || 'Online'}`, 20, 240);
+      if (payment.paidAt) {
+        doc.text(`Betaald op: ${new Date(payment.paidAt).toLocaleDateString('nl-NL')}`, 20, 250);
+      }
+
+      // Footer with styling
+      doc.setFillColor(...primaryColor);
+      doc.rect(0, 270, 210, 27, 'F');
+      
+      doc.setTextColor(255, 255, 255);
       doc.setFontSize(10);
-      doc.text('Bedankt voor uw betaling', 20, 250);
-      doc.text(`Gegenereerd op: ${new Date().toLocaleDateString('nl-NL')}`, 20, 270);
+      doc.setFont('helvetica', 'normal');
+      doc.text('Bedankt voor uw vertrouwen in myMadrassa', 20, 285);
+      doc.text(`Gegenereerd op: ${new Date().toLocaleDateString('nl-NL')} om ${new Date().toLocaleTimeString('nl-NL')}`, 20, 292);
 
       const pdfBuffer = Buffer.from(doc.output('arraybuffer'));
       

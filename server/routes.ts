@@ -2864,7 +2864,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         isActive: true
       });
       
-      res.status(201).json(tuitionFee);
+      // Return the tuition fee with academic year relation using direct query
+      const [completeTuitionFee] = await db.select({
+        id: schema.tuitionFees.id,
+        academicYearId: schema.tuitionFees.academicYearId,
+        amount: schema.tuitionFees.amount,
+        description: schema.tuitionFees.description,
+        isActive: schema.tuitionFees.isActive,
+        createdAt: schema.tuitionFees.createdAt,
+        updatedAt: schema.tuitionFees.updatedAt,
+        academicYear: {
+          id: schema.academicYears.id,
+          name: schema.academicYears.name,
+          startDate: schema.academicYears.startDate,
+          endDate: schema.academicYears.endDate
+        }
+      })
+      .from(schema.tuitionFees)
+      .leftJoin(schema.academicYears, eq(schema.tuitionFees.academicYearId, schema.academicYears.id))
+      .where(eq(schema.tuitionFees.id, tuitionFee.id));
+      
+      res.status(201).json(completeTuitionFee);
     } catch (error) {
       console.error("Error creating tuition fee:", error);
       res.status(500).json({ message: "Error creating tuition fee" });

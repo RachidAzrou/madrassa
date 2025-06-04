@@ -256,24 +256,26 @@ export default function Fees() {
 
   const tuitionFeeMutation = useMutation({
     mutationFn: async (data: z.infer<typeof tuitionFeeSchema>) => {
-      return await apiRequest('POST', '/api/tuition-fees', data);
+      const response = await apiRequest('POST', '/api/tuition-fees', data);
+      return response;
     },
-    onSuccess: async () => {
-      // Force complete cache clear and page refresh
-      queryClient.clear();
+    onSuccess: async (newTuitionFee) => {
+      // Immediately update the cache with the new data
+      queryClient.setQueryData(['/api/tuition-fees'], (oldData: any) => {
+        if (!oldData || !Array.isArray(oldData)) return [newTuitionFee];
+        return [newTuitionFee, ...oldData];
+      });
+      
+      // Also invalidate to ensure consistency
+      queryClient.invalidateQueries({ queryKey: ['/api/tuition-fees'] });
       
       setShowTuitionFeeDialog(false);
       tuitionFeeForm.reset();
       
       toast({
         title: 'Collegegeld ingesteld',
-        description: 'Het collegegeld is succesvol ingesteld. Pagina wordt ververst...',
+        description: 'Het collegegeld is succesvol ingesteld.',
       });
-      
-      // Force page refresh to ensure data is updated
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
     },
     onError: (error: any) => {
       toast({

@@ -1683,7 +1683,24 @@ export class DatabaseStorage implements IStorage {
 
   async getTuitionFee(id: number): Promise<TuitionFee | undefined> {
     try {
-      const [fee] = await db.select().from(tuitionFees).where(eq(tuitionFees.id, id));
+      const [fee] = await db.select({
+        id: tuitionFees.id,
+        academicYearId: tuitionFees.academicYearId,
+        amount: tuitionFees.amount,
+        description: tuitionFees.description,
+        isActive: tuitionFees.isActive,
+        createdAt: tuitionFees.createdAt,
+        updatedAt: tuitionFees.updatedAt,
+        academicYear: {
+          id: academicYears.id,
+          name: academicYears.name,
+          startDate: academicYears.startDate,
+          endDate: academicYears.endDate
+        }
+      })
+      .from(tuitionFees)
+      .leftJoin(academicYears, eq(tuitionFees.academicYearId, academicYears.id))
+      .where(eq(tuitionFees.id, id));
       return fee;
     } catch (error) {
       console.error('Error fetching tuition fee:', error);

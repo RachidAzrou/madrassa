@@ -312,9 +312,12 @@ export default function SecretariatLayout({ children }: SecretariatLayoutProps) 
               <div className="p-4 border-b border-gray-200">
                 <div className="flex items-center justify-between">
                   <h3 className="font-medium text-sm">Notificaties</h3>
-                  <Link href="/notificaties">
-                    <a className="text-xs text-blue-600 hover:underline">Alle notificaties</a>
-                  </Link>
+                  <button 
+                    className="text-xs text-blue-600 hover:underline"
+                    onClick={() => setLocation('/notificaties')}
+                  >
+                    Alle notificaties
+                  </button>
                 </div>
               </div>
               <div className="max-h-72 overflow-y-auto">

@@ -337,7 +337,7 @@ export default function Guardians() {
             <CardTitle className="text-sm font-medium text-gray-600">Andere Voogden</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-violet-600">
+            <div className="text-2xl font-bold text-blue-600">
               {guardians.filter(g => !['vader', 'moeder'].includes(g.relationship.toLowerCase())).length}
             </div>
             <p className="text-xs text-gray-500">Overige voogden</p>

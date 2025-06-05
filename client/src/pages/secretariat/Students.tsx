@@ -316,7 +316,7 @@ export default function Students() {
             Importeren
           </Button>
           {canCreate(RESOURCES.STUDENTS) && (
-            <Button onClick={handleCreateStudent} className="bg-violet-600 hover:bg-violet-700">
+            <Button onClick={handleCreateStudent} className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg">
               <UserPlus className="w-4 h-4 mr-2" />
               Nieuwe Student
             </Button>
@@ -457,8 +457,8 @@ export default function Students() {
                     <TableRow key={student.id}>
                       <TableCell>
                         <div className="flex items-center space-x-3">
-                          <div className="w-8 h-8 bg-violet-100 rounded-full flex items-center justify-center">
-                            <span className="text-sm font-medium text-violet-700">
+                          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
+                            <span className="text-sm font-medium text-white">
                               {student.firstName[0]}{student.lastName[0]}
                             </span>
                           </div>

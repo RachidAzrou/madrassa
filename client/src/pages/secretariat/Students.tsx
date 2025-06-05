@@ -5,7 +5,7 @@ import {
   Search, Plus, Download, Filter, Eye, Edit, Trash2, 
   User, Users, GraduationCap, Phone, Mail, Calendar,
   MapPin, FileText, AlertTriangle, Star, BookOpen,
-  Settings, Save, X
+  Settings, Save, X, Upload
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -85,7 +85,12 @@ export default function Students() {
     guardianId: 0,
     emergencyContact: '',
     notes: '',
-    status: 'active'
+    status: 'active',
+    photoUrl: '',
+    street: '',
+    houseNumber: '',
+    postalCode: '',
+    city: ''
   });
 
   // Data fetching
@@ -191,7 +196,13 @@ export default function Students() {
       classId: 0,
       guardianId: 0,
       emergencyContact: '',
-      notes: ''
+      notes: '',
+      status: 'active',
+      photoUrl: '',
+      street: '',
+      houseNumber: '',
+      postalCode: '',
+      city: ''
     });
   };
 
@@ -231,7 +242,13 @@ export default function Students() {
       classId: student.classId || 0,
       guardianId: 0,
       emergencyContact: student.emergencyContact || '',
-      notes: ''
+      notes: '',
+      status: student.status || 'active',
+      photoUrl: '',
+      street: '',
+      houseNumber: '',
+      postalCode: '',
+      city: ''
     });
     setShowEditDialog(true);
   };
@@ -733,63 +750,178 @@ export default function Students() {
                     <User className="h-4 w-4 mr-2" />
                     Persoonlijke Informatie
                   </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="firstName" className="text-xs font-medium text-gray-700">
-                        Voornaam <span className="text-red-500">*</span>
-                      </Label>
-                      <Input
-                        id="firstName"
-                        value={newStudent.firstName}
-                        onChange={(e) => setNewStudent({...newStudent, firstName: e.target.value})}
-                        className="h-8 text-sm"
-                        placeholder="Voornaam"
-                        required
+                  <div className="flex items-start gap-6 mb-4">
+                    <div className="flex flex-col items-center gap-3">
+                      <Avatar className="h-24 w-24 border-4 border-white shadow-lg">
+                        {newStudent.photoUrl ? (
+                          <AvatarImage src={newStudent.photoUrl} alt="Student foto" />
+                        ) : (
+                          <AvatarFallback className="bg-[#1e40af] text-white text-lg">
+                            {newStudent.firstName?.[0]}{newStudent.lastName?.[0]}
+                          </AvatarFallback>
+                        )}
+                      </Avatar>
+                      <div className="flex gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => document.getElementById('photo-upload')?.click()}
+                          className="text-xs px-2 py-1 h-7"
+                        >
+                          <Upload className="h-3 w-3 mr-1" />
+                          Upload
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline" 
+                          size="sm"
+                          className="text-xs px-2 py-1 h-7"
+                        >
+                          <FileText className="h-3 w-3 mr-1" />
+                          eID
+                        </Button>
+                      </div>
+                      <input
+                        id="photo-upload"
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const reader = new FileReader();
+                            reader.onloadend = () => {
+                              setNewStudent(prev => ({
+                                ...prev,
+                                photoUrl: reader.result as string
+                              }));
+                            };
+                            reader.readAsDataURL(file);
+                          }
+                        }}
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="lastName" className="text-xs font-medium text-gray-700">
-                        Achternaam <span className="text-red-500">*</span>
-                      </Label>
-                      <Input
-                        id="lastName"
-                        value={newStudent.lastName}
-                        onChange={(e) => setNewStudent({...newStudent, lastName: e.target.value})}
-                        className="h-8 text-sm"
-                        placeholder="Achternaam"
-                        required
-                      />
+                    <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="studentId" className="text-xs font-medium text-gray-700">Student ID</Label>
+                        <Input
+                          id="studentId"
+                          value="ST25003"
+                          disabled
+                          className="h-8 text-sm bg-gray-50 text-gray-500"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="gender" className="text-xs font-medium text-gray-700">
+                          Geslacht <span className="text-red-500">*</span>
+                        </Label>
+                        <Select 
+                          value={newStudent.gender} 
+                          onValueChange={(value) => setNewStudent({...newStudent, gender: value})}
+                          required
+                        >
+                          <SelectTrigger className="h-8 text-sm border-gray-300">
+                            <SelectValue placeholder="Man of Vrouw" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-white">
+                            <SelectItem value="man" className="text-black hover:bg-blue-100 focus:bg-blue-200">Man</SelectItem>
+                            <SelectItem value="vrouw" className="text-black hover:bg-blue-100 focus:bg-blue-200">Vrouw</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="firstName" className="text-xs font-medium text-gray-700">
+                          Voornaam <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                          id="firstName"
+                          value={newStudent.firstName}
+                          onChange={(e) => setNewStudent({...newStudent, firstName: e.target.value})}
+                          className="h-8 text-sm"
+                          placeholder="Voornaam"
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="lastName" className="text-xs font-medium text-gray-700">
+                          Achternaam <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                          id="lastName"
+                          value={newStudent.lastName}
+                          onChange={(e) => setNewStudent({...newStudent, lastName: e.target.value})}
+                          className="h-8 text-sm"
+                          placeholder="Achternaam"
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="dateOfBirth" className="text-xs font-medium text-gray-700">
+                          Geboortedatum <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                          id="dateOfBirth"
+                          type="date"
+                          value={newStudent.dateOfBirth}
+                          onChange={(e) => setNewStudent({...newStudent, dateOfBirth: e.target.value})}
+                          className="h-8 text-sm"
+                          required
+                        />
+                      </div>
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="dateOfBirth" className="text-xs font-medium text-gray-700">
-                        Geboortedatum <span className="text-red-500">*</span>
-                      </Label>
-                      <Input
-                        id="dateOfBirth"
-                        type="date"
-                        value={newStudent.dateOfBirth}
-                        onChange={(e) => setNewStudent({...newStudent, dateOfBirth: e.target.value})}
-                        className="h-8 text-sm"
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="gender" className="text-xs font-medium text-gray-700">
-                        Geslacht <span className="text-red-500">*</span>
-                      </Label>
-                      <Select 
-                        value={newStudent.gender} 
-                        onValueChange={(value) => setNewStudent({...newStudent, gender: value})}
-                        required
-                      >
-                        <SelectTrigger className="h-8 text-sm border-gray-300">
-                          <SelectValue placeholder="Selecteer geslacht" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-white">
-                          <SelectItem value="Man" className="text-black hover:bg-blue-100 focus:bg-blue-200">Man</SelectItem>
-                          <SelectItem value="Vrouw" className="text-black hover:bg-blue-100 focus:bg-blue-200">Vrouw</SelectItem>
-                        </SelectContent>
-                      </Select>
+                  </div>
+                  
+                  <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                    <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                      <MapPin className="h-4 w-4 mr-2" />
+                      Adresgegevens
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      <div className="md:col-span-2">
+                        <Label htmlFor="street" className="text-xs font-medium text-gray-700">Straat <span className="text-red-500">*</span></Label>
+                        <Input
+                          id="street"
+                          value={newStudent.street || ''}
+                          onChange={(e) => setNewStudent({...newStudent, street: e.target.value})}
+                          className="h-8 text-sm"
+                          placeholder="Straat"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="houseNumber" className="text-xs font-medium text-gray-700">Huisnummer <span className="text-red-500">*</span></Label>
+                        <Input
+                          id="houseNumber"
+                          value={newStudent.houseNumber || ''}
+                          onChange={(e) => setNewStudent({...newStudent, houseNumber: e.target.value})}
+                          className="h-8 text-sm"
+                          placeholder="Nr."
+                          required
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="postalCode" className="text-xs font-medium text-gray-700">Postcode <span className="text-red-500">*</span></Label>
+                        <Input
+                          id="postalCode"
+                          value={newStudent.postalCode || ''}
+                          onChange={(e) => setNewStudent({...newStudent, postalCode: e.target.value})}
+                          className="h-8 text-sm"
+                          placeholder="Postcode"
+                          required
+                        />
+                      </div>
+                      <div className="md:col-span-2">
+                        <Label htmlFor="city" className="text-xs font-medium text-gray-700">Plaats <span className="text-red-500">*</span></Label>
+                        <Input
+                          id="city"
+                          value={newStudent.city || ''}
+                          onChange={(e) => setNewStudent({...newStudent, city: e.target.value})}
+                          className="h-8 text-sm"
+                          placeholder="Plaats"
+                          required
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>

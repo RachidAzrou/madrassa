@@ -209,9 +209,16 @@ export default function SecretariatLayout({ children }: SecretariatLayoutProps) 
           <Menu className="h-6 w-6 text-gray-600" />
         </Button>
         
-        {/* Logo sectie - links */}
-        <Link href="/secretariat" className="flex items-center h-full">
-          <img src={myMadrassaLogo} alt="myMadrassa Logo" className="h-10 sm:h-11" />
+        {/* Logo sectie in sidebar ruimte - links */}
+        <div className="hidden lg:block w-64 pr-4">
+          <Link href="/secretariat" className="flex items-center h-full">
+            <img src={myMadrassaLogo} alt="myMadrassa Logo" className="h-8" />
+          </Link>
+        </div>
+        
+        {/* Logo voor mobiel - center */}
+        <Link href="/secretariat" className="flex items-center h-full lg:hidden">
+          <img src={myMadrassaLogo} alt="myMadrassa Logo" className="h-8" />
         </Link>
 
         {/* Acties - rechts */}

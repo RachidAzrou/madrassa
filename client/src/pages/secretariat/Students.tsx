@@ -40,7 +40,29 @@ import {
   Edit,
   Trash2
 } from "lucide-react";
-import { RESOURCES } from "@shared/rbac";
+// Define RESOURCES locally to avoid import issues
+const RESOURCES = {
+  STUDENTS: 'students',
+  TEACHERS: 'teachers',
+  GUARDIANS: 'guardians',
+  CLASSES: 'classes',
+  PROGRAMS: 'programs',
+  ACADEMIC_YEARS: 'academic_years',
+  ENROLLMENTS: 'enrollments',
+  RE_ENROLLMENTS: 're_enrollments',
+  ACCOUNTS: 'accounts',
+  PAYMENTS: 'payments',
+  ATTENDANCE: 'attendance',
+  GRADES: 'grades',
+  REPORTS: 'reports',
+  SETTINGS: 'settings',
+  DASHBOARD: 'dashboard',
+  NOTIFICATIONS: 'notifications',
+  TASKS: 'tasks',
+  APPOINTMENTS: 'appointments',
+  COMMUNICATIONS: 'communications',
+  COURSES: 'courses'
+} as const;
 
 interface Student {
   id: number;
@@ -122,17 +144,17 @@ export default function Students() {
     },
   });
 
-  const { data: students = [], isLoading: studentsLoading } = useQuery({
+  const { data: students = [], isLoading: studentsLoading } = useQuery<Student[]>({
     queryKey: ["/api/students"],
   });
 
-  const { data: classes = [], isLoading: classesLoading } = useQuery({
+  const { data: classes = [], isLoading: classesLoading } = useQuery<StudentClass[]>({
     queryKey: ["/api/classes"],
   });
 
   const createStudentMutation = useMutation({
     mutationFn: async (data: StudentFormData) => {
-      const response = await apiRequest("POST", "/api/students", data);
+      const response = await apiRequest("POST", "/api/students", { body: data });
       return response;
     },
     onSuccess: () => {
@@ -152,7 +174,7 @@ export default function Students() {
 
   const updateStudentMutation = useMutation({
     mutationFn: async (data: StudentFormData) => {
-      const response = await apiRequest("PUT", `/api/students/${selectedStudent?.id}`, data);
+      const response = await apiRequest("PUT", `/api/students/${selectedStudent?.id}`, { body: data });
       return response;
     },
     onSuccess: () => {
@@ -172,7 +194,7 @@ export default function Students() {
 
   const deleteStudentMutation = useMutation({
     mutationFn: async (studentId: number) => {
-      await apiRequest("DELETE", `/api/students/${studentId}`);
+      await apiRequest("DELETE", `/api/students/${studentId}`, {});
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/students"] });
@@ -437,13 +459,36 @@ export default function Students() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <AdminActionButtons
-                      onView={() => handleViewStudent(student)}
-                      onEdit={canUpdate(RESOURCES.STUDENTS) ? () => handleEditStudent(student) : undefined}
-                      onDelete={canDelete(RESOURCES.STUDENTS) ? () => handleDeleteStudent(student) : undefined}
-                      canEdit={canUpdate(RESOURCES.STUDENTS)}
-                      canDelete={canDelete(RESOURCES.STUDENTS)}
-                    />
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleViewStudent(student)}
+                        className="h-8 w-8 p-0 hover:bg-blue-50 hover:text-blue-600"
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      {canUpdate(RESOURCES.STUDENTS) && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleEditStudent(student)}
+                          className="h-8 w-8 p-0 hover:bg-blue-50 hover:text-blue-600"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                      )}
+                      {canDelete(RESOURCES.STUDENTS) && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteStudent(student)}
+                          className="h-8 w-8 p-0 text-red-600 hover:text-red-800 hover:bg-red-50"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
                   </TableCell>
                 </TableRow>
               ))

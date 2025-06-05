@@ -625,7 +625,7 @@ export default function SecretariatLayout({ children }: SecretariatLayoutProps) 
         </div>
 
         {/* Main Content Area */}
-        <div className="flex-1 flex flex-col lg:ml-64">
+        <div className="flex-1 flex flex-col lg:ml-0">
           {/* Page Content - Full Height */}
           <main className="flex-1 overflow-auto">
             {children}

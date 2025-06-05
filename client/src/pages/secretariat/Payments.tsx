@@ -8,9 +8,8 @@ import {
   Euro, Clock, AlertCircle, Calendar, CreditCard,
   Users, User, Gift, Shield, Activity, Receipt,
   Tag, Settings, History, GraduationCap, Pencil, Percent,
-  FileText
+  FileText, PlusCircle
 } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
 import { PremiumHeader } from '@/components/layout/premium-header';
 
 import { Button } from '@/components/ui/button';
@@ -22,14 +21,15 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Label } from '@/components/ui/label';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { DeleteDialog } from '@/components/ui/delete-dialog';
-import { CustomDialogContent } from '@/components/ui/custom-dialog-content';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Switch } from '@/components/ui/switch';
 import { FormDescription } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import EmptyState from '@/components/ui/empty-state';
 
 // Form schemas
 const addPaymentSchema = z.object({
@@ -46,82 +46,125 @@ const discountSchema = z.object({
   reason: z.string().optional(),
 });
 
-const tuitionFeeSchema = z.object({
-  academicYearId: z.number().min(1, 'Selecteer een schooljaar'),
-  amount: z.string().min(1, 'Bedrag is verplicht'),
-  description: z.string().min(1, 'Omschrijving is verplicht'),
-});
+// Types
+interface Payment {
+  id: number;
+  studentId: number;
+  studentName: string;
+  description: string;
+  amount: number;
+  dueDate: string;
+  status: 'pending' | 'paid' | 'overdue' | 'cancelled';
+  type: string;
+  paymentDate?: string;
+  createdAt: string;
+}
 
-const createDiscountSchema = z.object({
-  name: z.string().min(1, 'Naam is verplicht'),
-  type: z.enum(['percentage', 'amount']),
-  value: z.number().min(0.01, 'Waarde moet groter zijn dan 0'),
-  isAutomatic: z.boolean(),
-  rule: z.string().optional(),
-  ruleCondition: z.string().optional(),
-  ruleOperator: z.string().optional(),
-  ruleValue: z.string().optional(),
-  ruleDescription: z.string().optional(),
-  isActive: z.boolean().default(true),
-});
+interface Student {
+  id: number;
+  firstName: string;
+  lastName: string;
+  studentId: string;
+  email: string;
+}
+
+interface DiscountType {
+  id: number;
+  name: string;
+  percentage: number;
+  description: string;
+}
+
+// Admin-style components
+const DataTableContainer = ({ children }: { children: React.ReactNode }) => (
+  <div className="bg-white border border-[#e5e7eb] rounded-lg shadow-sm overflow-hidden">
+    {children}
+  </div>
+);
+
+const SearchActionBar = ({ children }: { children: React.ReactNode }) => (
+  <div className="px-4 py-3 border-b border-[#e5e7eb] flex flex-wrap items-center justify-between gap-3">
+    {children}
+  </div>
+);
+
+const TableContainer = ({ children }: { children: React.ReactNode }) => (
+  <div className="overflow-x-auto">
+    {children}
+  </div>
+);
+
+const QuickActions = ({ onView, onEdit, onDelete }: { onView: () => void, onEdit: () => void, onDelete: () => void }) => (
+  <div className="flex items-center gap-1">
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={onView}>
+            <Eye className="h-3 w-3" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>Bekijken</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+    
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={onEdit}>
+            <Edit className="h-3 w-3" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>Bewerken</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+    
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button variant="ghost" size="sm" className="h-6 w-6 p-0 text-red-500 hover:text-red-700" onClick={onDelete}>
+            <Trash2 className="h-3 w-3" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>Verwijderen</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  </div>
+);
 
 export default function Payments() {
-  const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // State
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState('alle');
-  const [yearFilter, setYearFilter] = useState('alle');
-  const [classFilter, setClassFilter] = useState('alle');
-  const [showAddPaymentDialog, setShowAddPaymentDialog] = useState(false);
-  const [showDiscountDialog, setShowDiscountDialog] = useState(false);
-  const [showTuitionFeeDialog, setShowTuitionFeeDialog] = useState(false);
-  const [showCreateDiscountDialog, setShowCreateDiscountDialog] = useState(false);
-  const [showEditPaymentDialog, setShowEditPaymentDialog] = useState(false);
-  const [showEditTuitionFeeDialog, setShowEditTuitionFeeDialog] = useState(false);
-  const [showEditDiscountDialog, setShowEditDiscountDialog] = useState(false);
-  const [showDeleteConfirmDialog, setShowDeleteConfirmDialog] = useState(false);
-  const [editingPayment, setEditingPayment] = useState<any>(null);
-  const [editingTuitionFee, setEditingTuitionFee] = useState<any>(null);
-  const [editingDiscount, setEditingDiscount] = useState<any>(null);
-  const [deleteItem, setDeleteItem] = useState<{type: string, id: number, name: string} | null>(null);
-  const [showPaymentDetailDialog, setShowPaymentDetailDialog] = useState(false);
-  const [selectedPayment, setSelectedPayment] = useState<any>(null);
-  const [hoveredRowId, setHoveredRowId] = useState<number | null>(null);
-
-  // Check if user is parent
-  const isParent = user?.role === 'ouder' as any;
+  // State variables
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [typeFilter, setTypeFilter] = useState('all');
+  const [showFilterOptions, setShowFilterOptions] = useState(false);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDiscountDialogOpen, setIsDiscountDialogOpen] = useState(false);
+  const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
 
   // Data fetching
-  const { data: paymentsData = [], isLoading: paymentsLoading } = useQuery<any[]>({
+  const { data: payments = [], isLoading } = useQuery({
     queryKey: ['/api/payments'],
     staleTime: 60000,
   });
 
-  const { data: studentsData = [], isLoading: studentsLoading } = useQuery<any[]>({
+  const { data: students = [] } = useQuery<Student[]>({
     queryKey: ['/api/students'],
     staleTime: 60000,
   });
 
-  const { data: academicYearsData = [], isLoading: academicYearsLoading } = useQuery<any[]>({
-    queryKey: ['/api/academic-years'],
-    staleTime: 60000,
-  });
-
-  const { data: discountsData = [], isLoading: discountsLoading } = useQuery<any[]>({
-    queryKey: ['/api/discounts'],
-    staleTime: 60000,
-  });
-
-  const { data: tuitionFeesData = [], isLoading: tuitionFeesLoading } = useQuery<any[]>({
-    queryKey: ['/api/tuition-fees'],
+  const { data: discountTypes = [] } = useQuery<DiscountType[]>({
+    queryKey: ['/api/discount-types'],
     staleTime: 60000,
   });
 
   // Forms
-  const addPaymentForm = useForm<z.infer<typeof addPaymentSchema>>({
+  const addPaymentForm = useForm({
     resolver: zodResolver(addPaymentSchema),
     defaultValues: {
       studentId: 0,
@@ -132,7 +175,7 @@ export default function Payments() {
     },
   });
 
-  const discountForm = useForm<z.infer<typeof discountSchema>>({
+  const discountForm = useForm({
     resolver: zodResolver(discountSchema),
     defaultValues: {
       studentId: 0,
@@ -141,626 +184,445 @@ export default function Payments() {
     },
   });
 
-  const tuitionFeeForm = useForm<z.infer<typeof tuitionFeeSchema>>({
-    resolver: zodResolver(tuitionFeeSchema),
-    defaultValues: {
-      academicYearId: 0,
-      amount: '',
-      description: '',
-    },
-  });
-
-  const createDiscountForm = useForm<z.infer<typeof createDiscountSchema>>({
-    resolver: zodResolver(createDiscountSchema),
-    defaultValues: {
-      name: '',
-      type: 'percentage',
-      value: 0,
-      isAutomatic: false,
-      rule: '',
-      ruleCondition: '',
-      ruleOperator: '',
-      ruleValue: '',
-      ruleDescription: '',
-      isActive: true,
-    },
+  // Filter payments
+  const filteredPayments = payments.filter((payment: Payment) => {
+    const matchesSearch = searchTerm === '' || 
+      payment.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      payment.studentName?.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesStatus = statusFilter === 'all' || payment.status === statusFilter;
+    const matchesType = typeFilter === 'all' || payment.type === typeFilter;
+    
+    return matchesSearch && matchesStatus && matchesType;
   });
 
   // Mutations
-  const addPaymentMutation = useMutation({
-    mutationFn: async (data: z.infer<typeof addPaymentSchema>) => {
-      const response = await apiRequest('POST', '/api/payments', { body: data });
+  const createPaymentMutation = useMutation({
+    mutationFn: async (paymentData: any) => {
+      const response = await apiRequest('POST', '/api/payments', paymentData);
       return response;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/payments'] });
-      toast({ title: "Betaling succesvol toegevoegd" });
-      setShowAddPaymentDialog(false);
+      setIsCreateDialogOpen(false);
       addPaymentForm.reset();
+      toast({
+        title: "Betaling toegevoegd",
+        description: "De nieuwe betaling is succesvol toegevoegd.",
+      });
     },
     onError: (error: any) => {
       toast({
-        title: "Fout bij toevoegen betaling",
-        description: error.message,
+        title: "Fout bij toevoegen",
+        description: error.message || "Er is een fout opgetreden bij het toevoegen van de betaling.",
         variant: "destructive",
       });
     },
   });
 
   const updatePaymentMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: number; data: any }) => {
-      const response = await apiRequest('PUT', `/api/payments/${id}`, { body: data });
+    mutationFn: async ({ id, data }: { id: number, data: any }) => {
+      const response = await apiRequest('PUT', `/api/payments/${id}`, data);
       return response;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/payments'] });
-      toast({ title: "Betaling succesvol bijgewerkt" });
-      setShowEditPaymentDialog(false);
-      setEditingPayment(null);
-    },
-    onError: (error: any) => {
+      setIsEditDialogOpen(false);
+      setSelectedPayment(null);
       toast({
-        title: "Fout bij bijwerken betaling",
-        description: error.message,
-        variant: "destructive",
+        title: "Betaling bijgewerkt",
+        description: "De betaling is succesvol bijgewerkt.",
       });
     },
   });
 
   const deletePaymentMutation = useMutation({
     mutationFn: async (id: number) => {
-      await apiRequest('DELETE', `/api/payments/${id}`, {});
+      const response = await apiRequest('DELETE', `/api/payments/${id}`);
+      return response;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/payments'] });
-      toast({ title: "Betaling succesvol verwijderd" });
-      setShowDeleteConfirmDialog(false);
-      setDeleteItem(null);
-    },
-    onError: (error: any) => {
+      setIsDeleteDialogOpen(false);
+      setSelectedPayment(null);
       toast({
-        title: "Fout bij verwijderen betaling",
-        description: error.message,
-        variant: "destructive",
+        title: "Betaling verwijderd",
+        description: "De betaling is succesvol verwijderd.",
       });
     },
   });
 
-  // Helper functions
+  // Handlers
+  const handleCreatePayment = async (data: any) => {
+    createPaymentMutation.mutate({
+      ...data,
+      amount: parseFloat(data.amount),
+    });
+  };
+
+  const handleEditPayment = (payment: Payment) => {
+    setSelectedPayment(payment);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleViewPayment = (payment: Payment) => {
+    setSelectedPayment(payment);
+    setIsViewDialogOpen(true);
+  };
+
+  const handleDeletePayment = (payment: Payment) => {
+    setSelectedPayment(payment);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const confirmDeletePayment = () => {
+    if (selectedPayment) {
+      deletePaymentMutation.mutate(selectedPayment.id);
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     const statusConfig = {
+      pending: { label: 'In behandeling', className: 'bg-yellow-100 text-yellow-800' },
       paid: { label: 'Betaald', className: 'bg-green-100 text-green-800' },
-      pending: { label: 'Openstaand', className: 'bg-yellow-100 text-yellow-800' },
       overdue: { label: 'Achterstallig', className: 'bg-red-100 text-red-800' },
       cancelled: { label: 'Geannuleerd', className: 'bg-gray-100 text-gray-800' }
     };
     
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.pending;
-    
-    return (
-      <Badge className={config.className}>
-        {config.label}
-      </Badge>
-    );
+    return <Badge className={config.className}>{config.label}</Badge>;
   };
 
-  const getTypeBadge = (type: string) => {
-    const typeConfig = {
-      tuition: { label: 'Schoolgeld', className: 'bg-blue-100 text-blue-800' },
-      materials: { label: 'Materialen', className: 'bg-purple-100 text-purple-800' },
-      excursion: { label: 'Excursie', className: 'bg-orange-100 text-orange-800' },
-      other: { label: 'Overig', className: 'bg-gray-100 text-gray-800' }
-    };
-    
-    const config = typeConfig[type as keyof typeof typeConfig] || typeConfig.other;
-    
-    return (
-      <Badge variant="outline" className={config.className}>
-        {config.label}
-      </Badge>
-    );
-  };
-
-  // Filter payments
-  const filteredPayments = paymentsData.filter((payment: any) => {
-    const matchesSearch = searchQuery === '' || 
-      payment.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      payment.studentName?.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesStatus = statusFilter === 'alle' || payment.status === statusFilter;
-    const matchesYear = yearFilter === 'alle' || payment.academicYearId?.toString() === yearFilter;
-    const matchesClass = classFilter === 'alle' || payment.classId?.toString() === classFilter;
-    
-    return matchesSearch && matchesStatus && matchesYear && matchesClass;
-  });
-
-  // Calculate statistics
-  const totalAmount = paymentsData.reduce((sum: number, payment: any) => sum + parseFloat(payment.amount || 0), 0);
-  const paidAmount = paymentsData
-    .filter((payment: any) => payment.status === 'paid')
-    .reduce((sum: number, payment: any) => sum + parseFloat(payment.amount || 0), 0);
-  const pendingAmount = paymentsData
-    .filter((payment: any) => payment.status === 'pending')
-    .reduce((sum: number, payment: any) => sum + parseFloat(payment.amount || 0), 0);
-  const overdueAmount = paymentsData
-    .filter((payment: any) => payment.status === 'overdue')
-    .reduce((sum: number, payment: any) => sum + parseFloat(payment.amount || 0), 0);
-
-  const handleAddPayment = (data: z.infer<typeof addPaymentSchema>) => {
-    addPaymentMutation.mutate(data);
-  };
-
-  const handleEditPayment = (payment: any) => {
-    setEditingPayment(payment);
-    setShowEditPaymentDialog(true);
-  };
-
-  const handleUpdatePayment = (data: any) => {
-    if (editingPayment) {
-      updatePaymentMutation.mutate({ id: editingPayment.id, data });
-    }
-  };
-
-  const handleDeletePayment = (payment: any) => {
-    setDeleteItem({
-      type: 'payment',
-      id: payment.id,
-      name: payment.description
-    });
-    setShowDeleteConfirmDialog(true);
-  };
-
-  const handleViewPayment = (payment: any) => {
-    setSelectedPayment(payment);
-    setShowPaymentDetailDialog(true);
-  };
-
-  const handleConfirmDelete = () => {
-    if (deleteItem?.type === 'payment') {
-      deletePaymentMutation.mutate(deleteItem.id);
-    }
-  };
-
-  // Export functionality
-  const handleExport = () => {
-    const headers = ['Student', 'Beschrijving', 'Bedrag', 'Type', 'Status', 'Vervaldatum'];
-    const csvData = filteredPayments.map((payment: any) => [
-      payment.studentName,
-      payment.description,
-      `€${parseFloat(payment.amount).toFixed(2)}`,
-      payment.type,
-      payment.status,
-      new Date(payment.dueDate).toLocaleDateString('nl-NL')
-    ]);
-
-    const csvContent = [headers, ...csvData]
-      .map(row => row.map(field => `"${field}"`).join(','))
-      .join('\n');
-
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = `betalingen_export_${new Date().toISOString().split('T')[0]}.csv`;
-    link.click();
-    
-    toast({
-      title: "Export voltooid",
-      description: "Betalingen zijn geëxporteerd naar CSV bestand.",
-    });
-  };
-
-  if (paymentsLoading || studentsLoading || academicYearsLoading) {
-    return (
-      <div className="bg-[#f7f9fc] min-h-screen">
-        <PremiumHeader
-          icon={CreditCard}
-          title="Betalingsbeheer"
-          description="Beheer alle betalingen en schoolgelden"
-          breadcrumbs={{
-            parent: "Secretariaat",
-            current: "Betalingen"
-          }}
-        />
-        <div className="px-6 py-6 max-w-7xl mx-auto">
-          <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // Statistics
+  const totalAmount = filteredPayments.reduce((sum: number, payment: Payment) => sum + payment.amount, 0);
+  const paidAmount = filteredPayments
+    .filter((payment: Payment) => payment.status === 'paid')
+    .reduce((sum: number, payment: Payment) => sum + payment.amount, 0);
+  const pendingAmount = filteredPayments
+    .filter((payment: Payment) => payment.status === 'pending')
+    .reduce((sum: number, payment: Payment) => sum + payment.amount, 0);
+  const overdueAmount = filteredPayments
+    .filter((payment: Payment) => payment.status === 'overdue')
+    .reduce((sum: number, payment: Payment) => sum + payment.amount, 0);
 
   return (
     <div className="bg-[#f7f9fc] min-h-screen">
-      {/* Premium Header */}
-      <PremiumHeader
-        icon={CreditCard}
-        title="Betalingsbeheer"
-        description="Beheer alle betalingen en schoolgelden"
+      <PremiumHeader 
+        title="Betalingen" 
+        description="Beheer schoolgeld, boeten en overige betalingen van studenten"
+        icon={Euro}
         breadcrumbs={{
           parent: "Secretariaat",
           current: "Betalingen"
         }}
       />
 
-      {/* Main Content */}
-      <div className="px-6 py-6 max-w-7xl mx-auto space-y-6">
+      {/* Statistics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Euro className="h-6 w-6 text-blue-600" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-500">Totaal bedrag</p>
+                <p className="text-2xl font-bold text-gray-900">€{totalAmount.toFixed(2)}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
         
-        {/* Statistics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Totaal Bedrag</CardTitle>
-              <Euro className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">€{totalAmount.toFixed(2)}</div>
-              <p className="text-xs text-muted-foreground">
-                Alle betalingen
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Betaald</CardTitle>
-              <Shield className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-600">€{paidAmount.toFixed(2)}</div>
-              <p className="text-xs text-muted-foreground">
-                Ontvangen betalingen
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Uitstaand</CardTitle>
-              <Clock className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-yellow-600">€{pendingAmount.toFixed(2)}</div>
-              <p className="text-xs text-muted-foreground">
-                Openstaande betalingen
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Achterstallig</CardTitle>
-              <AlertCircle className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-red-600">€{overdueAmount.toFixed(2)}</div>
-              <p className="text-xs text-muted-foreground">
-                Verlopen betalingen
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Action Bar */}
-        <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
-          <div className="px-6 py-4">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              
-              {/* Search and Filters */}
-              <div className="flex-1 max-w-md">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                  <Input
-                    type="text"
-                    placeholder="Zoek betalingen..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center">
+              <div className="p-2 bg-green-100 rounded-lg">
+                <CreditCard className="h-6 w-6 text-green-600" />
               </div>
-
-              {/* Action Buttons */}
-              <div className="flex items-center gap-2">
-                <Button variant="outline" onClick={handleExport}>
-                  <Download className="h-4 w-4 mr-2" />
-                  Exporteren
-                </Button>
-                <Button
-                  onClick={() => setShowAddPaymentDialog(true)}
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Nieuwe Betaling
-                </Button>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-500">Betaald</p>
+                <p className="text-2xl font-bold text-gray-900">€{paidAmount.toFixed(2)}</p>
               </div>
             </div>
-
-            {/* Filter Row */}
-            <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <Label className="text-sm font-medium">Status</Label>
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Alle statussen" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="alle">Alle statussen</SelectItem>
-                    <SelectItem value="paid">Betaald</SelectItem>
-                    <SelectItem value="pending">Openstaand</SelectItem>
-                    <SelectItem value="overdue">Achterstallig</SelectItem>
-                    <SelectItem value="cancelled">Geannuleerd</SelectItem>
-                  </SelectContent>
-                </Select>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center">
+              <div className="p-2 bg-yellow-100 rounded-lg">
+                <Clock className="h-6 w-6 text-yellow-600" />
               </div>
-
-              <div>
-                <Label className="text-sm font-medium">Academisch Jaar</Label>
-                <Select value={yearFilter} onValueChange={setYearFilter}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Alle jaren" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="alle">Alle jaren</SelectItem>
-                    {academicYearsData.map((year: any) => (
-                      <SelectItem key={year.id} value={year.id.toString()}>
-                        {year.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label className="text-sm font-medium">Klas</Label>
-                <Select value={classFilter} onValueChange={setClassFilter}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Alle klassen" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="alle">Alle klassen</SelectItem>
-                    {/* Add class options here based on available data */}
-                  </SelectContent>
-                </Select>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-500">Openstaand</p>
+                <p className="text-2xl font-bold text-gray-900">€{pendingAmount.toFixed(2)}</p>
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* Content Tabs */}
-        <Tabs defaultValue="payments" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="payments">Betalingen</TabsTrigger>
-            <TabsTrigger value="tuition">Schoolgeld</TabsTrigger>
-            <TabsTrigger value="discounts">Kortingen</TabsTrigger>
-            <TabsTrigger value="reports">Rapporten</TabsTrigger>
-          </TabsList>
-
-          {/* Payments Tab */}
-          <TabsContent value="payments" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle>Betalingen ({filteredPayments.length})</CardTitle>
-                    <CardDescription>
-                      Overzicht van alle betalingen en hun status
-                    </CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Student</TableHead>
-                        <TableHead>Beschrijving</TableHead>
-                        <TableHead>Bedrag</TableHead>
-                        <TableHead>Type</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Vervaldatum</TableHead>
-                        <TableHead>Acties</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredPayments.length === 0 ? (
-                        <TableRow>
-                          <TableCell colSpan={7} className="text-center text-gray-500 py-8">
-                            Geen betalingen gevonden
-                          </TableCell>
-                        </TableRow>
-                      ) : (
-                        filteredPayments.map((payment: any) => (
-                          <TableRow 
-                            key={payment.id}
-                            className="hover:bg-gray-50 cursor-pointer"
-                            onMouseEnter={() => setHoveredRowId(payment.id)}
-                            onMouseLeave={() => setHoveredRowId(null)}
-                            onClick={() => handleViewPayment(payment)}
-                          >
-                            <TableCell>
-                              <div className="font-medium">{payment.studentName}</div>
-                              <div className="text-sm text-gray-500">{payment.studentId}</div>
-                            </TableCell>
-                            <TableCell>
-                              <div className="font-medium">{payment.description}</div>
-                            </TableCell>
-                            <TableCell>
-                              <div className="font-medium">€{parseFloat(payment.amount).toFixed(2)}</div>
-                            </TableCell>
-                            <TableCell>
-                              {getTypeBadge(payment.type)}
-                            </TableCell>
-                            <TableCell>
-                              {getStatusBadge(payment.status)}
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex items-center">
-                                <Calendar className="h-4 w-4 text-gray-400 mr-2" />
-                                {new Date(payment.dueDate).toLocaleDateString('nl-NL')}
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex items-center space-x-2">
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleViewPayment(payment);
-                                  }}
-                                  className="h-8 w-8 p-0"
-                                >
-                                  <Eye className="h-4 w-4" />
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleEditPayment(payment);
-                                  }}
-                                  className="h-8 w-8 p-0"
-                                >
-                                  <Edit className="h-4 w-4" />
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleDeletePayment(payment);
-                                  }}
-                                  className="h-8 w-8 p-0 text-red-600 hover:text-red-800"
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        ))
-                      )}
-                    </TableBody>
-                  </Table>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Other tabs content would go here */}
-          <TabsContent value="tuition">
-            <Card>
-              <CardHeader>
-                <CardTitle>Schoolgeld Beheer</CardTitle>
-                <CardDescription>
-                  Beheer schoolgeld tarieven per academisch jaar
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-500">Schoolgeld functionaliteit komt binnenkort beschikbaar.</p>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="discounts">
-            <Card>
-              <CardHeader>
-                <CardTitle>Kortingen</CardTitle>
-                <CardDescription>
-                  Beheer kortingsregelingen en -toekenningen
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-500">Kortingen functionaliteit komt binnenkort beschikbaar.</p>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="reports">
-            <Card>
-              <CardHeader>
-                <CardTitle>Betalingsrapporten</CardTitle>
-                <CardDescription>
-                  Genereer rapporten en analyses over betalingen
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-500">Rapporten functionaliteit komt binnenkort beschikbaar.</p>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center">
+              <div className="p-2 bg-red-100 rounded-lg">
+                <AlertCircle className="h-6 w-6 text-red-600" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-500">Achterstallig</p>
+                <p className="text-2xl font-bold text-gray-900">€{overdueAmount.toFixed(2)}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
+      
+      <DataTableContainer>
+        <SearchActionBar>
+          {/* Zoekbalk */}
+          <div className="relative w-full sm:max-w-md">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+            <Input
+              type="text"
+              placeholder="Zoek betalingen..."
+              className="w-full pl-9 h-8 text-xs rounded-sm bg-white border-[#e5e7eb]"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          
+          {/* Acties */}
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowFilterOptions(!showFilterOptions)}
+              className="h-7 w-7 p-0 rounded-sm border-[#e5e7eb]"
+              title="Filters"
+            >
+              <Filter className="h-3.5 w-3.5" />
+            </Button>
+            
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsDiscountDialogOpen(true)}
+              className="h-7 w-7 p-0 rounded-sm border-[#e5e7eb]"
+              title="Korting toepassen"
+            >
+              <Percent className="h-3.5 w-3.5" />
+            </Button>
+            
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 w-7 p-0 rounded-sm border-[#e5e7eb]"
+              title="Exporteer betalingen"
+            >
+              <Download className="h-3.5 w-3.5" />
+            </Button>
 
-      {/* Add Payment Dialog */}
-      <Dialog open={showAddPaymentDialog} onOpenChange={setShowAddPaymentDialog}>
-        <DialogContent className="max-w-2xl">
+            <Button
+              size="sm"
+              onClick={() => setIsCreateDialogOpen(true)}
+              className="h-7 text-xs rounded-sm bg-[#1e40af] hover:bg-[#1e3a8a] text-white ml-auto"
+            >
+              <PlusCircle className="h-3.5 w-3.5 mr-1" />
+              Nieuwe Betaling
+            </Button>
+          </div>
+        </SearchActionBar>
+
+        {/* Filter opties */}
+        {showFilterOptions && (
+          <div className="px-4 py-3 border-t border-[#e5e7eb] flex flex-wrap gap-3 items-center">
+            <div className="flex items-center">
+              {(statusFilter !== 'all' || typeFilter !== 'all') && (
+                <Button
+                  variant="link"
+                  size="sm"
+                  onClick={() => {
+                    setStatusFilter('all');
+                    setTypeFilter('all');
+                  }}
+                  className="h-7 text-xs text-blue-600 p-0 mr-3"
+                >
+                  Filters wissen
+                </Button>
+              )}
+            </div>
+            
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="h-7 w-32 text-xs rounded-sm border-[#e5e7eb]">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent className="bg-white border-[#e5e7eb]">
+                <SelectItem value="all" className="text-xs focus:bg-blue-200 hover:bg-blue-100">Alle statussen</SelectItem>
+                <SelectItem value="pending" className="text-xs focus:bg-blue-200 hover:bg-blue-100">In behandeling</SelectItem>
+                <SelectItem value="paid" className="text-xs focus:bg-blue-200 hover:bg-blue-100">Betaald</SelectItem>
+                <SelectItem value="overdue" className="text-xs focus:bg-blue-200 hover:bg-blue-100">Achterstallig</SelectItem>
+                <SelectItem value="cancelled" className="text-xs focus:bg-blue-200 hover:bg-blue-100">Geannuleerd</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select value={typeFilter} onValueChange={setTypeFilter}>
+              <SelectTrigger className="h-7 w-32 text-xs rounded-sm border-[#e5e7eb]">
+                <SelectValue placeholder="Type" />
+              </SelectTrigger>
+              <SelectContent className="bg-white border-[#e5e7eb]">
+                <SelectItem value="all" className="text-xs focus:bg-blue-200 hover:bg-blue-100">Alle types</SelectItem>
+                <SelectItem value="tuition" className="text-xs focus:bg-blue-200 hover:bg-blue-100">Schoolgeld</SelectItem>
+                <SelectItem value="fine" className="text-xs focus:bg-blue-200 hover:bg-blue-100">Boete</SelectItem>
+                <SelectItem value="materials" className="text-xs focus:bg-blue-200 hover:bg-blue-100">Materialen</SelectItem>
+                <SelectItem value="activity" className="text-xs focus:bg-blue-200 hover:bg-blue-100">Activiteit</SelectItem>
+                <SelectItem value="other" className="text-xs focus:bg-blue-200 hover:bg-blue-100">Overig</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+
+        {/* Tabel */}
+        <TableContainer>
+          <Table>
+            <TableHeader className="bg-[#f9fafb]">
+              <TableRow>
+                <TableHead className="w-12 px-4 py-3">
+                  <Checkbox />
+                </TableHead>
+                <TableHead className="px-4 py-3 text-xs font-medium text-gray-700">Student</TableHead>
+                <TableHead className="px-4 py-3 text-xs font-medium text-gray-700">Beschrijving</TableHead>
+                <TableHead className="px-4 py-3 text-xs font-medium text-gray-700">Type</TableHead>
+                <TableHead className="px-4 py-3 text-xs font-medium text-gray-700">Bedrag</TableHead>
+                <TableHead className="px-4 py-3 text-xs font-medium text-gray-700">Vervaldatum</TableHead>
+                <TableHead className="px-4 py-3 text-xs font-medium text-gray-700">Status</TableHead>
+                <TableHead className="w-20 px-4 py-3 text-xs font-medium text-gray-700 text-right">Acties</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={8} className="text-center py-8">
+                    <div className="flex items-center justify-center">
+                      <div className="animate-spin w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full"></div>
+                      <span className="ml-2 text-gray-600">Laden...</span>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : filteredPayments.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={8} className="text-center py-8">
+                    <EmptyState
+                      icon={Euro}
+                      title="Geen betalingen gevonden"
+                      description="Er zijn geen betalingen die voldoen aan de huidige criteria."
+                    />
+                  </TableCell>
+                </TableRow>
+              ) : (
+                filteredPayments.map((payment: Payment) => (
+                  <TableRow key={payment.id} className="hover:bg-gray-50">
+                    <TableCell className="px-4 py-3">
+                      <Checkbox />
+                    </TableCell>
+                    <TableCell className="px-4 py-3">
+                      <div className="text-xs font-medium text-gray-900">{payment.studentName}</div>
+                    </TableCell>
+                    <TableCell className="px-4 py-3 text-xs text-gray-600">
+                      {payment.description}
+                    </TableCell>
+                    <TableCell className="px-4 py-3">
+                      <Badge variant="outline" className="text-xs">
+                        {payment.type === 'tuition' && 'Schoolgeld'}
+                        {payment.type === 'fine' && 'Boete'}
+                        {payment.type === 'materials' && 'Materialen'}
+                        {payment.type === 'activity' && 'Activiteit'}
+                        {payment.type === 'other' && 'Overig'}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="px-4 py-3 text-xs font-medium">
+                      €{payment.amount.toFixed(2)}
+                    </TableCell>
+                    <TableCell className="px-4 py-3 text-xs text-gray-600">
+                      {new Date(payment.dueDate).toLocaleDateString('nl-NL')}
+                    </TableCell>
+                    <TableCell className="px-4 py-3">
+                      {getStatusBadge(payment.status)}
+                    </TableCell>
+                    <TableCell className="px-4 py-3 text-right">
+                      <QuickActions
+                        onView={() => handleViewPayment(payment)}
+                        onEdit={() => handleEditPayment(payment)}
+                        onDelete={() => handleDeletePayment(payment)}
+                      />
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </DataTableContainer>
+
+      {/* Create Payment Dialog */}
+      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>Nieuwe Betaling Toevoegen</DialogTitle>
+            <DialogTitle className="flex items-center gap-2">
+              <Euro className="h-5 w-5 text-blue-600" />
+              Nieuwe Betaling Toevoegen
+            </DialogTitle>
             <DialogDescription>
               Voeg een nieuwe betaling toe voor een student
             </DialogDescription>
           </DialogHeader>
           
           <Form {...addPaymentForm}>
-            <form onSubmit={addPaymentForm.handleSubmit(handleAddPayment)} className="space-y-6">
+            <form onSubmit={addPaymentForm.handleSubmit(handleCreatePayment)} className="space-y-4">
+              <FormField
+                control={addPaymentForm.control}
+                name="studentId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Student *</FormLabel>
+                    <Select onValueChange={(value) => field.onChange(parseInt(value))} value={field.value?.toString()}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecteer een student" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {students.map((student: Student) => (
+                          <SelectItem key={student.id} value={student.id.toString()}>
+                            {student.firstName} {student.lastName} ({student.studentId})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={addPaymentForm.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Beschrijving *</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Bijvoorbeeld: Schoolgeld januari 2025" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
               <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={addPaymentForm.control}
-                  name="studentId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Student</FormLabel>
-                      <Select onValueChange={(value) => field.onChange(parseInt(value))}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecteer student" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {studentsData.map((student: any) => (
-                            <SelectItem key={student.id} value={student.id.toString()}>
-                              {student.firstName} {student.lastName} ({student.studentId})
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={addPaymentForm.control}
-                  name="type"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Type</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecteer type" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="tuition">Schoolgeld</SelectItem>
-                          <SelectItem value="materials">Materialen</SelectItem>
-                          <SelectItem value="excursion">Excursie</SelectItem>
-                          <SelectItem value="other">Overig</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
                 <FormField
                   control={addPaymentForm.control}
                   name="amount"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Bedrag (€)</FormLabel>
+                      <FormLabel>Bedrag *</FormLabel>
                       <FormControl>
                         <Input type="number" step="0.01" placeholder="0.00" {...field} />
                       </FormControl>
@@ -771,13 +633,24 @@ export default function Payments() {
                 
                 <FormField
                   control={addPaymentForm.control}
-                  name="dueDate"
+                  name="type"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Vervaldatum</FormLabel>
-                      <FormControl>
-                        <Input type="date" {...field} />
-                      </FormControl>
+                      <FormLabel>Type *</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecteer type" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="tuition">Schoolgeld</SelectItem>
+                          <SelectItem value="fine">Boete</SelectItem>
+                          <SelectItem value="materials">Materialen</SelectItem>
+                          <SelectItem value="activity">Activiteit</SelectItem>
+                          <SelectItem value="other">Overig</SelectItem>
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -786,16 +659,12 @@ export default function Payments() {
               
               <FormField
                 control={addPaymentForm.control}
-                name="description"
+                name="dueDate"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Beschrijving</FormLabel>
+                    <FormLabel>Vervaldatum *</FormLabel>
                     <FormControl>
-                      <Textarea 
-                        placeholder="Beschrijf de betaling..."
-                        rows={3}
-                        {...field} 
-                      />
+                      <Input type="date" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -803,11 +672,11 @@ export default function Payments() {
               />
               
               <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setShowAddPaymentDialog(false)}>
+                <Button type="button" variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
                   Annuleren
                 </Button>
-                <Button type="submit" disabled={addPaymentMutation.isPending}>
-                  {addPaymentMutation.isPending ? 'Bezig...' : 'Betaling Toevoegen'}
+                <Button type="submit" disabled={createPaymentMutation.isPending}>
+                  {createPaymentMutation.isPending ? 'Toevoegen...' : 'Betaling toevoegen'}
                 </Button>
               </DialogFooter>
             </form>
@@ -815,87 +684,32 @@ export default function Payments() {
         </DialogContent>
       </Dialog>
 
-      {/* Payment Detail Dialog */}
-      <Dialog open={showPaymentDetailDialog} onOpenChange={setShowPaymentDetailDialog}>
-        <DialogContent className="max-w-2xl">
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent>
           <DialogHeader>
-            <DialogTitle>Betaling Details</DialogTitle>
+            <DialogTitle className="flex items-center gap-2 text-red-600">
+              <AlertCircle className="h-5 w-5" />
+              Betaling verwijderen
+            </DialogTitle>
             <DialogDescription>
-              {selectedPayment && `Details van betaling voor ${selectedPayment.studentName}`}
+              Weet je zeker dat je deze betaling wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
             </DialogDescription>
           </DialogHeader>
-          
-          {selectedPayment && (
-            <div className="space-y-6">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label className="text-sm font-medium text-gray-700">Student</Label>
-                  <p className="text-sm text-gray-900 mt-1">{selectedPayment.studentName}</p>
-                </div>
-                <div>
-                  <Label className="text-sm font-medium text-gray-700">Bedrag</Label>
-                  <p className="text-sm text-gray-900 mt-1">€{parseFloat(selectedPayment.amount).toFixed(2)}</p>
-                </div>
-                <div>
-                  <Label className="text-sm font-medium text-gray-700">Type</Label>
-                  <div className="mt-1">{getTypeBadge(selectedPayment.type)}</div>
-                </div>
-                <div>
-                  <Label className="text-sm font-medium text-gray-700">Status</Label>
-                  <div className="mt-1">{getStatusBadge(selectedPayment.status)}</div>
-                </div>
-                <div>
-                  <Label className="text-sm font-medium text-gray-700">Vervaldatum</Label>
-                  <p className="text-sm text-gray-900 mt-1">
-                    {new Date(selectedPayment.dueDate).toLocaleDateString('nl-NL')}
-                  </p>
-                </div>
-                {selectedPayment.paidDate && (
-                  <div>
-                    <Label className="text-sm font-medium text-gray-700">Betaaldatum</Label>
-                    <p className="text-sm text-gray-900 mt-1">
-                      {new Date(selectedPayment.paidDate).toLocaleDateString('nl-NL')}
-                    </p>
-                  </div>
-                )}
-              </div>
-              
-              <div>
-                <Label className="text-sm font-medium text-gray-700">Beschrijving</Label>
-                <p className="text-sm text-gray-900 mt-1">{selectedPayment.description}</p>
-              </div>
-            </div>
-          )}
-          
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowPaymentDetailDialog(false)}>
-              Sluiten
+            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+              Annuleren
             </Button>
-            {selectedPayment && (
-              <Button onClick={() => {
-                setShowPaymentDetailDialog(false);
-                handleEditPayment(selectedPayment);
-              }}>
-                <Edit className="h-4 w-4 mr-2" />
-                Bewerken
-              </Button>
-            )}
+            <Button 
+              variant="destructive" 
+              onClick={confirmDeletePayment}
+              disabled={deletePaymentMutation.isPending}
+            >
+              {deletePaymentMutation.isPending ? 'Verwijderen...' : 'Verwijderen'}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
-      {/* Delete Confirmation Dialog */}
-      <DeleteDialog
-        open={showDeleteConfirmDialog}
-        onOpenChange={setShowDeleteConfirmDialog}
-        onConfirm={handleConfirmDelete}
-        title={`${deleteItem?.type === 'payment' ? 'Betaling' : 'Item'} Verwijderen`}
-        description={
-          deleteItem 
-            ? `Weet je zeker dat je "${deleteItem.name}" wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.`
-            : ""
-        }
-      />
     </div>
   );
 }

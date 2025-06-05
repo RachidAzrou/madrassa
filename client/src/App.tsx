@@ -76,13 +76,16 @@ function AuthenticatedRouter() {
     return (
       <SecretariatLayout>
         <Switch>
-          <Route path="/" component={() => <AuthenticatedRoute component={Dashboard} />} />
+          <Route path="/secretariat" component={() => <AuthenticatedRoute component={SecretariatDashboard} />} />
+          <Route path="/" component={() => <AuthenticatedRoute component={SecretariatDashboard} />} />
           <Route path="/secretariat/students" component={() => <AuthenticatedRoute component={Students} />} />
           <Route path="/secretariat/guardians" component={() => <AuthenticatedRoute component={Guardians} />} />
-
+          <Route path="/secretariat/teachers" component={() => <AuthenticatedRoute component={Teachers} />} />
           <Route path="/secretariat/classes" component={() => <AuthenticatedRoute component={StudentGroups} />} />
+          <Route path="/secretariat/courses" component={() => <AuthenticatedRoute component={Courses} />} />
           <Route path="/secretariat/schedule" component={() => <AuthenticatedRoute component={Calendar} />} />
           <Route path="/secretariat/payments" component={() => <AuthenticatedRoute component={Fees} />} />
+          <Route path="/secretariat/reports" component={() => <AuthenticatedRoute component={Reports} />} />
           <Route path="/secretariat/communication" component={() => <AuthenticatedRoute component={Messages} />} />
           <Route path="/notifications" component={() => <AuthenticatedRoute component={Notifications} />} />
           <Route path="/messages" component={() => <AuthenticatedRoute component={Messages} />} />

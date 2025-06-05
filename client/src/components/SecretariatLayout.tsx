@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRBAC } from "@/hooks/useRBAC";
 import { RESOURCES } from "../../../shared/rbac";
+import { Topbar } from "@/components/layout/topbar";
 import {
   Home,
   Users,
@@ -223,68 +224,8 @@ export default function SecretariatLayout({ children }: SecretariatLayoutProps) 
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col lg:ml-0">
-        {/* Enhanced Top Bar - Full Width */}
-        <header className="bg-white shadow-md border-b border-gray-200 sticky top-0 z-30">
-          <div className="flex items-center justify-between h-16 px-6">
-            {/* Mobile Menu Button & Logo */}
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={() => setSidebarOpen(true)}
-                className="lg:hidden text-gray-600 hover:text-violet-600 transition-colors"
-              >
-                <Menu className="w-6 h-6" />
-              </button>
-              <div className="lg:hidden flex items-center space-x-2">
-                <div className="w-8 h-8 bg-violet-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">M</span>
-                </div>
-                <span className="font-bold text-gray-900">myMadrassa</span>
-              </div>
-              
-              {/* Page Title - Desktop */}
-              <div className="hidden lg:block">
-                <h1 className="text-xl font-semibold text-gray-900">
-                  {navigation.find(item => item.current)?.name || 'Dashboard'}
-                </h1>
-                <p className="text-sm text-gray-600">Secretariaat Beheersysteem</p>
-              </div>
-            </div>
-
-            {/* Top Bar Actions */}
-            <div className="flex items-center space-x-4">
-              {/* Search Bar - Desktop */}
-              <div className="hidden md:flex items-center bg-gray-100 rounded-lg px-3 py-2 max-w-md">
-                <Search className="w-4 h-4 text-gray-500 mr-2" />
-                <input
-                  type="text"
-                  placeholder="Zoeken..."
-                  className="bg-transparent text-sm text-gray-700 placeholder-gray-500 border-none outline-none flex-1"
-                />
-              </div>
-
-              {/* Notifications */}
-              <Button variant="ghost" size="sm" className="relative hover:bg-violet-50">
-                <Bell className="w-5 h-5 text-gray-600" />
-                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
-              </Button>
-
-              {/* User Menu - Desktop */}
-              <div className="hidden lg:flex items-center space-x-3 bg-gray-50 rounded-lg px-3 py-2">
-                <div className="w-8 h-8 bg-gradient-to-br from-violet-500 to-purple-600 rounded-full flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">
-                    {user?.firstName?.[0]}{user?.lastName?.[0]}
-                  </span>
-                </div>
-                <div className="text-right">
-                  <p className="text-sm font-medium text-gray-900">
-                    {user?.firstName} {user?.lastName}
-                  </p>
-                  <p className="text-xs text-gray-600">Secretariaat</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </header>
+        {/* Top Bar */}
+        <Topbar onMenuClick={() => setSidebarOpen(true)} />
 
         {/* Page Content - Full Height */}
         <main className="flex-1 overflow-auto">

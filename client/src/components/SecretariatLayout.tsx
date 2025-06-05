@@ -132,92 +132,205 @@ export default function SecretariatLayout({ children }: SecretariatLayoutProps) 
         />
       )}
 
-      {/* Sidebar - Full Height */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-72 bg-white shadow-xl transform ${
+      {/* Sidebar - Admin Style */}
+      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-xl transform ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      } transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 flex flex-col`}>
+      } transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 flex flex-col border-r border-gray-200`}>
         
-        {/* Logo Section */}
-        <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200 bg-gradient-to-r from-violet-600 to-purple-700">
+        {/* Mobile header with close button */}
+        <div className="lg:hidden p-4 border-b border-gray-200 flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-md">
-              <span className="text-violet-600 font-bold text-lg">M</span>
+            <div className="w-8 h-8 bg-violet-600 rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-sm">M</span>
             </div>
-            <span className="text-xl font-bold text-white">myMadrassa</span>
+            <span className="text-lg font-bold text-gray-900">myMadrassa</span>
           </div>
           <button
             onClick={() => setSidebarOpen(false)}
-            className="lg:hidden text-white hover:text-violet-200 transition-colors"
+            className="p-1 rounded-full hover:bg-gray-100"
           >
-            <X className="w-6 h-6" />
+            <X className="h-5 w-5 text-gray-500" />
           </button>
         </div>
 
-        {/* User Profile Section */}
-        <div className="px-6 py-5 border-b border-gray-200 bg-gradient-to-b from-violet-50 to-white">
-          <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-violet-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
-              <span className="text-white font-bold text-lg">
-                {user?.firstName?.[0]}{user?.lastName?.[0]}
-              </span>
-            </div>
-            <div className="flex-1">
-              <p className="text-sm font-semibold text-gray-900">
-                {user?.firstName} {user?.lastName}
-              </p>
-              <p className="text-xs text-gray-600 mb-2">{user?.email}</p>
-              <Badge variant="secondary" className="bg-violet-100 text-violet-800 border-violet-200 text-xs">
-                Secretariaat
-              </Badge>
-            </div>
+        {/* Dashboard link */}
+        <div className="px-3 pt-3 pb-2 border-b border-gray-100">
+          <div className="bg-gray-50 rounded-md overflow-hidden">
+            <Link href="/secretariat">
+              <div className={`flex items-center gap-2 px-2 py-1.5 text-xs rounded-md transition-colors cursor-pointer ${
+                location === "/secretariat"
+                  ? "bg-primary/10 text-primary font-medium"
+                  : "text-gray-700 hover:text-primary hover:bg-gray-100"
+              }`}>
+                <div className="flex-shrink-0">
+                  <Home className="h-4 w-4" />
+                </div>
+                <span className="truncate whitespace-nowrap">Dashboard</span>
+              </div>
+            </Link>
           </div>
         </div>
 
-        {/* Navigation Menu - Flex Grow */}
-        <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
-          <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 mb-3">
-            Hoofdmenu
-          </div>
-          {navigation.map((item) => {
-            const Icon = item.icon;
-            return (
-              <Link key={item.name} href={item.href}>
-                <div className={`group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 cursor-pointer ${
-                  item.current
-                    ? 'bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-lg transform scale-105'
-                    : 'text-gray-700 hover:bg-violet-50 hover:text-violet-700 hover:transform hover:scale-105'
-                }`}>
-                  <Icon className={`mr-4 h-5 w-5 transition-colors ${
-                    item.current ? 'text-white' : 'text-gray-400 group-hover:text-violet-600'
-                  }`} />
-                  <span className="font-medium">{item.name}</span>
-                  {item.current && (
-                    <div className="ml-auto w-2 h-2 bg-white rounded-full opacity-75"></div>
-                  )}
+        {/* Navigation Menu */}
+        <nav className="flex flex-col flex-1">
+          <div className="flex-1 py-2 px-3 overflow-y-auto">
+            <div className="space-y-4">
+              <div className="pt-2">
+                <p className="mb-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Beheer
+                </p>
+                <div className="space-y-1.5">
+                  {navigation
+                    .filter(item => ['Studentenbeheer', 'Voogdenbeheer', 'Docentenbeheer', 'Klassenbeheer'].includes(item.name))
+                    .map((item) => {
+                      const Icon = item.icon;
+                      return (
+                        <Link key={item.name} href={item.href}>
+                          <div className={`flex items-center gap-2 px-2 py-1.5 text-xs rounded-md transition-colors cursor-pointer ${
+                            item.current
+                              ? "bg-primary text-white font-medium"
+                              : "text-gray-600 hover:text-primary hover:bg-gray-100"
+                          }`}>
+                            <div className="flex-shrink-0">
+                              <Icon className="h-4 w-4" />
+                            </div>
+                            <span className="truncate whitespace-nowrap">{item.name}</span>
+                          </div>
+                        </Link>
+                      );
+                    })}
                 </div>
-              </Link>
-            );
-          })}
+              </div>
+
+              <div className="pt-2">
+                <p className="mb-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Onderwijs
+                </p>
+                <div className="space-y-1.5">
+                  {navigation
+                    .filter(item => ['Cursussen', 'Roosterbeheer'].includes(item.name))
+                    .map((item) => {
+                      const Icon = item.icon;
+                      return (
+                        <Link key={item.name} href={item.href}>
+                          <div className={`flex items-center gap-2 px-2 py-1.5 text-xs rounded-md transition-colors cursor-pointer ${
+                            item.current
+                              ? "bg-primary text-white font-medium"
+                              : "text-gray-600 hover:text-primary hover:bg-gray-100"
+                          }`}>
+                            <div className="flex-shrink-0">
+                              <Icon className="h-4 w-4" />
+                            </div>
+                            <span className="truncate whitespace-nowrap">{item.name}</span>
+                          </div>
+                        </Link>
+                      );
+                    })}
+                </div>
+              </div>
+
+              <div className="pt-2">
+                <p className="mb-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Evaluatie
+                </p>
+                <div className="space-y-1.5">
+                  {navigation
+                    .filter(item => ['Rapporten'].includes(item.name))
+                    .map((item) => {
+                      const Icon = item.icon;
+                      return (
+                        <Link key={item.name} href={item.href}>
+                          <div className={`flex items-center gap-2 px-2 py-1.5 text-xs rounded-md transition-colors cursor-pointer ${
+                            item.current
+                              ? "bg-primary text-white font-medium"
+                              : "text-gray-600 hover:text-primary hover:bg-gray-100"
+                          }`}>
+                            <div className="flex-shrink-0">
+                              <Icon className="h-4 w-4" />
+                            </div>
+                            <span className="truncate whitespace-nowrap">{item.name}</span>
+                          </div>
+                        </Link>
+                      );
+                    })}
+                </div>
+              </div>
+
+              <div className="pt-2">
+                <p className="mb-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Financiën
+                </p>
+                <div className="space-y-1.5">
+                  {navigation
+                    .filter(item => ['Betalingsbeheer'].includes(item.name))
+                    .map((item) => {
+                      const Icon = item.icon;
+                      return (
+                        <Link key={item.name} href={item.href}>
+                          <div className={`flex items-center gap-2 px-2 py-1.5 text-xs rounded-md transition-colors cursor-pointer ${
+                            item.current
+                              ? "bg-primary text-white font-medium"
+                              : "text-gray-600 hover:text-primary hover:bg-gray-100"
+                          }`}>
+                            <div className="flex-shrink-0">
+                              <Icon className="h-4 w-4" />
+                            </div>
+                            <span className="truncate whitespace-nowrap">{item.name}</span>
+                          </div>
+                        </Link>
+                      );
+                    })}
+                </div>
+              </div>
+
+              <div className="pt-2">
+                <p className="mb-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Communicatie
+                </p>
+                <div className="space-y-1.5">
+                  {navigation
+                    .filter(item => ['Communicatie'].includes(item.name))
+                    .map((item) => {
+                      const Icon = item.icon;
+                      return (
+                        <Link key={item.name} href={item.href}>
+                          <div className={`flex items-center gap-2 px-2 py-1.5 text-xs rounded-md transition-colors cursor-pointer ${
+                            item.current
+                              ? "bg-primary text-white font-medium"
+                              : "text-gray-600 hover:text-primary hover:bg-gray-100"
+                          }`}>
+                            <div className="flex-shrink-0">
+                              <Icon className="h-4 w-4" />
+                            </div>
+                            <span className="truncate whitespace-nowrap">{item.name}</span>
+                          </div>
+                        </Link>
+                      );
+                    })}
+                </div>
+              </div>
+            </div>
+          </div>
         </nav>
 
         {/* Settings & Logout Section */}
-        <div className="p-4 border-t border-gray-200 bg-gray-50">
-          <div className="space-y-2">
-            <Button
-              variant="ghost"
-              className="w-full justify-start text-gray-700 hover:text-violet-600 hover:bg-violet-50 transition-all"
-            >
-              <Settings className="mr-3 h-5 w-5" />
-              Instellingen
-            </Button>
-            <Button
+        <div className="px-3 border-t border-gray-300 py-3 bg-gray-50">
+          <div className="space-y-0.5">
+            <div className="flex items-center gap-2 px-2 py-1.5 text-xs rounded-md transition-colors cursor-pointer text-gray-600 hover:text-primary hover:bg-gray-100">
+              <div className="flex-shrink-0">
+                <Settings className="h-4 w-4" />
+              </div>
+              <span className="truncate whitespace-nowrap">Instellingen</span>
+            </div>
+            <div
               onClick={handleLogout}
-              variant="ghost"
-              className="w-full justify-start text-gray-700 hover:text-red-600 hover:bg-red-50 transition-all"
+              className="flex items-center gap-2 px-2 py-1.5 text-xs rounded-md transition-colors cursor-pointer text-gray-600 hover:text-red-600 hover:bg-red-50"
             >
-              <LogOut className="mr-3 h-5 w-5" />
-              Afmelden
-            </Button>
+              <div className="flex-shrink-0">
+                <LogOut className="h-4 w-4" />
+              </div>
+              <span className="truncate whitespace-nowrap">Afmelden</span>
+            </div>
           </div>
         </div>
       </div>

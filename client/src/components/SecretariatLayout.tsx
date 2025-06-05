@@ -140,7 +140,7 @@ export default function SecretariatLayout({ children }: SecretariatLayoutProps) 
         {/* Mobile header with close button */}
         <div className="lg:hidden p-4 border-b border-gray-200 flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-violet-600 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">M</span>
             </div>
             <span className="text-lg font-bold text-gray-900">myMadrassa</span>
@@ -157,13 +157,15 @@ export default function SecretariatLayout({ children }: SecretariatLayoutProps) 
         <div className="px-3 pt-3 pb-2 border-b border-gray-100">
           <div className="bg-gray-50 rounded-md overflow-hidden">
             <Link href="/secretariat">
-              <div className={`flex items-center gap-2 px-2 py-1.5 text-xs rounded-md transition-colors cursor-pointer ${
+              <div className={`flex items-center gap-2 px-2 py-1.5 text-xs rounded-md transition-all duration-200 cursor-pointer ${
                 location === "/secretariat"
-                  ? "bg-primary/10 text-primary font-medium"
-                  : "text-gray-700 hover:text-primary hover:bg-gray-100"
+                  ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg transform scale-105"
+                  : "text-gray-700 hover:text-blue-600 hover:bg-blue-50 hover:transform hover:scale-105"
               }`}>
                 <div className="flex-shrink-0">
-                  <Home className="h-4 w-4" />
+                  <Home className={`h-4 w-4 transition-colors ${
+                    location === "/secretariat" ? 'text-white' : 'text-gray-400 hover:text-blue-600'
+                  }`} />
                 </div>
                 <span className="truncate whitespace-nowrap">Dashboard</span>
               </div>
@@ -186,13 +188,15 @@ export default function SecretariatLayout({ children }: SecretariatLayoutProps) 
                       const Icon = item.icon;
                       return (
                         <Link key={item.name} href={item.href}>
-                          <div className={`flex items-center gap-2 px-2 py-1.5 text-xs rounded-md transition-colors cursor-pointer ${
+                          <div className={`flex items-center gap-2 px-2 py-1.5 text-xs rounded-md transition-all duration-200 cursor-pointer ${
                             item.current
-                              ? "bg-primary text-white font-medium"
-                              : "text-gray-600 hover:text-primary hover:bg-gray-100"
+                              ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg transform scale-105"
+                              : "text-gray-600 hover:text-blue-600 hover:bg-blue-50 hover:transform hover:scale-105"
                           }`}>
                             <div className="flex-shrink-0">
-                              <Icon className="h-4 w-4" />
+                              <Icon className={`h-4 w-4 transition-colors ${
+                                item.current ? 'text-white' : 'text-gray-400 group-hover:text-blue-600'
+                              }`} />
                             </div>
                             <span className="truncate whitespace-nowrap">{item.name}</span>
                           </div>
@@ -213,13 +217,15 @@ export default function SecretariatLayout({ children }: SecretariatLayoutProps) 
                       const Icon = item.icon;
                       return (
                         <Link key={item.name} href={item.href}>
-                          <div className={`flex items-center gap-2 px-2 py-1.5 text-xs rounded-md transition-colors cursor-pointer ${
+                          <div className={`flex items-center gap-2 px-2 py-1.5 text-xs rounded-md transition-all duration-200 cursor-pointer ${
                             item.current
-                              ? "bg-primary text-white font-medium"
-                              : "text-gray-600 hover:text-primary hover:bg-gray-100"
+                              ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg transform scale-105"
+                              : "text-gray-600 hover:text-blue-600 hover:bg-blue-50 hover:transform hover:scale-105"
                           }`}>
                             <div className="flex-shrink-0">
-                              <Icon className="h-4 w-4" />
+                              <Icon className={`h-4 w-4 transition-colors ${
+                                item.current ? 'text-white' : 'text-gray-400 group-hover:text-blue-600'
+                              }`} />
                             </div>
                             <span className="truncate whitespace-nowrap">{item.name}</span>
                           </div>
@@ -240,13 +246,15 @@ export default function SecretariatLayout({ children }: SecretariatLayoutProps) 
                       const Icon = item.icon;
                       return (
                         <Link key={item.name} href={item.href}>
-                          <div className={`flex items-center gap-2 px-2 py-1.5 text-xs rounded-md transition-colors cursor-pointer ${
+                          <div className={`flex items-center gap-2 px-2 py-1.5 text-xs rounded-md transition-all duration-200 cursor-pointer ${
                             item.current
-                              ? "bg-primary text-white font-medium"
-                              : "text-gray-600 hover:text-primary hover:bg-gray-100"
+                              ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg transform scale-105"
+                              : "text-gray-600 hover:text-blue-600 hover:bg-blue-50 hover:transform hover:scale-105"
                           }`}>
                             <div className="flex-shrink-0">
-                              <Icon className="h-4 w-4" />
+                              <Icon className={`h-4 w-4 transition-colors ${
+                                item.current ? 'text-white' : 'text-gray-400 group-hover:text-blue-600'
+                              }`} />
                             </div>
                             <span className="truncate whitespace-nowrap">{item.name}</span>
                           </div>
@@ -267,13 +275,15 @@ export default function SecretariatLayout({ children }: SecretariatLayoutProps) 
                       const Icon = item.icon;
                       return (
                         <Link key={item.name} href={item.href}>
-                          <div className={`flex items-center gap-2 px-2 py-1.5 text-xs rounded-md transition-colors cursor-pointer ${
+                          <div className={`flex items-center gap-2 px-2 py-1.5 text-xs rounded-md transition-all duration-200 cursor-pointer ${
                             item.current
-                              ? "bg-primary text-white font-medium"
-                              : "text-gray-600 hover:text-primary hover:bg-gray-100"
+                              ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg transform scale-105"
+                              : "text-gray-600 hover:text-blue-600 hover:bg-blue-50 hover:transform hover:scale-105"
                           }`}>
                             <div className="flex-shrink-0">
-                              <Icon className="h-4 w-4" />
+                              <Icon className={`h-4 w-4 transition-colors ${
+                                item.current ? 'text-white' : 'text-gray-400 group-hover:text-blue-600'
+                              }`} />
                             </div>
                             <span className="truncate whitespace-nowrap">{item.name}</span>
                           </div>
@@ -294,13 +304,15 @@ export default function SecretariatLayout({ children }: SecretariatLayoutProps) 
                       const Icon = item.icon;
                       return (
                         <Link key={item.name} href={item.href}>
-                          <div className={`flex items-center gap-2 px-2 py-1.5 text-xs rounded-md transition-colors cursor-pointer ${
+                          <div className={`flex items-center gap-2 px-2 py-1.5 text-xs rounded-md transition-all duration-200 cursor-pointer ${
                             item.current
-                              ? "bg-primary text-white font-medium"
-                              : "text-gray-600 hover:text-primary hover:bg-gray-100"
+                              ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg transform scale-105"
+                              : "text-gray-600 hover:text-blue-600 hover:bg-blue-50 hover:transform hover:scale-105"
                           }`}>
                             <div className="flex-shrink-0">
-                              <Icon className="h-4 w-4" />
+                              <Icon className={`h-4 w-4 transition-colors ${
+                                item.current ? 'text-white' : 'text-gray-400 group-hover:text-blue-600'
+                              }`} />
                             </div>
                             <span className="truncate whitespace-nowrap">{item.name}</span>
                           </div>
@@ -316,18 +328,18 @@ export default function SecretariatLayout({ children }: SecretariatLayoutProps) 
         {/* Settings & Logout Section */}
         <div className="px-3 border-t border-gray-300 py-3 bg-gray-50">
           <div className="space-y-0.5">
-            <div className="flex items-center gap-2 px-2 py-1.5 text-xs rounded-md transition-colors cursor-pointer text-gray-600 hover:text-primary hover:bg-gray-100">
+            <div className="flex items-center gap-2 px-2 py-1.5 text-xs rounded-md transition-all duration-200 cursor-pointer text-gray-600 hover:text-blue-600 hover:bg-blue-50">
               <div className="flex-shrink-0">
-                <Settings className="h-4 w-4" />
+                <Settings className="h-4 w-4 transition-colors text-gray-400 hover:text-blue-600" />
               </div>
               <span className="truncate whitespace-nowrap">Instellingen</span>
             </div>
             <div
               onClick={handleLogout}
-              className="flex items-center gap-2 px-2 py-1.5 text-xs rounded-md transition-colors cursor-pointer text-gray-600 hover:text-red-600 hover:bg-red-50"
+              className="flex items-center gap-2 px-2 py-1.5 text-xs rounded-md transition-all duration-200 cursor-pointer text-gray-600 hover:text-red-600 hover:bg-red-50"
             >
               <div className="flex-shrink-0">
-                <LogOut className="h-4 w-4" />
+                <LogOut className="h-4 w-4 transition-colors text-gray-400 hover:text-red-600" />
               </div>
               <span className="truncate whitespace-nowrap">Afmelden</span>
             </div>

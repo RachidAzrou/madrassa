@@ -84,7 +84,8 @@ export default function Students() {
     classId: 0,
     guardianId: 0,
     emergencyContact: '',
-    notes: ''
+    notes: '',
+    status: 'active'
   });
 
   // Data fetching

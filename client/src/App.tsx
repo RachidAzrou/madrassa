@@ -76,7 +76,7 @@ function AuthenticatedRouter() {
     return (
       <SecretariatLayout>
         <Switch>
-          <Route path="/" component={() => <AuthenticatedRoute component={SecretariatDashboard} />} />
+          <Route path="/" component={() => <AuthenticatedRoute component={Dashboard} />} />
           <Route path="/secretariat/students" component={() => <AuthenticatedRoute component={Students} />} />
           <Route path="/secretariat/guardians" component={() => <AuthenticatedRoute component={Guardians} />} />
 

@@ -221,7 +221,7 @@ export default function Admissions() {
           </p>
         </div>
         {canCreate(RESOURCES.STUDENTS) && (
-          <Button>
+          <Button className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg">
             <UserPlus className="w-4 h-4 mr-2" />
             Nieuwe Aanmelding
           </Button>
@@ -285,7 +285,7 @@ export default function Admissions() {
             <CardTitle className="text-sm font-medium text-gray-600">Conversie</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-violet-600">{stats.conversionRate}%</div>
+            <div className="text-2xl font-bold text-blue-600">{stats.conversionRate}%</div>
             <p className="text-xs text-gray-500">Slaagpercentage</p>
           </CardContent>
         </Card>

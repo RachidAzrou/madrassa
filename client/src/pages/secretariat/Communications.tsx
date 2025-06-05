@@ -2,578 +2,522 @@ import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { useRBAC } from "@/hooks/useRBAC";
+import { 
+  AdminPageLayout,
+  AdminPageHeader,
+  AdminStatsGrid,
+  AdminStatCard,
+  AdminActionButton,
+  AdminSearchBar,
+  AdminTableCard,
+  AdminFilterSelect,
+  AdminAvatar
+} from "@/components/ui/admin-layout";
 import {
   MessageSquare,
   Send,
-  Search,
-  Filter,
-  Eye,
-  Edit,
-  Plus,
-  Calendar,
-  User,
-  Users,
   Mail,
   Phone,
-  Bell,
-  AlertCircle,
+  Users,
+  TrendingUp,
+  Download,
+  Upload,
+  Calendar,
+  Eye,
+  Edit,
+  Trash2,
   CheckCircle,
   Clock,
-  Archive,
-  Trash2
+  AlertCircle
 } from "lucide-react";
 
+// Define RESOURCES locally
 const RESOURCES = {
   COMMUNICATIONS: 'communications',
-  STUDENTS: 'students',
-  GUARDIANS: 'guardians'
+  STUDENTS: 'students'
 } as const;
 
-interface Message {
+interface Communication {
   id: number;
-  subject: string;
-  content: string;
-  recipientType: 'student' | 'guardian' | 'teacher' | 'all_students' | 'all_guardians' | 'all_teachers';
-  recipientId?: number;
-  recipientName?: string;
-  recipientEmail?: string;
-  senderName: string;
-  sentAt: string;
-  readAt?: string;
-  status: 'draft' | 'sent' | 'delivered' | 'read';
-  priority: 'low' | 'normal' | 'high' | 'urgent';
-  messageType: 'announcement' | 'reminder' | 'notification' | 'emergency' | 'personal';
-  attachments?: string[];
+  title: string;
+  message: string;
+  type: 'email' | 'sms' | 'notification' | 'announcement';
+  status: 'draft' | 'sent' | 'scheduled' | 'failed';
+  recipientType: 'students' | 'guardians' | 'teachers' | 'all';
+  recipientCount: number;
+  sentDate?: string;
+  scheduledDate?: string;
+  createdBy: string;
+  priority: 'low' | 'medium' | 'high';
 }
 
-interface MessageStats {
-  totalSent: number;
-  totalRead: number;
-  totalUnread: number;
-  readRate: number;
-  averageReadTime: number;
+interface Student {
+  id: number;
+  studentId: string;
+  firstName: string;
+  lastName: string;
 }
 
-const messageFormSchema = z.object({
-  subject: z.string().min(1, "Onderwerp is verplicht"),
-  content: z.string().min(1, "Bericht is verplicht"),
-  recipientType: z.enum(['student', 'guardian', 'teacher', 'all_students', 'all_guardians', 'all_teachers']),
-  recipientId: z.number().optional(),
-  priority: z.enum(['low', 'normal', 'high', 'urgent']),
-  messageType: z.enum(['announcement', 'reminder', 'notification', 'emergency', 'personal']),
+const communicationFormSchema = z.object({
+  title: z.string().min(1, "Titel is verplicht"),
+  message: z.string().min(1, "Bericht is verplicht"),
+  type: z.enum(['email', 'sms', 'notification', 'announcement']),
+  recipientType: z.enum(['students', 'guardians', 'teachers', 'all']),
+  priority: z.enum(['low', 'medium', 'high']),
+  scheduledDate: z.string().optional(),
 });
 
-type MessageFormData = z.infer<typeof messageFormSchema>;
+type CommunicationFormData = z.infer<typeof communicationFormSchema>;
 
 export default function Communications() {
-  const { canCreate, canUpdate, canRead } = useRBAC();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [typeFilter, setTypeFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [showDialog, setShowDialog] = useState(false);
+  const [dialogMode, setDialogMode] = useState<'create' | 'edit' | 'view'>('create');
+  const [selectedCommunication, setSelectedCommunication] = useState<Communication | null>(null);
+
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [typeFilter, setTypeFilter] = useState<string>("all");
-  const [recipientFilter, setRecipientFilter] = useState<string>("all");
-  const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
-  const [showDialog, setShowDialog] = useState(false);
-  const [dialogMode, setDialogMode] = useState<'view' | 'edit' | 'create'>('view');
+  const { canCreate, canUpdate, canDelete } = useRBAC();
 
-  if (!canRead(RESOURCES.COMMUNICATIONS)) {
-    return (
-      <div className="p-6">
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-center text-gray-500">
-              Je hebt geen toegang tot deze pagina.
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  const { data: messagesData, isLoading } = useQuery<{ messages: Message[] }>({
-    queryKey: ['/api/communications'],
-    retry: false,
-  });
-
-  const { data: statsData } = useQuery<{ stats: MessageStats }>({
-    queryKey: ['/api/communications/stats'],
-    retry: false,
-  });
-
-  const { data: studentsData } = useQuery<{ students: Array<{id: number, firstName: string, lastName: string, email: string}> }>({
-    queryKey: ['/api/students/basic'],
-    retry: false,
-  });
-
-  const { data: guardiansData } = useQuery<{ guardians: Array<{id: number, firstName: string, lastName: string, email: string}> }>({
-    queryKey: ['/api/guardians/basic'],
-    retry: false,
-  });
-
-  const form = useForm<MessageFormData>({
-    resolver: zodResolver(messageFormSchema),
+  const form = useForm<CommunicationFormData>({
+    resolver: zodResolver(communicationFormSchema),
     defaultValues: {
-      subject: "",
-      content: "",
-      recipientType: 'student',
-      recipientId: undefined,
-      priority: 'normal',
-      messageType: 'announcement',
+      title: "",
+      message: "",
+      type: "email",
+      recipientType: "students",
+      priority: "medium",
+      scheduledDate: "",
     },
   });
 
-  const sendMessageMutation = useMutation({
-    mutationFn: async (data: MessageFormData) => {
-      return apiRequest('POST', '/api/communications/send', data);
+  const { data: communications = [], isLoading: communicationsLoading } = useQuery<Communication[]>({
+    queryKey: ["/api/communications"],
+  });
+
+  const { data: students = [], isLoading: studentsLoading } = useQuery<Student[]>({
+    queryKey: ["/api/students"],
+  });
+
+  const createCommunicationMutation = useMutation({
+    mutationFn: async (data: CommunicationFormData) => {
+      const response = await apiRequest("POST", "/api/communications", { body: data });
+      return response;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/communications'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/communications/stats'] });
-      toast({ title: "Bericht verzonden", description: "Het bericht is succesvol verzonden." });
+      queryClient.invalidateQueries({ queryKey: ["/api/communications"] });
+      toast({ title: "Communicatie succesvol toegevoegd" });
       setShowDialog(false);
       form.reset();
     },
     onError: (error: any) => {
       toast({
-        title: "Fout",
-        description: error.message || "Er is een fout opgetreden bij het verzenden van het bericht.",
+        title: "Fout bij toevoegen communicatie",
+        description: error.message,
         variant: "destructive",
       });
     },
   });
 
-  const messages = messagesData?.messages || [];
-  const stats = statsData?.stats || {
-    totalSent: 0,
-    totalRead: 0,
-    totalUnread: 0,
-    readRate: 0,
-    averageReadTime: 0
-  };
-  const students = studentsData?.students || [];
-  const guardians = guardiansData?.guardians || [];
-
-  const filteredMessages = messages.filter((message) => {
-    const matchesSearch = searchTerm === "" || 
-      message.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      message.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      message.recipientName?.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesStatus = statusFilter === "all" || message.status === statusFilter;
-    const matchesType = typeFilter === "all" || message.messageType === typeFilter;
-    const matchesRecipient = recipientFilter === "all" || message.recipientType === recipientFilter;
-    
-    return matchesSearch && matchesStatus && matchesType && matchesRecipient;
+  const updateCommunicationMutation = useMutation({
+    mutationFn: async (data: CommunicationFormData) => {
+      const response = await apiRequest("PUT", `/api/communications/${selectedCommunication?.id}`, { body: data });
+      return response;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/communications"] });
+      toast({ title: "Communicatie succesvol bijgewerkt" });
+      setShowDialog(false);
+      form.reset();
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Fout bij bijwerken communicatie",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
   });
 
-  const handleCreateMessage = () => {
+  const deleteCommunicationMutation = useMutation({
+    mutationFn: async (communicationId: number) => {
+      await apiRequest("DELETE", `/api/communications/${communicationId}`, {});
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/communications"] });
+      toast({ title: "Communicatie succesvol verwijderd" });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Fout bij verwijderen communicatie",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const filteredCommunications = communications.filter((comm: Communication) => {
+    const matchesSearch = 
+      comm.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      comm.message.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      comm.createdBy.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesType = typeFilter === "all" || comm.type === typeFilter;
+    const matchesStatus = statusFilter === "all" || comm.status === statusFilter;
+    
+    return matchesSearch && matchesType && matchesStatus;
+  });
+
+  const handleCreateCommunication = () => {
     setDialogMode('create');
-    setSelectedMessage(null);
+    setSelectedCommunication(null);
     form.reset();
     setShowDialog(true);
   };
 
-  const handleViewMessage = (message: Message) => {
+  const handleViewCommunication = (communication: Communication) => {
     setDialogMode('view');
-    setSelectedMessage(message);
+    setSelectedCommunication(communication);
     setShowDialog(true);
   };
 
-  const onSubmit = (data: MessageFormData) => {
+  const handleEditCommunication = (communication: Communication) => {
+    setDialogMode('edit');
+    setSelectedCommunication(communication);
+    form.reset({
+      title: communication.title,
+      message: communication.message,
+      type: communication.type,
+      recipientType: communication.recipientType,
+      priority: communication.priority,
+      scheduledDate: communication.scheduledDate || "",
+    });
+    setShowDialog(true);
+  };
+
+  const handleDeleteCommunication = (communication: Communication) => {
+    if (window.confirm(`Weet je zeker dat je communicatie "${communication.title}" wilt verwijderen?`)) {
+      deleteCommunicationMutation.mutate(communication.id);
+    }
+  };
+
+  const onSubmit = (data: CommunicationFormData) => {
     if (dialogMode === 'create') {
-      sendMessageMutation.mutate(data);
+      createCommunicationMutation.mutate(data);
+    } else if (dialogMode === 'edit') {
+      updateCommunicationMutation.mutate(data);
     }
   };
 
   const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'draft':
-        return <Badge variant="secondary" className="bg-gray-100 text-gray-800"><Edit className="w-3 h-3 mr-1" />Concept</Badge>;
-      case 'sent':
-        return <Badge variant="secondary" className="bg-blue-100 text-blue-800"><Send className="w-3 h-3 mr-1" />Verzonden</Badge>;
-      case 'delivered':
-        return <Badge variant="secondary" className="bg-green-100 text-green-800"><CheckCircle className="w-3 h-3 mr-1" />Afgeleverd</Badge>;
-      case 'read':
-        return <Badge variant="secondary" className="bg-violet-100 text-violet-800"><Eye className="w-3 h-3 mr-1" />Gelezen</Badge>;
-      default:
-        return <Badge variant="outline">{status}</Badge>;
-    }
-  };
-
-  const getPriorityBadge = (priority: string) => {
-    switch (priority) {
-      case 'urgent':
-        return <Badge variant="secondary" className="bg-red-100 text-red-800"><AlertCircle className="w-3 h-3 mr-1" />Urgent</Badge>;
-      case 'high':
-        return <Badge variant="secondary" className="bg-orange-100 text-orange-800">Hoog</Badge>;
-      case 'normal':
-        return <Badge variant="secondary" className="bg-blue-100 text-blue-800">Normaal</Badge>;
-      case 'low':
-        return <Badge variant="secondary" className="bg-gray-100 text-gray-800">Laag</Badge>;
-      default:
-        return <Badge variant="outline">{priority}</Badge>;
-    }
+    const variants = {
+      draft: { className: "bg-gray-100 text-gray-800", icon: <Edit className="w-3 h-3 mr-1" /> },
+      sent: { className: "bg-green-100 text-green-800", icon: <CheckCircle className="w-3 h-3 mr-1" /> },
+      scheduled: { className: "bg-blue-100 text-blue-800", icon: <Clock className="w-3 h-3 mr-1" /> },
+      failed: { className: "bg-red-100 text-red-800", icon: <AlertCircle className="w-3 h-3 mr-1" /> }
+    };
+    
+    const labels = {
+      draft: "Concept",
+      sent: "Verstuurd",
+      scheduled: "Gepland",
+      failed: "Mislukt"
+    };
+    
+    const variant = variants[status as keyof typeof variants];
+    
+    return (
+      <Badge className={variant.className}>
+        <div className="flex items-center">
+          {variant.icon}
+          {labels[status as keyof typeof labels]}
+        </div>
+      </Badge>
+    );
   };
 
   const getTypeBadge = (type: string) => {
-    const typeMap = {
-      'announcement': { label: 'Aankondiging', color: 'bg-blue-100 text-blue-800' },
-      'reminder': { label: 'Herinnering', color: 'bg-yellow-100 text-yellow-800' },
-      'notification': { label: 'Notificatie', color: 'bg-green-100 text-green-800' },
-      'emergency': { label: 'Noodgeval', color: 'bg-red-100 text-red-800' },
-      'personal': { label: 'Persoonlijk', color: 'bg-purple-100 text-purple-800' }
+    const variants = {
+      email: { className: "bg-blue-100 text-blue-800", icon: <Mail className="w-3 h-3 mr-1" /> },
+      sms: { className: "bg-green-100 text-green-800", icon: <Phone className="w-3 h-3 mr-1" /> },
+      notification: { className: "bg-yellow-100 text-yellow-800", icon: <MessageSquare className="w-3 h-3 mr-1" /> },
+      announcement: { className: "bg-purple-100 text-purple-800", icon: <TrendingUp className="w-3 h-3 mr-1" /> }
     };
     
-    const messageType = typeMap[type as keyof typeof typeMap] || { label: type, color: 'bg-gray-100 text-gray-800' };
-    return <Badge variant="secondary" className={messageType.color}>{messageType.label}</Badge>;
-  };
-
-  const getRecipientDisplay = (message: Message) => {
-    switch (message.recipientType) {
-      case 'all_students':
-        return 'Alle Studenten';
-      case 'all_guardians':
-        return 'Alle Voogden';
-      case 'all_teachers':
-        return 'Alle Docenten';
-      default:
-        return message.recipientName || 'Onbekend';
-    }
-  };
-
-  if (isLoading) {
+    const labels = {
+      email: "Email",
+      sms: "SMS",
+      notification: "Notificatie",
+      announcement: "Aankondiging"
+    };
+    
+    const variant = variants[type as keyof typeof variants];
+    
     return (
-      <div className="p-6">
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/4 mb-6"></div>
-          <div className="space-y-4">
-            {[...Array(8)].map((_, i) => (
-              <div key={i} className="h-16 bg-gray-200 rounded-lg"></div>
-            ))}
-          </div>
+      <Badge className={variant.className}>
+        <div className="flex items-center">
+          {variant.icon}
+          {labels[type as keyof typeof labels]}
         </div>
-      </div>
+      </Badge>
+    );
+  };
+
+  const totalCommunications = communications.length;
+  const sentCommunications = communications.filter(c => c.status === 'sent').length;
+  const scheduledCommunications = communications.filter(c => c.status === 'scheduled').length;
+  const totalRecipients = communications.reduce((sum, comm) => sum + comm.recipientCount, 0);
+
+  if (communicationsLoading || studentsLoading) {
+    return (
+      <AdminPageLayout>
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full" />
+        </div>
+      </AdminPageLayout>
     );
   }
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-start">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Communicatie</h1>
-          <p className="text-gray-600 mt-2">
-            Beheer berichten en communicatie met studenten, voogden en docenten
-          </p>
-        </div>
+    <AdminPageLayout>
+      <AdminPageHeader 
+        title="Communicatie" 
+        description="Beheer communicatie met studenten, voogden en docenten"
+      >
+        <AdminActionButton variant="outline" icon={<Download className="w-4 h-4" />}>
+          Exporteren
+        </AdminActionButton>
+        <AdminActionButton variant="outline" icon={<Upload className="w-4 h-4" />}>
+          Sjablonen
+        </AdminActionButton>
         {canCreate(RESOURCES.COMMUNICATIONS) && (
-          <Button onClick={handleCreateMessage} className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg">
-            <Plus className="w-4 h-4 mr-2" />
-            Nieuw Bericht
-          </Button>
+          <AdminActionButton 
+            icon={<Send className="w-4 h-4" />}
+            onClick={handleCreateCommunication}
+          >
+            Nieuwe Communicatie
+          </AdminActionButton>
         )}
-      </div>
+      </AdminPageHeader>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Totaal Verzonden</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.totalSent}</div>
-            <p className="text-xs text-gray-500">Berichten</p>
-          </CardContent>
-        </Card>
+      <AdminStatsGrid columns={4}>
+        <AdminStatCard
+          title="Totaal Berichten"
+          value={totalCommunications}
+          subtitle="Alle communicaties"
+          icon={<MessageSquare className="h-4 w-4" />}
+        />
+        <AdminStatCard
+          title="Verstuurd"
+          value={sentCommunications}
+          subtitle="Verzonden berichten"
+          valueColor="text-green-600"
+          icon={<CheckCircle className="h-4 w-4" />}
+        />
+        <AdminStatCard
+          title="Gepland"
+          value={scheduledCommunications}
+          subtitle="Ingeplande berichten"
+          valueColor="text-blue-600"
+          icon={<Clock className="h-4 w-4" />}
+        />
+        <AdminStatCard
+          title="Ontvangers"
+          value={totalRecipients}
+          subtitle="Totaal bereikt"
+          valueColor="text-blue-600"
+          icon={<Users className="h-4 w-4" />}
+        />
+      </AdminStatsGrid>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Gelezen</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">{stats.totalRead}</div>
-            <p className="text-xs text-gray-500">Berichten</p>
-          </CardContent>
-        </Card>
+      <AdminSearchBar
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        placeholder="Zoek op titel, bericht of auteur..."
+        filters={
+          <>
+            <AdminFilterSelect
+              value={typeFilter}
+              onValueChange={setTypeFilter}
+              placeholder="Type filter"
+              options={[
+                { value: "all", label: "Alle types" },
+                { value: "email", label: "Email" },
+                { value: "sms", label: "SMS" },
+                { value: "notification", label: "Notificatie" },
+                { value: "announcement", label: "Aankondiging" }
+              ]}
+            />
+            <AdminFilterSelect
+              value={statusFilter}
+              onValueChange={setStatusFilter}
+              placeholder="Status filter"
+              options={[
+                { value: "all", label: "Alle statussen" },
+                { value: "draft", label: "Concept" },
+                { value: "sent", label: "Verstuurd" },
+                { value: "scheduled", label: "Gepland" },
+                { value: "failed", label: "Mislukt" }
+              ]}
+            />
+          </>
+        }
+      />
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Ongelezen</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-yellow-600">{stats.totalUnread}</div>
-            <p className="text-xs text-gray-500">Berichten</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Leespercentage</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-blue-600">{stats.readRate.toFixed(1)}%</div>
-            <p className="text-xs text-gray-500">Gelezen</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Gem. Leestijd</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-blue-600">{stats.averageReadTime}</div>
-            <p className="text-xs text-gray-500">Uren</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Filters and Search */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Filters</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <Input
-                  placeholder="Zoek op onderwerp, inhoud of ontvanger..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-            </div>
-            <div className="w-full sm:w-48">
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Status filter" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Alle statussen</SelectItem>
-                  <SelectItem value="draft">Concept</SelectItem>
-                  <SelectItem value="sent">Verzonden</SelectItem>
-                  <SelectItem value="delivered">Afgeleverd</SelectItem>
-                  <SelectItem value="read">Gelezen</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="w-full sm:w-48">
-              <Select value={typeFilter} onValueChange={setTypeFilter}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Type filter" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Alle types</SelectItem>
-                  <SelectItem value="announcement">Aankondiging</SelectItem>
-                  <SelectItem value="reminder">Herinnering</SelectItem>
-                  <SelectItem value="notification">Notificatie</SelectItem>
-                  <SelectItem value="emergency">Noodgeval</SelectItem>
-                  <SelectItem value="personal">Persoonlijk</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="w-full sm:w-48">
-              <Select value={recipientFilter} onValueChange={setRecipientFilter}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Ontvanger filter" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Alle ontvangers</SelectItem>
-                  <SelectItem value="student">Student</SelectItem>
-                  <SelectItem value="guardian">Voogd</SelectItem>
-                  <SelectItem value="teacher">Docent</SelectItem>
-                  <SelectItem value="all_students">Alle Studenten</SelectItem>
-                  <SelectItem value="all_guardians">Alle Voogden</SelectItem>
-                  <SelectItem value="all_teachers">Alle Docenten</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Messages Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Berichten ({filteredMessages.length})</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Onderwerp</TableHead>
-                  <TableHead>Ontvanger</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Prioriteit</TableHead>
-                  <TableHead>Verzonden</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Acties</TableHead>
+      <AdminTableCard 
+        title={`Communicaties (${filteredCommunications.length})`}
+        subtitle="Beheer alle communicaties"
+      >
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Titel</TableHead>
+              <TableHead>Type</TableHead>
+              <TableHead>Ontvangers</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Datum</TableHead>
+              <TableHead>Acties</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredCommunications.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center text-gray-500 py-8">
+                  Geen communicaties gevonden
+                </TableCell>
+              </TableRow>
+            ) : (
+              filteredCommunications.map((communication: Communication) => (
+                <TableRow key={communication.id}>
+                  <TableCell>
+                    <div>
+                      <div className="font-medium">{communication.title}</div>
+                      <div className="text-sm text-gray-500 truncate max-w-xs">
+                        {communication.message}
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>{getTypeBadge(communication.type)}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center">
+                      <Users className="w-4 h-4 text-gray-400 mr-2" />
+                      <span className="font-medium text-blue-600">{communication.recipientCount}</span>
+                      <span className="text-sm text-gray-500 ml-1">{communication.recipientType}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>{getStatusBadge(communication.status)}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center">
+                      <Calendar className="w-4 h-4 text-gray-400 mr-2" />
+                      {communication.sentDate ? 
+                        new Date(communication.sentDate).toLocaleDateString('nl-NL') :
+                        communication.scheduledDate ?
+                        new Date(communication.scheduledDate).toLocaleDateString('nl-NL') :
+                        'Niet gepland'
+                      }
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleViewCommunication(communication)}
+                        className="h-8 w-8 p-0 hover:bg-blue-50 hover:text-blue-600"
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      {canUpdate(RESOURCES.COMMUNICATIONS) && communication.status === 'draft' && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleEditCommunication(communication)}
+                          className="h-8 w-8 p-0 hover:bg-blue-50 hover:text-blue-600"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                      )}
+                      {canDelete(RESOURCES.COMMUNICATIONS) && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteCommunication(communication)}
+                          className="h-8 w-8 p-0 text-red-600 hover:text-red-800 hover:bg-red-50"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredMessages.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center text-gray-500 py-8">
-                      Geen berichten gevonden
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  filteredMessages.map((message) => (
-                    <TableRow key={message.id}>
-                      <TableCell>
-                        <div>
-                          <div className="font-medium">{message.subject}</div>
-                          <div className="text-sm text-gray-500 truncate max-w-xs">
-                            {message.content.substring(0, 80)}...
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center space-x-2">
-                          {message.recipientType.startsWith('all_') ? (
-                            <Users className="w-4 h-4 text-gray-400" />
-                          ) : (
-                            <User className="w-4 h-4 text-gray-400" />
-                          )}
-                          <span>{getRecipientDisplay(message)}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>{getTypeBadge(message.messageType)}</TableCell>
-                      <TableCell>{getPriorityBadge(message.priority)}</TableCell>
-                      <TableCell>
-                        <div className="flex items-center">
-                          <Calendar className="w-4 h-4 text-gray-400 mr-2" />
-                          <span>{new Date(message.sentAt).toLocaleDateString('nl-NL')}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>{getStatusBadge(message.status)}</TableCell>
-                      <TableCell>
-                        <div className="flex items-center space-x-2">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleViewMessage(message)}
-                          >
-                            <Eye className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </CardContent>
-      </Card>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </AdminTableCard>
 
-      {/* Message Dialog */}
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              {dialogMode === 'create' && 'Nieuw Bericht Verzenden'}
-              {dialogMode === 'view' && 'Bericht Details'}
+              {dialogMode === 'create' && 'Nieuwe Communicatie Aanmaken'}
+              {dialogMode === 'edit' && 'Communicatie Bewerken'}
+              {dialogMode === 'view' && 'Communicatie Details'}
             </DialogTitle>
           </DialogHeader>
           
-          {dialogMode === 'view' && selectedMessage ? (
+          {dialogMode === 'view' && selectedCommunication ? (
             <div className="space-y-6">
-              {/* Message Header */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">{selectedMessage.subject}</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                      <div className="flex items-center space-x-2">
-                        <span className="font-medium">Van:</span>
-                        <span>{selectedMessage.senderName}</span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <span className="font-medium">Naar:</span>
-                        <span>{getRecipientDisplay(selectedMessage)}</span>
-                      </div>
-                    </div>
-                    <div className="flex space-x-2">
-                      {getTypeBadge(selectedMessage.messageType)}
-                      {getPriorityBadge(selectedMessage.priority)}
-                      {getStatusBadge(selectedMessage.status)}
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-4 text-sm text-gray-500">
-                    <div className="flex items-center space-x-2">
-                      <Calendar className="w-4 h-4" />
-                      <span>Verzonden: {new Date(selectedMessage.sentAt).toLocaleString('nl-NL')}</span>
-                    </div>
-                    {selectedMessage.readAt && (
-                      <div className="flex items-center space-x-2">
-                        <Eye className="w-4 h-4" />
-                        <span>Gelezen: {new Date(selectedMessage.readAt).toLocaleString('nl-NL')}</span>
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Message Content */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Bericht Inhoud</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="prose max-w-none">
-                    <p className="whitespace-pre-wrap">{selectedMessage.content}</p>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Attachments */}
-              {selectedMessage.attachments && selectedMessage.attachments.length > 0 && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Bijlagen</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2">
-                      {selectedMessage.attachments.map((attachment, index) => (
-                        <div key={index} className="flex items-center space-x-2 p-2 bg-gray-50 rounded">
-                          <span className="text-sm">{attachment}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
+              <div className="grid grid-cols-2 gap-6">
+                <div>
+                  <Label className="text-sm font-medium text-gray-700">Titel</Label>
+                  <p className="mt-1 text-sm text-gray-900">{selectedCommunication.title}</p>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-gray-700">Type</Label>
+                  <div className="mt-1">{getTypeBadge(selectedCommunication.type)}</div>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-gray-700">Status</Label>
+                  <div className="mt-1">{getStatusBadge(selectedCommunication.status)}</div>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-gray-700">Ontvangers</Label>
+                  <p className="mt-1 text-sm text-gray-900">{selectedCommunication.recipientCount} {selectedCommunication.recipientType}</p>
+                </div>
+              </div>
+              <div>
+                <Label className="text-sm font-medium text-gray-700">Bericht</Label>
+                <div className="mt-1 p-3 border rounded-md bg-gray-50">
+                  <p className="text-sm text-gray-900 whitespace-pre-wrap">{selectedCommunication.message}</p>
+                </div>
+              </div>
             </div>
           ) : (
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-6">
                   <FormField
                     control={form.control}
-                    name="subject"
+                    name="title"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Onderwerp</FormLabel>
+                        <FormLabel>Titel</FormLabel>
                         <FormControl>
                           <Input {...field} />
                         </FormControl>
@@ -581,65 +525,59 @@ export default function Communications() {
                       </FormItem>
                     )}
                   />
-
                   <FormField
                     control={form.control}
-                    name="messageType"
+                    name="type"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Type Bericht</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
+                        <FormLabel>Type</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Selecteer type" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="announcement">Aankondiging</SelectItem>
-                            <SelectItem value="reminder">Herinnering</SelectItem>
+                            <SelectItem value="email">Email</SelectItem>
+                            <SelectItem value="sms">SMS</SelectItem>
                             <SelectItem value="notification">Notificatie</SelectItem>
-                            <SelectItem value="emergency">Noodgeval</SelectItem>
-                            <SelectItem value="personal">Persoonlijk</SelectItem>
+                            <SelectItem value="announcement">Aankondiging</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-
                   <FormField
                     control={form.control}
                     name="recipientType"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Ontvanger Type</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
+                        <FormLabel>Ontvangers</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Selecteer ontvanger type" />
+                              <SelectValue placeholder="Selecteer ontvangers" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="student">Specifieke Student</SelectItem>
-                            <SelectItem value="guardian">Specifieke Voogd</SelectItem>
-                            <SelectItem value="teacher">Specifieke Docent</SelectItem>
-                            <SelectItem value="all_students">Alle Studenten</SelectItem>
-                            <SelectItem value="all_guardians">Alle Voogden</SelectItem>
-                            <SelectItem value="all_teachers">Alle Docenten</SelectItem>
+                            <SelectItem value="students">Studenten</SelectItem>
+                            <SelectItem value="guardians">Voogden</SelectItem>
+                            <SelectItem value="teachers">Docenten</SelectItem>
+                            <SelectItem value="all">Iedereen</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-
                   <FormField
                     control={form.control}
                     name="priority"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Prioriteit</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Selecteer prioriteit" />
@@ -647,9 +585,8 @@ export default function Communications() {
                           </FormControl>
                           <SelectContent>
                             <SelectItem value="low">Laag</SelectItem>
-                            <SelectItem value="normal">Normaal</SelectItem>
+                            <SelectItem value="medium">Gemiddeld</SelectItem>
                             <SelectItem value="high">Hoog</SelectItem>
-                            <SelectItem value="urgent">Urgent</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -657,74 +594,31 @@ export default function Communications() {
                     )}
                   />
                 </div>
-
-                {(form.watch('recipientType') === 'student' || 
-                  form.watch('recipientType') === 'guardian' || 
-                  form.watch('recipientType') === 'teacher') && (
-                  <FormField
-                    control={form.control}
-                    name="recipientId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Specifieke Ontvanger</FormLabel>
-                        <Select 
-                          onValueChange={(value) => field.onChange(parseInt(value))} 
-                          value={field.value?.toString() || ""}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Selecteer ontvanger" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {form.watch('recipientType') === 'student' && students.map((student) => (
-                              <SelectItem key={student.id} value={student.id.toString()}>
-                                {student.firstName} {student.lastName} ({student.email})
-                              </SelectItem>
-                            ))}
-                            {form.watch('recipientType') === 'guardian' && guardians.map((guardian) => (
-                              <SelectItem key={guardian.id} value={guardian.id.toString()}>
-                                {guardian.firstName} {guardian.lastName} ({guardian.email})
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                )}
-
+                
                 <FormField
                   control={form.control}
-                  name="content"
+                  name="message"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Bericht Inhoud</FormLabel>
+                      <FormLabel>Bericht</FormLabel>
                       <FormControl>
-                        <textarea 
-                          {...field}
-                          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-violet-500"
-                          rows={8}
-                          placeholder="Typ hier je bericht..."
-                        />
+                        <Textarea {...field} rows={6} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-
-                <div className="flex justify-end space-x-4">
+                
+                <div className="flex justify-end space-x-2">
                   <Button type="button" variant="outline" onClick={() => setShowDialog(false)}>
                     Annuleren
                   </Button>
                   <Button 
                     type="submit" 
-                    className="bg-violet-600 hover:bg-violet-700"
-                    disabled={sendMessageMutation.isPending}
+                    disabled={createCommunicationMutation.isPending || updateCommunicationMutation.isPending}
+                    className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
                   >
-                    <Send className="w-4 h-4 mr-2" />
-                    Bericht Verzenden
+                    {dialogMode === 'create' ? 'Communicatie Aanmaken' : 'Wijzigingen Opslaan'}
                   </Button>
                 </div>
               </form>
@@ -732,6 +626,6 @@ export default function Communications() {
           )}
         </DialogContent>
       </Dialog>
-    </div>
+    </AdminPageLayout>
   );
 }

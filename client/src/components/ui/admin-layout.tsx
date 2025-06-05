@@ -317,7 +317,7 @@ export function AdminActionButtons({
           onClick={onDelete}
           className="h-8 w-8 p-0 text-red-600 hover:text-red-800 hover:bg-red-50"
         >
-          <Plus className="h-4 w-4" />
+          <Download className="h-4 w-4" />
         </Button>
       )}
     </div>

@@ -75,7 +75,61 @@ export default function Students() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
 
-  // Form state
+  // Admin-style state variables
+  const [newStudentGuardians, setNewStudentGuardians] = useState<any[]>([]);
+  const [newStudentSiblings, setNewStudentSiblings] = useState<any[]>([]);
+  const [isAddGuardianDialogOpen, setIsAddGuardianDialogOpen] = useState(false);
+  const [isLinkSiblingDialogOpen, setIsLinkSiblingDialogOpen] = useState(false);
+  const [guardianFormData, setGuardianFormData] = useState({
+    firstName: '',
+    lastName: '',
+    relationship: 'parent',
+    relationshipOther: '',
+    email: '',
+    phone: '',
+    isEmergencyContact: false,
+    emergencyContactFirstName: '',
+    emergencyContactLastName: '',
+    emergencyContactPhone: '',
+    emergencyContactRelationship: '',
+    emergencyContactRelationshipOther: '',
+  });
+  const [isAddingNewGuardian, setIsAddingNewGuardian] = useState(true);
+  const [guardianSearchTerm, setGuardianSearchTerm] = useState('');
+  const [siblingSearchTerm, setSiblingSearchTerm] = useState('');
+  const [selectedGuardians, setSelectedGuardians] = useState<any[]>([]);
+  const [selectedSiblings, setSelectedSiblings] = useState<any[]>([]);
+  const [hasValidationAttempt, setHasValidationAttempt] = useState(false);
+  const currentYear = new Date().getFullYear();
+  const [nextStudentId, setNextStudentId] = useState(`ST${currentYear.toString().substring(2, 4)}001`);
+  const [importFile, setImportFile] = useState<File | null>(null);
+  
+  // Admin-style form data
+  const emptyFormData = {
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    dateOfBirth: null,
+    street: "",
+    houseNumber: "",
+    postalCode: "",
+    city: "",
+    programId: "",
+    enrollmentDate: new Date().toISOString().split('T')[0],
+    status: "enrolled",
+    notes: "",
+    studentGroupId: "",
+    gender: "man",
+    photoUrl: "",
+    studentId: "",
+    academicYear: "2024-2025"
+  };
+  
+  const [formData, setFormData] = useState(emptyFormData);
+  const [editFormData, setEditFormData] = useState(emptyFormData);
+  
+  // Legacy form state for compatibility
   const [newStudent, setNewStudent] = useState({
     firstName: '',
     lastName: '',
@@ -186,26 +240,60 @@ export default function Students() {
     },
   });
 
-  // Helper functions
+  // Admin-style helper functions
+  const generateNextStudentId = (studentsData = []) => {
+    const currentYear = new Date().getFullYear();
+    const yearSuffix = currentYear.toString().slice(-2);
+    const prefix = `ST${yearSuffix}`;
+    
+    if (studentsData.length === 0) return `${prefix}001`;
+    
+    const existingIds = studentsData
+      .map(student => student.studentId)
+      .filter(id => id && id.startsWith(prefix))
+      .map(id => parseInt(id.substring(prefix.length)))
+      .filter(num => !isNaN(num))
+      .sort((a, b) => a - b);
+    
+    let nextNumber = 1;
+    for (const num of existingIds) {
+      if (num === nextNumber) {
+        nextNumber++;
+      } else {
+        break;
+      }
+    }
+    
+    return `${prefix}${nextNumber.toString().padStart(3, '0')}`;
+  };
+
   const resetForm = () => {
-    setNewStudent({
-      firstName: '',
-      lastName: '',
-      email: '',
-      phone: '',
-      dateOfBirth: '',
-      gender: '',
-      classId: 0,
-      guardianId: 0,
-      emergencyContact: '',
-      notes: '',
-      status: 'active',
-      photoUrl: '',
-      street: '',
-      houseNumber: '',
-      postalCode: '',
-      city: ''
-    });
+    setFormData(emptyFormData);
+    setNewStudentGuardians([]);
+    setNewStudentSiblings([]);
+    setNextStudentId(generateNextStudentId(students));
+    setHasValidationAttempt(false);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSelectChange = (name: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const validateRequiredFields = () => {
+    const requiredFields = ['firstName', 'lastName', 'dateOfBirth', 'gender', 'street', 'houseNumber', 'postalCode', 'city'];
+    const missing = requiredFields.filter(field => !formData[field as keyof typeof formData]);
+    return missing;
   };
 
   const getStatusBadge = (status: string) => {

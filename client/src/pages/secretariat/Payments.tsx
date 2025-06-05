@@ -273,7 +273,7 @@ export default function Payments() {
             Exporteren
           </Button>
           {canCreate(RESOURCES.PAYMENTS) && (
-            <Button onClick={handleCreatePayment} className="bg-violet-600 hover:bg-violet-700">
+            <Button onClick={handleCreatePayment} className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg">
               <Plus className="w-4 h-4 mr-2" />
               Nieuwe Betaling
             </Button>
@@ -318,7 +318,7 @@ export default function Payments() {
             <CardTitle className="text-sm font-medium text-gray-600">Slagingspercentage</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-violet-600">{stats.paymentSuccessRate.toFixed(1)}%</div>
+            <div className="text-2xl font-bold text-blue-600">{stats.paymentSuccessRate.toFixed(1)}%</div>
             <p className="text-xs text-gray-500">Betaald op tijd</p>
           </CardContent>
         </Card>

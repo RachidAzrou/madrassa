@@ -289,7 +289,7 @@ export default function Guardians() {
           </p>
         </div>
         {canCreate(RESOURCES.GUARDIANS) && (
-          <Button onClick={handleCreateGuardian} className="bg-violet-600 hover:bg-violet-700">
+          <Button onClick={handleCreateGuardian} className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg">
             <UserPlus className="w-4 h-4 mr-2" />
             Nieuwe Voogd
           </Button>
@@ -411,8 +411,8 @@ export default function Guardians() {
                     <TableRow key={guardian.id}>
                       <TableCell>
                         <div className="flex items-center space-x-3">
-                          <div className="w-8 h-8 bg-violet-100 rounded-full flex items-center justify-center">
-                            <span className="text-sm font-medium text-violet-700">
+                          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
+                            <span className="text-sm font-medium text-white">
                               {guardian.firstName[0]}{guardian.lastName[0]}
                             </span>
                           </div>
@@ -473,6 +473,7 @@ export default function Guardians() {
                             variant="ghost"
                             size="sm"
                             onClick={() => handleViewGuardian(guardian)}
+                            className="hover:bg-blue-50 hover:text-blue-600"
                           >
                             <Eye className="w-4 h-4" />
                           </Button>
@@ -481,6 +482,7 @@ export default function Guardians() {
                               variant="ghost"
                               size="sm"
                               onClick={() => handleEditGuardian(guardian)}
+                              className="hover:bg-blue-50 hover:text-blue-600"
                             >
                               <Edit className="w-4 h-4" />
                             </Button>

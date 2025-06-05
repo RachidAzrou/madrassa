@@ -281,7 +281,7 @@ export default function Communications() {
           </p>
         </div>
         {canCreate(RESOURCES.COMMUNICATIONS) && (
-          <Button onClick={handleCreateMessage} className="bg-violet-600 hover:bg-violet-700">
+          <Button onClick={handleCreateMessage} className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg">
             <Plus className="w-4 h-4 mr-2" />
             Nieuw Bericht
           </Button>
@@ -325,7 +325,7 @@ export default function Communications() {
             <CardTitle className="text-sm font-medium text-gray-600">Leespercentage</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-violet-600">{stats.readRate.toFixed(1)}%</div>
+            <div className="text-2xl font-bold text-blue-600">{stats.readRate.toFixed(1)}%</div>
             <p className="text-xs text-gray-500">Gelezen</p>
           </CardContent>
         </Card>

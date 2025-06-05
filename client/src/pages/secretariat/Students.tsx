@@ -149,18 +149,18 @@ export default function Students() {
     city: ''
   });
 
-  // Data fetching
-  const { data: students = [], isLoading, isError } = useQuery({
+  // Data fetching with proper typing
+  const { data: students = [], isLoading, isError } = useQuery<Student[]>({
     queryKey: ['/api/students'],
     staleTime: 60000,
   });
 
-  const { data: classes = [], isLoading: classesLoading } = useQuery({
+  const { data: classes = [], isLoading: classesLoading } = useQuery<StudentClass[]>({
     queryKey: ['/api/classes'],
     staleTime: 60000,
   });
 
-  const { data: guardians = [], isLoading: guardiansLoading } = useQuery({
+  const { data: guardians = [], isLoading: guardiansLoading } = useQuery<Guardian[]>({
     queryKey: ['/api/guardians'],
     staleTime: 60000,
   });
@@ -308,16 +308,47 @@ export default function Students() {
     return <Badge className={config.className}>{config.label}</Badge>;
   };
 
-  const handleCreateStudent = () => {
-    if (!newStudent.firstName || !newStudent.lastName) {
+  const handleCreateStudent = (e: React.FormEvent) => {
+    e.preventDefault();
+    setHasValidationAttempt(true);
+    
+    // Validate required fields using admin-style validation
+    const missingFields = validateRequiredFields();
+    if (missingFields.length > 0) {
       toast({
         title: "Validatiefout",
-        description: "Voornaam en achternaam zijn verplicht",
+        description: `Vul alle verplichte velden in: ${missingFields.join(', ')}`,
         variant: "destructive",
       });
       return;
     }
-    createStudentMutation.mutate(newStudent);
+
+    // Build student data with admin structure
+    const studentData = {
+      studentId: formData.academicYear ? 
+        `ST${formData.academicYear.substring(2, 4)}001` : 
+        generateNextStudentId(students as any[]),
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      email: formData.email || null,
+      phone: formData.phone || null,
+      dateOfBirth: formData.dateOfBirth,
+      gender: formData.gender,
+      street: formData.street,
+      houseNumber: formData.houseNumber,
+      postalCode: formData.postalCode,
+      city: formData.city,
+      photoUrl: formData.photoUrl || null,
+      status: formData.status || 'ingeschreven',
+      notes: formData.notes || null,
+      academicYear: formData.academicYear,
+      enrollmentDate: formData.enrollmentDate,
+      studentGroupId: formData.studentGroupId ? parseInt(formData.studentGroupId) : null,
+      guardians: newStudentGuardians,
+      siblings: newStudentSiblings
+    };
+
+    createStudentMutation.mutate(studentData);
   };
 
   const handleEditStudent = (student: Student) => {
@@ -796,167 +827,185 @@ export default function Students() {
         </div>
       </div>
 
-      {/* Create Student Dialog - Admin Style */}
-      <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader className="pb-4 border-b border-gray-200">
+      {/* Create Student Dialog - Complete Admin Copy */}
+      <Dialog 
+        open={showCreateDialog} 
+        onOpenChange={(open) => {
+          setShowCreateDialog(open);
+          if (!open) {
+            resetForm();
+          }
+        }}>
+        <DialogContent className="sm:max-w-[800px] p-0 overflow-hidden max-h-[90vh]" aria-describedby="student-dialog-description">
+          <div className="bg-[#1e40af] py-4 px-6 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+              <div className="bg-white/20 p-2 rounded-full">
                 <User className="h-5 w-5 text-white" />
               </div>
               <div>
-                <DialogTitle className="text-lg font-semibold text-gray-900">Nieuwe Student Toevoegen</DialogTitle>
-                <DialogDescription className="text-sm text-gray-600 mt-1">
-                  Voeg een nieuwe student toe aan het systeem met alle benodigde gegevens
+                <DialogTitle className="text-white text-lg font-semibold m-0">Student Toevoegen</DialogTitle>
+                <DialogDescription id="student-dialog-description" className="text-white/70 text-sm m-0">
+                  Voeg een nieuwe student toe aan het systeem.
                 </DialogDescription>
               </div>
             </div>
-          </DialogHeader>
-
-          <div className="space-y-6 py-4">
-            <Tabs defaultValue="personal" className="w-full">
-              <TabsList className="grid w-full grid-cols-4 mb-6">
-                <TabsTrigger value="personal" className="flex items-center gap-2 text-xs">
-                  <User className="h-3.5 w-3.5" />
-                  <span>Persoonlijk</span>
-                </TabsTrigger>
-                <TabsTrigger value="contact" className="flex items-center gap-2 text-xs">
-                  <Phone className="h-3.5 w-3.5" />
-                  <span>Contact</span>
-                </TabsTrigger>
-                <TabsTrigger value="academic" className="flex items-center gap-2 text-xs">
-                  <GraduationCap className="h-3.5 w-3.5" />
-                  <span>Onderwijs</span>
-                </TabsTrigger>
-                <TabsTrigger value="guardian" className="flex items-center gap-2 text-xs">
-                  <Users className="h-3.5 w-3.5" />
-                  <span>Voogden</span>
-                </TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="personal" className="space-y-4 min-h-[400px]">
-                <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
-                  <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
-                    <User className="h-4 w-4 mr-2" />
-                    Persoonlijke Informatie
-                  </h3>
-                  <div className="flex items-start gap-6 mb-4">
-                    <div className="flex flex-col items-center gap-3">
-                      <Avatar className="h-24 w-24 border-4 border-white shadow-lg">
-                        {newStudent.photoUrl ? (
-                          <AvatarImage src={newStudent.photoUrl} alt="Student foto" />
-                        ) : (
-                          <AvatarFallback className="bg-[#1e40af] text-white text-lg">
-                            {newStudent.firstName?.[0]}{newStudent.lastName?.[0]}
-                          </AvatarFallback>
-                        )}
-                      </Avatar>
-                      <div className="flex gap-2">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
+          </div>
+          
+          <form onSubmit={handleCreateStudent} className="overflow-y-auto" style={{ maxHeight: 'calc(90vh - 150px)' }}>
+            <div className="px-6 py-3">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-4 md:col-span-2">
+                  <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                    <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                      <User className="h-4 w-4 mr-2" />
+                      Persoonlijke Informatie
+                    </h3>
+                    <div className="mb-4">
+                      <p className="text-sm font-medium text-gray-700 mb-1">Foto</p>
+                      <div className="flex gap-4 justify-between">
+                        <div 
+                          className="w-32 h-32 rounded-md border border-gray-300 flex flex-col items-center justify-center bg-gray-50 overflow-hidden relative cursor-pointer hover:bg-gray-100 transition-colors"
                           onClick={() => document.getElementById('photo-upload')?.click()}
-                          className="text-xs px-2 py-1 h-7"
                         >
-                          <Upload className="h-3 w-3 mr-1" />
-                          Upload
-                        </Button>
-                        <Button
-                          type="button"
-                          variant="outline" 
-                          size="sm"
-                          className="text-xs px-2 py-1 h-7"
-                        >
-                          <FileText className="h-3 w-3 mr-1" />
-                          eID
-                        </Button>
+                          {formData.photoUrl ? (
+                            <img src={formData.photoUrl} alt="Student foto" className="w-full h-full object-cover" />
+                          ) : (
+                            <User className="h-12 w-12 text-gray-400" />
+                          )}
+                        </div>
+                        <div className="flex flex-col gap-2 justify-center items-end">
+                          <button 
+                            type="button" 
+                            className="flex items-center justify-center gap-1 border border-gray-300 rounded-md px-2 py-1 hover:bg-gray-50 transition-colors text-sm"
+                            onClick={() => document.getElementById('photo-upload')?.click()}
+                          >
+                            <Upload className="h-4 w-4 text-gray-500" />
+                            <span className="text-xs font-medium text-gray-700">Upload</span>
+                          </button>
+                          <button 
+                            type="button" 
+                            className="flex items-center justify-center gap-1 border border-gray-300 rounded-md px-2 py-1 hover:bg-gray-50 transition-colors text-sm"
+                          >
+                            <FileText className="h-4 w-4 text-gray-500" />
+                            <span className="text-xs font-medium text-gray-700">eID</span>
+                          </button>
+                        </div>
+                        <input
+                          id="photo-upload"
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              const reader = new FileReader();
+                              reader.onloadend = () => {
+                                setFormData(prev => ({
+                                  ...prev,
+                                  photoUrl: reader.result as string
+                                }));
+                              };
+                              reader.readAsDataURL(file);
+                            }
+                          }}
+                        />
                       </div>
-                      <input
-                        id="photo-upload"
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                            const reader = new FileReader();
-                            reader.onloadend = () => {
-                              setNewStudent(prev => ({
-                                ...prev,
-                                photoUrl: reader.result as string
-                              }));
-                            };
-                            reader.readAsDataURL(file);
-                          }
-                        }}
-                      />
                     </div>
-                    <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div>
                         <Label htmlFor="studentId" className="text-xs font-medium text-gray-700">Student ID</Label>
                         <Input
                           id="studentId"
-                          value="ST25003"
+                          name="studentId"
+                          value={formData.academicYear ? 
+                            `ST${formData.academicYear.substring(2, 4)}001` : 
+                            nextStudentId}
                           disabled
-                          className="h-8 text-sm bg-gray-50 text-gray-500"
+                          className="mt-1 h-9 bg-gray-50 text-gray-500"
                         />
                       </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="gender" className="text-xs font-medium text-gray-700">
-                          Geslacht <span className="text-red-500">*</span>
-                        </Label>
+                      
+                      <div>
+                        <Label htmlFor="gender" className="text-xs font-medium text-gray-700">Geslacht *</Label>
                         <Select 
-                          value={newStudent.gender} 
-                          onValueChange={(value) => setNewStudent({...newStudent, gender: value})}
+                          value={formData.gender} 
+                          onValueChange={(value) => handleSelectChange('gender', value)}
                           required
                         >
-                          <SelectTrigger className="h-8 text-sm border-gray-300">
+                          <SelectTrigger 
+                            id="gender" 
+                            className="mt-1 h-9 w-full border-[#e5e7eb] bg-white"
+                          >
                             <SelectValue placeholder="Man of Vrouw" />
                           </SelectTrigger>
-                          <SelectContent className="bg-white">
-                            <SelectItem value="man" className="text-black hover:bg-blue-100 focus:bg-blue-200">Man</SelectItem>
-                            <SelectItem value="vrouw" className="text-black hover:bg-blue-100 focus:bg-blue-200">Vrouw</SelectItem>
+                          <SelectContent className="bg-white border-[#e5e7eb]">
+                            <SelectItem value="man" className="focus:bg-blue-200 hover:bg-blue-100">Man</SelectItem>
+                            <SelectItem value="vrouw" className="focus:bg-blue-200 hover:bg-blue-100">Vrouw</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="firstName" className="text-xs font-medium text-gray-700">
-                          Voornaam <span className="text-red-500">*</span>
-                        </Label>
+                      
+                      <div>
+                        <Label htmlFor="firstName" className="text-xs font-medium text-gray-700">Voornaam *</Label>
                         <Input
                           id="firstName"
-                          value={newStudent.firstName}
-                          onChange={(e) => setNewStudent({...newStudent, firstName: e.target.value})}
-                          className="h-8 text-sm"
-                          placeholder="Voornaam"
+                          name="firstName"
+                          value={formData.firstName}
+                          onChange={handleInputChange}
                           required
+                          className="mt-1 h-9"
+                          placeholder="Voornaam"
                         />
                       </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="lastName" className="text-xs font-medium text-gray-700">
-                          Achternaam <span className="text-red-500">*</span>
-                        </Label>
+                      
+                      <div>
+                        <Label htmlFor="lastName" className="text-xs font-medium text-gray-700">Achternaam *</Label>
                         <Input
                           id="lastName"
-                          value={newStudent.lastName}
-                          onChange={(e) => setNewStudent({...newStudent, lastName: e.target.value})}
-                          className="h-8 text-sm"
-                          placeholder="Achternaam"
+                          name="lastName"
+                          value={formData.lastName}
+                          onChange={handleInputChange}
                           required
+                          className="mt-1 h-9"
+                          placeholder="Achternaam"
                         />
                       </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="dateOfBirth" className="text-xs font-medium text-gray-700">
-                          Geboortedatum <span className="text-red-500">*</span>
-                        </Label>
+                      
+                      <div>
+                        <Label htmlFor="dateOfBirth" className="text-xs font-medium text-gray-700">Geboortedatum *</Label>
                         <Input
                           id="dateOfBirth"
+                          name="dateOfBirth"
                           type="date"
-                          value={newStudent.dateOfBirth}
-                          onChange={(e) => setNewStudent({...newStudent, dateOfBirth: e.target.value})}
-                          className="h-8 text-sm"
+                          value={formData.dateOfBirth || ''}
+                          onChange={handleInputChange}
                           required
+                          className="mt-1 h-9"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="email" className="text-xs font-medium text-gray-700">Email</Label>
+                        <Input
+                          id="email"
+                          name="email"
+                          type="email"
+                          value={formData.email}
+                          onChange={handleInputChange}
+                          className="mt-1 h-9"
+                          placeholder="Email"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="phone" className="text-xs font-medium text-gray-700">Telefoon</Label>
+                        <Input
+                          id="phone"
+                          name="phone"
+                          value={formData.phone}
+                          onChange={handleInputChange}
+                          className="mt-1 h-9"
+                          placeholder="Telefoon"
                         />
                       </div>
                     </div>
@@ -969,178 +1018,536 @@ export default function Students() {
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                       <div className="md:col-span-2">
-                        <Label htmlFor="street" className="text-xs font-medium text-gray-700">Straat <span className="text-red-500">*</span></Label>
+                        <Label htmlFor="street" className="text-xs font-medium text-gray-700">Straat *</Label>
                         <Input
                           id="street"
-                          value={newStudent.street || ''}
-                          onChange={(e) => setNewStudent({...newStudent, street: e.target.value})}
-                          className="h-8 text-sm"
-                          placeholder="Straat"
+                          name="street"
+                          value={formData.street}
+                          onChange={handleInputChange}
                           required
+                          className="mt-1 h-9"
+                          placeholder="Straat"
                         />
                       </div>
+                      
                       <div>
-                        <Label htmlFor="houseNumber" className="text-xs font-medium text-gray-700">Huisnummer <span className="text-red-500">*</span></Label>
+                        <Label htmlFor="houseNumber" className="text-xs font-medium text-gray-700">Huisnummer *</Label>
                         <Input
                           id="houseNumber"
-                          value={newStudent.houseNumber || ''}
-                          onChange={(e) => setNewStudent({...newStudent, houseNumber: e.target.value})}
-                          className="h-8 text-sm"
-                          placeholder="Nr."
+                          name="houseNumber"
+                          value={formData.houseNumber}
+                          onChange={handleInputChange}
                           required
+                          className="mt-1 h-9"
+                          placeholder="Nr."
                         />
                       </div>
+                      
                       <div>
-                        <Label htmlFor="postalCode" className="text-xs font-medium text-gray-700">Postcode <span className="text-red-500">*</span></Label>
+                        <Label htmlFor="postalCode" className="text-xs font-medium text-gray-700">Postcode *</Label>
                         <Input
                           id="postalCode"
-                          value={newStudent.postalCode || ''}
-                          onChange={(e) => setNewStudent({...newStudent, postalCode: e.target.value})}
-                          className="h-8 text-sm"
-                          placeholder="Postcode"
+                          name="postalCode"
+                          value={formData.postalCode}
+                          onChange={handleInputChange}
                           required
+                          className="mt-1 h-9"
+                          placeholder="Postcode"
                         />
                       </div>
+                      
                       <div className="md:col-span-2">
-                        <Label htmlFor="city" className="text-xs font-medium text-gray-700">Plaats <span className="text-red-500">*</span></Label>
+                        <Label htmlFor="city" className="text-xs font-medium text-gray-700">Plaats *</Label>
                         <Input
                           id="city"
-                          value={newStudent.city || ''}
-                          onChange={(e) => setNewStudent({...newStudent, city: e.target.value})}
-                          className="h-8 text-sm"
-                          placeholder="Plaats"
+                          name="city"
+                          value={formData.city}
+                          onChange={handleInputChange}
                           required
+                          className="mt-1 h-9"
+                          placeholder="Plaats"
                         />
                       </div>
                     </div>
                   </div>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="contact" className="space-y-4 min-h-[400px]">
-                <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
-                  <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
-                    <Phone className="h-4 w-4 mr-2" />
-                    Contact Informatie
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="email" className="text-xs font-medium text-gray-700">Email</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        value={newStudent.email}
-                        onChange={(e) => setNewStudent({...newStudent, email: e.target.value})}
-                        className="h-8 text-sm"
-                        placeholder="student@example.com"
-                      />
+                  
+                  <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                    <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                      <GraduationCap className="h-4 w-4 mr-2" />
+                      Onderwijsgegevens
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div>
+                        <Label htmlFor="academicYear" className="text-xs font-medium text-gray-700">Schooljaar *</Label>
+                        <Input
+                          id="academicYear"
+                          name="academicYear"
+                          value={formData.academicYear}
+                          onChange={handleInputChange}
+                          required
+                          placeholder="2024-2025"
+                          className="mt-1 h-9 w-full border-[#e5e7eb] bg-white"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="studentGroupId" className="text-xs font-medium text-gray-700">Klas</Label>
+                        <Select 
+                          value={formData.studentGroupId} 
+                          onValueChange={(value) => handleSelectChange('studentGroupId', value)}
+                        >
+                          <SelectTrigger id="studentGroupId" className="mt-1 h-9 w-full border-[#e5e7eb] bg-white">
+                            <SelectValue placeholder="Selecteer klas" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-white border-[#e5e7eb]">
+                            {classes?.map?.((group: any) => (
+                              <SelectItem key={group.id} value={group.id.toString()} className="focus:bg-blue-200 hover:bg-blue-100">
+                                {group.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="enrollmentDate" className="text-xs font-medium text-gray-700">Inschrijfdatum *</Label>
+                        <Input
+                          id="enrollmentDate"
+                          name="enrollmentDate"
+                          type="date"
+                          value={formData.enrollmentDate || new Date().toISOString().split('T')[0]}
+                          onChange={handleInputChange}
+                          required
+                          className="mt-1 h-9"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="status" className="text-xs font-medium text-gray-700">Status *</Label>
+                        <Select 
+                          value={formData.status} 
+                          onValueChange={(value) => handleSelectChange('status', value)}
+                          required
+                        >
+                          <SelectTrigger 
+                            id="status" 
+                            className="mt-1 h-9 w-full border-[#e5e7eb] bg-white"
+                          >
+                            <SelectValue placeholder="Selecteer status" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-white border-[#e5e7eb]">
+                            <SelectItem value="ingeschreven" className="focus:bg-blue-200 hover:bg-blue-100">Ingeschreven</SelectItem>
+                            <SelectItem value="uitgeschreven" className="focus:bg-blue-200 hover:bg-blue-100">Uitgeschreven</SelectItem>
+                            <SelectItem value="geschorst" className="focus:bg-blue-200 hover:bg-blue-100">Geschorst</SelectItem>
+                            <SelectItem value="afgestudeerd" className="focus:bg-blue-200 hover:bg-blue-100">Afgestudeerd</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="phone" className="text-xs font-medium text-gray-700">Telefoon</Label>
-                      <Input
-                        id="phone"
-                        value={newStudent.phone}
-                        onChange={(e) => setNewStudent({...newStudent, phone: e.target.value})}
-                        className="h-8 text-sm"
-                        placeholder="06-12345678"
-                      />
+                  </div>
+                  
+                  <div className="bg-[#f1f5f9] px-4 py-3 rounded-md w-full">
+                    <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                      <Users className="h-4 w-4 mr-2" />
+                      Familie
+                    </h3>
+                    <div className="space-y-3">
+                      <div>
+                        <Label className="text-xs font-medium text-gray-700 mb-2 block">Voogden</Label>
+                        {newStudentGuardians.length > 0 ? (
+                          <div className="space-y-2 mb-2">
+                            {newStudentGuardians.map((guardian, index) => (
+                              <div key={index} className="flex items-center gap-3 p-2 bg-white rounded-md border">
+                                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                  <User className="h-4 w-4 text-blue-600" />
+                                </div>
+                                <div className="flex-1">
+                                  <p className="text-sm font-medium">{guardian.firstName} {guardian.lastName}</p>
+                                  <p className="text-xs text-gray-500">
+                                    {guardian.relationship === 'parent' && 'Ouder'}
+                                    {guardian.relationship === 'guardian' && 'Voogd'}
+                                    {guardian.relationship === 'grandparent' && 'Grootouder'}
+                                    {guardian.relationship === 'other' && guardian.relationshipOther}
+                                    {guardian.phone && ` • ${guardian.phone}`}
+                                  </p>
+                                </div>
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  className="h-7 w-7 p-0 text-red-500 hover:text-red-700"
+                                  onClick={() => {
+                                    setNewStudentGuardians(newStudentGuardians.filter((_, i) => i !== index));
+                                    toast({
+                                      title: "Voogd verwijderd",
+                                      description: `${guardian.firstName} ${guardian.lastName} is verwijderd.`,
+                                    });
+                                  }}
+                                >
+                                  <X className="h-3.5 w-3.5" />
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="p-3 bg-gray-50 rounded-md text-center mb-2">
+                            <UserPlus className="h-6 w-6 text-gray-400 mx-auto mb-1" />
+                            <p className="text-xs text-gray-500">Nog geen voogden toegevoegd</p>
+                          </div>
+                        )}
+                        <Button 
+                          type="button"
+                          variant="outline" 
+                          size="sm"
+                          className="text-[#1e40af] border-[#1e40af] hover:bg-blue-50 w-full"
+                          onClick={() => setIsAddGuardianDialogOpen(true)}
+                        >
+                          <UserPlus className="h-3.5 w-3.5 mr-1" />
+                          Voogd toevoegen
+                        </Button>
+                      </div>
+                      
+                      <div>
+                        <Label className="text-xs font-medium text-gray-700 mb-2 block">Broers/Zussen</Label>
+                        {newStudentSiblings.length > 0 ? (
+                          <div className="space-y-2 mb-2">
+                            {newStudentSiblings.map((sibling, index) => (
+                              <div key={index} className="flex items-center gap-3 p-2 bg-white rounded-md border">
+                                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                                  <Users className="h-4 w-4 text-green-600" />
+                                </div>
+                                <div className="flex-1">
+                                  <p className="text-sm font-medium">{sibling.firstName} {sibling.lastName}</p>
+                                  <p className="text-xs text-gray-500">{sibling.studentId} • {sibling.class}</p>
+                                </div>
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  className="h-7 w-7 p-0 text-red-500 hover:text-red-700"
+                                  onClick={() => {
+                                    setNewStudentSiblings(newStudentSiblings.filter((_, i) => i !== index));
+                                    toast({
+                                      title: "Broer/zus ontkoppeld",
+                                      description: `${sibling.firstName} ${sibling.lastName} is ontkoppeld.`,
+                                    });
+                                  }}
+                                >
+                                  <X className="h-3.5 w-3.5" />
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="p-3 bg-gray-50 rounded-md text-center mb-2">
+                            <Users className="h-6 w-6 text-gray-400 mx-auto mb-1" />
+                            <p className="text-xs text-gray-500">Nog geen broers/zussen gekoppeld</p>
+                          </div>
+                        )}
+                        <Button 
+                          type="button"
+                          variant="outline" 
+                          size="sm"
+                          className="text-[#1e40af] border-[#1e40af] hover:bg-blue-50 w-full"
+                          onClick={() => setIsLinkSiblingDialogOpen(true)}
+                        >
+                          <Users className="h-3.5 w-3.5 mr-1" />
+                          Broer/Zus koppelen
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </TabsContent>
-
-              <TabsContent value="academic" className="space-y-4 min-h-[400px]">
+                
                 <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
                   <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
-                    <GraduationCap className="h-4 w-4 mr-2" />
-                    Onderwijsgegevens
+                    <NotebookText className="h-4 w-4 mr-2" />
+                    Aantekeningen
                   </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="classId" className="text-xs font-medium text-gray-700">Klas</Label>
-                      <Select 
-                        value={newStudent.classId.toString()} 
-                        onValueChange={(value) => setNewStudent({...newStudent, classId: parseInt(value)})}
+                  <div>
+                    <Textarea
+                      id="notes"
+                      name="notes"
+                      value={formData.notes}
+                      onChange={handleInputChange}
+                      rows={5}
+                      className="resize-none"
+                      placeholder="Voeg hier eventuele opmerkingen of aantekeningen toe..."
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-gray-50 px-6 py-3 flex justify-end gap-2 border-t">
+              <Button 
+                type="button" 
+                variant="outline"
+                onClick={() => {
+                  setShowCreateDialog(false);
+                  resetForm();
+                }}
+              >
+                Annuleren
+              </Button>
+              <Button 
+                type="submit"
+                disabled={createStudentMutation.isPending}
+                className="bg-[#1e40af] hover:bg-[#1d3a9e] text-white"
+              >
+                <User className="h-4 w-4 mr-2" />
+                {createStudentMutation.isPending ? 'Student toevoegen...' : 'Student toevoegen'}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Guardian Dialog - Complete Admin Copy */}
+      <Dialog open={isAddGuardianDialogOpen} onOpenChange={setIsAddGuardianDialogOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <UserPlus className="h-5 w-5 text-blue-600" />
+              Voogd Toevoegen
+            </DialogTitle>
+            <DialogDescription>
+              Voeg een voogd toe voor deze student
+            </DialogDescription>
+          </DialogHeader>
+          
+          <Tabs value={isAddingNewGuardian ? "new" : "existing"} onValueChange={(value) => setIsAddingNewGuardian(value === "new")}>
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="new">Nieuwe Voogd</TabsTrigger>
+              <TabsTrigger value="existing">Bestaande Voogd</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="new" className="space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label htmlFor="guardian-firstName">Voornaam *</Label>
+                  <Input
+                    id="guardian-firstName"
+                    value={guardianFormData.firstName}
+                    onChange={(e) => setGuardianFormData({...guardianFormData, firstName: e.target.value})}
+                    placeholder="Voornaam"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="guardian-lastName">Achternaam *</Label>
+                  <Input
+                    id="guardian-lastName"
+                    value={guardianFormData.lastName}
+                    onChange={(e) => setGuardianFormData({...guardianFormData, lastName: e.target.value})}
+                    placeholder="Achternaam"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="guardian-email">Email</Label>
+                  <Input
+                    id="guardian-email"
+                    type="email"
+                    value={guardianFormData.email}
+                    onChange={(e) => setGuardianFormData({...guardianFormData, email: e.target.value})}
+                    placeholder="Email"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="guardian-phone">Telefoon</Label>
+                  <Input
+                    id="guardian-phone"
+                    value={guardianFormData.phone}
+                    onChange={(e) => setGuardianFormData({...guardianFormData, phone: e.target.value})}
+                    placeholder="Telefoon"
+                  />
+                </div>
+                <div className="col-span-2">
+                  <Label htmlFor="guardian-relationship">Relatie *</Label>
+                  <Select 
+                    value={guardianFormData.relationship} 
+                    onValueChange={(value) => setGuardianFormData({...guardianFormData, relationship: value})}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecteer relatie" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="parent">Ouder</SelectItem>
+                      <SelectItem value="guardian">Voogd</SelectItem>
+                      <SelectItem value="grandparent">Grootouder</SelectItem>
+                      <SelectItem value="other">Anders</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                {guardianFormData.relationship === 'other' && (
+                  <div className="col-span-2">
+                    <Label htmlFor="guardian-relationshipOther">Specificeer relatie</Label>
+                    <Input
+                      id="guardian-relationshipOther"
+                      value={guardianFormData.relationshipOther}
+                      onChange={(e) => setGuardianFormData({...guardianFormData, relationshipOther: e.target.value})}
+                      placeholder="Specificeer relatie"
+                    />
+                  </div>
+                )}
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="existing" className="space-y-4">
+              <div>
+                <Label>Zoek Bestaande Voogd</Label>
+                <Input
+                  value={guardianSearchTerm}
+                  onChange={(e) => setGuardianSearchTerm(e.target.value)}
+                  placeholder="Zoek op naam..."
+                  className="mb-3"
+                />
+                <div className="max-h-48 overflow-y-auto space-y-2">
+                  {guardians
+                    ?.filter((guardian: any) => 
+                      guardian.firstName?.toLowerCase().includes(guardianSearchTerm.toLowerCase()) ||
+                      guardian.lastName?.toLowerCase().includes(guardianSearchTerm.toLowerCase())
+                    )
+                    .map((guardian: any) => (
+                      <div
+                        key={guardian.id}
+                        className={`p-3 border rounded-md cursor-pointer transition-colors ${
+                          selectedGuardians.some(g => g.id === guardian.id)
+                            ? 'border-blue-500 bg-blue-50'
+                            : 'border-gray-200 hover:border-gray-300'
+                        }`}
+                        onClick={() => {
+                          if (selectedGuardians.some(g => g.id === guardian.id)) {
+                            setSelectedGuardians(selectedGuardians.filter(g => g.id !== guardian.id));
+                          } else {
+                            setSelectedGuardians([...selectedGuardians, guardian]);
+                          }
+                        }}
                       >
-                        <SelectTrigger className="h-8 text-sm border-gray-300">
-                          <SelectValue placeholder="Selecteer klas" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-white">
-                          <SelectItem value="0" className="text-black hover:bg-blue-100 focus:bg-blue-200">Geen klas</SelectItem>
-                          {classes.map((cls: StudentClass) => (
-                            <SelectItem key={cls.id} value={cls.id.toString()} className="text-black hover:bg-blue-100 focus:bg-blue-200">
-                              {cls.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
+                            <User className="h-4 w-4 text-gray-600" />
+                          </div>
+                          <div>
+                            <p className="font-medium">{guardian.firstName} {guardian.lastName}</p>
+                            <p className="text-sm text-gray-500">{guardian.email}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                 </div>
-              </TabsContent>
-
-              <TabsContent value="guardian" className="space-y-4 min-h-[400px]">
-                <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
-                  <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
-                    <Users className="h-4 w-4 mr-2" />
-                    Voogd Informatie
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="guardianId" className="text-xs font-medium text-gray-700">Voogd</Label>
-                      <Select 
-                        value={newStudent.guardianId.toString()} 
-                        onValueChange={(value) => setNewStudent({...newStudent, guardianId: parseInt(value)})}
-                      >
-                        <SelectTrigger className="h-8 text-sm border-gray-300">
-                          <SelectValue placeholder="Selecteer voogd" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-white">
-                          <SelectItem value="0" className="text-black hover:bg-blue-100 focus:bg-blue-200">Geen voogd</SelectItem>
-                          {guardians.map((guardian: Guardian) => (
-                            <SelectItem key={guardian.id} value={guardian.id.toString()} className="text-black hover:bg-blue-100 focus:bg-blue-200">
-                              {guardian.firstName} {guardian.lastName}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="emergencyContact" className="text-xs font-medium text-gray-700">Noodcontact</Label>
-                      <Input
-                        id="emergencyContact"
-                        value={newStudent.emergencyContact}
-                        onChange={(e) => setNewStudent({...newStudent, emergencyContact: e.target.value})}
-                        className="h-8 text-sm"
-                        placeholder="Noodcontact informatie"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </TabsContent>
-            </Tabs>
-          </div>
-
-          <DialogFooter className="pt-4 border-t border-gray-200">
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={() => {
-                setShowCreateDialog(false);
-                resetForm();
-              }}
-              className="mr-2"
-            >
+              </div>
+            </TabsContent>
+          </Tabs>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsAddGuardianDialogOpen(false)}>
               Annuleren
             </Button>
             <Button 
-              type="submit"
-              onClick={handleCreateStudent}
-              disabled={createStudentMutation.isPending}
-              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6"
+              onClick={() => {
+                if (isAddingNewGuardian) {
+                  if (guardianFormData.firstName && guardianFormData.lastName && guardianFormData.relationship) {
+                    setNewStudentGuardians([...newStudentGuardians, guardianFormData]);
+                    setGuardianFormData({
+                      firstName: '',
+                      lastName: '',
+                      relationship: 'parent',
+                      relationshipOther: '',
+                      email: '',
+                      phone: '',
+                      isEmergencyContact: false,
+                      emergencyContactFirstName: '',
+                      emergencyContactLastName: '',
+                      emergencyContactPhone: '',
+                      emergencyContactRelationship: '',
+                      emergencyContactRelationshipOther: '',
+                    });
+                    setIsAddGuardianDialogOpen(false);
+                  }
+                } else {
+                  setNewStudentGuardians([...newStudentGuardians, ...selectedGuardians]);
+                  setSelectedGuardians([]);
+                  setIsAddGuardianDialogOpen(false);
+                }
+              }}
             >
-              <Plus className="h-4 w-4 mr-2" />
-              {createStudentMutation.isPending ? 'Student Toevoegen...' : 'Student Toevoegen'}
+              Toevoegen
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Link Sibling Dialog - Complete Admin Copy */}
+      <Dialog open={isLinkSiblingDialogOpen} onOpenChange={setIsLinkSiblingDialogOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Users className="h-5 w-5 text-green-600" />
+              Broer/Zus Koppelen
+            </DialogTitle>
+            <DialogDescription>
+              Koppel een bestaande student als broer of zus
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div>
+              <Label>Zoek Student</Label>
+              <Input
+                value={siblingSearchTerm}
+                onChange={(e) => setSiblingSearchTerm(e.target.value)}
+                placeholder="Zoek op naam of student ID..."
+                className="mb-3"
+              />
+              <div className="max-h-48 overflow-y-auto space-y-2">
+                {students
+                  ?.filter((student: any) => 
+                    (student.firstName?.toLowerCase().includes(siblingSearchTerm.toLowerCase()) ||
+                     student.lastName?.toLowerCase().includes(siblingSearchTerm.toLowerCase()) ||
+                     student.studentId?.toLowerCase().includes(siblingSearchTerm.toLowerCase())) &&
+                    !newStudentSiblings.some(s => s.id === student.id)
+                  )
+                  .map((student: any) => (
+                    <div
+                      key={student.id}
+                      className={`p-3 border rounded-md cursor-pointer transition-colors ${
+                        selectedSiblings.some(s => s.id === student.id)
+                          ? 'border-green-500 bg-green-50'
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                      onClick={() => {
+                        if (selectedSiblings.some(s => s.id === student.id)) {
+                          setSelectedSiblings(selectedSiblings.filter(s => s.id !== student.id));
+                        } else {
+                          setSelectedSiblings([...selectedSiblings, student]);
+                        }
+                      }}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
+                          <User className="h-4 w-4 text-gray-600" />
+                        </div>
+                        <div>
+                          <p className="font-medium">{student.firstName} {student.lastName}</p>
+                          <p className="text-sm text-gray-500">{student.studentId} • {student.className || 'Geen klas'}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsLinkSiblingDialogOpen(false)}>
+              Annuleren
+            </Button>
+            <Button 
+              onClick={() => {
+                setNewStudentSiblings([...newStudentSiblings, ...selectedSiblings]);
+                setSelectedSiblings([]);
+                setIsLinkSiblingDialogOpen(false);
+              }}
+            >
+              Koppelen
             </Button>
           </DialogFooter>
         </DialogContent>

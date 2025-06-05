@@ -5,7 +5,7 @@ import {
   Search, Plus, Download, Filter, Eye, Edit, Trash2, 
   User, Users, GraduationCap, Phone, Mail, Calendar,
   MapPin, FileText, AlertTriangle, Star, BookOpen,
-  Settings, Save, X, Upload, UserPlus, NotebookText
+  Settings, Save, X, Upload
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -17,7 +17,6 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Checkbox } from '@/components/ui/checkbox';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import EmptyState from '@/components/ui/empty-state';
 import { PremiumHeader } from '@/components/layout/premium-header';

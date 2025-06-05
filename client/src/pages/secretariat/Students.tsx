@@ -687,177 +687,387 @@ export default function Students() {
         </div>
       </div>
 
-      {/* Create Student Dialog */}
+      {/* Create Student Dialog - Admin Style */}
       <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Nieuwe Student Toevoegen</DialogTitle>
-            <DialogDescription>
-              Voeg een nieuwe student toe aan het systeem
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="space-y-6">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="firstName">Voornaam *</Label>
-                <Input
-                  id="firstName"
-                  value={newStudent.firstName}
-                  onChange={(e) => setNewStudent({...newStudent, firstName: e.target.value})}
-                  placeholder="Voornaam"
-                />
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader className="pb-4 border-b border-gray-200">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                <User className="h-5 w-5 text-white" />
               </div>
               <div>
-                <Label htmlFor="lastName">Achternaam *</Label>
-                <Input
-                  id="lastName"
-                  value={newStudent.lastName}
-                  onChange={(e) => setNewStudent({...newStudent, lastName: e.target.value})}
-                  placeholder="Achternaam"
-                />
-              </div>
-              <div>
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={newStudent.email}
-                  onChange={(e) => setNewStudent({...newStudent, email: e.target.value})}
-                  placeholder="student@example.com"
-                />
-              </div>
-              <div>
-                <Label htmlFor="phone">Telefoon</Label>
-                <Input
-                  id="phone"
-                  value={newStudent.phone}
-                  onChange={(e) => setNewStudent({...newStudent, phone: e.target.value})}
-                  placeholder="06-12345678"
-                />
-              </div>
-              <div>
-                <Label htmlFor="dateOfBirth">Geboortedatum</Label>
-                <Input
-                  id="dateOfBirth"
-                  type="date"
-                  value={newStudent.dateOfBirth}
-                  onChange={(e) => setNewStudent({...newStudent, dateOfBirth: e.target.value})}
-                />
-              </div>
-              <div>
-                <Label htmlFor="gender">Geslacht</Label>
-                <Select 
-                  value={newStudent.gender} 
-                  onValueChange={(value) => setNewStudent({...newStudent, gender: value})}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecteer geslacht" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Man">Man</SelectItem>
-                    <SelectItem value="Vrouw">Vrouw</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="classId">Klas</Label>
-                <Select 
-                  value={newStudent.classId.toString()} 
-                  onValueChange={(value) => setNewStudent({...newStudent, classId: parseInt(value)})}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecteer klas" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="0">Geen klas</SelectItem>
-                    {classes.map((cls: StudentClass) => (
-                      <SelectItem key={cls.id} value={cls.id.toString()}>
-                        {cls.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <DialogTitle className="text-lg font-semibold text-gray-900">Nieuwe Student Toevoegen</DialogTitle>
+                <DialogDescription className="text-sm text-gray-600 mt-1">
+                  Voeg een nieuwe student toe aan het systeem met alle benodigde gegevens
+                </DialogDescription>
               </div>
             </div>
-          </div>
-          
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setShowCreateDialog(false)}>
+          </DialogHeader>
+
+          <form onSubmit={handleCreateStudent} className="space-y-6 py-4">
+            <Tabs defaultValue="personal" className="w-full">
+              <TabsList className="grid w-full grid-cols-4 mb-6">
+                <TabsTrigger value="personal" className="flex items-center gap-2 text-xs">
+                  <User className="h-3.5 w-3.5" />
+                  <span>Persoonlijk</span>
+                </TabsTrigger>
+                <TabsTrigger value="contact" className="flex items-center gap-2 text-xs">
+                  <Phone className="h-3.5 w-3.5" />
+                  <span>Contact</span>
+                </TabsTrigger>
+                <TabsTrigger value="academic" className="flex items-center gap-2 text-xs">
+                  <GraduationCap className="h-3.5 w-3.5" />
+                  <span>Onderwijs</span>
+                </TabsTrigger>
+                <TabsTrigger value="guardian" className="flex items-center gap-2 text-xs">
+                  <Users className="h-3.5 w-3.5" />
+                  <span>Voogden</span>
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="personal" className="space-y-4 min-h-[400px]">
+                <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                  <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                    <User className="h-4 w-4 mr-2" />
+                    Persoonlijke Informatie
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="firstName" className="text-xs font-medium text-gray-700">
+                        Voornaam <span className="text-red-500">*</span>
+                      </Label>
+                      <Input
+                        id="firstName"
+                        value={newStudent.firstName}
+                        onChange={(e) => setNewStudent({...newStudent, firstName: e.target.value})}
+                        className="h-8 text-sm"
+                        placeholder="Voornaam"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="lastName" className="text-xs font-medium text-gray-700">
+                        Achternaam <span className="text-red-500">*</span>
+                      </Label>
+                      <Input
+                        id="lastName"
+                        value={newStudent.lastName}
+                        onChange={(e) => setNewStudent({...newStudent, lastName: e.target.value})}
+                        className="h-8 text-sm"
+                        placeholder="Achternaam"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="dateOfBirth" className="text-xs font-medium text-gray-700">
+                        Geboortedatum <span className="text-red-500">*</span>
+                      </Label>
+                      <Input
+                        id="dateOfBirth"
+                        type="date"
+                        value={newStudent.dateOfBirth}
+                        onChange={(e) => setNewStudent({...newStudent, dateOfBirth: e.target.value})}
+                        className="h-8 text-sm"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="gender" className="text-xs font-medium text-gray-700">
+                        Geslacht <span className="text-red-500">*</span>
+                      </Label>
+                      <Select 
+                        value={newStudent.gender} 
+                        onValueChange={(value) => setNewStudent({...newStudent, gender: value})}
+                        required
+                      >
+                        <SelectTrigger className="h-8 text-sm border-gray-300">
+                          <SelectValue placeholder="Selecteer geslacht" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-white">
+                          <SelectItem value="Man" className="text-black hover:bg-blue-100 focus:bg-blue-200">Man</SelectItem>
+                          <SelectItem value="Vrouw" className="text-black hover:bg-blue-100 focus:bg-blue-200">Vrouw</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="contact" className="space-y-4 min-h-[400px]">
+                <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                  <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                    <Phone className="h-4 w-4 mr-2" />
+                    Contact Informatie
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="email" className="text-xs font-medium text-gray-700">Email</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        value={newStudent.email}
+                        onChange={(e) => setNewStudent({...newStudent, email: e.target.value})}
+                        className="h-8 text-sm"
+                        placeholder="student@example.com"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="phone" className="text-xs font-medium text-gray-700">Telefoon</Label>
+                      <Input
+                        id="phone"
+                        value={newStudent.phone}
+                        onChange={(e) => setNewStudent({...newStudent, phone: e.target.value})}
+                        className="h-8 text-sm"
+                        placeholder="06-12345678"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="academic" className="space-y-4 min-h-[400px]">
+                <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                  <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                    <GraduationCap className="h-4 w-4 mr-2" />
+                    Onderwijsgegevens
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="classId" className="text-xs font-medium text-gray-700">Klas</Label>
+                      <Select 
+                        value={newStudent.classId.toString()} 
+                        onValueChange={(value) => setNewStudent({...newStudent, classId: parseInt(value)})}
+                      >
+                        <SelectTrigger className="h-8 text-sm border-gray-300">
+                          <SelectValue placeholder="Selecteer klas" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-white">
+                          <SelectItem value="0" className="text-black hover:bg-blue-100 focus:bg-blue-200">Geen klas</SelectItem>
+                          {classes.map((cls: StudentClass) => (
+                            <SelectItem key={cls.id} value={cls.id.toString()} className="text-black hover:bg-blue-100 focus:bg-blue-200">
+                              {cls.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="guardian" className="space-y-4 min-h-[400px]">
+                <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                  <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                    <Users className="h-4 w-4 mr-2" />
+                    Voogd Informatie
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="guardianId" className="text-xs font-medium text-gray-700">Voogd</Label>
+                      <Select 
+                        value={newStudent.guardianId.toString()} 
+                        onValueChange={(value) => setNewStudent({...newStudent, guardianId: parseInt(value)})}
+                      >
+                        <SelectTrigger className="h-8 text-sm border-gray-300">
+                          <SelectValue placeholder="Selecteer voogd" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-white">
+                          <SelectItem value="0" className="text-black hover:bg-blue-100 focus:bg-blue-200">Geen voogd</SelectItem>
+                          {guardians.map((guardian: Guardian) => (
+                            <SelectItem key={guardian.id} value={guardian.id.toString()} className="text-black hover:bg-blue-100 focus:bg-blue-200">
+                              {guardian.firstName} {guardian.lastName}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="emergencyContact" className="text-xs font-medium text-gray-700">Noodcontact</Label>
+                      <Input
+                        id="emergencyContact"
+                        value={newStudent.emergencyContact}
+                        onChange={(e) => setNewStudent({...newStudent, emergencyContact: e.target.value})}
+                        className="h-8 text-sm"
+                        placeholder="Noodcontact informatie"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </form>
+
+          <DialogFooter className="pt-4 border-t border-gray-200">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => {
+                setShowCreateDialog(false);
+                resetForm();
+              }}
+              className="mr-2"
+            >
               Annuleren
             </Button>
             <Button 
               type="submit"
               onClick={handleCreateStudent}
               disabled={createStudentMutation.isPending}
-              className="bg-blue-600 hover:bg-blue-700"
+              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6"
             >
-              {createStudentMutation.isPending ? 'Bezig...' : 'Student Toevoegen'}
+              <Plus className="h-4 w-4 mr-2" />
+              {createStudentMutation.isPending ? 'Student Toevoegen...' : 'Student Toevoegen'}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* View Student Dialog */}
+      {/* View Student Dialog - Admin Style */}
       <Dialog open={showViewDialog} onOpenChange={setShowViewDialog}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Student Details</DialogTitle>
-            <DialogDescription>
-              {selectedStudent ? `Details van ${selectedStudent.firstName} ${selectedStudent.lastName}` : ""}
-            </DialogDescription>
-          </DialogHeader>
-          
-          {selectedStudent && (
-            <div className="space-y-6">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label className="text-sm font-medium text-gray-700">Student ID</Label>
-                  <p className="text-sm text-gray-900 mt-1">{selectedStudent.studentId}</p>
-                </div>
-                <div>
-                  <Label className="text-sm font-medium text-gray-700">Naam</Label>
-                  <p className="text-sm text-gray-900 mt-1">{selectedStudent.firstName} {selectedStudent.lastName}</p>
-                </div>
-                <div>
-                  <Label className="text-sm font-medium text-gray-700">Email</Label>
-                  <p className="text-sm text-gray-900 mt-1">{selectedStudent.email || 'Niet opgegeven'}</p>
-                </div>
-                <div>
-                  <Label className="text-sm font-medium text-gray-700">Telefoon</Label>
-                  <p className="text-sm text-gray-900 mt-1">{selectedStudent.phone || 'Niet opgegeven'}</p>
-                </div>
-                <div>
-                  <Label className="text-sm font-medium text-gray-700">Geslacht</Label>
-                  <p className="text-sm text-gray-900 mt-1">{selectedStudent.gender}</p>
-                </div>
-                <div>
-                  <Label className="text-sm font-medium text-gray-700">Status</Label>
-                  <div className="mt-1">{getStatusBadge(selectedStudent.status)}</div>
-                </div>
-                <div>
-                  <Label className="text-sm font-medium text-gray-700">Klas</Label>
-                  <p className="text-sm text-gray-900 mt-1">{selectedStudent.className || 'Geen klas'}</p>
-                </div>
-                <div>
-                  <Label className="text-sm font-medium text-gray-700">Inschrijfdatum</Label>
-                  <p className="text-sm text-gray-900 mt-1">
-                    {new Date(selectedStudent.createdAt).toLocaleDateString('nl-NL')}
-                  </p>
-                </div>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader className="pb-4 border-b border-gray-200">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center">
+                <Eye className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <DialogTitle className="text-lg font-semibold text-gray-900">Student Details</DialogTitle>
+                <DialogDescription className="text-sm text-gray-600 mt-1">
+                  {selectedStudent ? `Bekijk alle details van ${selectedStudent.firstName} ${selectedStudent.lastName}` : ""}
+                </DialogDescription>
               </div>
             </div>
+          </DialogHeader>
+
+          {selectedStudent && (
+            <div className="py-4">
+              <Tabs defaultValue="personal" className="w-full">
+                <TabsList className="grid w-full grid-cols-4 mb-6">
+                  <TabsTrigger value="personal" className="flex items-center gap-2 text-xs">
+                    <User className="h-3.5 w-3.5" />
+                    <span>Persoonlijk</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="contact" className="flex items-center gap-2 text-xs">
+                    <Phone className="h-3.5 w-3.5" />
+                    <span>Contact</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="academic" className="flex items-center gap-2 text-xs">
+                    <GraduationCap className="h-3.5 w-3.5" />
+                    <span>Onderwijs</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="guardian" className="flex items-center gap-2 text-xs">
+                    <Users className="h-3.5 w-3.5" />
+                    <span>Voogden</span>
+                  </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="personal" className="space-y-4">
+                  <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                    <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                      <User className="h-4 w-4 mr-2" />
+                      Persoonlijke Informatie
+                    </h3>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-xs font-medium text-gray-700">Student ID</Label>
+                        <p className="text-sm text-gray-900 mt-1 font-medium">{selectedStudent.studentId}</p>
+                      </div>
+                      <div>
+                        <Label className="text-xs font-medium text-gray-700">Volledige Naam</Label>
+                        <p className="text-sm text-gray-900 mt-1">{selectedStudent.firstName} {selectedStudent.lastName}</p>
+                      </div>
+                      <div>
+                        <Label className="text-xs font-medium text-gray-700">Geslacht</Label>
+                        <p className="text-sm text-gray-900 mt-1">{selectedStudent.gender}</p>
+                      </div>
+                      <div>
+                        <Label className="text-xs font-medium text-gray-700">Geboortedatum</Label>
+                        <p className="text-sm text-gray-900 mt-1">
+                          {selectedStudent.dateOfBirth ? new Date(selectedStudent.dateOfBirth).toLocaleDateString('nl-NL') : 'Niet opgegeven'}
+                        </p>
+                      </div>
+                      <div>
+                        <Label className="text-xs font-medium text-gray-700">Status</Label>
+                        <div className="mt-1">{getStatusBadge(selectedStudent.status)}</div>
+                      </div>
+                      <div>
+                        <Label className="text-xs font-medium text-gray-700">Inschrijfdatum</Label>
+                        <p className="text-sm text-gray-900 mt-1">
+                          {new Date(selectedStudent.createdAt).toLocaleDateString('nl-NL')}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="contact" className="space-y-4">
+                  <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                    <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                      <Phone className="h-4 w-4 mr-2" />
+                      Contact Informatie
+                    </h3>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-xs font-medium text-gray-700">Email</Label>
+                        <p className="text-sm text-gray-900 mt-1">{selectedStudent.email || 'Niet opgegeven'}</p>
+                      </div>
+                      <div>
+                        <Label className="text-xs font-medium text-gray-700">Telefoon</Label>
+                        <p className="text-sm text-gray-900 mt-1">{selectedStudent.phone || 'Niet opgegeven'}</p>
+                      </div>
+                      <div>
+                        <Label className="text-xs font-medium text-gray-700">Noodcontact</Label>
+                        <p className="text-sm text-gray-900 mt-1">{selectedStudent.emergencyContact || 'Niet opgegeven'}</p>
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="academic" className="space-y-4">
+                  <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                    <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                      <GraduationCap className="h-4 w-4 mr-2" />
+                      Onderwijsgegevens
+                    </h3>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-xs font-medium text-gray-700">Huidige Klas</Label>
+                        <p className="text-sm text-gray-900 mt-1">{selectedStudent.className || 'Geen klas toegewezen'}</p>
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="guardian" className="space-y-4">
+                  <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                    <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                      <Users className="h-4 w-4 mr-2" />
+                      Voogd Informatie
+                    </h3>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-xs font-medium text-gray-700">Voogd</Label>
+                        <p className="text-sm text-gray-900 mt-1">{selectedStudent.guardianName || 'Geen voogd toegewezen'}</p>
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+              </Tabs>
+            </div>
           )}
-          
-          <DialogFooter>
+
+          <DialogFooter className="pt-4 border-t border-gray-200">
             <Button variant="outline" onClick={() => setShowViewDialog(false)}>
               Sluiten
             </Button>
             {selectedStudent && (
-              <Button onClick={() => {
-                setShowViewDialog(false);
-                handleEditStudent(selectedStudent);
-              }}>
+              <Button 
+                onClick={() => {
+                  setShowViewDialog(false);
+                  handleEditStudent(selectedStudent);
+                }}
+                className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white"
+              >
                 <Edit className="h-4 w-4 mr-2" />
                 Bewerken
               </Button>

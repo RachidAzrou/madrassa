@@ -353,11 +353,13 @@ export default function Payments() {
     return (
       <div className="bg-[#f7f9fc] min-h-screen">
         <PremiumHeader
-          icon={<CreditCard className="h-5 w-5 text-white" />}
+          icon={CreditCard}
           title="Betalingsbeheer"
-          subtitle="Beheer alle betalingen en schoolgelden"
-          parentLabel="Secretariaat"
-          currentLabel="Betalingen"
+          description="Beheer alle betalingen en schoolgelden"
+          breadcrumbs={{
+            parent: "Secretariaat",
+            current: "Betalingen"
+          }}
         />
         <div className="px-6 py-6 max-w-7xl mx-auto">
           <div className="flex items-center justify-center h-64">
@@ -372,11 +374,13 @@ export default function Payments() {
     <div className="bg-[#f7f9fc] min-h-screen">
       {/* Premium Header */}
       <PremiumHeader
-        icon={<CreditCard className="h-5 w-5 text-white" />}
+        icon={CreditCard}
         title="Betalingsbeheer"
-        subtitle="Beheer alle betalingen en schoolgelden"
-        parentLabel="Secretariaat"
-        currentLabel="Betalingen"
+        description="Beheer alle betalingen en schoolgelden"
+        breadcrumbs={{
+          parent: "Secretariaat",
+          current: "Betalingen"
+        }}
       />
 
       {/* Main Content */}

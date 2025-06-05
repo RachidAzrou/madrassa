@@ -137,25 +137,25 @@ export default function SecretariatLayout({ children }: SecretariatLayoutProps) 
       } transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 flex flex-col`}>
         
         {/* Logo Section */}
-        <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200 bg-gradient-to-r from-orange-600 to-orange-700">
+        <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200 bg-gradient-to-r from-violet-600 to-purple-700">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-md">
-              <span className="text-orange-600 font-bold text-lg">M</span>
+              <span className="text-violet-600 font-bold text-lg">M</span>
             </div>
             <span className="text-xl font-bold text-white">myMadrassa</span>
           </div>
           <button
             onClick={() => setSidebarOpen(false)}
-            className="lg:hidden text-white hover:text-orange-200 transition-colors"
+            className="lg:hidden text-white hover:text-violet-200 transition-colors"
           >
             <X className="w-6 h-6" />
           </button>
         </div>
 
         {/* User Profile Section */}
-        <div className="px-6 py-5 border-b border-gray-200 bg-gradient-to-b from-orange-50 to-white">
+        <div className="px-6 py-5 border-b border-gray-200 bg-gradient-to-b from-violet-50 to-white">
           <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center shadow-lg">
+            <div className="w-12 h-12 bg-gradient-to-br from-violet-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
               <span className="text-white font-bold text-lg">
                 {user?.firstName?.[0]}{user?.lastName?.[0]}
               </span>
@@ -165,7 +165,7 @@ export default function SecretariatLayout({ children }: SecretariatLayoutProps) 
                 {user?.firstName} {user?.lastName}
               </p>
               <p className="text-xs text-gray-600 mb-2">{user?.email}</p>
-              <Badge variant="secondary" className="bg-orange-100 text-orange-800 border-orange-200 text-xs">
+              <Badge variant="secondary" className="bg-violet-100 text-violet-800 border-violet-200 text-xs">
                 Secretariaat
               </Badge>
             </div>
@@ -183,11 +183,11 @@ export default function SecretariatLayout({ children }: SecretariatLayoutProps) 
               <Link key={item.name} href={item.href}>
                 <div className={`group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 cursor-pointer ${
                   item.current
-                    ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg transform scale-105'
-                    : 'text-gray-700 hover:bg-orange-50 hover:text-orange-700 hover:transform hover:scale-105'
+                    ? 'bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-lg transform scale-105'
+                    : 'text-gray-700 hover:bg-violet-50 hover:text-violet-700 hover:transform hover:scale-105'
                 }`}>
                   <Icon className={`mr-4 h-5 w-5 transition-colors ${
-                    item.current ? 'text-white' : 'text-gray-400 group-hover:text-orange-600'
+                    item.current ? 'text-white' : 'text-gray-400 group-hover:text-violet-600'
                   }`} />
                   <span className="font-medium">{item.name}</span>
                   {item.current && (
@@ -204,7 +204,7 @@ export default function SecretariatLayout({ children }: SecretariatLayoutProps) 
           <div className="space-y-2">
             <Button
               variant="ghost"
-              className="w-full justify-start text-gray-700 hover:text-orange-600 hover:bg-orange-50 transition-all"
+              className="w-full justify-start text-gray-700 hover:text-violet-600 hover:bg-violet-50 transition-all"
             >
               <Settings className="mr-3 h-5 w-5" />
               Instellingen
@@ -230,12 +230,12 @@ export default function SecretariatLayout({ children }: SecretariatLayoutProps) 
             <div className="flex items-center space-x-4">
               <button
                 onClick={() => setSidebarOpen(true)}
-                className="lg:hidden text-gray-600 hover:text-orange-600 transition-colors"
+                className="lg:hidden text-gray-600 hover:text-violet-600 transition-colors"
               >
                 <Menu className="w-6 h-6" />
               </button>
               <div className="lg:hidden flex items-center space-x-2">
-                <div className="w-8 h-8 bg-orange-600 rounded-lg flex items-center justify-center">
+                <div className="w-8 h-8 bg-violet-600 rounded-lg flex items-center justify-center">
                   <span className="text-white font-bold text-sm">M</span>
                 </div>
                 <span className="font-bold text-gray-900">myMadrassa</span>
@@ -263,14 +263,14 @@ export default function SecretariatLayout({ children }: SecretariatLayoutProps) 
               </div>
 
               {/* Notifications */}
-              <Button variant="ghost" size="sm" className="relative hover:bg-orange-50">
+              <Button variant="ghost" size="sm" className="relative hover:bg-violet-50">
                 <Bell className="w-5 h-5 text-gray-600" />
                 <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
               </Button>
 
               {/* User Menu - Desktop */}
               <div className="hidden lg:flex items-center space-x-3 bg-gray-50 rounded-lg px-3 py-2">
-                <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center">
+                <div className="w-8 h-8 bg-gradient-to-br from-violet-500 to-purple-600 rounded-full flex items-center justify-center">
                   <span className="text-white font-bold text-sm">
                     {user?.firstName?.[0]}{user?.lastName?.[0]}
                   </span>

@@ -356,7 +356,7 @@ export default function Guardians() {
     return (
       <div className="bg-[#f7f9fc] min-h-screen">
         <PremiumHeader
-          icon={<UserCheck className="h-5 w-5 text-white" />}
+          icon={UserCheck}
           title="Voogdenbeheer"
           subtitle="Beheer alle voogden en hun contactinformatie"
           parentLabel="Secretariaat"

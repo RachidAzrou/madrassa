@@ -1,631 +1,818 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
+
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
-import { useRBAC } from "@/hooks/useRBAC";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { 
-  AdminPageLayout,
-  AdminPageHeader,
-  AdminStatsGrid,
-  AdminStatCard,
-  AdminActionButton,
-  AdminSearchBar,
-  AdminTableCard,
-  AdminFilterSelect,
-  AdminAvatar
-} from "@/components/ui/admin-layout";
-import {
-  MessageSquare,
-  Send,
-  Mail,
-  Phone,
-  Users,
-  TrendingUp,
-  Download,
-  Upload,
-  Calendar,
-  Eye,
-  Edit,
-  Trash2,
-  CheckCircle,
-  Clock,
-  AlertCircle
+  Loader2, Send, Mail, MailOpen, Trash2, Reply, UserPlus, 
+  Search, Filter, Download, PlusCircle, Eye, MessageCircle,
+  Clock, User, Users, AlertCircle, CheckCircle
 } from "lucide-react";
+import { format } from "date-fns";
+import { nl } from "date-fns/locale";
+import { PremiumHeader } from '@/components/layout/premium-header';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Checkbox } from '@/components/ui/checkbox';
 
-// Define RESOURCES locally
-const RESOURCES = {
-  COMMUNICATIONS: 'communications',
-  STUDENTS: 'students'
-} as const;
-
-interface Communication {
+// Types voor de berichtenmodule
+interface Message {
   id: number;
+  senderId: number;
+  senderRole: string;
+  receiverId: number;
+  receiverRole: string;
   title: string;
-  message: string;
-  type: 'email' | 'sms' | 'notification' | 'announcement';
-  status: 'draft' | 'sent' | 'scheduled' | 'failed';
-  recipientType: 'students' | 'guardians' | 'teachers' | 'all';
-  recipientCount: number;
-  sentDate?: string;
-  scheduledDate?: string;
-  createdBy: string;
-  priority: 'low' | 'medium' | 'high';
+  content: string;
+  sentAt: string;
+  isRead: boolean;
+  attachmentUrl?: string;
+  parentMessageId?: number;
+  senderName?: string;
+  receiverName?: string;
+  type?: string;
+  priority?: string;
+  status?: string;
 }
 
-interface Student {
+interface Receiver {
   id: number;
-  studentId: string;
-  firstName: string;
-  lastName: string;
+  role: string;
+  name: string;
 }
-
-const communicationFormSchema = z.object({
-  title: z.string().min(1, "Titel is verplicht"),
-  message: z.string().min(1, "Bericht is verplicht"),
-  type: z.enum(['email', 'sms', 'notification', 'announcement']),
-  recipientType: z.enum(['students', 'guardians', 'teachers', 'all']),
-  priority: z.enum(['low', 'medium', 'high']),
-  scheduledDate: z.string().optional(),
-});
-
-type CommunicationFormData = z.infer<typeof communicationFormSchema>;
 
 export default function Communications() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [typeFilter, setTypeFilter] = useState("all");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [showDialog, setShowDialog] = useState(false);
-  const [dialogMode, setDialogMode] = useState<'create' | 'edit' | 'view'>('create');
-  const [selectedCommunication, setSelectedCommunication] = useState<Communication | null>(null);
+  // Get current user from profile API
+  const { data: currentUser, isLoading: isAuthLoading } = useQuery({
+    queryKey: ["/api/profile"],
+  });
 
+  // Type the currentUser properly
+  const typedUser = currentUser as { id: number; role: string; firstName: string; lastName: string } | undefined;
+  const [selectedTab, setSelectedTab] = useState("inbox");
+  const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
+  const [isComposeOpen, setIsComposeOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [typeFilter, setTypeFilter] = useState("alle");
+  const [statusFilter, setStatusFilter] = useState("alle");
+  const [selectedMessages, setSelectedMessages] = useState<number[]>([]);
+  const [newMessage, setNewMessage] = useState({
+    title: "",
+    content: "",
+    receiverId: 0,
+    receiverRole: "",
+    type: "general",
+    priority: "normal"
+  });
+  
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { canCreate, canUpdate, canDelete } = useRBAC();
 
-  const form = useForm<CommunicationFormData>({
-    resolver: zodResolver(communicationFormSchema),
-    defaultValues: {
-      title: "",
-      message: "",
-      type: "email",
-      recipientType: "students",
-      priority: "medium",
-      scheduledDate: "",
+  // Haal berichten op voor de huidige gebruiker met automatic refresh
+  const { data: inboxMessages = [], isLoading: isLoadingInbox } = useQuery({
+    queryKey: [`/api/messages/receiver/${typedUser?.id}/${typedUser?.role}`],
+    enabled: !!typedUser,
+    refetchInterval: 30000,
+    refetchIntervalInBackground: true,
+  });
+
+  const { data: sentMessages = [], isLoading: isLoadingSent } = useQuery({
+    queryKey: [`/api/messages/sender/${typedUser?.id}/${typedUser?.role}`],
+    enabled: !!typedUser,
+    refetchInterval: 30000,
+    refetchIntervalInBackground: true,
+  });
+
+  // Haal mogelijke ontvangers op met role-based filtering
+  const { data: receivers = [], isLoading: isLoadingReceivers } = useQuery({
+    queryKey: [`/api/messages/receivers/${typedUser?.id}/${typedUser?.role}`],
+    enabled: !!typedUser,
+    refetchInterval: 60000,
+  });
+
+  // Markeer bericht als gelezen
+  const markAsReadMutation = useMutation({
+    mutationFn: (id: number) => apiRequest(`/api/messages/${id}/read`, { method: "PATCH" }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/messages/receiver/${typedUser?.id}/${typedUser?.role}`] });
     },
   });
 
-  const { data: communications = [], isLoading: communicationsLoading } = useQuery<Communication[]>({
-    queryKey: ["/api/communications"],
-  });
-
-  const { data: students = [], isLoading: studentsLoading } = useQuery<Student[]>({
-    queryKey: ["/api/students"],
-  });
-
-  const createCommunicationMutation = useMutation({
-    mutationFn: async (data: CommunicationFormData) => {
-      const response = await apiRequest("POST", "/api/communications", { body: data });
-      return response;
+  // Verstuur nieuw bericht
+  const sendMessageMutation = useMutation({
+    mutationFn: async (messageData: any) => {
+      return await apiRequest("/api/messages", {
+        method: "POST",
+        body: {
+          ...messageData,
+          senderId: typedUser?.id,
+          senderRole: typedUser?.role,
+        },
+      });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/communications"] });
-      toast({ title: "Communicatie succesvol toegevoegd" });
-      setShowDialog(false);
-      form.reset();
+      queryClient.invalidateQueries({ queryKey: [`/api/messages/sender/${typedUser?.id}/${typedUser?.role}`] });
+      toast({ title: "Bericht succesvol verzonden!" });
+      setIsComposeOpen(false);
+      setNewMessage({
+        title: "",
+        content: "",
+        receiverId: 0,
+        receiverRole: "",
+        type: "general",
+        priority: "normal"
+      });
     },
     onError: (error: any) => {
       toast({
-        title: "Fout bij toevoegen communicatie",
-        description: error.message,
+        title: "Fout bij verzenden",
+        description: error.message || "Er ging iets mis bij het verzenden van het bericht.",
         variant: "destructive",
       });
     },
   });
 
-  const updateCommunicationMutation = useMutation({
-    mutationFn: async (data: CommunicationFormData) => {
-      const response = await apiRequest("PUT", `/api/communications/${selectedCommunication?.id}`, { body: data });
-      return response;
-    },
+  // Verwijder bericht
+  const deleteMessageMutation = useMutation({
+    mutationFn: (id: number) => apiRequest(`/api/messages/${id}`, { method: "DELETE" }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/communications"] });
-      toast({ title: "Communicatie succesvol bijgewerkt" });
-      setShowDialog(false);
-      form.reset();
+      queryClient.invalidateQueries({ queryKey: [`/api/messages/receiver/${typedUser?.id}/${typedUser?.role}`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/messages/sender/${typedUser?.id}/${typedUser?.role}`] });
+      toast({ title: "Bericht verwijderd" });
+      setSelectedMessage(null);
     },
     onError: (error: any) => {
       toast({
-        title: "Fout bij bijwerken communicatie",
-        description: error.message,
+        title: "Fout bij verwijderen",
+        description: error.message || "Er ging iets mis bij het verwijderen van het bericht.",
         variant: "destructive",
       });
     },
   });
 
-  const deleteCommunicationMutation = useMutation({
-    mutationFn: async (communicationId: number) => {
-      await apiRequest("DELETE", `/api/communications/${communicationId}`, {});
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/communications"] });
-      toast({ title: "Communicatie succesvol verwijderd" });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Fout bij verwijderen communicatie",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
-  const filteredCommunications = communications.filter((comm: Communication) => {
-    const matchesSearch = 
-      comm.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      comm.message.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      comm.createdBy.toLowerCase().includes(searchTerm.toLowerCase());
+  // Filter messages
+  const currentMessages = selectedTab === "inbox" ? inboxMessages : sentMessages;
+  const filteredMessages = currentMessages.filter((message: Message) => {
+    const matchesSearch = searchQuery === '' || 
+      message.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      message.content?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      message.senderName?.toLowerCase().includes(searchQuery.toLowerCase());
     
-    const matchesType = typeFilter === "all" || comm.type === typeFilter;
-    const matchesStatus = statusFilter === "all" || comm.status === statusFilter;
+    const matchesType = typeFilter === 'alle' || message.type === typeFilter;
+    const matchesStatus = statusFilter === 'alle' || 
+      (statusFilter === 'gelezen' && message.isRead) ||
+      (statusFilter === 'ongelezen' && !message.isRead);
     
     return matchesSearch && matchesType && matchesStatus;
   });
 
-  const handleCreateCommunication = () => {
-    setDialogMode('create');
-    setSelectedCommunication(null);
-    form.reset();
-    setShowDialog(true);
+  // Helper functions
+  const getMessageTypeBadge = (type: string) => {
+    const typeConfig = {
+      general: { label: 'Algemeen', className: 'bg-blue-100 text-blue-800' },
+      urgent: { label: 'Urgent', className: 'bg-red-100 text-red-800' },
+      announcement: { label: 'Aankondiging', className: 'bg-green-100 text-green-800' },
+      reminder: { label: 'Herinnering', className: 'bg-yellow-100 text-yellow-800' }
+    };
+    
+    const config = typeConfig[type as keyof typeof typeConfig] || typeConfig.general;
+    return <Badge className={config.className}>{config.label}</Badge>;
   };
 
-  const handleViewCommunication = (communication: Communication) => {
-    setDialogMode('view');
-    setSelectedCommunication(communication);
-    setShowDialog(true);
+  const getPriorityBadge = (priority: string) => {
+    const priorityConfig = {
+      low: { label: 'Laag', className: 'bg-gray-100 text-gray-800' },
+      normal: { label: 'Normaal', className: 'bg-blue-100 text-blue-800' },
+      high: { label: 'Hoog', className: 'bg-orange-100 text-orange-800' },
+      urgent: { label: 'Urgent', className: 'bg-red-100 text-red-800' }
+    };
+    
+    const config = priorityConfig[priority as keyof typeof priorityConfig] || priorityConfig.normal;
+    return <Badge variant="outline" className={config.className}>{config.label}</Badge>;
   };
 
-  const handleEditCommunication = (communication: Communication) => {
-    setDialogMode('edit');
-    setSelectedCommunication(communication);
-    form.reset({
-      title: communication.title,
-      message: communication.message,
-      type: communication.type,
-      recipientType: communication.recipientType,
-      priority: communication.priority,
-      scheduledDate: communication.scheduledDate || "",
+  const handleSendMessage = () => {
+    if (!newMessage.title || !newMessage.content || !newMessage.receiverId) {
+      toast({
+        title: "Validatiefout",
+        description: "Vul alle verplichte velden in.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    sendMessageMutation.mutate(newMessage);
+  };
+
+  const handleMessageClick = (message: Message) => {
+    setSelectedMessage(message);
+    if (!message.isRead && selectedTab === "inbox") {
+      markAsReadMutation.mutate(message.id);
+    }
+  };
+
+  const handleDeleteMessage = (message: Message) => {
+    deleteMessageMutation.mutate(message.id);
+  };
+
+  // Export functionality
+  const handleExport = () => {
+    const headers = ['Datum', 'Van/Naar', 'Onderwerp', 'Type', 'Status'];
+    const csvData = filteredMessages.map((message: Message) => [
+      new Date(message.sentAt).toLocaleDateString('nl-NL'),
+      selectedTab === 'inbox' ? message.senderName || 'Onbekend' : message.receiverName || 'Onbekend',
+      message.title,
+      message.type || 'Algemeen',
+      message.isRead ? 'Gelezen' : 'Ongelezen'
+    ]);
+
+    const csvContent = [headers, ...csvData]
+      .map(row => row.map(field => `"${field}"`).join(','))
+      .join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `berichten_export_${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+    
+    toast({
+      title: "Export voltooid",
+      description: "Berichten zijn geëxporteerd naar CSV bestand.",
     });
-    setShowDialog(true);
   };
 
-  const handleDeleteCommunication = (communication: Communication) => {
-    if (window.confirm(`Weet je zeker dat je communicatie "${communication.title}" wilt verwijderen?`)) {
-      deleteCommunicationMutation.mutate(communication.id);
-    }
-  };
+  // Calculate statistics
+  const totalMessages = inboxMessages.length + sentMessages.length;
+  const unreadMessages = inboxMessages.filter((m: Message) => !m.isRead).length;
+  const sentToday = sentMessages.filter((m: Message) => 
+    new Date(m.sentAt).toDateString() === new Date().toDateString()
+  ).length;
 
-  const onSubmit = (data: CommunicationFormData) => {
-    if (dialogMode === 'create') {
-      createCommunicationMutation.mutate(data);
-    } else if (dialogMode === 'edit') {
-      updateCommunicationMutation.mutate(data);
-    }
-  };
-
-  const getStatusBadge = (status: string) => {
-    const variants = {
-      draft: { className: "bg-gray-100 text-gray-800", icon: <Edit className="w-3 h-3 mr-1" /> },
-      sent: { className: "bg-green-100 text-green-800", icon: <CheckCircle className="w-3 h-3 mr-1" /> },
-      scheduled: { className: "bg-blue-100 text-blue-800", icon: <Clock className="w-3 h-3 mr-1" /> },
-      failed: { className: "bg-red-100 text-red-800", icon: <AlertCircle className="w-3 h-3 mr-1" /> }
-    };
-    
-    const labels = {
-      draft: "Concept",
-      sent: "Verstuurd",
-      scheduled: "Gepland",
-      failed: "Mislukt"
-    };
-    
-    const variant = variants[status as keyof typeof variants];
-    
+  if (isAuthLoading || isLoadingInbox || isLoadingSent) {
     return (
-      <Badge className={variant.className}>
-        <div className="flex items-center">
-          {variant.icon}
-          {labels[status as keyof typeof labels]}
+      <div className="bg-[#f7f9fc] min-h-screen">
+        <PremiumHeader
+          icon={MessageCircle}
+          title="Communicatie"
+          description="Beheer alle berichten en communicatie"
+          breadcrumbs={{
+            parent: "Secretariaat",
+            current: "Communicatie"
+          }}
+        />
+        <div className="px-6 py-6 max-w-7xl mx-auto">
+          <div className="flex items-center justify-center h-64">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          </div>
         </div>
-      </Badge>
-    );
-  };
-
-  const getTypeBadge = (type: string) => {
-    const variants = {
-      email: { className: "bg-blue-100 text-blue-800", icon: <Mail className="w-3 h-3 mr-1" /> },
-      sms: { className: "bg-green-100 text-green-800", icon: <Phone className="w-3 h-3 mr-1" /> },
-      notification: { className: "bg-yellow-100 text-yellow-800", icon: <MessageSquare className="w-3 h-3 mr-1" /> },
-      announcement: { className: "bg-purple-100 text-purple-800", icon: <TrendingUp className="w-3 h-3 mr-1" /> }
-    };
-    
-    const labels = {
-      email: "Email",
-      sms: "SMS",
-      notification: "Notificatie",
-      announcement: "Aankondiging"
-    };
-    
-    const variant = variants[type as keyof typeof variants];
-    
-    return (
-      <Badge className={variant.className}>
-        <div className="flex items-center">
-          {variant.icon}
-          {labels[type as keyof typeof labels]}
-        </div>
-      </Badge>
-    );
-  };
-
-  const totalCommunications = communications.length;
-  const sentCommunications = communications.filter(c => c.status === 'sent').length;
-  const scheduledCommunications = communications.filter(c => c.status === 'scheduled').length;
-  const totalRecipients = communications.reduce((sum, comm) => sum + comm.recipientCount, 0);
-
-  if (communicationsLoading || studentsLoading) {
-    return (
-      <AdminPageLayout>
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full" />
-        </div>
-      </AdminPageLayout>
+      </div>
     );
   }
 
   return (
-    <AdminPageLayout>
-      <AdminPageHeader 
-        title="Communicatie" 
-        description="Beheer communicatie met studenten, voogden en docenten"
-      >
-        <AdminActionButton variant="outline" icon={<Download className="w-4 h-4" />}>
-          Exporteren
-        </AdminActionButton>
-        <AdminActionButton variant="outline" icon={<Upload className="w-4 h-4" />}>
-          Sjablonen
-        </AdminActionButton>
-        {canCreate(RESOURCES.COMMUNICATIONS) && (
-          <AdminActionButton 
-            icon={<Send className="w-4 h-4" />}
-            onClick={handleCreateCommunication}
-          >
-            Nieuwe Communicatie
-          </AdminActionButton>
-        )}
-      </AdminPageHeader>
-
-      <AdminStatsGrid columns={4}>
-        <AdminStatCard
-          title="Totaal Berichten"
-          value={totalCommunications}
-          subtitle="Alle communicaties"
-          icon={<MessageSquare className="h-4 w-4" />}
-        />
-        <AdminStatCard
-          title="Verstuurd"
-          value={sentCommunications}
-          subtitle="Verzonden berichten"
-          valueColor="text-green-600"
-          icon={<CheckCircle className="h-4 w-4" />}
-        />
-        <AdminStatCard
-          title="Gepland"
-          value={scheduledCommunications}
-          subtitle="Ingeplande berichten"
-          valueColor="text-blue-600"
-          icon={<Clock className="h-4 w-4" />}
-        />
-        <AdminStatCard
-          title="Ontvangers"
-          value={totalRecipients}
-          subtitle="Totaal bereikt"
-          valueColor="text-blue-600"
-          icon={<Users className="h-4 w-4" />}
-        />
-      </AdminStatsGrid>
-
-      <AdminSearchBar
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
-        placeholder="Zoek op titel, bericht of auteur..."
-        filters={
-          <>
-            <AdminFilterSelect
-              value={typeFilter}
-              onValueChange={setTypeFilter}
-              placeholder="Type filter"
-              options={[
-                { value: "all", label: "Alle types" },
-                { value: "email", label: "Email" },
-                { value: "sms", label: "SMS" },
-                { value: "notification", label: "Notificatie" },
-                { value: "announcement", label: "Aankondiging" }
-              ]}
-            />
-            <AdminFilterSelect
-              value={statusFilter}
-              onValueChange={setStatusFilter}
-              placeholder="Status filter"
-              options={[
-                { value: "all", label: "Alle statussen" },
-                { value: "draft", label: "Concept" },
-                { value: "sent", label: "Verstuurd" },
-                { value: "scheduled", label: "Gepland" },
-                { value: "failed", label: "Mislukt" }
-              ]}
-            />
-          </>
-        }
+    <div className="bg-[#f7f9fc] min-h-screen">
+      {/* Premium Header */}
+      <PremiumHeader
+        icon={MessageCircle}
+        title="Communicatie"
+        description="Beheer alle berichten en communicatie"
+        breadcrumbs={{
+          parent: "Secretariaat",
+          current: "Communicatie"
+        }}
       />
 
-      <AdminTableCard 
-        title={`Communicaties (${filteredCommunications.length})`}
-        subtitle="Beheer alle communicaties"
-      >
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Titel</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Ontvangers</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Datum</TableHead>
-              <TableHead>Acties</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredCommunications.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={6} className="text-center text-gray-500 py-8">
-                  Geen communicaties gevonden
-                </TableCell>
-              </TableRow>
-            ) : (
-              filteredCommunications.map((communication: Communication) => (
-                <TableRow key={communication.id}>
-                  <TableCell>
-                    <div>
-                      <div className="font-medium">{communication.title}</div>
-                      <div className="text-sm text-gray-500 truncate max-w-xs">
-                        {communication.message}
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>{getTypeBadge(communication.type)}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center">
-                      <Users className="w-4 h-4 text-gray-400 mr-2" />
-                      <span className="font-medium text-blue-600">{communication.recipientCount}</span>
-                      <span className="text-sm text-gray-500 ml-1">{communication.recipientType}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>{getStatusBadge(communication.status)}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center">
-                      <Calendar className="w-4 h-4 text-gray-400 mr-2" />
-                      {communication.sentDate ? 
-                        new Date(communication.sentDate).toLocaleDateString('nl-NL') :
-                        communication.scheduledDate ?
-                        new Date(communication.scheduledDate).toLocaleDateString('nl-NL') :
-                        'Niet gepland'
-                      }
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center space-x-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleViewCommunication(communication)}
-                        className="h-8 w-8 p-0 hover:bg-blue-50 hover:text-blue-600"
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      {canUpdate(RESOURCES.COMMUNICATIONS) && communication.status === 'draft' && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleEditCommunication(communication)}
-                          className="h-8 w-8 p-0 hover:bg-blue-50 hover:text-blue-600"
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                      )}
-                      {canDelete(RESOURCES.COMMUNICATIONS) && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDeleteCommunication(communication)}
-                          className="h-8 w-8 p-0 text-red-600 hover:text-red-800 hover:bg-red-50"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      )}
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </AdminTableCard>
+      {/* Main Content */}
+      <div className="px-6 py-6 max-w-7xl mx-auto space-y-6">
+        
+        {/* Statistics Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Totaal Berichten</CardTitle>
+              <MessageCircle className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{totalMessages}</div>
+              <p className="text-xs text-muted-foreground">
+                Alle berichten
+              </p>
+            </CardContent>
+          </Card>
 
-      <Dialog open={showDialog} onOpenChange={setShowDialog}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>
-              {dialogMode === 'create' && 'Nieuwe Communicatie Aanmaken'}
-              {dialogMode === 'edit' && 'Communicatie Bewerken'}
-              {dialogMode === 'view' && 'Communicatie Details'}
-            </DialogTitle>
-          </DialogHeader>
-          
-          {dialogMode === 'view' && selectedCommunication ? (
-            <div className="space-y-6">
-              <div className="grid grid-cols-2 gap-6">
-                <div>
-                  <Label className="text-sm font-medium text-gray-700">Titel</Label>
-                  <p className="mt-1 text-sm text-gray-900">{selectedCommunication.title}</p>
-                </div>
-                <div>
-                  <Label className="text-sm font-medium text-gray-700">Type</Label>
-                  <div className="mt-1">{getTypeBadge(selectedCommunication.type)}</div>
-                </div>
-                <div>
-                  <Label className="text-sm font-medium text-gray-700">Status</Label>
-                  <div className="mt-1">{getStatusBadge(selectedCommunication.status)}</div>
-                </div>
-                <div>
-                  <Label className="text-sm font-medium text-gray-700">Ontvangers</Label>
-                  <p className="mt-1 text-sm text-gray-900">{selectedCommunication.recipientCount} {selectedCommunication.recipientType}</p>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Ongelezen</CardTitle>
+              <Mail className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-red-600">{unreadMessages}</div>
+              <p className="text-xs text-muted-foreground">
+                Nieuwe berichten
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Verzonden Vandaag</CardTitle>
+              <Send className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-blue-600">{sentToday}</div>
+              <p className="text-xs text-muted-foreground">
+                Berichten verstuurd
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Ontvangers</CardTitle>
+              <Users className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-green-600">{receivers.length}</div>
+              <p className="text-xs text-muted-foreground">
+                Beschikbare contacten
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Action Bar */}
+        <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
+          <div className="px-6 py-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              
+              {/* Search */}
+              <div className="flex-1 max-w-md">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                  <Input
+                    type="text"
+                    placeholder="Zoek berichten..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10"
+                  />
                 </div>
               </div>
-              <div>
-                <Label className="text-sm font-medium text-gray-700">Bericht</Label>
-                <div className="mt-1 p-3 border rounded-md bg-gray-50">
-                  <p className="text-sm text-gray-900 whitespace-pre-wrap">{selectedCommunication.message}</p>
-                </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center gap-2">
+                <Button variant="outline" onClick={handleExport}>
+                  <Download className="h-4 w-4 mr-2" />
+                  Exporteren
+                </Button>
+                <Button
+                  onClick={() => setIsComposeOpen(true)}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  <PlusCircle className="h-4 w-4 mr-2" />
+                  Nieuw Bericht
+                </Button>
               </div>
             </div>
-          ) : (
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                <div className="grid grid-cols-2 gap-6">
-                  <FormField
-                    control={form.control}
-                    name="title"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Titel</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="type"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Type</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Selecteer type" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="email">Email</SelectItem>
-                            <SelectItem value="sms">SMS</SelectItem>
-                            <SelectItem value="notification">Notificatie</SelectItem>
-                            <SelectItem value="announcement">Aankondiging</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="recipientType"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Ontvangers</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Selecteer ontvangers" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="students">Studenten</SelectItem>
-                            <SelectItem value="guardians">Voogden</SelectItem>
-                            <SelectItem value="teachers">Docenten</SelectItem>
-                            <SelectItem value="all">Iedereen</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="priority"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Prioriteit</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Selecteer prioriteit" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="low">Laag</SelectItem>
-                            <SelectItem value="medium">Gemiddeld</SelectItem>
-                            <SelectItem value="high">Hoog</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                
-                <FormField
-                  control={form.control}
-                  name="message"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Bericht</FormLabel>
-                      <FormControl>
-                        <Textarea {...field} rows={6} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+
+            {/* Filter Row */}
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label className="text-sm font-medium">Type</Label>
+                <Select value={typeFilter} onValueChange={setTypeFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Alle types" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="alle">Alle types</SelectItem>
+                    <SelectItem value="general">Algemeen</SelectItem>
+                    <SelectItem value="urgent">Urgent</SelectItem>
+                    <SelectItem value="announcement">Aankondiging</SelectItem>
+                    <SelectItem value="reminder">Herinnering</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label className="text-sm font-medium">Status</Label>
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Alle statussen" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="alle">Alle statussen</SelectItem>
+                    <SelectItem value="ongelezen">Ongelezen</SelectItem>
+                    <SelectItem value="gelezen">Gelezen</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Content Tabs */}
+        <Tabs value={selectedTab} onValueChange={setSelectedTab} className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="inbox" className="flex items-center gap-2">
+              <Mail className="h-4 w-4" />
+              Postvak IN ({inboxMessages.length})
+            </TabsTrigger>
+            <TabsTrigger value="sent" className="flex items-center gap-2">
+              <Send className="h-4 w-4" />
+              Verzonden ({sentMessages.length})
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Messages List */}
+          <TabsContent value={selectedTab} className="space-y-6">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>
+                      {selectedTab === 'inbox' ? 'Ontvangen Berichten' : 'Verzonden Berichten'} ({filteredMessages.length})
+                    </CardTitle>
+                    <CardDescription>
+                      {selectedTab === 'inbox' 
+                        ? 'Berichten ontvangen van andere gebruikers'
+                        : 'Berichten die u heeft verzonden'
+                      }
+                    </CardDescription>
+                  </div>
+                  
+                  {selectedMessages.length > 0 && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-gray-500">
+                        {selectedMessages.length} geselecteerd
+                      </span>
+                      <Button variant="outline" size="sm">
+                        <Trash2 className="h-4 w-4 mr-1" />
+                        Verwijderen
+                      </Button>
+                    </div>
                   )}
-                />
-                
-                <div className="flex justify-end space-x-2">
-                  <Button type="button" variant="outline" onClick={() => setShowDialog(false)}>
-                    Annuleren
-                  </Button>
-                  <Button 
-                    type="submit" 
-                    disabled={createCommunicationMutation.isPending || updateCommunicationMutation.isPending}
-                    className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
-                  >
-                    {dialogMode === 'create' ? 'Communicatie Aanmaken' : 'Wijzigingen Opslaan'}
-                  </Button>
                 </div>
-              </form>
-            </Form>
-          )}
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  {filteredMessages.length === 0 ? (
+                    <div className="text-center py-8">
+                      <MessageCircle className="mx-auto h-12 w-12 text-gray-400" />
+                      <h3 className="mt-2 text-sm font-medium text-gray-900">Geen berichten</h3>
+                      <p className="mt-1 text-sm text-gray-500">
+                        {selectedTab === 'inbox' 
+                          ? 'U heeft nog geen berichten ontvangen.'
+                          : 'U heeft nog geen berichten verzonden.'
+                        }
+                      </p>
+                      {selectedTab === 'inbox' ? null : (
+                        <div className="mt-6">
+                          <Button onClick={() => setIsComposeOpen(true)}>
+                            <PlusCircle className="h-4 w-4 mr-2" />
+                            Nieuw Bericht
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="w-12">
+                            <Checkbox
+                              checked={selectedMessages.length === filteredMessages.length}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setSelectedMessages(filteredMessages.map((m: Message) => m.id));
+                                } else {
+                                  setSelectedMessages([]);
+                                }
+                              }}
+                            />
+                          </TableHead>
+                          <TableHead>
+                            {selectedTab === 'inbox' ? 'Van' : 'Naar'}
+                          </TableHead>
+                          <TableHead>Onderwerp</TableHead>
+                          <TableHead>Type</TableHead>
+                          <TableHead>Datum</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead>Acties</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {filteredMessages.map((message: Message) => (
+                          <TableRow 
+                            key={message.id} 
+                            className={`hover:bg-gray-50 cursor-pointer ${!message.isRead && selectedTab === 'inbox' ? 'font-medium' : ''}`}
+                            onClick={() => handleMessageClick(message)}
+                          >
+                            <TableCell>
+                              <Checkbox
+                                checked={selectedMessages.includes(message.id)}
+                                onCheckedChange={(checked) => {
+                                  if (checked) {
+                                    setSelectedMessages([...selectedMessages, message.id]);
+                                  } else {
+                                    setSelectedMessages(selectedMessages.filter(id => id !== message.id));
+                                  }
+                                }}
+                                onClick={(e) => e.stopPropagation()}
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center">
+                                <Avatar className="h-8 w-8">
+                                  <AvatarFallback className="bg-blue-100 text-blue-600 text-xs">
+                                    {selectedTab === 'inbox' 
+                                      ? (message.senderName || 'ON').split(' ').map(n => n[0]).join('')
+                                      : (message.receiverName || 'ON').split(' ').map(n => n[0]).join('')
+                                    }
+                                  </AvatarFallback>
+                                </Avatar>
+                                <div className="ml-3">
+                                  <div className="text-sm font-medium text-gray-900">
+                                    {selectedTab === 'inbox' 
+                                      ? message.senderName || 'Onbekend'
+                                      : message.receiverName || 'Onbekend'
+                                    }
+                                  </div>
+                                </div>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="text-sm text-gray-900">
+                                {message.title}
+                              </div>
+                              <div className="text-xs text-gray-500 truncate max-w-xs">
+                                {message.content}
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              {getMessageTypeBadge(message.type || 'general')}
+                            </TableCell>
+                            <TableCell>
+                              <div className="text-sm text-gray-900">
+                                {format(new Date(message.sentAt), 'dd MMM yyyy', { locale: nl })}
+                              </div>
+                              <div className="text-xs text-gray-500">
+                                {format(new Date(message.sentAt), 'HH:mm')}
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              {selectedTab === 'inbox' ? (
+                                message.isRead ? (
+                                  <Badge className="bg-green-100 text-green-800">
+                                    <CheckCircle className="h-3 w-3 mr-1" />
+                                    Gelezen
+                                  </Badge>
+                                ) : (
+                                  <Badge className="bg-yellow-100 text-yellow-800">
+                                    <Clock className="h-3 w-3 mr-1" />
+                                    Ongelezen
+                                  </Badge>
+                                )
+                              ) : (
+                                <Badge className="bg-blue-100 text-blue-800">
+                                  <Send className="h-3 w-3 mr-1" />
+                                  Verzonden
+                                </Badge>
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center space-x-2">
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleMessageClick(message);
+                                        }}
+                                        className="h-8 w-8 p-0"
+                                      >
+                                        <Eye className="h-4 w-4" />
+                                      </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      <p>Bekijken</p>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
+
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleDeleteMessage(message);
+                                        }}
+                                        className="h-8 w-8 p-0 text-red-600 hover:text-red-800"
+                                      >
+                                        <Trash2 className="h-4 w-4" />
+                                      </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      <p>Verwijderen</p>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
+
+      {/* Compose Message Dialog */}
+      <Dialog open={isComposeOpen} onOpenChange={setIsComposeOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Nieuw Bericht Opstellen</DialogTitle>
+            <DialogDescription>
+              Verstuur een bericht naar een andere gebruiker
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-6">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="receiver">Ontvanger *</Label>
+                <Select 
+                  value={`${newMessage.receiverId}-${newMessage.receiverRole}`} 
+                  onValueChange={(value) => {
+                    const [receiverId, receiverRole] = value.split('-');
+                    setNewMessage({
+                      ...newMessage, 
+                      receiverId: parseInt(receiverId), 
+                      receiverRole
+                    });
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecteer ontvanger" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {receivers.map((receiver: Receiver) => (
+                      <SelectItem key={`${receiver.id}-${receiver.role}`} value={`${receiver.id}-${receiver.role}`}>
+                        {receiver.name} ({receiver.role})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div>
+                <Label htmlFor="type">Type *</Label>
+                <Select 
+                  value={newMessage.type} 
+                  onValueChange={(value) => setNewMessage({...newMessage, type: value})}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecteer type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="general">Algemeen</SelectItem>
+                    <SelectItem value="urgent">Urgent</SelectItem>
+                    <SelectItem value="announcement">Aankondiging</SelectItem>
+                    <SelectItem value="reminder">Herinnering</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            
+            <div>
+              <Label htmlFor="title">Onderwerp *</Label>
+              <Input
+                id="title"
+                value={newMessage.title}
+                onChange={(e) => setNewMessage({...newMessage, title: e.target.value})}
+                placeholder="Voer het onderwerp in..."
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="content">Bericht *</Label>
+              <Textarea
+                id="content"
+                value={newMessage.content}
+                onChange={(e) => setNewMessage({...newMessage, content: e.target.value})}
+                placeholder="Typ hier uw bericht..."
+                rows={6}
+              />
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setIsComposeOpen(false)}>
+              Annuleren
+            </Button>
+            <Button 
+              type="submit"
+              onClick={handleSendMessage}
+              disabled={sendMessageMutation.isPending}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              {sendMessageMutation.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Verzenden...
+                </>
+              ) : (
+                <>
+                  <Send className="h-4 w-4 mr-2" />
+                  Bericht Verzenden
+                </>
+              )}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
-    </AdminPageLayout>
+
+      {/* Message Detail Dialog */}
+      <Dialog open={!!selectedMessage} onOpenChange={() => setSelectedMessage(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>{selectedMessage?.title}</DialogTitle>
+            <DialogDescription>
+              {selectedMessage && (
+                <div className="flex items-center space-x-4 text-sm">
+                  <span>
+                    Van: {selectedTab === 'inbox' 
+                      ? selectedMessage.senderName || 'Onbekend'
+                      : 'U'
+                    }
+                  </span>
+                  <span>
+                    Naar: {selectedTab === 'inbox' 
+                      ? 'U'
+                      : selectedMessage.receiverName || 'Onbekend'
+                    }
+                  </span>
+                  <span>
+                    {format(new Date(selectedMessage.sentAt), 'dd MMM yyyy HH:mm', { locale: nl })}
+                  </span>
+                </div>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedMessage && (
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2">
+                {getMessageTypeBadge(selectedMessage.type || 'general')}
+                {selectedMessage.priority && getPriorityBadge(selectedMessage.priority)}
+              </div>
+              
+              <div className="bg-gray-50 p-4 rounded-md">
+                <p className="text-sm text-gray-900 whitespace-pre-wrap">
+                  {selectedMessage.content}
+                </p>
+              </div>
+            </div>
+          )}
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSelectedMessage(null)}>
+              Sluiten
+            </Button>
+            {selectedMessage && (
+              <Button
+                variant="destructive"
+                onClick={() => handleDeleteMessage(selectedMessage)}
+                disabled={deleteMessageMutation.isPending}
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Verwijderen
+              </Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 }

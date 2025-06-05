@@ -42,6 +42,7 @@ import GuardianLayout from "@/components/GuardianLayout";
 import GuardianDashboard from "@/pages/guardian/GuardianDashboard";
 import SecretariatLayout from "@/components/SecretariatLayout";
 import SecretariatDashboard from "@/pages/secretariat/SecretariatDashboard";
+import Admissions from "@/pages/secretariat/Admissions";
 import DemoPayment from "@/pages/DemoPayment";
 import PaymentSuccess from "@/pages/PaymentSuccess";
 
@@ -87,6 +88,7 @@ function AuthenticatedRouter() {
           <Route path="/secretariat/payments" component={() => <AuthenticatedRoute component={Fees} />} />
           <Route path="/secretariat/reports" component={() => <AuthenticatedRoute component={Reports} />} />
           <Route path="/secretariat/communication" component={() => <AuthenticatedRoute component={Messages} />} />
+          <Route path="/secretariat/admissions" component={() => <AuthenticatedRoute component={Admissions} />} />
           <Route path="/notifications" component={() => <AuthenticatedRoute component={Notifications} />} />
           <Route path="/messages" component={() => <AuthenticatedRoute component={Messages} />} />
           <Route path="/mijn-account" component={() => <AuthenticatedRoute component={MyAccount} />} />

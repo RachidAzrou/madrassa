@@ -28,7 +28,11 @@ export const RESOURCES = {
   REPORTS: 'reports',
   SETTINGS: 'settings',
   DASHBOARD: 'dashboard',
-  NOTIFICATIONS: 'notifications'
+  NOTIFICATIONS: 'notifications',
+  TASKS: 'tasks',
+  APPOINTMENTS: 'appointments',
+  COMMUNICATIONS: 'communications',
+  COURSES: 'courses'
 } as const;
 
 // Define permissions for each role
@@ -60,16 +64,22 @@ export const ROLE_PERMISSIONS: RolePermissions[] = [
     role: 'secretariat',
     permissions: [
       { resource: RESOURCES.STUDENTS, action: 'manage' },
+      { resource: RESOURCES.TEACHERS, action: 'read' },
       { resource: RESOURCES.GUARDIANS, action: 'manage' },
       { resource: RESOURCES.CLASSES, action: 'manage' },
+      { resource: RESOURCES.COURSES, action: 'read' },
       { resource: RESOURCES.PROGRAMS, action: 'read' },
       { resource: RESOURCES.ENROLLMENTS, action: 'manage' },
       { resource: RESOURCES.RE_ENROLLMENTS, action: 'manage' },
       { resource: RESOURCES.PAYMENTS, action: 'manage' },
       { resource: RESOURCES.ATTENDANCE, action: 'read' },
+      { resource: RESOURCES.GRADES, action: 'read' },
       { resource: RESOURCES.REPORTS, action: 'read' },
       { resource: RESOURCES.DASHBOARD, action: 'read' },
-      { resource: RESOURCES.NOTIFICATIONS, action: 'manage' }
+      { resource: RESOURCES.NOTIFICATIONS, action: 'manage' },
+      { resource: RESOURCES.TASKS, action: 'manage' },
+      { resource: RESOURCES.APPOINTMENTS, action: 'manage' },
+      { resource: RESOURCES.COMMUNICATIONS, action: 'manage' }
     ]
   },
   // TEACHER - Educational access

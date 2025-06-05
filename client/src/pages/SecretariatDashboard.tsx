@@ -21,6 +21,7 @@ import {
   Activity
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { useRBAC, RESOURCES } from '@/hooks/useRBAC';
 
 interface DashboardStats {
   totalStudents: number;
@@ -55,6 +56,7 @@ interface UpcomingAppointment {
 
 export default function SecretariatDashboard() {
   const { user } = useAuth();
+  const { canRead, canCreate, canUpdate, canDelete, canManage } = useRBAC();
 
   // Stats query
   const { data: statsData, isLoading: statsLoading } = useQuery({
@@ -186,44 +188,50 @@ export default function SecretariatDashboard() {
 
         {/* Secondary Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Nieuwe Aanmeldingen</CardTitle>
-              <BookOpen className="h-4 w-4 text-purple-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-gray-900">{stats.pendingEnrollments}</div>
-              <p className="text-xs text-gray-600 mt-1">Te beoordelen</p>
-            </CardContent>
-          </Card>
+          {canRead(RESOURCES.ENROLLMENTS) && (
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Nieuwe Aanmeldingen</CardTitle>
+                <BookOpen className="h-4 w-4 text-purple-600" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-gray-900">{stats.pendingEnrollments}</div>
+                <p className="text-xs text-gray-600 mt-1">Te beoordelen</p>
+              </CardContent>
+            </Card>
+          )}
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Actieve Klassen</CardTitle>
-              <Activity className="h-4 w-4 text-indigo-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-gray-900">{stats.activeClasses}</div>
-              <p className="text-xs text-gray-600 mt-1">Dit semester</p>
-            </CardContent>
-          </Card>
+          {canRead(RESOURCES.CLASSES) && (
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Actieve Klassen</CardTitle>
+                <Activity className="h-4 w-4 text-indigo-600" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-gray-900">{stats.activeClasses}</div>
+                <p className="text-xs text-gray-600 mt-1">Dit semester</p>
+              </CardContent>
+            </Card>
+          )}
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Taakvoortgang</CardTitle>
-              <TrendingUp className="h-4 w-4 text-teal-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between mb-2">
-                <div className="text-2xl font-bold text-gray-900">{completionRate.toFixed(0)}%</div>
-                <div className="text-sm text-gray-600">
-                  {stats.completedTasks}/{totalTasks}
+          {canRead(RESOURCES.TASKS) && (
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Taakvoortgang</CardTitle>
+                <TrendingUp className="h-4 w-4 text-teal-600" />
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="text-2xl font-bold text-gray-900">{completionRate.toFixed(0)}%</div>
+                  <div className="text-sm text-gray-600">
+                    {stats.completedTasks}/{totalTasks}
+                  </div>
                 </div>
-              </div>
-              <Progress value={completionRate} className="h-2" />
-              <p className="text-xs text-gray-600 mt-1">Voltooiingspercentage</p>
-            </CardContent>
-          </Card>
+                <Progress value={completionRate} className="h-2" />
+                <p className="text-xs text-gray-600 mt-1">Voltooiingspercentage</p>
+              </CardContent>
+            </Card>
+          )}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

@@ -15,6 +15,18 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { useRBAC } from "@/hooks/useRBAC";
+import { 
+  AdminPageLayout,
+  AdminPageHeader,
+  AdminStatsGrid,
+  AdminStatCard,
+  AdminActionButton,
+  AdminSearchBar,
+  AdminTableCard,
+  AdminFilterSelect,
+  AdminAvatar,
+  AdminActionButtons
+} from "@/components/ui/admin-layout";
 import {
   Users,
   UserPlus,
@@ -297,142 +309,104 @@ export default function Students() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <AdminPageLayout>
       {/* Header */}
-      <div className="flex justify-between items-start">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Studenten</h1>
-          <p className="text-gray-600 mt-2">
-            Beheer student informatie en inschrijvingen
-          </p>
-        </div>
-        <div className="flex space-x-2">
-          <Button variant="outline">
-            <Download className="w-4 h-4 mr-2" />
-            Exporteren
-          </Button>
-          <Button variant="outline">
-            <Upload className="w-4 h-4 mr-2" />
-            Importeren
-          </Button>
-          {canCreate(RESOURCES.STUDENTS) && (
-            <Button onClick={handleCreateStudent} className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg">
-              <UserPlus className="w-4 h-4 mr-2" />
-              Nieuwe Student
-            </Button>
-          )}
-        </div>
-      </div>
+      <AdminPageHeader 
+        title="Studenten" 
+        description="Beheer student informatie en inschrijvingen"
+      >
+        <AdminActionButton variant="outline" icon={<Download className="w-4 h-4" />}>
+          Exporteren
+        </AdminActionButton>
+        <AdminActionButton variant="outline" icon={<Upload className="w-4 h-4" />}>
+          Importeren
+        </AdminActionButton>
+        {canCreate(RESOURCES.STUDENTS) && (
+          <AdminActionButton 
+            icon={<UserPlus className="w-4 h-4" />}
+            onClick={handleCreateStudent}
+          >
+            Nieuwe Student
+          </AdminActionButton>
+        )}
+      </AdminPageHeader>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Totaal Studenten</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{students.length}</div>
-            <p className="text-xs text-gray-500">Alle studenten</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Actieve Studenten</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">
-              {students.filter(s => s.status === 'active').length}
-            </div>
-            <p className="text-xs text-gray-500">Momenteel ingeschreven</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Nieuwe Studenten</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-blue-600">
-              {students.filter(s => {
-                const enrollmentDate = new Date(s.enrollmentDate);
-                const oneMonthAgo = new Date();
-                oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-                return enrollmentDate > oneMonthAgo;
-              }).length}
-            </div>
-            <p className="text-xs text-gray-500">Laatste maand</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Klassen</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-violet-600">{classes.length}</div>
-            <p className="text-xs text-gray-500">Beschikbare klassen</p>
-          </CardContent>
-        </Card>
-      </div>
+      <AdminStatsGrid columns={4}>
+        <AdminStatCard
+          title="Totaal Studenten"
+          value={students.length}
+          subtitle="Alle studenten"
+          icon={<Users className="h-4 w-4" />}
+        />
+        <AdminStatCard
+          title="Actieve Studenten"
+          value={students.filter(s => s.status === 'active').length}
+          subtitle="Momenteel ingeschreven"
+          valueColor="text-green-600"
+          icon={<UserCheck className="h-4 w-4" />}
+        />
+        <AdminStatCard
+          title="Nieuwe Studenten"
+          value={students.filter(s => {
+            const enrollmentDate = new Date(s.enrollmentDate);
+            const oneMonthAgo = new Date();
+            oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+            return enrollmentDate > oneMonthAgo;
+          }).length}
+          subtitle="Laatste maand"
+          valueColor="text-blue-600"
+          icon={<UserPlus className="h-4 w-4" />}
+        />
+        <AdminStatCard
+          title="Klassen"
+          value={classes.length}
+          subtitle="Beschikbare klassen"
+          valueColor="text-blue-600"
+          icon={<BookOpen className="h-4 w-4" />}
+        />
+      </AdminStatsGrid>
 
       {/* Filters and Search */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Filters</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <Input
-                  placeholder="Zoek op naam, email of student ID..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-            </div>
-            <div className="w-full sm:w-48">
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Status filter" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Alle statussen</SelectItem>
-                  <SelectItem value="active">Actief</SelectItem>
-                  <SelectItem value="inactive">Inactief</SelectItem>
-                  <SelectItem value="graduated">Afgestudeerd</SelectItem>
-                  <SelectItem value="transferred">Overgeplaatst</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="w-full sm:w-48">
-              <Select value={classFilter} onValueChange={setClassFilter}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Klas filter" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Alle klassen</SelectItem>
-                  {classes.map((cls) => (
-                    <SelectItem key={cls.id} value={cls.id.toString()}>
-                      {cls.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <AdminSearchBar
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        placeholder="Zoek op naam, email of student ID..."
+        filters={
+          <>
+            <AdminFilterSelect
+              value={statusFilter}
+              onValueChange={setStatusFilter}
+              placeholder="Status filter"
+              options={[
+                { value: "all", label: "Alle statussen" },
+                { value: "active", label: "Actief" },
+                { value: "inactive", label: "Inactief" },
+                { value: "graduated", label: "Afgestudeerd" },
+                { value: "transferred", label: "Overgeplaatst" }
+              ]}
+            />
+            <AdminFilterSelect
+              value={classFilter}
+              onValueChange={setClassFilter}
+              placeholder="Klas filter"
+              options={[
+                { value: "all", label: "Alle klassen" },
+                ...classes.map((cls) => ({
+                  value: cls.id.toString(),
+                  label: cls.name
+                }))
+              ]}
+            />
+          </>
+        }
+      />
 
       {/* Students Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Studenten ({filteredStudents.length})</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <AdminTableCard 
+        title={`Studenten (${filteredStudents.length})`}
+        subtitle="Beheer alle geregistreerde studenten"
+      >
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
@@ -920,6 +894,6 @@ export default function Students() {
           )}
         </DialogContent>
       </Dialog>
-    </div>
+    </AdminPageLayout>
   );
 }

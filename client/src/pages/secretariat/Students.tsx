@@ -4,7 +4,8 @@ import { apiRequest } from '@/lib/queryClient';
 import { 
   Search, Plus, Download, Filter, Eye, Edit, Trash2, 
   User, Users, GraduationCap, Phone, Mail, Calendar,
-  MapPin, FileText, AlertTriangle, Star, BookOpen
+  MapPin, FileText, AlertTriangle, Star, BookOpen,
+  Settings, Save, X
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -704,7 +705,7 @@ export default function Students() {
             </div>
           </DialogHeader>
 
-          <form onSubmit={handleCreateStudent} className="space-y-6 py-4">
+          <div className="space-y-6 py-4">
             <Tabs defaultValue="personal" className="w-full">
               <TabsList className="grid w-full grid-cols-4 mb-6">
                 <TabsTrigger value="personal" className="flex items-center gap-2 text-xs">
@@ -895,7 +896,7 @@ export default function Students() {
                 </div>
               </TabsContent>
             </Tabs>
-          </form>
+          </div>
 
           <DialogFooter className="pt-4 border-t border-gray-200">
             <Button 
@@ -1076,125 +1077,307 @@ export default function Students() {
         </DialogContent>
       </Dialog>
 
-      {/* Edit Student Dialog */}
+      {/* Edit Student Dialog - Admin Style */}
       <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Student Bewerken</DialogTitle>
-            <DialogDescription>
-              {selectedStudent ? `Bewerk gegevens van ${selectedStudent.firstName} ${selectedStudent.lastName}` : ""}
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="space-y-6">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="editFirstName">Voornaam *</Label>
-                <Input
-                  id="editFirstName"
-                  value={newStudent.firstName}
-                  onChange={(e) => setNewStudent({...newStudent, firstName: e.target.value})}
-                />
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader className="pb-4 border-b border-gray-200">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center">
+                <Edit className="h-5 w-5 text-white" />
               </div>
               <div>
-                <Label htmlFor="editLastName">Achternaam *</Label>
-                <Input
-                  id="editLastName"
-                  value={newStudent.lastName}
-                  onChange={(e) => setNewStudent({...newStudent, lastName: e.target.value})}
-                />
-              </div>
-              <div>
-                <Label htmlFor="editEmail">Email</Label>
-                <Input
-                  id="editEmail"
-                  type="email"
-                  value={newStudent.email}
-                  onChange={(e) => setNewStudent({...newStudent, email: e.target.value})}
-                />
-              </div>
-              <div>
-                <Label htmlFor="editPhone">Telefoon</Label>
-                <Input
-                  id="editPhone"
-                  value={newStudent.phone}
-                  onChange={(e) => setNewStudent({...newStudent, phone: e.target.value})}
-                />
-              </div>
-              <div>
-                <Label htmlFor="editGender">Geslacht</Label>
-                <Select 
-                  value={newStudent.gender} 
-                  onValueChange={(value) => setNewStudent({...newStudent, gender: value})}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecteer geslacht" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Man">Man</SelectItem>
-                    <SelectItem value="Vrouw">Vrouw</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="editClassId">Klas</Label>
-                <Select 
-                  value={newStudent.classId.toString()} 
-                  onValueChange={(value) => setNewStudent({...newStudent, classId: parseInt(value)})}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecteer klas" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="0">Geen klas</SelectItem>
-                    {classes.map((cls: StudentClass) => (
-                      <SelectItem key={cls.id} value={cls.id.toString()}>
-                        {cls.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <DialogTitle className="text-lg font-semibold text-gray-900">Student Bewerken</DialogTitle>
+                <DialogDescription className="text-sm text-gray-600 mt-1">
+                  {selectedStudent ? `Bewerk gegevens van ${selectedStudent.firstName} ${selectedStudent.lastName}` : "Bewerk studentgegevens"}
+                </DialogDescription>
               </div>
             </div>
-          </div>
-          
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setShowEditDialog(false)}>
+          </DialogHeader>
+
+          {selectedStudent && (
+            <div className="py-4">
+              <Tabs defaultValue="personal" className="w-full">
+                <TabsList className="grid w-full grid-cols-4 mb-6">
+                  <TabsTrigger value="personal" className="flex items-center gap-2 text-xs">
+                    <User className="h-3.5 w-3.5" />
+                    <span>Persoonlijk</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="contact" className="flex items-center gap-2 text-xs">
+                    <Phone className="h-3.5 w-3.5" />
+                    <span>Contact</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="academic" className="flex items-center gap-2 text-xs">
+                    <GraduationCap className="h-3.5 w-3.5" />
+                    <span>Onderwijs</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="status" className="flex items-center gap-2 text-xs">
+                    <Settings className="h-3.5 w-3.5" />
+                    <span>Status</span>
+                  </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="personal" className="space-y-4 min-h-[400px]">
+                  <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                    <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                      <User className="h-4 w-4 mr-2" />
+                      Persoonlijke Informatie
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="editFirstName" className="text-xs font-medium text-gray-700">
+                          Voornaam <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                          id="editFirstName"
+                          value={newStudent.firstName}
+                          onChange={(e) => setNewStudent({...newStudent, firstName: e.target.value})}
+                          className="h-8 text-sm"
+                          placeholder="Voornaam"
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="editLastName" className="text-xs font-medium text-gray-700">
+                          Achternaam <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                          id="editLastName"
+                          value={newStudent.lastName}
+                          onChange={(e) => setNewStudent({...newStudent, lastName: e.target.value})}
+                          className="h-8 text-sm"
+                          placeholder="Achternaam"
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="editDateOfBirth" className="text-xs font-medium text-gray-700">
+                          Geboortedatum <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                          id="editDateOfBirth"
+                          type="date"
+                          value={newStudent.dateOfBirth}
+                          onChange={(e) => setNewStudent({...newStudent, dateOfBirth: e.target.value})}
+                          className="h-8 text-sm"
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="editGender" className="text-xs font-medium text-gray-700">
+                          Geslacht <span className="text-red-500">*</span>
+                        </Label>
+                        <Select 
+                          value={newStudent.gender} 
+                          onValueChange={(value) => setNewStudent({...newStudent, gender: value})}
+                          required
+                        >
+                          <SelectTrigger className="h-8 text-sm border-gray-300">
+                            <SelectValue placeholder="Selecteer geslacht" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-white">
+                            <SelectItem value="Man" className="text-black hover:bg-blue-100 focus:bg-blue-200">Man</SelectItem>
+                            <SelectItem value="Vrouw" className="text-black hover:bg-blue-100 focus:bg-blue-200">Vrouw</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="contact" className="space-y-4 min-h-[400px]">
+                  <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                    <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                      <Phone className="h-4 w-4 mr-2" />
+                      Contact Informatie
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="editEmail" className="text-xs font-medium text-gray-700">Email</Label>
+                        <Input
+                          id="editEmail"
+                          type="email"
+                          value={newStudent.email}
+                          onChange={(e) => setNewStudent({...newStudent, email: e.target.value})}
+                          className="h-8 text-sm"
+                          placeholder="student@example.com"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="editPhone" className="text-xs font-medium text-gray-700">Telefoon</Label>
+                        <Input
+                          id="editPhone"
+                          value={newStudent.phone}
+                          onChange={(e) => setNewStudent({...newStudent, phone: e.target.value})}
+                          className="h-8 text-sm"
+                          placeholder="06-12345678"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="editEmergencyContact" className="text-xs font-medium text-gray-700">Noodcontact</Label>
+                        <Input
+                          id="editEmergencyContact"
+                          value={newStudent.emergencyContact}
+                          onChange={(e) => setNewStudent({...newStudent, emergencyContact: e.target.value})}
+                          className="h-8 text-sm"
+                          placeholder="Noodcontact informatie"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="academic" className="space-y-4 min-h-[400px]">
+                  <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                    <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                      <GraduationCap className="h-4 w-4 mr-2" />
+                      Onderwijsgegevens
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="editClassId" className="text-xs font-medium text-gray-700">Klas</Label>
+                        <Select 
+                          value={newStudent.classId.toString()} 
+                          onValueChange={(value) => setNewStudent({...newStudent, classId: parseInt(value)})}
+                        >
+                          <SelectTrigger className="h-8 text-sm border-gray-300">
+                            <SelectValue placeholder="Selecteer klas" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-white">
+                            <SelectItem value="0" className="text-black hover:bg-blue-100 focus:bg-blue-200">Geen klas</SelectItem>
+                            {classes.map((cls: StudentClass) => (
+                              <SelectItem key={cls.id} value={cls.id.toString()} className="text-black hover:bg-blue-100 focus:bg-blue-200">
+                                {cls.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="editGuardianId" className="text-xs font-medium text-gray-700">Voogd</Label>
+                        <Select 
+                          value={newStudent.guardianId.toString()} 
+                          onValueChange={(value) => setNewStudent({...newStudent, guardianId: parseInt(value)})}
+                        >
+                          <SelectTrigger className="h-8 text-sm border-gray-300">
+                            <SelectValue placeholder="Selecteer voogd" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-white">
+                            <SelectItem value="0" className="text-black hover:bg-blue-100 focus:bg-blue-200">Geen voogd</SelectItem>
+                            {guardians.map((guardian: Guardian) => (
+                              <SelectItem key={guardian.id} value={guardian.id.toString()} className="text-black hover:bg-blue-100 focus:bg-blue-200">
+                                {guardian.firstName} {guardian.lastName}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="status" className="space-y-4 min-h-[400px]">
+                  <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                    <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                      <Settings className="h-4 w-4 mr-2" />
+                      Status & Instellingen
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="editStatus" className="text-xs font-medium text-gray-700">Status</Label>
+                        <Select 
+                          value={newStudent.status} 
+                          onValueChange={(value) => setNewStudent({...newStudent, status: value})}
+                        >
+                          <SelectTrigger className="h-8 text-sm border-gray-300">
+                            <SelectValue placeholder="Selecteer status" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-white">
+                            <SelectItem value="active" className="text-black hover:bg-blue-100 focus:bg-blue-200">Actief</SelectItem>
+                            <SelectItem value="inactive" className="text-black hover:bg-blue-100 focus:bg-blue-200">Inactief</SelectItem>
+                            <SelectItem value="suspended" className="text-black hover:bg-blue-100 focus:bg-blue-200">Geschorst</SelectItem>
+                            <SelectItem value="graduated" className="text-black hover:bg-blue-100 focus:bg-blue-200">Afgestudeerd</SelectItem>
+                            <SelectItem value="withdrawn" className="text-black hover:bg-blue-100 focus:bg-blue-200">Teruggetrokken</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+              </Tabs>
+            </div>
+          )}
+
+          <DialogFooter className="pt-4 border-t border-gray-200">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => setShowEditDialog(false)}
+              className="mr-2"
+            >
               Annuleren
             </Button>
             <Button 
               type="submit"
               onClick={handleUpdateStudent}
               disabled={updateStudentMutation.isPending}
-              className="bg-blue-600 hover:bg-blue-700"
+              className="bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-white px-6"
             >
-              {updateStudentMutation.isPending ? 'Bezig...' : 'Wijzigingen Opslaan'}
+              <Save className="h-4 w-4 mr-2" />
+              {updateStudentMutation.isPending ? 'Wijzigingen Opslaan...' : 'Wijzigingen Opslaan'}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Delete Confirmation Dialog */}
+      {/* Delete Confirmation Dialog - Admin Style */}
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Student Verwijderen</DialogTitle>
-            <DialogDescription>
-              {selectedStudent && 
-                `Weet je zeker dat je ${selectedStudent.firstName} ${selectedStudent.lastName} wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.`
-              }
-            </DialogDescription>
+        <DialogContent className="max-w-md">
+          <DialogHeader className="pb-4 border-b border-gray-200">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-red-600 rounded-lg flex items-center justify-center">
+                <Trash2 className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <DialogTitle className="text-lg font-semibold text-gray-900">Student Verwijderen</DialogTitle>
+                <DialogDescription className="text-sm text-gray-600 mt-1">
+                  Deze actie kan niet ongedaan worden gemaakt
+                </DialogDescription>
+              </div>
+            </div>
           </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>
+
+          <div className="py-4">
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="h-5 w-5 text-red-600 mt-0.5 flex-shrink-0" />
+                <div>
+                  <h4 className="text-sm font-medium text-red-800 mb-1">Waarschuwing</h4>
+                  <p className="text-sm text-red-700">
+                    {selectedStudent && 
+                      `Weet je zeker dat je ${selectedStudent.firstName} ${selectedStudent.lastName} permanent wilt verwijderen? Alle gerelateerde gegevens worden ook verwijderd.`
+                    }
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="pt-4 border-t border-gray-200">
+            <Button 
+              variant="outline" 
+              onClick={() => setShowDeleteDialog(false)}
+              className="mr-2"
+            >
               Annuleren
             </Button>
             <Button 
               variant="destructive" 
               onClick={handleConfirmDelete}
               disabled={deleteStudentMutation.isPending}
+              className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800"
             >
-              {deleteStudentMutation.isPending ? 'Bezig...' : 'Verwijderen'}
+              <Trash2 className="h-4 w-4 mr-2" />
+              {deleteStudentMutation.isPending ? 'Verwijderen...' : 'Definitief Verwijderen'}
             </Button>
           </DialogFooter>
         </DialogContent>

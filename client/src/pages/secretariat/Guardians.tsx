@@ -377,11 +377,13 @@ export default function Guardians() {
     <div className="bg-[#f7f9fc] min-h-screen">
       {/* Premium Header */}
       <PremiumHeader
-        icon={<UserCheck className="h-5 w-5 text-white" />}
+        icon={UserCheck}
         title="Voogdenbeheer"
-        subtitle="Beheer alle voogden en hun contactinformatie"
-        parentLabel="Secretariaat"
-        currentLabel="Voogden"
+        description="Beheer alle voogden en hun contactinformatie"
+        breadcrumbs={{
+          parent: "Secretariaat",
+          current: "Voogden"
+        }}
       />
 
       {/* Main Content */}

@@ -95,10 +95,8 @@ export default function SecretariatLayout({ children }: SecretariatLayoutProps) 
     },
   ];
 
-  // Filter navigation based on user permissions
-  const navigation = allNavigationItems.filter(item => 
-    canRead(user?.role || 'guest', item.resource)
-  );
+  // Show all navigation items for secretariat role
+  const navigation = allNavigationItems;
 
   const handleLogout = () => {
     logout();
@@ -108,8 +106,43 @@ export default function SecretariatLayout({ children }: SecretariatLayoutProps) 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Top Bar - Full Width */}
-      <div className="fixed top-0 left-0 right-0 z-50">
-        <Topbar onMenuClick={() => setSidebarOpen(true)} />
+      <div className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm h-16 flex items-center justify-between px-6">
+        {/* Left section with menu button and title */}
+        <div className="flex items-center space-x-4">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="lg:hidden p-2 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+          >
+            <Menu className="w-6 h-6" />
+          </button>
+          
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-md">
+              <span className="text-white font-bold text-sm">M</span>
+            </div>
+            <div>
+              <h1 className="text-xl font-bold text-gray-900">myMadrassa</h1>
+              <p className="text-sm text-gray-600">Secretariaat Dashboard</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Right section with user info */}
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-md">
+              <span className="text-white font-bold text-sm">
+                {user?.firstName?.[0]}{user?.lastName?.[0]}
+              </span>
+            </div>
+            <div className="hidden md:block">
+              <p className="text-sm font-semibold text-gray-900">
+                {user?.firstName} {user?.lastName}
+              </p>
+              <p className="text-xs text-gray-600">Secretariaat</p>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="flex pt-16">

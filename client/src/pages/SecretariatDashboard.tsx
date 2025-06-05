@@ -186,55 +186,48 @@ export default function SecretariatDashboard() {
 
         {/* Secondary Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          {canRead(RESOURCES.ENROLLMENTS) && (
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Nieuwe Aanmeldingen</CardTitle>
-                <BookOpen className="h-4 w-4 text-purple-600" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-gray-900">{stats.pendingEnrollments}</div>
-                <p className="text-xs text-gray-600 mt-1">Te beoordelen</p>
-              </CardContent>
-            </Card>
-          )}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Nieuwe Aanmeldingen</CardTitle>
+              <BookOpen className="h-4 w-4 text-purple-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-gray-900">{stats.pendingEnrollments}</div>
+              <p className="text-xs text-gray-600 mt-1">Te beoordelen</p>
+            </CardContent>
+          </Card>
 
-          {canRead(RESOURCES.CLASSES) && (
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Actieve Klassen</CardTitle>
-                <Activity className="h-4 w-4 text-indigo-600" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-gray-900">{stats.activeClasses}</div>
-                <p className="text-xs text-gray-600 mt-1">Dit semester</p>
-              </CardContent>
-            </Card>
-          )}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Actieve Klassen</CardTitle>
+              <Activity className="h-4 w-4 text-indigo-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-gray-900">{stats.activeClasses}</div>
+              <p className="text-xs text-gray-600 mt-1">Dit semester</p>
+            </CardContent>
+          </Card>
 
-          {canRead(RESOURCES.TASKS) && (
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Taakvoortgang</CardTitle>
-                <TrendingUp className="h-4 w-4 text-teal-600" />
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between mb-2">
-                  <div className="text-2xl font-bold text-gray-900">{completionRate.toFixed(0)}%</div>
-                  <div className="text-sm text-gray-600">
-                    {stats.completedTasks}/{totalTasks}
-                  </div>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Taakvoortgang</CardTitle>
+              <TrendingUp className="h-4 w-4 text-teal-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between mb-2">
+                <div className="text-2xl font-bold text-gray-900">{completionRate.toFixed(0)}%</div>
+                <div className="text-sm text-gray-600">
+                  {stats.completedTasks}/{totalTasks}
                 </div>
-                <Progress value={completionRate} className="h-2" />
-                <p className="text-xs text-gray-600 mt-1">Voltooiingspercentage</p>
-              </CardContent>
-            </Card>
-          )}
+              </div>
+              <Progress value={completionRate} className="h-2" />
+              <p className="text-xs text-gray-600 mt-1">Voltooiingspercentage</p>
+            </CardContent>
+          </Card>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Pending Tasks */}
-          {canRead(RESOURCES.TASKS) && (
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -288,10 +281,8 @@ export default function SecretariatDashboard() {
                 )}
               </CardContent>
             </Card>
-          )}
-
+          
           {/* Upcoming Appointments */}
-          {canRead(RESOURCES.APPOINTMENTS) && (
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -372,33 +363,25 @@ export default function SecretariatDashboard() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {canRead(RESOURCES.STUDENTS) && (
-                <Button variant="outline" className="h-20 flex flex-col items-center justify-center gap-2">
-                  <Users className="h-6 w-6" />
-                  <span className="text-sm">Studentenbeheer</span>
-                </Button>
-              )}
+              <Button variant="outline" className="h-20 flex flex-col items-center justify-center gap-2">
+                <Users className="h-6 w-6" />
+                <span className="text-sm">Studentenbeheer</span>
+              </Button>
               
-              {canRead(RESOURCES.PAYMENTS) && (
-                <Button variant="outline" className="h-20 flex flex-col items-center justify-center gap-2">
-                  <CreditCard className="h-6 w-6" />
-                  <span className="text-sm">Betalingen</span>
-                </Button>
-              )}
+              <Button variant="outline" className="h-20 flex flex-col items-center justify-center gap-2">
+                <CreditCard className="h-6 w-6" />
+                <span className="text-sm">Betalingen</span>
+              </Button>
               
-              {canRead(RESOURCES.ENROLLMENTS) && (
-                <Button variant="outline" className="h-20 flex flex-col items-center justify-center gap-2">
-                  <BookOpen className="h-6 w-6" />
-                  <span className="text-sm">Aanmeldingen</span>
-                </Button>
-              )}
+              <Button variant="outline" className="h-20 flex flex-col items-center justify-center gap-2">
+                <BookOpen className="h-6 w-6" />
+                <span className="text-sm">Aanmeldingen</span>
+              </Button>
               
-              {canRead(RESOURCES.COMMUNICATIONS) && (
-                <Button variant="outline" className="h-20 flex flex-col items-center justify-center gap-2">
-                  <Mail className="h-6 w-6" />
-                  <span className="text-sm">Berichten</span>
-                </Button>
-              )}
+              <Button variant="outline" className="h-20 flex flex-col items-center justify-center gap-2">
+                <Mail className="h-6 w-6" />
+                <span className="text-sm">Berichten</span>
+              </Button>
             </div>
           </CardContent>
         </Card>

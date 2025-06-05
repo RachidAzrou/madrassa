@@ -181,7 +181,7 @@ export default function SecretariatLayout({ children }: SecretariatLayoutProps) 
             const Icon = item.icon;
             return (
               <Link key={item.name} href={item.href}>
-                <a className={`group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
+                <div className={`group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 cursor-pointer ${
                   item.current
                     ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg transform scale-105'
                     : 'text-gray-700 hover:bg-orange-50 hover:text-orange-700 hover:transform hover:scale-105'
@@ -193,7 +193,7 @@ export default function SecretariatLayout({ children }: SecretariatLayoutProps) 
                   {item.current && (
                     <div className="ml-auto w-2 h-2 bg-white rounded-full opacity-75"></div>
                   )}
-                </a>
+                </div>
               </Link>
             );
           })}

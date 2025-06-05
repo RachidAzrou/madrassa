@@ -2,49 +2,40 @@ import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { useRBAC } from "@/hooks/useRBAC";
-import { 
-  AdminPageLayout,
-  AdminPageHeader,
-  AdminStatsGrid,
-  AdminStatCard,
-  AdminActionButton,
-  AdminSearchBar,
-  AdminTableCard,
-  AdminFilterSelect,
-  AdminAvatar
-} from "@/components/ui/admin-layout";
 import {
   CreditCard,
   DollarSign,
   TrendingUp,
-  AlertTriangle,
+  AlertCircle,
+  CheckCircle,
+  Clock,
   Download,
   Upload,
-  Calendar,
+  Plus,
   Eye,
   Edit,
   Trash2,
-  CheckCircle,
-  XCircle,
-  Clock
+  Search,
+  Calendar,
+  Users
 } from "lucide-react";
 
-// Define RESOURCES locally
 const RESOURCES = {
-  PAYMENTS: 'payments',
-  STUDENTS: 'students'
+  PAYMENTS: 'payments'
 } as const;
 
 interface Payment {
@@ -52,14 +43,14 @@ interface Payment {
   studentId: number;
   studentName: string;
   amount: number;
-  description: string;
-  paymentDate: string;
   dueDate: string;
+  paidDate?: string;
   status: 'pending' | 'paid' | 'overdue' | 'cancelled';
+  category: string;
+  description: string;
   paymentMethod?: string;
   transactionId?: string;
   notes?: string;
-  category: string;
 }
 
 interface Student {
@@ -72,10 +63,9 @@ interface Student {
 const paymentFormSchema = z.object({
   studentId: z.string().min(1, "Student selecteren is verplicht"),
   amount: z.number().min(0.01, "Bedrag moet groter zijn dan 0"),
-  description: z.string().min(1, "Beschrijving is verplicht"),
   dueDate: z.string().min(1, "Vervaldatum is verplicht"),
   category: z.string().min(1, "Categorie is verplicht"),
-  paymentMethod: z.string().optional(),
+  description: z.string().min(1, "Beschrijving is verplicht"),
   notes: z.string().optional(),
 });
 
@@ -98,10 +88,9 @@ export default function Payments() {
     defaultValues: {
       studentId: "",
       amount: 0,
-      description: "",
       dueDate: "",
       category: "",
-      paymentMethod: "",
+      description: "",
       notes: "",
     },
   });
@@ -116,7 +105,7 @@ export default function Payments() {
 
   const createPaymentMutation = useMutation({
     mutationFn: async (data: PaymentFormData) => {
-      const response = await apiRequest("POST", "/api/payments", { body: data });
+      const response = await apiRequest("POST", "/api/payments", data);
       return response;
     },
     onSuccess: () => {
@@ -136,7 +125,7 @@ export default function Payments() {
 
   const updatePaymentMutation = useMutation({
     mutationFn: async (data: PaymentFormData) => {
-      const response = await apiRequest("PUT", `/api/payments/${selectedPayment?.id}`, { body: data });
+      const response = await apiRequest("PUT", `/api/payments/${selectedPayment?.id}`, data);
       return response;
     },
     onSuccess: () => {
@@ -175,7 +164,7 @@ export default function Payments() {
     const matchesSearch = 
       payment.studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       payment.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      payment.transactionId?.toLowerCase().includes(searchTerm.toLowerCase());
+      payment.category.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesStatus = statusFilter === "all" || payment.status === statusFilter;
     const matchesCategory = categoryFilter === "all" || payment.category === categoryFilter;
@@ -202,17 +191,16 @@ export default function Payments() {
     form.reset({
       studentId: payment.studentId.toString(),
       amount: payment.amount,
-      description: payment.description,
       dueDate: payment.dueDate,
       category: payment.category,
-      paymentMethod: payment.paymentMethod || "",
+      description: payment.description,
       notes: payment.notes || "",
     });
     setShowDialog(true);
   };
 
   const handleDeletePayment = (payment: Payment) => {
-    if (window.confirm(`Weet je zeker dat je betaling ${payment.description} wilt verwijderen?`)) {
+    if (window.confirm(`Weet je zeker dat je deze betaling van ${payment.studentName} wilt verwijderen?`)) {
       deletePaymentMutation.mutate(payment.id);
     }
   };
@@ -229,14 +217,14 @@ export default function Payments() {
     const variants = {
       pending: { className: "bg-yellow-100 text-yellow-800", icon: <Clock className="w-3 h-3 mr-1" /> },
       paid: { className: "bg-green-100 text-green-800", icon: <CheckCircle className="w-3 h-3 mr-1" /> },
-      overdue: { className: "bg-red-100 text-red-800", icon: <XCircle className="w-3 h-3 mr-1" /> },
-      cancelled: { className: "bg-gray-100 text-gray-800", icon: <XCircle className="w-3 h-3 mr-1" /> }
+      overdue: { className: "bg-red-100 text-red-800", icon: <AlertCircle className="w-3 h-3 mr-1" /> },
+      cancelled: { className: "bg-gray-100 text-gray-800", icon: <AlertCircle className="w-3 h-3 mr-1" /> }
     };
     
     const labels = {
-      pending: "In behandeling",
+      pending: "Openstaand",
       paid: "Betaald",
-      overdue: "Achterstallig",
+      overdue: "Verlopen",
       cancelled: "Geannuleerd"
     };
     
@@ -252,204 +240,281 @@ export default function Payments() {
     );
   };
 
-  const getCategoryOptions = () => {
-    const categories = [...new Set(payments.map(p => p.category))];
+  const getCategories = () => {
+    const categories = Array.from(new Set(payments.map(p => p.category)));
     return categories.map(cat => ({ value: cat, label: cat }));
   };
 
-  const totalAmount = payments.reduce((sum, payment) => sum + payment.amount, 0);
-  const paidAmount = payments.filter(p => p.status === 'paid').reduce((sum, payment) => sum + payment.amount, 0);
-  const pendingAmount = payments.filter(p => p.status === 'pending').reduce((sum, payment) => sum + payment.amount, 0);
-  const overdueCount = payments.filter(p => p.status === 'overdue').length;
-
   if (paymentsLoading || studentsLoading) {
     return (
-      <AdminPageLayout>
+      <div className="p-6 space-y-6">
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full" />
         </div>
-      </AdminPageLayout>
+      </div>
     );
   }
 
+  const totalPayments = payments.length;
+  const totalAmount = payments.reduce((sum, p) => sum + p.amount, 0);
+  const paidPayments = payments.filter(p => p.status === 'paid').length;
+  const overduePayments = payments.filter(p => p.status === 'overdue').length;
+  const paidAmount = payments.filter(p => p.status === 'paid').reduce((sum, p) => sum + p.amount, 0);
+
   return (
-    <AdminPageLayout>
-      <AdminPageHeader 
-        title="Betalingen" 
-        description="Beheer studentenbetalingen en facturatie"
-      >
-        <AdminActionButton variant="outline" icon={<Download className="w-4 h-4" />}>
-          Exporteren
-        </AdminActionButton>
-        <AdminActionButton variant="outline" icon={<Upload className="w-4 h-4" />}>
-          Importeren
-        </AdminActionButton>
-        {canCreate(RESOURCES.PAYMENTS) && (
-          <AdminActionButton 
-            icon={<CreditCard className="w-4 h-4" />}
-            onClick={handleCreatePayment}
-          >
-            Nieuwe Betaling
-          </AdminActionButton>
-        )}
-      </AdminPageHeader>
+    <div className="p-6 space-y-6">
+      {/* Page Header */}
+      <div className="flex justify-between items-start">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Betalingsbeheer</h1>
+          <p className="text-gray-600 mt-2">Beheer alle betalingen en schoolgelden</p>
+        </div>
+        <div className="flex space-x-2">
+          <Button variant="outline" className="border-gray-300 bg-white hover:bg-gray-50">
+            <Download className="w-4 h-4 mr-2" />
+            Exporteren
+          </Button>
+          <Button variant="outline" className="border-gray-300 bg-white hover:bg-gray-50">
+            <Upload className="w-4 h-4 mr-2" />
+            Importeren
+          </Button>
+          {canCreate(RESOURCES.PAYMENTS) && (
+            <Button 
+              onClick={handleCreatePayment}
+              className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Nieuwe Betaling
+            </Button>
+          )}
+        </div>
+      </div>
 
-      <AdminStatsGrid columns={4}>
-        <AdminStatCard
-          title="Totaal Bedrag"
-          value={`€${totalAmount.toFixed(2)}`}
-          subtitle="Alle betalingen"
-          icon={<DollarSign className="h-4 w-4" />}
-        />
-        <AdminStatCard
-          title="Betaald"
-          value={`€${paidAmount.toFixed(2)}`}
-          subtitle="Ontvangen betalingen"
-          valueColor="text-green-600"
-          icon={<CheckCircle className="h-4 w-4" />}
-        />
-        <AdminStatCard
-          title="Uitstaand"
-          value={`€${pendingAmount.toFixed(2)}`}
-          subtitle="Openstaande betalingen"
-          valueColor="text-blue-600"
-          icon={<Clock className="h-4 w-4" />}
-        />
-        <AdminStatCard
-          title="Achterstallig"
-          value={overdueCount}
-          subtitle="Verlopen betalingen"
-          valueColor="text-red-600"
-          icon={<AlertTriangle className="h-4 w-4" />}
-        />
-      </AdminStatsGrid>
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+        <Card>
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-sm font-medium text-gray-600">Totaal Betalingen</CardTitle>
+              <CreditCard className="h-4 w-4 text-gray-400" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-gray-900">{totalPayments}</div>
+            <p className="text-xs text-gray-500">Alle betalingen</p>
+          </CardContent>
+        </Card>
 
-      <AdminSearchBar
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
-        placeholder="Zoek op student, beschrijving of transactie ID..."
-        filters={
-          <>
-            <AdminFilterSelect
-              value={statusFilter}
-              onValueChange={setStatusFilter}
-              placeholder="Status filter"
-              options={[
-                { value: "all", label: "Alle statussen" },
-                { value: "pending", label: "In behandeling" },
-                { value: "paid", label: "Betaald" },
-                { value: "overdue", label: "Achterstallig" },
-                { value: "cancelled", label: "Geannuleerd" }
-              ]}
-            />
-            <AdminFilterSelect
-              value={categoryFilter}
-              onValueChange={setCategoryFilter}
-              placeholder="Categorie filter"
-              options={[
-                { value: "all", label: "Alle categorieën" },
-                ...getCategoryOptions()
-              ]}
-            />
-          </>
-        }
-      />
+        <Card>
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-sm font-medium text-gray-600">Totaal Bedrag</CardTitle>
+              <DollarSign className="h-4 w-4 text-gray-400" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-blue-600">€{totalAmount.toFixed(2)}</div>
+            <p className="text-xs text-gray-500">Alle betalingen</p>
+          </CardContent>
+        </Card>
 
-      <AdminTableCard 
-        title={`Betalingen (${filteredPayments.length})`}
-        subtitle="Beheer alle studentenbetalingen"
-      >
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Student</TableHead>
-              <TableHead>Beschrijving</TableHead>
-              <TableHead>Bedrag</TableHead>
-              <TableHead>Vervaldatum</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Acties</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredPayments.length === 0 ? (
+        <Card>
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-sm font-medium text-gray-600">Betaald</CardTitle>
+              <CheckCircle className="h-4 w-4 text-gray-400" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-green-600">{paidPayments}</div>
+            <p className="text-xs text-gray-500">€{paidAmount.toFixed(2)} ontvangen</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-sm font-medium text-gray-600">Verlopen</CardTitle>
+              <AlertCircle className="h-4 w-4 text-gray-400" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-red-600">{overduePayments}</div>
+            <p className="text-xs text-gray-500">Betalingen achterstallig</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-sm font-medium text-gray-600">Betalingspercentage</CardTitle>
+              <TrendingUp className="h-4 w-4 text-gray-400" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-blue-600">
+              {totalPayments > 0 ? Math.round((paidPayments / totalPayments) * 100) : 0}%
+            </div>
+            <p className="text-xs text-gray-500">Succesvol betaald</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Search and Filters */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Filters</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex-1">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Input
+                  placeholder="Zoek op student, beschrijving of categorie..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </div>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-full sm:w-48">
+                <SelectValue placeholder="Status filter" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Alle statussen</SelectItem>
+                <SelectItem value="pending">Openstaand</SelectItem>
+                <SelectItem value="paid">Betaald</SelectItem>
+                <SelectItem value="overdue">Verlopen</SelectItem>
+                <SelectItem value="cancelled">Geannuleerd</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+              <SelectTrigger className="w-full sm:w-48">
+                <SelectValue placeholder="Categorie filter" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Alle categorieën</SelectItem>
+                {getCategories().map(cat => (
+                  <SelectItem key={cat.value} value={cat.value}>
+                    {cat.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Payments Table */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Betalingen ({filteredPayments.length})</CardTitle>
+              <p className="text-sm text-gray-600 mt-1">Beheer alle betalingen en schoolgelden</p>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={6} className="text-center text-gray-500 py-8">
-                  Geen betalingen gevonden
-                </TableCell>
+                <TableHead>Student</TableHead>
+                <TableHead>Beschrijving</TableHead>
+                <TableHead>Categorie</TableHead>
+                <TableHead>Bedrag</TableHead>
+                <TableHead>Vervaldatum</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Acties</TableHead>
               </TableRow>
-            ) : (
-              filteredPayments.map((payment: Payment) => (
-                <TableRow key={payment.id}>
-                  <TableCell>
-                    <div className="flex items-center space-x-3">
-                      <AdminAvatar initials={payment.studentName.split(' ').map(n => n[0]).join('')} />
-                      <div>
-                        <div className="font-medium">{payment.studentName}</div>
-                        <div className="text-sm text-gray-500">ID: {payment.studentId}</div>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div>
-                      <div className="font-medium">{payment.description}</div>
-                      <Badge variant="outline" className="mt-1 text-xs">
-                        {payment.category}
-                      </Badge>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="font-mono text-lg font-semibold text-blue-600">
-                      €{payment.amount.toFixed(2)}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center">
-                      <Calendar className="w-4 h-4 text-gray-400 mr-2" />
-                      {new Date(payment.dueDate).toLocaleDateString('nl-NL')}
-                    </div>
-                  </TableCell>
-                  <TableCell>{getStatusBadge(payment.status)}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center space-x-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleViewPayment(payment)}
-                        className="h-8 w-8 p-0 hover:bg-blue-50 hover:text-blue-600"
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      {canUpdate(RESOURCES.PAYMENTS) && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleEditPayment(payment)}
-                          className="h-8 w-8 p-0 hover:bg-blue-50 hover:text-blue-600"
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                      )}
-                      {canDelete(RESOURCES.PAYMENTS) && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDeletePayment(payment)}
-                          className="h-8 w-8 p-0 text-red-600 hover:text-red-800 hover:bg-red-50"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      )}
-                    </div>
+            </TableHeader>
+            <TableBody>
+              {filteredPayments.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center text-gray-500 py-8">
+                    Geen betalingen gevonden
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </AdminTableCard>
+              ) : (
+                filteredPayments.map((payment: Payment) => (
+                  <TableRow key={payment.id}>
+                    <TableCell>
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                          <Users className="w-4 h-4 text-blue-600" />
+                        </div>
+                        <div>
+                          <div className="font-medium">{payment.studentName}</div>
+                          <div className="text-sm text-gray-500">ID: {payment.studentId}</div>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div>
+                        <div className="font-medium">{payment.description}</div>
+                        {payment.notes && (
+                          <div className="text-sm text-gray-500">{payment.notes}</div>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline">{payment.category}</Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="font-medium">€{payment.amount.toFixed(2)}</div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center">
+                        <Calendar className="w-4 h-4 text-gray-400 mr-2" />
+                        {new Date(payment.dueDate).toLocaleDateString('nl-NL')}
+                      </div>
+                    </TableCell>
+                    <TableCell>{getStatusBadge(payment.status)}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center space-x-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleViewPayment(payment)}
+                          className="h-8 w-8 p-0 hover:bg-blue-50 hover:text-blue-600"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        {canUpdate(RESOURCES.PAYMENTS) && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleEditPayment(payment)}
+                            className="h-8 w-8 p-0 hover:bg-blue-50 hover:text-blue-600"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        )}
+                        {canDelete(RESOURCES.PAYMENTS) && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeletePayment(payment)}
+                            className="h-8 w-8 p-0 text-red-600 hover:text-red-800 hover:bg-red-50"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
 
+      {/* Dialog */}
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
               {dialogMode === 'create' && 'Nieuwe Betaling Toevoegen'}
@@ -467,11 +532,7 @@ export default function Payments() {
                 </div>
                 <div>
                   <Label className="text-sm font-medium text-gray-700">Bedrag</Label>
-                  <p className="mt-1 text-sm text-gray-900 font-mono">€{selectedPayment.amount.toFixed(2)}</p>
-                </div>
-                <div>
-                  <Label className="text-sm font-medium text-gray-700">Beschrijving</Label>
-                  <p className="mt-1 text-sm text-gray-900">{selectedPayment.description}</p>
+                  <p className="mt-1 text-sm text-gray-900">€{selectedPayment.amount.toFixed(2)}</p>
                 </div>
                 <div>
                   <Label className="text-sm font-medium text-gray-700">Categorie</Label>
@@ -485,7 +546,39 @@ export default function Payments() {
                   <Label className="text-sm font-medium text-gray-700">Vervaldatum</Label>
                   <p className="mt-1 text-sm text-gray-900">{new Date(selectedPayment.dueDate).toLocaleDateString('nl-NL')}</p>
                 </div>
+                {selectedPayment.paidDate && (
+                  <div>
+                    <Label className="text-sm font-medium text-gray-700">Betaaldatum</Label>
+                    <p className="mt-1 text-sm text-gray-900">{new Date(selectedPayment.paidDate).toLocaleDateString('nl-NL')}</p>
+                  </div>
+                )}
+                {selectedPayment.paymentMethod && (
+                  <div>
+                    <Label className="text-sm font-medium text-gray-700">Betaalmethode</Label>
+                    <p className="mt-1 text-sm text-gray-900">{selectedPayment.paymentMethod}</p>
+                  </div>
+                )}
+                {selectedPayment.transactionId && (
+                  <div>
+                    <Label className="text-sm font-medium text-gray-700">Transactie ID</Label>
+                    <p className="mt-1 text-sm text-gray-900">{selectedPayment.transactionId}</p>
+                  </div>
+                )}
               </div>
+              
+              <div>
+                <Label className="text-sm font-medium text-gray-700">Beschrijving</Label>
+                <p className="mt-1 text-sm text-gray-900">{selectedPayment.description}</p>
+              </div>
+
+              {selectedPayment.notes && (
+                <div>
+                  <Label className="text-sm font-medium text-gray-700">Notities</Label>
+                  <div className="mt-1 p-3 border rounded-md bg-gray-50">
+                    <p className="text-sm text-gray-900">{selectedPayment.notes}</p>
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             <Form {...form}>
@@ -506,7 +599,7 @@ export default function Payments() {
                           <SelectContent>
                             {students.map((student: Student) => (
                               <SelectItem key={student.id} value={student.id.toString()}>
-                                {student.firstName} {student.lastName} (ID: {student.studentId})
+                                {student.firstName} {student.lastName} ({student.studentId})
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -525,22 +618,9 @@ export default function Payments() {
                           <Input 
                             type="number" 
                             step="0.01" 
-                            {...field} 
+                            {...field}
                             onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                           />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="description"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Beschrijving</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -559,10 +639,10 @@ export default function Payments() {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="Collegegeld">Collegegeld</SelectItem>
-                            <SelectItem value="Examengeld">Examengeld</SelectItem>
+                            <SelectItem value="Schoolgeld">Schoolgeld</SelectItem>
                             <SelectItem value="Boeken">Boeken</SelectItem>
-                            <SelectItem value="Activiteiten">Activiteiten</SelectItem>
+                            <SelectItem value="Excursie">Excursie</SelectItem>
+                            <SelectItem value="Materialen">Materialen</SelectItem>
                             <SelectItem value="Overig">Overig</SelectItem>
                           </SelectContent>
                         </Select>
@@ -583,30 +663,35 @@ export default function Payments() {
                       </FormItem>
                     )}
                   />
-                  <FormField
-                    control={form.control}
-                    name="paymentMethod"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Betaalmethode</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Selecteer betaalmethode" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="Bankoverschrijving">Bankoverschrijving</SelectItem>
-                            <SelectItem value="iDEAL">iDEAL</SelectItem>
-                            <SelectItem value="Contant">Contant</SelectItem>
-                            <SelectItem value="Creditcard">Creditcard</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
                 </div>
+                
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Beschrijving</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="notes"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Notities</FormLabel>
+                      <FormControl>
+                        <Textarea {...field} rows={3} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 
                 <div className="flex justify-end space-x-2">
                   <Button type="button" variant="outline" onClick={() => setShowDialog(false)}>
@@ -625,6 +710,6 @@ export default function Payments() {
           )}
         </DialogContent>
       </Dialog>
-    </AdminPageLayout>
+    </div>
   );
 }

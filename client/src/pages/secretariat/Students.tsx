@@ -2,29 +2,20 @@ import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { useRBAC } from "@/hooks/useRBAC";
-import { 
-  AdminPageLayout,
-  AdminPageHeader,
-  AdminStatsGrid,
-  AdminStatCard,
-  AdminActionButton,
-  AdminSearchBar,
-  AdminTableCard,
-  AdminFilterSelect,
-  AdminAvatar
-} from "@/components/ui/admin-layout";
 import {
   Users,
   UserPlus,
@@ -38,30 +29,14 @@ import {
   Calendar,
   Eye,
   Edit,
-  Trash2
+  Trash2,
+  Search,
+  Filter
 } from "lucide-react";
-// Define RESOURCES locally to avoid import issues
+
+// Define RESOURCES locally
 const RESOURCES = {
-  STUDENTS: 'students',
-  TEACHERS: 'teachers',
-  GUARDIANS: 'guardians',
-  CLASSES: 'classes',
-  PROGRAMS: 'programs',
-  ACADEMIC_YEARS: 'academic_years',
-  ENROLLMENTS: 'enrollments',
-  RE_ENROLLMENTS: 're_enrollments',
-  ACCOUNTS: 'accounts',
-  PAYMENTS: 'payments',
-  ATTENDANCE: 'attendance',
-  GRADES: 'grades',
-  REPORTS: 'reports',
-  SETTINGS: 'settings',
-  DASHBOARD: 'dashboard',
-  NOTIFICATIONS: 'notifications',
-  TASKS: 'tasks',
-  APPOINTMENTS: 'appointments',
-  COMMUNICATIONS: 'communications',
-  COURSES: 'courses'
+  STUDENTS: 'students'
 } as const;
 
 interface Student {
@@ -154,7 +129,7 @@ export default function Students() {
 
   const createStudentMutation = useMutation({
     mutationFn: async (data: StudentFormData) => {
-      const response = await apiRequest("POST", "/api/students", { body: data });
+      const response = await apiRequest("POST", "/api/students", data);
       return response;
     },
     onSuccess: () => {
@@ -174,7 +149,7 @@ export default function Students() {
 
   const updateStudentMutation = useMutation({
     mutationFn: async (data: StudentFormData) => {
-      const response = await apiRequest("PUT", `/api/students/${selectedStudent?.id}`, { body: data });
+      const response = await apiRequest("PUT", `/api/students/${selectedStudent?.id}`, data);
       return response;
     },
     onSuccess: () => {
@@ -217,7 +192,7 @@ export default function Students() {
       student.studentId.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesStatus = statusFilter === "all" || student.status === statusFilter;
-    const matchesClass = classFilter === "all" || student.classId?.toString() === classFilter;
+    const matchesClass = classFilter === "all" || (student.classId && student.classId.toString() === classFilter);
     
     return matchesSearch && matchesStatus && matchesClass;
   });
@@ -294,211 +269,277 @@ export default function Students() {
 
   if (studentsLoading || classesLoading) {
     return (
-      <AdminPageLayout>
+      <div className="p-6 space-y-6">
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full" />
         </div>
-      </AdminPageLayout>
+      </div>
     );
   }
 
   return (
-    <AdminPageLayout>
-      <AdminPageHeader 
-        title="Studenten" 
-        description="Beheer student informatie en inschrijvingen"
-      >
-        <AdminActionButton variant="outline" icon={<Download className="w-4 h-4" />}>
-          Exporteren
-        </AdminActionButton>
-        <AdminActionButton variant="outline" icon={<Upload className="w-4 h-4" />}>
-          Importeren
-        </AdminActionButton>
-        {canCreate(RESOURCES.STUDENTS) && (
-          <AdminActionButton 
-            icon={<UserPlus className="w-4 h-4" />}
-            onClick={handleCreateStudent}
-          >
-            Nieuwe Student
-          </AdminActionButton>
-        )}
-      </AdminPageHeader>
+    <div className="p-6 space-y-6">
+      {/* Page Header */}
+      <div className="flex justify-between items-start">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Studentenbeheer</h1>
+          <p className="text-gray-600 mt-2">Beheer alle studenten en hun informatie</p>
+        </div>
+        <div className="flex space-x-2">
+          <Button variant="outline" className="border-gray-300 bg-white hover:bg-gray-50">
+            <Download className="w-4 h-4 mr-2" />
+            Exporteren
+          </Button>
+          <Button variant="outline" className="border-gray-300 bg-white hover:bg-gray-50">
+            <Upload className="w-4 h-4 mr-2" />
+            Importeren
+          </Button>
+          {canCreate(RESOURCES.STUDENTS) && (
+            <Button 
+              onClick={handleCreateStudent}
+              className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg"
+            >
+              <UserPlus className="w-4 h-4 mr-2" />
+              Nieuwe Student
+            </Button>
+          )}
+        </div>
+      </div>
 
-      <AdminStatsGrid columns={4}>
-        <AdminStatCard
-          title="Totaal Studenten"
-          value={students.length}
-          subtitle="Alle studenten"
-          icon={<Users className="h-4 w-4" />}
-        />
-        <AdminStatCard
-          title="Actieve Studenten"
-          value={students.filter((s: Student) => s.status === 'active').length}
-          subtitle="Momenteel ingeschreven"
-          valueColor="text-green-600"
-          icon={<UserCheck className="h-4 w-4" />}
-        />
-        <AdminStatCard
-          title="Nieuwe Studenten"
-          value={students.filter((s: Student) => {
-            const enrollmentDate = new Date(s.enrollmentDate);
-            const oneMonthAgo = new Date();
-            oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-            return enrollmentDate > oneMonthAgo;
-          }).length}
-          subtitle="Laatste maand"
-          valueColor="text-blue-600"
-          icon={<UserPlus className="h-4 w-4" />}
-        />
-        <AdminStatCard
-          title="Klassen"
-          value={classes.length}
-          subtitle="Beschikbare klassen"
-          valueColor="text-blue-600"
-          icon={<BookOpen className="h-4 w-4" />}
-        />
-      </AdminStatsGrid>
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card>
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-sm font-medium text-gray-600">Totaal Studenten</CardTitle>
+              <Users className="h-4 w-4 text-gray-400" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-gray-900">{students.length}</div>
+            <p className="text-xs text-gray-500">Alle studenten</p>
+          </CardContent>
+        </Card>
 
-      <AdminSearchBar
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
-        placeholder="Zoek op naam, email of student ID..."
-        filters={
-          <>
-            <AdminFilterSelect
-              value={statusFilter}
-              onValueChange={setStatusFilter}
-              placeholder="Status filter"
-              options={[
-                { value: "all", label: "Alle statussen" },
-                { value: "active", label: "Actief" },
-                { value: "inactive", label: "Inactief" },
-                { value: "graduated", label: "Afgestudeerd" },
-                { value: "transferred", label: "Overgeplaatst" }
-              ]}
-            />
-            <AdminFilterSelect
-              value={classFilter}
-              onValueChange={setClassFilter}
-              placeholder="Klas filter"
-              options={[
-                { value: "all", label: "Alle klassen" },
-                ...classes.map((cls: StudentClass) => ({
-                  value: cls.id.toString(),
-                  label: cls.name
-                }))
-              ]}
-            />
-          </>
-        }
-      />
+        <Card>
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-sm font-medium text-gray-600">Actieve Studenten</CardTitle>
+              <UserCheck className="h-4 w-4 text-gray-400" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-green-600">
+              {students.filter((s: Student) => s.status === 'active').length}
+            </div>
+            <p className="text-xs text-gray-500">Momenteel ingeschreven</p>
+          </CardContent>
+        </Card>
 
-      <AdminTableCard 
-        title={`Studenten (${filteredStudents.length})`}
-        subtitle="Beheer alle geregistreerde studenten"
-      >
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Student</TableHead>
-              <TableHead>Contact</TableHead>
-              <TableHead>Klas</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Inschrijfdatum</TableHead>
-              <TableHead>Acties</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredStudents.length === 0 ? (
+        <Card>
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-sm font-medium text-gray-600">Nieuwe Studenten</CardTitle>
+              <UserPlus className="h-4 w-4 text-gray-400" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-blue-600">
+              {students.filter((s: Student) => {
+                const enrollmentDate = new Date(s.enrollmentDate);
+                const oneMonthAgo = new Date();
+                oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+                return enrollmentDate > oneMonthAgo;
+              }).length}
+            </div>
+            <p className="text-xs text-gray-500">Laatste maand</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-sm font-medium text-gray-600">Klassen</CardTitle>
+              <BookOpen className="h-4 w-4 text-gray-400" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-blue-600">{classes.length}</div>
+            <p className="text-xs text-gray-500">Beschikbare klassen</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Search and Filters */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Filters</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex-1">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Input
+                  placeholder="Zoek op naam, email of student ID..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </div>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-full sm:w-48">
+                <SelectValue placeholder="Status filter" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Alle statussen</SelectItem>
+                <SelectItem value="active">Actief</SelectItem>
+                <SelectItem value="inactive">Inactief</SelectItem>
+                <SelectItem value="graduated">Afgestudeerd</SelectItem>
+                <SelectItem value="transferred">Overgeplaatst</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={classFilter} onValueChange={setClassFilter}>
+              <SelectTrigger className="w-full sm:w-48">
+                <SelectValue placeholder="Klas filter" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Alle klassen</SelectItem>
+                {classes.map((cls: StudentClass) => (
+                  <SelectItem key={cls.id} value={cls.id.toString()}>
+                    {cls.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Students Table */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Studenten ({filteredStudents.length})</CardTitle>
+              <p className="text-sm text-gray-600 mt-1">Beheer alle geregistreerde studenten</p>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={6} className="text-center text-gray-500 py-8">
-                  Geen studenten gevonden
-                </TableCell>
+                <TableHead>Student</TableHead>
+                <TableHead>Student ID</TableHead>
+                <TableHead>Klas</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Contact</TableHead>
+                <TableHead>Inschrijfdatum</TableHead>
+                <TableHead>Acties</TableHead>
               </TableRow>
-            ) : (
-              filteredStudents.map((student: Student) => (
-                <TableRow key={student.id}>
-                  <TableCell>
-                    <div className="flex items-center space-x-3">
-                      <AdminAvatar initials={`${student.firstName[0]}${student.lastName[0]}`} />
-                      <div>
-                        <div className="font-medium">{student.firstName} {student.lastName}</div>
-                        <div className="text-sm text-gray-500">ID: {student.studentId}</div>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="space-y-1">
-                      <div className="flex items-center text-sm">
-                        <Mail className="w-4 h-4 text-gray-400 mr-2" />
-                        {student.email}
-                      </div>
-                      {student.phone && (
-                        <div className="flex items-center text-sm text-gray-500">
-                          <Phone className="w-4 h-4 text-gray-400 mr-2" />
-                          {student.phone}
-                        </div>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    {student.className ? (
-                      <div className="flex items-center">
-                        <BookOpen className="w-4 h-4 text-gray-400 mr-2" />
-                        {student.className}
-                      </div>
-                    ) : (
-                      <span className="text-gray-500">Geen klas</span>
-                    )}
-                  </TableCell>
-                  <TableCell>{getStatusBadge(student.status)}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center">
-                      <Calendar className="w-4 h-4 text-gray-400 mr-2" />
-                      {new Date(student.enrollmentDate).toLocaleDateString('nl-NL')}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center space-x-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleViewStudent(student)}
-                        className="h-8 w-8 p-0 hover:bg-blue-50 hover:text-blue-600"
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      {canUpdate(RESOURCES.STUDENTS) && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleEditStudent(student)}
-                          className="h-8 w-8 p-0 hover:bg-blue-50 hover:text-blue-600"
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                      )}
-                      {canDelete(RESOURCES.STUDENTS) && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDeleteStudent(student)}
-                          className="h-8 w-8 p-0 text-red-600 hover:text-red-800 hover:bg-red-50"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      )}
-                    </div>
+            </TableHeader>
+            <TableBody>
+              {filteredStudents.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center text-gray-500 py-8">
+                    Geen studenten gevonden
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </AdminTableCard>
+              ) : (
+                filteredStudents.map((student: Student) => (
+                  <TableRow key={student.id}>
+                    <TableCell>
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                          <span className="text-sm font-medium text-blue-600">
+                            {student.firstName[0]}{student.lastName[0]}
+                          </span>
+                        </div>
+                        <div>
+                          <div className="font-medium">{student.firstName} {student.lastName}</div>
+                          <div className="text-sm text-gray-500">{student.email}</div>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <span className="font-mono text-sm">{student.studentId}</span>
+                    </TableCell>
+                    <TableCell>
+                      {student.className ? (
+                        <div className="flex items-center">
+                          <GraduationCap className="w-4 h-4 text-gray-400 mr-2" />
+                          {student.className}
+                        </div>
+                      ) : (
+                        <span className="text-gray-400">Geen klas</span>
+                      )}
+                    </TableCell>
+                    <TableCell>{getStatusBadge(student.status)}</TableCell>
+                    <TableCell>
+                      <div className="space-y-1">
+                        {student.phone && (
+                          <div className="flex items-center text-sm">
+                            <Phone className="w-3 h-3 text-gray-400 mr-1" />
+                            {student.phone}
+                          </div>
+                        )}
+                        <div className="flex items-center text-sm">
+                          <Mail className="w-3 h-3 text-gray-400 mr-1" />
+                          {student.email}
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center">
+                        <Calendar className="w-4 h-4 text-gray-400 mr-2" />
+                        {new Date(student.enrollmentDate).toLocaleDateString('nl-NL')}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center space-x-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleViewStudent(student)}
+                          className="h-8 w-8 p-0 hover:bg-blue-50 hover:text-blue-600"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        {canUpdate(RESOURCES.STUDENTS) && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleEditStudent(student)}
+                            className="h-8 w-8 p-0 hover:bg-blue-50 hover:text-blue-600"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        )}
+                        {canDelete(RESOURCES.STUDENTS) && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeleteStudent(student)}
+                            className="h-8 w-8 p-0 text-red-600 hover:text-red-800 hover:bg-red-50"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
 
+      {/* Dialog */}
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
               {dialogMode === 'create' && 'Nieuwe Student Toevoegen'}
@@ -511,12 +552,12 @@ export default function Students() {
             <div className="space-y-6">
               <div className="grid grid-cols-2 gap-6">
                 <div>
-                  <Label className="text-sm font-medium text-gray-700">Voornaam</Label>
-                  <p className="mt-1 text-sm text-gray-900">{selectedStudent.firstName}</p>
+                  <Label className="text-sm font-medium text-gray-700">Naam</Label>
+                  <p className="mt-1 text-sm text-gray-900">{selectedStudent.firstName} {selectedStudent.lastName}</p>
                 </div>
                 <div>
-                  <Label className="text-sm font-medium text-gray-700">Achternaam</Label>
-                  <p className="mt-1 text-sm text-gray-900">{selectedStudent.lastName}</p>
+                  <Label className="text-sm font-medium text-gray-700">Student ID</Label>
+                  <p className="mt-1 text-sm text-gray-900">{selectedStudent.studentId}</p>
                 </div>
                 <div>
                   <Label className="text-sm font-medium text-gray-700">Email</Label>
@@ -535,14 +576,46 @@ export default function Students() {
                   <p className="mt-1 text-sm text-gray-900">{selectedStudent.gender === 'male' ? 'Man' : 'Vrouw'}</p>
                 </div>
                 <div>
+                  <Label className="text-sm font-medium text-gray-700">Klas</Label>
+                  <p className="mt-1 text-sm text-gray-900">{selectedStudent.className || 'Geen klas toegewezen'}</p>
+                </div>
+                <div>
                   <Label className="text-sm font-medium text-gray-700">Status</Label>
                   <div className="mt-1">{getStatusBadge(selectedStudent.status)}</div>
                 </div>
                 <div>
-                  <Label className="text-sm font-medium text-gray-700">Klas</Label>
-                  <p className="mt-1 text-sm text-gray-900">{selectedStudent.className || 'Geen klas toegewezen'}</p>
+                  <Label className="text-sm font-medium text-gray-700">Inschrijfdatum</Label>
+                  <p className="mt-1 text-sm text-gray-900">{new Date(selectedStudent.enrollmentDate).toLocaleDateString('nl-NL')}</p>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-gray-700">Voogd</Label>
+                  <p className="mt-1 text-sm text-gray-900">{selectedStudent.guardianName || 'Geen voogd toegewezen'}</p>
                 </div>
               </div>
+              {selectedStudent.address && (
+                <div>
+                  <Label className="text-sm font-medium text-gray-700">Adres</Label>
+                  <p className="mt-1 text-sm text-gray-900">
+                    {selectedStudent.address}, {selectedStudent.postalCode} {selectedStudent.city}
+                  </p>
+                </div>
+              )}
+              {selectedStudent.emergencyContact && (
+                <div>
+                  <Label className="text-sm font-medium text-gray-700">Noodcontact</Label>
+                  <p className="mt-1 text-sm text-gray-900">
+                    {selectedStudent.emergencyContact} - {selectedStudent.emergencyPhone}
+                  </p>
+                </div>
+              )}
+              {selectedStudent.medicalInfo && (
+                <div>
+                  <Label className="text-sm font-medium text-gray-700">Medische informatie</Label>
+                  <div className="mt-1 p-3 border rounded-md bg-gray-50">
+                    <p className="text-sm text-gray-900">{selectedStudent.medicalInfo}</p>
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             <Form {...form}>
@@ -640,7 +713,7 @@ export default function Students() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Klas</FormLabel>
-                        <Select onValueChange={(value: any) => field.onChange(value)} defaultValue={field.value}>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Selecteer klas" />
@@ -659,7 +732,86 @@ export default function Students() {
                       </FormItem>
                     )}
                   />
+                  <FormField
+                    control={form.control}
+                    name="address"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Adres</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="postalCode"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Postcode</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="city"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Stad</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="emergencyContact"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Noodcontact naam</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="emergencyPhone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Noodcontact telefoon</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
+                
+                <FormField
+                  control={form.control}
+                  name="medicalInfo"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Medische informatie</FormLabel>
+                      <FormControl>
+                        <Textarea {...field} rows={3} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 
                 <div className="flex justify-end space-x-2">
                   <Button type="button" variant="outline" onClick={() => setShowDialog(false)}>
@@ -678,6 +830,6 @@ export default function Students() {
           )}
         </DialogContent>
       </Dialog>
-    </AdminPageLayout>
+    </div>
   );
 }

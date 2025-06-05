@@ -236,6 +236,7 @@ export default function SecretariatDashboard() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Pending Tasks */}
+          {canRead(RESOURCES.TASKS) && (
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -289,8 +290,10 @@ export default function SecretariatDashboard() {
                 )}
               </CardContent>
             </Card>
+          )}
           
           {/* Upcoming Appointments */}
+          {canRead(RESOURCES.APPOINTMENTS) && (
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">

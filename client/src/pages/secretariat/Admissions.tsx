@@ -12,17 +12,17 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useRBAC } from "@/hooks/useRBAC";
-// RBAC resources constants
+
+// RBAC Resources - duplicated to avoid import issues
 const RESOURCES = {
   STUDENTS: 'students',
-  TEACHERS: 'teachers',
+  TEACHERS: 'teachers', 
   GUARDIANS: 'guardians',
   CLASSES: 'classes',
   COURSES: 'courses',
   PROGRAMS: 'programs',
   ENROLLMENTS: 'enrollments',
   PAYMENTS: 'payments',
-  REPORTS: 'reports',
   COMMUNICATIONS: 'communications'
 } as const;
 import {

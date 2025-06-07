@@ -9,7 +9,7 @@ import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import NotFound from "@/pages/not-found";
 import MainLayout from "@/components/layout/main-layout";
 import Dashboard from "@/pages/Dashboard";
-import Students from "@/pages/Students";
+// Students import removed - using role-specific components
 import Courses from "@/pages/Courses";
 import Programs from "@/pages/Programs";
 import Calendar from "@/pages/Calendar";
@@ -36,6 +36,7 @@ import AcademicYearManagement from "@/pages/AcademicYearManagement";
 import Accounts from "@/pages/Accounts";
 import TeacherLayout from "@/components/TeacherLayout";
 import TeacherDashboard from "@/pages/teacher/TeacherDashboard";
+import TeacherStudents from "@/pages/teacher/TeacherStudents";
 import StudentLayout from "@/components/StudentLayout";
 import StudentDashboard from "@/pages/student/StudentDashboard";
 import GuardianLayout from "@/components/GuardianLayout";
@@ -108,7 +109,7 @@ function AuthenticatedRouter() {
       <GuardianLayout>
         <Switch>
           <Route path="/" component={() => <AuthenticatedRoute component={Dashboard} />} />
-          <Route path="/guardian/children" component={() => <AuthenticatedRoute component={Students} />} />
+          <Route path="/guardian/children" component={() => <AuthenticatedRoute component={SecretariatStudents} />} />
           <Route path="/guardian/attendance" component={() => <AuthenticatedRoute component={Attendance} />} />
           <Route path="/guardian/grades" component={() => <AuthenticatedRoute component={Cijfers} />} />
           <Route path="/guardian/reports" component={() => <AuthenticatedRoute component={Reports} />} />
@@ -129,7 +130,7 @@ function AuthenticatedRouter() {
       <StudentLayout>
         <Switch>
           <Route path="/" component={() => <AuthenticatedRoute component={StudentDashboard} />} />
-          <Route path="/student/class" component={() => <AuthenticatedRoute component={Students} />} />
+          <Route path="/student/class" component={() => <AuthenticatedRoute component={SecretariatStudents} />} />
           <Route path="/student/teachers" component={() => <AuthenticatedRoute component={Teachers} />} />
           <Route path="/student/subjects" component={() => <AuthenticatedRoute component={Courses} />} />
           <Route path="/student/attendance" component={() => <AuthenticatedRoute component={Attendance} />} />
@@ -150,7 +151,7 @@ function AuthenticatedRouter() {
       <TeacherLayout>
         <Switch>
           <Route path="/" component={() => <AuthenticatedRoute component={TeacherDashboard} />} />
-          <Route path="/teacher/classes" component={() => <AuthenticatedRoute component={Students} />} />
+          <Route path="/teacher/classes" component={() => <AuthenticatedRoute component={TeacherStudents} />} />
           <Route path="/teacher/schedule" component={() => <AuthenticatedRoute component={Calendar} />} />
           <Route path="/teacher/subjects" component={() => <AuthenticatedRoute component={Courses} />} />
           <Route path="/teacher/guardians" component={() => <AuthenticatedRoute component={Guardians} />} />

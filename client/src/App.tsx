@@ -174,7 +174,7 @@ function AuthenticatedRouter() {
       <Switch>
         <Route path="/" component={() => <AuthenticatedRoute component={Dashboard} />} />
         <Route path="/dashboard" component={() => <AuthenticatedRoute component={Dashboard} />} />
-        <Route path="/students" component={() => <AuthenticatedRoute component={Students} />} />
+        <Route path="/students" component={() => <AuthenticatedRoute component={SecretariatStudents} />} />
         <Route path="/guardians" component={() => <AuthenticatedRoute component={Guardians} />} />
         <Route path="/teachers" component={() => <AuthenticatedRoute component={Teachers} />} />
 

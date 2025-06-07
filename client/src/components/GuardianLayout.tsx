@@ -223,23 +223,21 @@ export default function GuardianLayout({ children }: GuardianLayoutProps) {
           {navigation.map((item) => {
             const Icon = item.icon;
             return (
-              <Link key={item.name} href={item.disabled ? "#" : item.href}>
-                <a className={`group flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 ${
-                  item.disabled 
-                    ? 'text-gray-400 cursor-not-allowed'
-                    : item.current
-                      ? 'bg-[#1e40af] text-white shadow-sm'
-                      : 'text-gray-700 hover:bg-[#f1f5f9] hover:text-[#1e40af]'
-                }`}>
-                  <Icon className={`mr-3 h-4 w-4 ${
-                    item.disabled
-                      ? 'text-gray-300'
-                      : item.current 
-                        ? 'text-white' 
-                        : 'text-gray-500 group-hover:text-[#1e40af]'
-                  }`} />
-                  <span className="truncate">{item.name}</span>
-                </a>
+              <Link key={item.name} href={item.disabled ? "#" : item.href} className={`group flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 ${
+                item.disabled 
+                  ? 'text-gray-400 cursor-not-allowed'
+                  : item.current
+                    ? 'bg-[#1e40af] text-white shadow-sm'
+                    : 'text-gray-700 hover:bg-[#f1f5f9] hover:text-[#1e40af]'
+              }`}>
+                <Icon className={`mr-3 h-4 w-4 ${
+                  item.disabled
+                    ? 'text-gray-300'
+                    : item.current 
+                      ? 'text-white' 
+                      : 'text-gray-500 group-hover:text-[#1e40af]'
+                }`} />
+                <span className="truncate">{item.name}</span>
               </Link>
             );
           })}

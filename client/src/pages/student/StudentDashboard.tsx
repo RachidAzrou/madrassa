@@ -12,17 +12,18 @@ import {
   Bell,
   ChevronRight,
   GraduationCap,
-  FileText
+  FileText,
+  MessageCircle
 } from "lucide-react";
 import { Link } from "wouter";
 
 interface StudentStats {
   myClass: string;
   totalSubjects: number;
-  attendanceRate: number;
   upcomingLessons: number;
-  pendingReports: number;
-  averageGrade: number;
+  attendanceRate: number;
+  recentGrades: number;
+  unreadMessages: number;
 }
 
 interface UpcomingLesson {
@@ -36,9 +37,16 @@ interface UpcomingLesson {
 interface RecentGrade {
   id: number;
   subject: string;
-  grade: number;
+  grade: string;
   description: string;
   date: string;
+}
+
+interface RecentActivity {
+  id: number;
+  type: 'grade' | 'attendance' | 'assignment' | 'message';
+  description: string;
+  timestamp: string;
 }
 
 export default function StudentDashboard() {
@@ -59,9 +67,14 @@ export default function StudentDashboard() {
     retry: false,
   });
 
+  const { data: recentActivity } = useQuery<{ activities: RecentActivity[] }>({
+    queryKey: ['/api/student/recent-activity'],
+    retry: false,
+  });
+
   if (statsLoading) {
     return (
-      <div className="p-6">
+      <div className="p-6 bg-[#f7f9fc] min-h-screen">
         <div className="animate-pulse">
           <div className="h-8 bg-gray-200 rounded w-1/4 mb-6"></div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -75,134 +88,159 @@ export default function StudentDashboard() {
   }
 
   const dashboardStats = stats?.stats || {
-    myClass: '',
+    myClass: 'Onbekend',
     totalSubjects: 0,
-    attendanceRate: 0,
     upcomingLessons: 0,
-    pendingReports: 0,
-    averageGrade: 0
+    attendanceRate: 0,
+    recentGrades: 0,
+    unreadMessages: 0
   };
 
   return (
-    <div className="p-6">
-      {/* Header */}
+    <div className="p-6 bg-[#f7f9fc] min-h-screen">
+      {/* Header - Admin Style */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">
-          Welkom terug, {user?.firstName}!
-        </h1>
-        <p className="text-gray-600 mt-2">
-          Hier is een overzicht van je lessen en voortgang
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-[#1e40af] mb-2">
+              Welkom terug, {user?.firstName}!
+            </h1>
+            <p className="text-gray-600">
+              Hier is een overzicht van je schoolactiviteiten
+            </p>
+          </div>
+          <div className="flex items-center space-x-3">
+            <Button className="bg-[#1e40af] hover:bg-[#1d3a8a] text-white">
+              <Calendar className="h-4 w-4 mr-2" />
+              Mijn Rooster
+            </Button>
+          </div>
+        </div>
       </div>
 
-      {/* Stats Grid */}
+      {/* Stats Grid - Admin Style */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Mijn Klas</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
+        <Card className="bg-white border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+            <CardTitle className="text-sm font-medium text-gray-700">Mijn Klas</CardTitle>
+            <div className="p-2 bg-[#eff6ff] rounded-lg">
+              <Users className="h-4 w-4 text-[#1e40af]" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{dashboardStats.myClass || 'Niet toegewezen'}</div>
-            <p className="text-xs text-muted-foreground">
-              Huidige klassengroep
+            <div className="text-2xl font-bold text-[#1e40af]">{dashboardStats.myClass}</div>
+            <p className="text-xs text-gray-600 mt-1">
+              Huidige klas
             </p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Mijn Vakken</CardTitle>
-            <BookOpen className="h-4 w-4 text-muted-foreground" />
+        <Card className="bg-white border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+            <CardTitle className="text-sm font-medium text-gray-700">Mijn Vakken</CardTitle>
+            <div className="p-2 bg-[#f0fdf4] rounded-lg">
+              <BookOpen className="h-4 w-4 text-[#16a34a]" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{dashboardStats.totalSubjects}</div>
-            <p className="text-xs text-muted-foreground">
-              Vakken dit schooljaar
+            <div className="text-2xl font-bold text-[#16a34a]">{dashboardStats.totalSubjects}</div>
+            <p className="text-xs text-gray-600 mt-1">
+              Actieve vakken
             </p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Aanwezigheid</CardTitle>
-            <UserCheck className="h-4 w-4 text-muted-foreground" />
+        <Card className="bg-white border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+            <CardTitle className="text-sm font-medium text-gray-700">Aanwezigheid</CardTitle>
+            <div className="p-2 bg-[#fef3c7] rounded-lg">
+              <UserCheck className="h-4 w-4 text-[#d97706]" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{dashboardStats.attendanceRate}%</div>
-            <p className="text-xs text-muted-foreground">
-              Aanwezigheidspercentage
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Komende Lessen</CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{dashboardStats.upcomingLessons}</div>
-            <p className="text-xs text-muted-foreground">
-              Vandaag en morgen
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Gemiddeld Cijfer</CardTitle>
-            <GraduationCap className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{dashboardStats.averageGrade.toFixed(1)}</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-2xl font-bold text-[#d97706]">{dashboardStats.attendanceRate}%</div>
+            <p className="text-xs text-gray-600 mt-1">
               Dit schooljaar
             </p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Rapporten</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
+        <Card className="bg-white border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+            <CardTitle className="text-sm font-medium text-gray-700">Komende Lessen</CardTitle>
+            <div className="p-2 bg-[#fdf2f8] rounded-lg">
+              <Calendar className="h-4 w-4 text-[#be185d]" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{dashboardStats.pendingReports}</div>
-            <p className="text-xs text-muted-foreground">
-              Nieuwe rapporten beschikbaar
+            <div className="text-2xl font-bold text-[#be185d]">{dashboardStats.upcomingLessons}</div>
+            <p className="text-xs text-gray-600 mt-1">
+              Vandaag en morgen
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+            <CardTitle className="text-sm font-medium text-gray-700">Nieuwe Cijfers</CardTitle>
+            <div className="p-2 bg-[#f3e8ff] rounded-lg">
+              <GraduationCap className="h-4 w-4 text-[#7c3aed]" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-[#7c3aed]">{dashboardStats.recentGrades}</div>
+            <p className="text-xs text-gray-600 mt-1">
+              Afgelopen week
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+            <CardTitle className="text-sm font-medium text-gray-700">Berichten</CardTitle>
+            <div className="p-2 bg-[#fef3c7] rounded-lg">
+              <Bell className="h-4 w-4 text-[#dc2626]" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-[#dc2626]">{dashboardStats.unreadMessages}</div>
+            <p className="text-xs text-gray-600 mt-1">
+              Ongelezen berichten
             </p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Content Grid */}
+      {/* Content Grid - Admin Style */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Upcoming Lessons */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="flex items-center">
-              <Clock className="h-5 w-5 mr-2 text-blue-600" />
+        {/* Upcoming Lessons - Admin Style */}
+        <Card className="bg-white border border-[#e5e7eb] shadow-sm">
+          <CardHeader className="flex flex-row items-center justify-between border-b border-[#e5e7eb] pb-4">
+            <CardTitle className="flex items-center text-[#1e40af] font-semibold">
+              <Clock className="h-5 w-5 mr-2 text-[#1e40af]" />
               Komende Lessen
             </CardTitle>
-            <Link href="/student/subjects">
-              <Button variant="ghost" size="sm">
-                Alles bekijken <ChevronRight className="h-4 w-4 ml-1" />
+            <Link href="/student/schedule">
+              <Button variant="ghost" size="sm" className="text-[#1e40af] hover:bg-[#eff6ff]">
+                Volledig rooster <ChevronRight className="h-4 w-4 ml-1" />
               </Button>
             </Link>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-4">
             {upcomingLessons?.lessons?.length ? (
               <div className="space-y-3">
                 {upcomingLessons.lessons.slice(0, 4).map((lesson) => (
-                  <div key={lesson.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <div>
-                      <p className="font-medium text-gray-900">{lesson.subject}</p>
-                      <p className="text-sm text-gray-500">{lesson.teacher} • {lesson.time} • {lesson.room}</p>
+                  <div key={lesson.id} className="p-3 bg-[#f8fafc] rounded-lg border border-[#e5e7eb]">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium text-gray-900">{lesson.subject}</p>
+                        <p className="text-sm text-gray-600">{lesson.teacher}</p>
+                        <p className="text-sm text-gray-500">{lesson.time} • {lesson.room}</p>
+                      </div>
+                      <Badge className="bg-[#eff6ff] text-[#1e40af] border-[#1e40af]">
+                        Vandaag
+                      </Badge>
                     </div>
-                    <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
-                      Vandaag
-                    </Badge>
                   </div>
                 ))}
               </div>
@@ -214,73 +252,114 @@ export default function StudentDashboard() {
           </CardContent>
         </Card>
 
-        {/* Recent Grades */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="flex items-center">
-              <GraduationCap className="h-5 w-5 mr-2 text-green-600" />
-              Laatste Cijfers
+        {/* Recent Grades - Admin Style */}
+        <Card className="bg-white border border-[#e5e7eb] shadow-sm">
+          <CardHeader className="flex flex-row items-center justify-between border-b border-[#e5e7eb] pb-4">
+            <CardTitle className="flex items-center text-[#1e40af] font-semibold">
+              <GraduationCap className="h-5 w-5 mr-2 text-[#1e40af]" />
+              Recente Cijfers
             </CardTitle>
             <Link href="/student/grades">
-              <Button variant="ghost" size="sm">
-                Alles bekijken <ChevronRight className="h-4 w-4 ml-1" />
+              <Button variant="ghost" size="sm" className="text-[#1e40af] hover:bg-[#eff6ff]">
+                Alle cijfers <ChevronRight className="h-4 w-4 ml-1" />
               </Button>
             </Link>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-4">
             {recentGrades?.grades?.length ? (
               <div className="space-y-3">
-                {recentGrades.grades.slice(0, 5).map((grade) => (
-                  <div key={grade.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <div className="flex-1">
-                      <p className="font-medium text-gray-900">{grade.subject}</p>
-                      <p className="text-sm text-gray-500">{grade.description}</p>
-                      <p className="text-xs text-gray-400">{grade.date}</p>
+                {recentGrades.grades.slice(0, 4).map((grade) => (
+                  <div key={grade.id} className="p-3 bg-[#f8fafc] rounded-lg border border-[#e5e7eb]">
+                    <div className="flex items-center justify-between mb-2">
+                      <div>
+                        <p className="font-medium text-gray-900">{grade.subject}</p>
+                        <p className="text-sm text-gray-600">{grade.description}</p>
+                      </div>
+                      <Badge className={`${
+                        parseFloat(grade.grade) >= 8 ? 'bg-[#f0fdf4] text-[#16a34a] border-[#16a34a]' :
+                        parseFloat(grade.grade) >= 6 ? 'bg-[#fef3c7] text-[#d97706] border-[#d97706]' :
+                        'bg-[#fef2f2] text-[#dc2626] border-[#dc2626]'
+                      }`}>
+                        {grade.grade}
+                      </Badge>
                     </div>
-                    <Badge variant={grade.grade >= 7 ? "default" : grade.grade >= 5.5 ? "secondary" : "destructive"}>
-                      {grade.grade.toFixed(1)}
-                    </Badge>
+                    <p className="text-xs text-gray-500">{grade.date}</p>
                   </div>
                 ))}
               </div>
             ) : (
               <p className="text-gray-500 text-center py-8">
-                Nog geen cijfers beschikbaar
+                Geen recente cijfers
               </p>
             )}
           </CardContent>
         </Card>
       </div>
 
-      {/* Quick Actions */}
+      {/* Recent Activity - Admin Style */}
+      <div className="mt-6">
+        <Card className="bg-white border border-[#e5e7eb] shadow-sm">
+          <CardHeader className="flex flex-row items-center justify-between border-b border-[#e5e7eb] pb-4">
+            <CardTitle className="flex items-center text-[#1e40af] font-semibold">
+              <Bell className="h-5 w-5 mr-2 text-[#1e40af]" />
+              Recente Activiteit
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-4">
+            {recentActivity?.activities?.length ? (
+              <div className="space-y-3">
+                {recentActivity.activities.slice(0, 5).map((activity) => (
+                  <div key={activity.id} className="flex items-start space-x-3 p-3 bg-[#f8fafc] rounded-lg border border-[#e5e7eb]">
+                    <div className={`w-2 h-2 rounded-full mt-2 ${
+                      activity.type === 'grade' ? 'bg-[#1e40af]' :
+                      activity.type === 'attendance' ? 'bg-[#16a34a]' :
+                      activity.type === 'assignment' ? 'bg-[#d97706]' : 'bg-[#7c3aed]'
+                    }`} />
+                    <div className="flex-1">
+                      <p className="text-sm text-gray-900">{activity.description}</p>
+                      <p className="text-xs text-gray-500">{activity.timestamp}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-500 text-center py-8">
+                Geen recente activiteit
+              </p>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Quick Actions - Admin Style */}
       <div className="mt-8">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Snelle Acties</h3>
+        <h3 className="text-lg font-semibold text-[#1e40af] mb-4">Snelle Acties</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <Link href="/student/attendance">
-            <Button variant="outline" className="h-16 flex flex-col items-center justify-center">
-              <UserCheck className="h-6 w-6 mb-1" />
-              <span className="text-sm">Aanwezigheid</span>
+            <Button variant="outline" className="h-16 flex flex-col items-center justify-center border-[#e5e7eb] hover:bg-[#eff6ff] hover:border-[#1e40af]">
+              <UserCheck className="h-6 w-6 mb-1 text-[#1e40af]" />
+              <span className="text-sm text-[#1e40af]">Aanwezigheid</span>
             </Button>
           </Link>
           
           <Link href="/student/grades">
-            <Button variant="outline" className="h-16 flex flex-col items-center justify-center">
-              <GraduationCap className="h-6 w-6 mb-1" />
-              <span className="text-sm">Cijfers</span>
+            <Button variant="outline" className="h-16 flex flex-col items-center justify-center border-[#e5e7eb] hover:bg-[#eff6ff] hover:border-[#1e40af]">
+              <GraduationCap className="h-6 w-6 mb-1 text-[#1e40af]" />
+              <span className="text-sm text-[#1e40af]">Cijfers</span>
             </Button>
           </Link>
           
-          <Link href="/student/reports">
-            <Button variant="outline" className="h-16 flex flex-col items-center justify-center">
-              <FileText className="h-6 w-6 mb-1" />
-              <span className="text-sm">Rapporten</span>
+          <Link href="/student/subjects">
+            <Button variant="outline" className="h-16 flex flex-col items-center justify-center border-[#e5e7eb] hover:bg-[#eff6ff] hover:border-[#1e40af]">
+              <BookOpen className="h-6 w-6 mb-1 text-[#1e40af]" />
+              <span className="text-sm text-[#1e40af]">Vakken</span>
             </Button>
           </Link>
           
-          <Link href="/student/class">
-            <Button variant="outline" className="h-16 flex flex-col items-center justify-center">
-              <Users className="h-6 w-6 mb-1" />
-              <span className="text-sm">Mijn Klas</span>
+          <Link href="/student/communications">
+            <Button variant="outline" className="h-16 flex flex-col items-center justify-center border-[#e5e7eb] hover:bg-[#eff6ff] hover:border-[#1e40af]">
+              <MessageCircle className="h-6 w-6 mb-1 text-[#1e40af]" />
+              <span className="text-sm text-[#1e40af]">Berichten</span>
             </Button>
           </Link>
         </div>

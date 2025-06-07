@@ -81,109 +81,131 @@ export default function TeacherDashboard() {
   };
 
   return (
-    <div className="p-6">
-      {/* Header */}
+    <div className="p-6 bg-[#f7f9fc] min-h-screen">
+      {/* Header - Admin Style */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">
-          Welkom terug, {user?.firstName}!
-        </h1>
-        <p className="text-gray-600 mt-2">
-          Hier is een overzicht van je klassen en activiteiten
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-[#1e40af] mb-2">
+              Welkom terug, {user?.firstName}!
+            </h1>
+            <p className="text-gray-600">
+              Hier is een overzicht van je klassen en activiteiten
+            </p>
+          </div>
+          <div className="flex items-center space-x-3">
+            <Button className="bg-[#1e40af] hover:bg-[#1d3a8a] text-white">
+              <Calendar className="h-4 w-4 mr-2" />
+              Nieuw Rooster
+            </Button>
+          </div>
+        </div>
       </div>
 
-      {/* Stats Grid */}
+      {/* Stats Grid - Admin Style */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Mijn Klassen</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
+        <Card className="bg-white border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+            <CardTitle className="text-sm font-medium text-gray-700">Mijn Klassen</CardTitle>
+            <div className="p-2 bg-[#eff6ff] rounded-lg">
+              <Users className="h-4 w-4 text-[#1e40af]" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{dashboardStats.myClasses}</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-2xl font-bold text-[#1e40af]">{dashboardStats.myClasses}</div>
+            <p className="text-xs text-gray-600 mt-1">
               Actieve klassen dit schooljaar
             </p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Mijn Studenten</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
+        <Card className="bg-white border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+            <CardTitle className="text-sm font-medium text-gray-700">Mijn Studenten</CardTitle>
+            <div className="p-2 bg-[#f0fdf4] rounded-lg">
+              <Users className="h-4 w-4 text-[#16a34a]" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{dashboardStats.totalStudents}</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-2xl font-bold text-[#16a34a]">{dashboardStats.totalStudents}</div>
+            <p className="text-xs text-gray-600 mt-1">
               Studenten in al mijn klassen
             </p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Mijn Vakken</CardTitle>
-            <BookOpen className="h-4 w-4 text-muted-foreground" />
+        <Card className="bg-white border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+            <CardTitle className="text-sm font-medium text-gray-700">Mijn Vakken</CardTitle>
+            <div className="p-2 bg-[#fef3c7] rounded-lg">
+              <BookOpen className="h-4 w-4 text-[#d97706]" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{dashboardStats.mySubjects}</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-2xl font-bold text-[#d97706]">{dashboardStats.mySubjects}</div>
+            <p className="text-xs text-gray-600 mt-1">
               Vakken die ik geef
             </p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Komende Lessen</CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
+        <Card className="bg-white border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+            <CardTitle className="text-sm font-medium text-gray-700">Komende Lessen</CardTitle>
+            <div className="p-2 bg-[#fdf2f8] rounded-lg">
+              <Calendar className="h-4 w-4 text-[#be185d]" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{dashboardStats.upcomingLessons}</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-2xl font-bold text-[#be185d]">{dashboardStats.upcomingLessons}</div>
+            <p className="text-xs text-gray-600 mt-1">
               Vandaag en morgen
             </p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Te Beoordelen</CardTitle>
-            <UserCheck className="h-4 w-4 text-muted-foreground" />
+        <Card className="bg-white border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+            <CardTitle className="text-sm font-medium text-gray-700">Te Beoordelen</CardTitle>
+            <div className="p-2 bg-[#f3e8ff] rounded-lg">
+              <UserCheck className="h-4 w-4 text-[#7c3aed]" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{dashboardStats.pendingGrades}</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-2xl font-bold text-[#7c3aed]">{dashboardStats.pendingGrades}</div>
+            <p className="text-xs text-gray-600 mt-1">
               Openstaande beoordelingen
             </p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Berichten</CardTitle>
-            <Bell className="h-4 w-4 text-muted-foreground" />
+        <Card className="bg-white border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+            <CardTitle className="text-sm font-medium text-gray-700">Berichten</CardTitle>
+            <div className="p-2 bg-[#fef3c7] rounded-lg">
+              <Bell className="h-4 w-4 text-[#dc2626]" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{dashboardStats.unreadMessages}</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-2xl font-bold text-[#dc2626]">{dashboardStats.unreadMessages}</div>
+            <p className="text-xs text-gray-600 mt-1">
               Ongelezen berichten
             </p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Content Grid */}
+      {/* Content Grid - Admin Style */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Upcoming Lessons */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="flex items-center">
-              <Clock className="h-5 w-5 mr-2 text-blue-600" />
+        {/* Upcoming Lessons - Admin Style */}
+        <Card className="bg-white border border-[#e5e7eb] shadow-sm">
+          <CardHeader className="flex flex-row items-center justify-between border-b border-[#e5e7eb] pb-4">
+            <CardTitle className="flex items-center text-[#1e40af] font-semibold">
+              <Clock className="h-5 w-5 mr-2 text-[#1e40af]" />
               Komende Lessen
             </CardTitle>
             <Link href="/teacher/schedule">
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" className="text-[#1e40af] hover:bg-[#eff6ff]">
                 Alles bekijken <ChevronRight className="h-4 w-4 ml-1" />
               </Button>
             </Link>

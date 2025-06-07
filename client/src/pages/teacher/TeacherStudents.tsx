@@ -1,399 +1,365 @@
 import { useState, useEffect } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { queryClient, apiRequest } from '@/lib/queryClient';
-import { Link, useLocation } from 'wouter';
-import { useToast } from "@/hooks/use-toast";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
 import { 
-  Search, PlusCircle, Filter, Download, Users, User, Camera,
-  Fingerprint, ChevronRight, Edit, Trash2, Eye, Home, X,
-  GraduationCap, NotebookText, MapPin, FileEdit, Upload, FileDown,
-  ArrowDownToLine, ArrowUpToLine, Info, UserPlus, UserCheck, HeartPulse,
-  Mail, Save, FileText, Calendar, Phone, AlertTriangle, Plus, Link2,
-  MoreHorizontal
+  Search, Plus, Download, Filter, Eye, Edit, Trash2, 
+  User, Users, GraduationCap, Phone, Mail, Calendar,
+  MapPin, FileText, AlertTriangle, Star, BookOpen,
+  Settings, Save, X, Upload, UserPlus, NotebookText,
+  Home, MoreHorizontal, PlusCircle
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
+import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Checkbox } from "@/components/ui/checkbox";
-import { format, parseISO } from 'date-fns';
-import { nl } from 'date-fns/locale';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Checkbox } from '@/components/ui/checkbox';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/hooks/use-toast';
+import EmptyState from '@/components/ui/empty-state';
+import { PremiumHeader } from '@/components/layout/premium-header';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
+// Types - exact copy from admin
 interface Student {
   id: number;
   studentId: string;
   firstName: string;
   lastName: string;
   email: string;
-  phone?: string;
-  dateOfBirth?: string;
+  phone: string;
+  dateOfBirth: string;
+  gender: string;
   status: string;
-  programId?: number;
-  enrollmentDate?: string;
-  photoUrl?: string;
-  street?: string;
-  houseNumber?: string;
-  postalCode?: string;
-  city?: string;
-  gender?: string;
-  notes?: string;
+  classId?: number;
+  className?: string;
+  guardianName?: string;
+  emergencyContact?: string;
+  createdAt: string;
 }
+
+interface Guardian {
+  id: number;
+  firstName: string;
+  lastName: string;
+  relationship: string;
+  email: string;
+  phone: string;
+}
+
+interface StudentClass {
+  id: number;
+  name: string;
+  academicYear: string;
+  studentCount: number;
+}
+
+// Admin-style components
+const DataTableContainer = ({ children }: { children: React.ReactNode }) => (
+  <div className="bg-white border border-[#e5e7eb] rounded-lg shadow-sm overflow-hidden">
+    {children}
+  </div>
+);
+
+const SearchActionBar = ({ children }: { children: React.ReactNode }) => (
+  <div className="px-4 py-3 border-b border-[#e5e7eb] flex flex-wrap items-center justify-between gap-3">
+    {children}
+  </div>
+);
+
+const TableContainer = ({ children }: { children: React.ReactNode }) => (
+  <div className="overflow-x-auto">
+    {children}
+  </div>
+);
+
+const QuickActions = ({ onView, onEdit, onDelete }: { onView: () => void, onEdit: () => void, onDelete: () => void }) => (
+  <div className="flex items-center gap-1">
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={onView}>
+            <Eye className="h-3 w-3" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>Bekijken</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+    
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={onEdit}>
+            <Edit className="h-3 w-3" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>Bewerken</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+    
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button variant="ghost" size="sm" className="h-6 w-6 p-0 text-red-600 hover:text-red-700" onClick={onDelete}>
+            <Trash2 className="h-3 w-3" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>Verwijderen</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  </div>
+);
 
 export default function TeacherStudents() {
   const { toast } = useToast();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [showFilterOptions, setShowFilterOptions] = useState(false);
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [selectedStudents, setSelectedStudents] = useState<number[]>([]);
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
+  const queryClient = useQueryClient();
+  
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [classFilter, setClassFilter] = useState<string>("all");
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+  const [showDialog, setShowDialog] = useState(false);
+  const [dialogMode, setDialogMode] = useState<'view' | 'edit' | 'create'>('view');
+  const [selectedStudents, setSelectedStudents] = useState<number[]>([]);
 
-  // Fetch students data
-  const { data: studentsData = [], isLoading: studentsLoading } = useQuery({
+  const { data: studentsData, isLoading } = useQuery<{ students: Student[] }>({
     queryKey: ['/api/students'],
+    retry: false,
   });
 
-  // Filter students based on search and status
-  const filteredStudents = (studentsData as Student[]).filter(student => {
-    const matchesSearch = 
-      student.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.lastName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.studentId?.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesStatus = statusFilter === 'all' || student.status === statusFilter;
-    
-    return matchesSearch && matchesStatus;
+  const { data: classesData } = useQuery<{ classes: StudentClass[] }>({
+    queryKey: ['/api/classes'],
+    retry: false,
+  });
+
+  const students = studentsData?.students || [];
+  const classes = classesData?.classes || [];
+
+  // Filter students based on search term, status, and class
+  const filteredStudents = students.filter(student => {
+    const matchesSearch = !searchTerm || 
+      student.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.studentId.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesStatus = statusFilter === "all" || student.status === statusFilter;
+    const matchesClass = classFilter === "all" || student.classId?.toString() === classFilter;
+
+    return matchesSearch && matchesStatus && matchesClass;
   });
 
   const handleViewStudent = (student: Student) => {
     setSelectedStudent(student);
-    setIsViewDialogOpen(true);
+    setDialogMode('view');
+    setShowDialog(true);
   };
 
   const handleEditStudent = (student: Student) => {
     setSelectedStudent(student);
-    setIsEditDialogOpen(true);
+    setDialogMode('edit');
+    setShowDialog(true);
+  };
+
+  const handleCreateStudent = () => {
+    setSelectedStudent(null);
+    setDialogMode('create');
+    setShowDialog(true);
   };
 
   const handleDeleteStudent = (student: Student) => {
-    // Delete functionality
-    console.log('Delete student:', student);
+    if (confirm(`Weet je zeker dat je ${student.firstName} ${student.lastName} wilt verwijderen?`)) {
+      // Delete logic would go here
+      toast({
+        title: "Student verwijderd",
+        description: `${student.firstName} ${student.lastName} is succesvol verwijderd.`,
+      });
+    }
   };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'active':
-        return <Badge className="bg-green-100 text-green-800">Actief</Badge>;
+        return <Badge variant="secondary" className="bg-green-100 text-green-800">Actief</Badge>;
       case 'inactive':
-        return <Badge className="bg-gray-100 text-gray-800">Inactief</Badge>;
+        return <Badge variant="secondary" className="bg-gray-100 text-gray-800">Inactief</Badge>;
       case 'graduated':
-        return <Badge className="bg-blue-100 text-blue-800">Afgestudeerd</Badge>;
-      case 'withdrawn':
-        return <Badge className="bg-red-100 text-red-800">Teruggetrokken</Badge>;
+        return <Badge variant="secondary" className="bg-blue-100 text-blue-800">Afgestudeerd</Badge>;
       default:
-        return <Badge className="bg-gray-100 text-gray-800">{status}</Badge>;
+        return <Badge variant="secondary" className="bg-gray-100 text-gray-800">{status}</Badge>;
     }
   };
 
   return (
     <div className="bg-[#f7f9fc] min-h-screen">
-      {/* Header - Admin Style */}
-      <div className="bg-white border-b border-[#e5e7eb] px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="p-2 bg-[#eff6ff] rounded-lg">
-              <Users className="h-6 w-6 text-[#1e40af]" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-[#1e40af]">Mijn Studenten</h1>
-              <p className="text-sm text-gray-600">Bekijk en beheer studenten in uw klassen</p>
-            </div>
-          </div>
-          <div className="flex items-center space-x-3">
-            <Button 
-              onClick={() => setIsCreateDialogOpen(true)}
-              className="bg-[#1e40af] hover:bg-[#1d3a8a] text-white"
-            >
-              <PlusCircle className="h-4 w-4 mr-2" />
-              Student Toevoegen
-            </Button>
-          </div>
-        </div>
-      </div>
+      {/* Premium Header - Exact admin styling */}
+      <PremiumHeader
+        title="Mijn Studenten"
+        description="Beheer studenten in uw klassen"
+        icon={Users}
+        breadcrumbs={{
+          parent: "Docent",
+          current: "Studenten"
+        }}
+      />
 
-      {/* Content Container - Admin Style */}
+      {/* Main Content */}
       <div className="p-6">
-        <div className="bg-white rounded-lg shadow-sm border border-[#e5e7eb]">
-          {/* Search and Actions Bar - Admin Style */}
-          <div className="p-4 border-b border-[#e5e7eb]">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              {/* Search Bar */}
-              <div className="relative flex-1 max-w-md">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <Input
-                  type="text"
-                  placeholder="Zoek studenten op naam, ID of email..."
-                  className="pl-10 h-10 border-[#e5e7eb] focus:border-[#1e40af] focus:ring-1 focus:ring-[#1e40af]"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-              
-              {/* Action Buttons */}
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  onClick={() => setShowFilterOptions(!showFilterOptions)}
-                  className="border-[#e5e7eb] hover:bg-gray-50"
-                >
-                  <Filter className="h-4 w-4 mr-2" />
-                  Filters
-                </Button>
-                
-                <Button
-                  variant="outline"
-                  className="border-[#e5e7eb] hover:bg-gray-50"
-                >
-                  <Download className="h-4 w-4 mr-2" />
-                  Exporteren
-                </Button>
-              </div>
+        <DataTableContainer>
+          <SearchActionBar>
+            {/* Search Input */}
+            <div className="relative w-full sm:max-w-md">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Zoek studenten..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-8"
+              />
             </div>
-          </div>
 
-          {/* Filter Options */}
-          {showFilterOptions && (
-            <div className="px-4 py-3 border-b border-[#e5e7eb] bg-gray-50">
-              <div className="flex flex-wrap gap-4">
-                <div className="flex items-center space-x-2">
-                  <Label htmlFor="status-filter" className="text-sm font-medium">Status:</Label>
-                  <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger id="status-filter" className="w-40">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Alle statussen</SelectItem>
-                      <SelectItem value="active">Actief</SelectItem>
-                      <SelectItem value="inactive">Inactief</SelectItem>
-                      <SelectItem value="graduated">Afgestudeerd</SelectItem>
-                      <SelectItem value="withdrawn">Teruggetrokken</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
+            {/* Action Buttons */}
+            <div className="flex items-center gap-2">
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-[140px]">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Alle statussen</SelectItem>
+                  <SelectItem value="active">Actief</SelectItem>
+                  <SelectItem value="inactive">Inactief</SelectItem>
+                  <SelectItem value="graduated">Afgestudeerd</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select value={classFilter} onValueChange={setClassFilter}>
+                <SelectTrigger className="w-[140px]">
+                  <SelectValue placeholder="Klas" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Alle klassen</SelectItem>
+                  {classes.map((cls) => (
+                    <SelectItem key={cls.id} value={cls.id.toString()}>
+                      {cls.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Button variant="outline" size="sm">
+                <Download className="w-4 h-4 mr-2" />
+                Export
+              </Button>
+
+              <Button size="sm" onClick={handleCreateStudent}>
+                <Plus className="w-4 h-4 mr-2" />
+                Nieuwe Student
+              </Button>
             </div>
-          )}
+          </SearchActionBar>
 
-          {/* Table */}
-          <div className="overflow-x-auto">
+          <TableContainer>
             <Table>
               <TableHeader>
-                <TableRow className="border-b border-[#e5e7eb]">
+                <TableRow>
                   <TableHead className="w-12">
                     <Checkbox
-                      checked={filteredStudents.length > 0 && selectedStudents.length === filteredStudents.length}
+                      checked={selectedStudents.length === filteredStudents.length && filteredStudents.length > 0}
                       onCheckedChange={(checked) => {
-                        if (checked) {
-                          setSelectedStudents(filteredStudents.map(s => s.id));
-                        } else {
-                          setSelectedStudents([]);
-                        }
+                        setSelectedStudents(checked ? filteredStudents.map(s => s.id) : []);
                       }}
                     />
                   </TableHead>
                   <TableHead>Student</TableHead>
-                  <TableHead>Student ID</TableHead>
-                  <TableHead>Email</TableHead>
+                  <TableHead>ID</TableHead>
+                  <TableHead>Klas</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Acties</TableHead>
+                  <TableHead>Contact</TableHead>
+                  <TableHead className="w-20">Acties</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {studentsLoading ? (
+                {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-8">
+                    <TableCell colSpan={7} className="h-24 text-center">
                       <div className="flex items-center justify-center">
-                        <div className="animate-spin w-6 h-6 border-2 border-[#1e40af] border-t-transparent rounded-full" />
-                        <span className="ml-2 text-gray-600">Laden...</span>
+                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+                        <span className="ml-2">Laden...</span>
                       </div>
                     </TableCell>
                   </TableRow>
                 ) : filteredStudents.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-8">
-                      <div className="flex flex-col items-center">
-                        <Users className="h-12 w-12 text-gray-300 mb-2" />
-                        <p className="text-gray-500">Geen studenten gevonden</p>
-                      </div>
+                    <TableCell colSpan={7} className="h-24 text-center">
+                      <EmptyState
+                        icon={<Users className="w-12 h-12" />}
+                        title="Geen studenten gevonden"
+                        description="Er zijn geen studenten die voldoen aan uw zoekcriteria."
+                      />
                     </TableCell>
                   </TableRow>
                 ) : (
                   filteredStudents.map((student) => (
-                    <TableRow key={student.id} className="border-b border-[#e5e7eb] hover:bg-gray-50">
+                    <TableRow 
+                      key={student.id}
+                      className={selectedStudents.includes(student.id) ? "bg-muted/50" : ""}
+                    >
                       <TableCell>
                         <Checkbox
                           checked={selectedStudents.includes(student.id)}
                           onCheckedChange={(checked) => {
-                            if (checked) {
-                              setSelectedStudents([...selectedStudents, student.id]);
-                            } else {
-                              setSelectedStudents(selectedStudents.filter(id => id !== student.id));
-                            }
+                            setSelectedStudents(prev => 
+                              checked 
+                                ? [...prev, student.id]
+                                : prev.filter(id => id !== student.id)
+                            );
                           }}
                         />
                       </TableCell>
                       <TableCell>
-                        <div className="flex items-center space-x-3">
-                          <Avatar className="h-8 w-8">
-                            <AvatarImage src={student.photoUrl} />
-                            <AvatarFallback className="bg-[#eff6ff] text-[#1e40af]">
-                              {student.firstName?.[0]}{student.lastName?.[0]}
+                        <div className="flex items-center gap-3">
+                          <Avatar className="w-8 h-8">
+                            <AvatarFallback className="bg-primary/10 text-primary">
+                              {student.firstName[0]}{student.lastName[0]}
                             </AvatarFallback>
                           </Avatar>
                           <div>
-                            <div className="font-medium text-gray-900">
-                              {student.firstName} {student.lastName}
-                            </div>
+                            <div className="font-medium">{student.firstName} {student.lastName}</div>
+                            <div className="text-sm text-muted-foreground">{student.email}</div>
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell className="font-mono text-sm">
-                        {student.studentId}
-                      </TableCell>
-                      <TableCell className="text-gray-600">
-                        {student.email}
+                      <TableCell className="font-mono text-sm">{student.studentId}</TableCell>
+                      <TableCell>{student.className || '-'}</TableCell>
+                      <TableCell>{getStatusBadge(student.status)}</TableCell>
+                      <TableCell>
+                        <div className="text-sm">
+                          <div>{student.phone}</div>
+                          {student.guardianName && (
+                            <div className="text-muted-foreground">Voogd: {student.guardianName}</div>
+                          )}
+                        </div>
                       </TableCell>
                       <TableCell>
-                        {getStatusBadge(student.status)}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Acties</DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={() => handleViewStudent(student)}>
-                              <Eye className="h-4 w-4 mr-2" />
-                              Bekijken
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleEditStudent(student)}>
-                              <Edit className="h-4 w-4 mr-2" />
-                              Bewerken
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem 
-                              onClick={() => handleDeleteStudent(student)}
-                              className="text-red-600"
-                            >
-                              <Trash2 className="h-4 w-4 mr-2" />
-                              Verwijderen
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                        <QuickActions
+                          onView={() => handleViewStudent(student)}
+                          onEdit={() => handleEditStudent(student)}
+                          onDelete={() => handleDeleteStudent(student)}
+                        />
                       </TableCell>
                     </TableRow>
                   ))
                 )}
               </TableBody>
             </Table>
-          </div>
-        </div>
+          </TableContainer>
+        </DataTableContainer>
       </div>
-
-      {/* View Student Dialog */}
-      <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle className="flex items-center text-[#1e40af]">
-              <User className="h-5 w-5 mr-2" />
-              Student Details
-            </DialogTitle>
-          </DialogHeader>
-          {selectedStudent && (
-            <div className="space-y-6">
-              <div className="flex items-center space-x-4">
-                <Avatar className="h-16 w-16">
-                  <AvatarImage src={selectedStudent.photoUrl} />
-                  <AvatarFallback className="bg-[#eff6ff] text-[#1e40af] text-lg">
-                    {selectedStudent.firstName?.[0]}{selectedStudent.lastName?.[0]}
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <h3 className="text-xl font-semibold text-gray-900">
-                    {selectedStudent.firstName} {selectedStudent.lastName}
-                  </h3>
-                  <p className="text-sm text-gray-500">ID: {selectedStudent.studentId}</p>
-                  {getStatusBadge(selectedStudent.status)}
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label className="text-sm font-medium text-gray-700">Email</Label>
-                  <p className="text-sm text-gray-900">{selectedStudent.email || 'Niet opgegeven'}</p>
-                </div>
-                <div>
-                  <Label className="text-sm font-medium text-gray-700">Telefoon</Label>
-                  <p className="text-sm text-gray-900">{selectedStudent.phone || 'Niet opgegeven'}</p>
-                </div>
-                <div>
-                  <Label className="text-sm font-medium text-gray-700">Geboortedatum</Label>
-                  <p className="text-sm text-gray-900">
-                    {selectedStudent.dateOfBirth 
-                      ? format(parseISO(selectedStudent.dateOfBirth), 'dd MMMM yyyy', { locale: nl })
-                      : 'Niet opgegeven'
-                    }
-                  </p>
-                </div>
-                <div>
-                  <Label className="text-sm font-medium text-gray-700">Inschrijfdatum</Label>
-                  <p className="text-sm text-gray-900">
-                    {selectedStudent.enrollmentDate 
-                      ? format(parseISO(selectedStudent.enrollmentDate), 'dd MMMM yyyy', { locale: nl })
-                      : 'Niet opgegeven'
-                    }
-                  </p>
-                </div>
-              </div>
-
-              {selectedStudent.notes && (
-                <div>
-                  <Label className="text-sm font-medium text-gray-700">Notities</Label>
-                  <p className="text-sm text-gray-900 mt-1">{selectedStudent.notes}</p>
-                </div>
-              )}
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

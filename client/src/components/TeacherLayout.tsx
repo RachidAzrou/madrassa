@@ -36,12 +36,12 @@ export default function TeacherLayout({ children }: TeacherLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Data fetching for notifications (admin interface copy)
-  const { data: notifications = [] } = useQuery({
+  const { data: notifications = [] } = useQuery<any[]>({
     queryKey: ['/api/notifications/user/1'],
     staleTime: 30000,
   });
 
-  const { data: profile } = useQuery({
+  const { data: profile } = useQuery<any>({
     queryKey: ['/api/profile'],
     staleTime: 60000,
   });

@@ -511,7 +511,7 @@ export default function Payments() {
                 <TableRow>
                   <TableCell colSpan={8} className="text-center py-8">
                     <EmptyState
-                      icon={Euro}
+                      icon={<Euro className="h-10 w-10 opacity-30" />}
                       title="Geen betalingen gevonden"
                       description="Er zijn geen betalingen die voldoen aan de huidige criteria."
                     />

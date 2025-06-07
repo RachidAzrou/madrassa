@@ -864,76 +864,83 @@ export default function Students() {
 
   return (
     <div className="bg-[#f7f9fc] min-h-screen">
-      <PremiumHeader 
-        title="Studenten" 
-        description="Bekijk en beheer alle studentgegevens, inclusief persoonlijke informatie en inschrijvingsdetails"
-        icon={Users}
-        breadcrumbs={{
-          parent: "Beheer",
-          current: "Studenten"
-        }}
-      />
-      
-      <DataTableContainer>
-        <SearchActionBar>
-          {/* Zoekbalk */}
-          <div className="relative w-full sm:max-w-md">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-            <Input
-              type="text"
-              placeholder="Zoek op naam, ID of email..."
-              className="w-full pl-9 h-8 text-xs rounded-sm bg-white border-[#e5e7eb]"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+      {/* Header - Admin Style */}
+      <div className="bg-white border-b border-[#e5e7eb] px-6 py-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <div className="p-2 bg-[#eff6ff] rounded-lg">
+              <Users className="h-6 w-6 text-[#1e40af]" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-[#1e40af]">Studenten</h1>
+              <p className="text-sm text-gray-600">Bekijk en beheer alle studentgegevens</p>
+            </div>
           </div>
-          
-          {/* Acties */}
-          <div className="flex flex-wrap items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowFilterOptions(!showFilterOptions)}
-              className="h-7 w-7 p-0 rounded-sm border-[#e5e7eb]"
-              title="Filters"
-            >
-              <Filter className="h-3.5 w-3.5" />
-            </Button>
-            
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsImportDialogOpen(true)}
-              className="h-7 w-7 p-0 rounded-sm border-[#e5e7eb]"
-              title="Importeer studenten"
-            >
-              <Download className="h-3.5 w-3.5" />
-            </Button>
-            
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsExportDialogOpen(true)}
-              className="h-7 w-7 p-0 rounded-sm border-[#e5e7eb]"
-              title="Exporteer studenten"
-            >
-              <Upload className="h-3.5 w-3.5" />
-            </Button>
-
-            <Button
-              size="sm"
+          <div className="flex items-center space-x-3">
+            <Button 
               onClick={() => setIsCreateDialogOpen(true)}
-              className="h-7 text-xs rounded-sm bg-[#1e40af] hover:bg-[#1e3a8a] text-white ml-auto"
+              className="bg-[#1e40af] hover:bg-[#1d3a8a] text-white"
             >
-              <PlusCircle className="h-3.5 w-3.5 mr-1" />
+              <PlusCircle className="h-4 w-4 mr-2" />
               Nieuwe Student
             </Button>
           </div>
-        </SearchActionBar>
+        </div>
+      </div>
+      
+      {/* Content Container - Admin Style */}
+      <div className="p-6">
+        <div className="bg-white rounded-lg shadow-sm border border-[#e5e7eb]">
+          {/* Search and Actions Bar - Admin Style */}
+          <div className="p-4 border-b border-[#e5e7eb]">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              {/* Search Bar */}
+              <div className="relative flex-1 max-w-md">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input
+                  type="text"
+                  placeholder="Zoek studenten op naam, ID of email..."
+                  className="pl-10 h-10 border-[#e5e7eb] focus:border-[#1e40af] focus:ring-1 focus:ring-[#1e40af]"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+              
+              {/* Action Buttons */}
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowFilterOptions(!showFilterOptions)}
+                  className="border-[#e5e7eb] hover:bg-gray-50"
+                >
+                  <Filter className="h-4 w-4 mr-2" />
+                  Filters
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  onClick={() => setIsImportDialogOpen(true)}
+                  className="border-[#e5e7eb] hover:bg-gray-50"
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Importeren
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  onClick={() => setIsExportDialogOpen(true)}
+                  className="border-[#e5e7eb] hover:bg-gray-50"
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  Exporteren
+                </Button>
+              </div>
+            </div>
+          </div>
 
-        {/* Filter opties */}
-        {showFilterOptions && (
-          <div className="px-4 py-3 border-t border-[#e5e7eb] flex flex-wrap gap-3 items-center">
+          {/* Filter opties */}
+          {showFilterOptions && (
+            <div className="px-4 py-3 border-t border-[#e5e7eb] flex flex-wrap gap-3 items-center">
             <div className="flex items-center">
               {(statusFilter !== 'all' || filterProgram !== 'all' || filterAcademicYear !== 'all' || filterStudentGroup !== 'all') && (
                 <Button
@@ -1005,8 +1012,7 @@ export default function Students() {
           </div>
         )}
 
-        {/* Student Table */}
-        <TableContainer>
+          {/* Student Table */}
           <Table>
             <DataTableHeader>
               <TableRow>
@@ -1140,8 +1146,8 @@ export default function Students() {
               )}
             </TableBody>
           </Table>
-        </TableContainer>
-      </DataTableContainer>
+        </div>
+      </div>
 
       {/* Create Student Dialog */}
       <Dialog 

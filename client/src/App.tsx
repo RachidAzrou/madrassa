@@ -107,12 +107,12 @@ function AuthenticatedRouter() {
     return (
       <GuardianLayout>
         <Switch>
-          <Route path="/" component={() => <AuthenticatedRoute component={GuardianDashboard} />} />
+          <Route path="/" component={() => <AuthenticatedRoute component={Dashboard} />} />
           <Route path="/guardian/children" component={() => <AuthenticatedRoute component={Students} />} />
           <Route path="/guardian/attendance" component={() => <AuthenticatedRoute component={Attendance} />} />
           <Route path="/guardian/grades" component={() => <AuthenticatedRoute component={Cijfers} />} />
           <Route path="/guardian/reports" component={() => <AuthenticatedRoute component={Reports} />} />
-          <Route path="/guardian/student-file" component={() => <AuthenticatedRoute component={StudentDossier} />} />
+          <Route path="/guardian/communications" component={() => <AuthenticatedRoute component={Messages} />} />
           <Route path="/guardian/payments" component={() => <AuthenticatedRoute component={Fees} />} />
           <Route path="/notifications" component={() => <AuthenticatedRoute component={Notifications} />} />
           <Route path="/messages" component={() => <AuthenticatedRoute component={Messages} />} />

@@ -246,7 +246,7 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
 
       {/* Main content - Admin Style */}
       <div className="pt-12 lg:pl-64">
-        <main className="overflow-auto">
+        <main className="bg-[#f7f9fc] min-h-screen p-6">
           {children}
         </main>
       </div>

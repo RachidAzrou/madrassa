@@ -112,7 +112,7 @@ export default function TeacherLayout({ children }: TeacherLayoutProps) {
   };
 
   return (
-    <div className="min-h-screen bg-[#f7f9fc]">
+    <div className="min-h-screen bg-[#f7f9fc] lg:flex">
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
         <div 
@@ -124,7 +124,7 @@ export default function TeacherLayout({ children }: TeacherLayoutProps) {
       {/* Sidebar - Admin Interface Copy */}
       <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      } transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 border-r border-[#e5e7eb]`}>
+      } transition-transform duration-300 ease-in-out lg:translate-x-0 lg:relative lg:flex lg:flex-col border-r border-[#e5e7eb]`}>
         
         {/* Logo - Admin Style */}
         <div className="flex items-center justify-between h-16 px-6 border-b border-[#e5e7eb] bg-white">
@@ -288,7 +288,7 @@ export default function TeacherLayout({ children }: TeacherLayoutProps) {
       </div>
 
       {/* Main content - Admin Style */}
-      <div className="lg:pl-64">
+      <div className="flex-1 lg:flex lg:flex-col">
         {/* Top bar - Admin Style */}
         <div className="bg-white shadow-sm border-b border-[#e5e7eb] sticky top-0 z-40">
           <div className="flex items-center justify-between h-16 px-4 lg:px-6">
@@ -353,7 +353,7 @@ export default function TeacherLayout({ children }: TeacherLayoutProps) {
         </div>
 
         {/* Main content area */}
-        <main>
+        <main className="flex-1 overflow-auto">
           {children}
         </main>
       </div>

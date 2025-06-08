@@ -203,21 +203,21 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
         />
       )}
 
-      {/* Top bar - Complete Admin Copy */}
-      <div className="w-full h-12 border-b border-gray-200 bg-white px-4 flex items-center justify-between fixed top-0 left-0 right-0 z-50">
+      {/* Top bar - Mobile Optimized */}
+      <div className="w-full h-12 border-b border-gray-200 bg-white px-2 sm:px-4 flex items-center justify-between fixed top-0 left-0 right-0 z-50">
         {/* Menu voor mobiel (links) */}
         <Button 
           variant="ghost" 
           size="icon" 
-          className="mr-2 lg:hidden"
+          className="mr-1 sm:mr-2 lg:hidden h-10 w-10 touch-manipulation"
           onClick={() => setSidebarOpen(true)}
         >
-          <Menu className="h-6 w-6 text-gray-600" />
+          <Menu className="h-5 w-5 sm:h-6 sm:w-6 text-gray-600" />
         </Button>
         
         {/* Logo sectie - links */}
         <Link href="/student" className="flex items-center h-full">
-          <img src={myMadrassaLogo} alt="myMadrassa Logo" className="h-10 sm:h-11" />
+          <img src={myMadrassaLogo} alt="myMadrassa Logo" className="h-8 sm:h-10 lg:h-11" />
         </Link>
 
         {/* Zoekbalk - midden */}
@@ -253,24 +253,24 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
         </div>
 
         {/* Acties - rechts */}
-        <div className="flex items-center space-x-1">
+        <div className="flex items-center space-x-0.5 sm:space-x-1">
           {/* Zoekknop voor mobiel */}
           <Popover open={showSearch} onOpenChange={setShowSearch}>
             <PopoverTrigger asChild>
               <Button 
                 variant="ghost" 
                 size="icon" 
-                className="md:hidden"
+                className="md:hidden h-10 w-10 touch-manipulation"
               >
                 <Search className="h-5 w-5 text-gray-600" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent align="end" className="w-80 p-0">
+            <PopoverContent align="end" className="w-[95vw] max-w-sm p-0 mx-2">
               <div className="p-4">
                 <div className="relative">
                   <input
                     type="text"
-                    placeholder="Zoeken in berichten, cijfers, vakken..."
+                    placeholder="Zoeken..."
                     value={mobileSearchTerm}
                     onChange={(e) => setMobileSearchTerm(e.target.value)}
                     onKeyDown={(e) => {
@@ -279,13 +279,13 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
                         setShowSearch(false);
                       }
                     }}
-                    className="w-full pl-9 pr-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#1e40af] focus:border-transparent"
+                    className="w-full pl-9 pr-4 py-3 text-base rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#1e40af] focus:border-transparent"
                     autoFocus
                   />
                   <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 </div>
                 <Button 
-                  className="w-full mt-3 bg-[#1e40af] hover:bg-[#1e40af]/90 text-white"
+                  className="w-full mt-3 bg-[#1e40af] hover:bg-[#1e40af]/90 text-white py-3 text-base touch-manipulation"
                   onClick={() => {
                     handleMobileSearch();
                     setShowSearch(false);
@@ -300,11 +300,11 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
           {/* Berichten knop */}
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="ghost" size="icon" className="relative">
+              <Button variant="ghost" size="icon" className="relative h-10 w-10 touch-manipulation">
                 <Mail className="h-5 w-5 text-gray-600" />
                 {unreadMessages.length > 0 && (
                   <Badge 
-                    className="absolute -top-1 -right-1 w-4 h-4 p-0 flex items-center justify-center bg-[#1e40af]"
+                    className="absolute -top-1 -right-1 w-4 h-4 p-0 flex items-center justify-center bg-[#1e40af] text-xs"
                     variant="default"
                   >
                     {unreadMessages.length}
@@ -312,51 +312,51 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
                 )}
               </Button>
             </PopoverTrigger>
-            <PopoverContent align="end" className="w-80 p-0">
+            <PopoverContent align="end" className="w-[95vw] max-w-sm p-0 mx-2">
               <div className="p-4 border-b border-gray-200">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-medium text-sm">Berichten</h3>
+                  <h3 className="font-medium text-base">Berichten</h3>
                   <button 
-                    className="text-xs text-[#1e40af] hover:underline"
+                    className="text-sm text-[#1e40af] hover:underline touch-manipulation"
                     onClick={() => window.location.href = "/student/communications"}
                   >
                     Alle berichten
                   </button>
                 </div>
               </div>
-              <div className="max-h-72 overflow-y-auto">
+              <div className="max-h-80 overflow-y-auto">
                 {unreadMessages.length === 0 ? (
-                  <div className="py-6 text-center">
-                    <p className="text-sm text-gray-500">Geen nieuwe berichten</p>
+                  <div className="py-8 text-center">
+                    <p className="text-base text-gray-500">Geen nieuwe berichten</p>
                   </div>
                 ) : (
                   unreadMessages.map((message) => (
                     <div 
                       key={message.id}
-                      className="py-2 px-4 hover:bg-gray-50 cursor-pointer border-b border-gray-100"
+                      className="py-4 px-4 hover:bg-gray-50 active:bg-gray-100 cursor-pointer border-b border-gray-100 touch-manipulation"
                       onClick={() => handleMessageClick(message.id)}
                     >
                       <div className="flex items-start gap-3">
-                        <Avatar className="h-8 w-8 mt-1">
+                        <Avatar className="h-10 w-10 mt-1">
                           <AvatarFallback className={`${message.bgColor} ${message.textColor}`}>
                             {message.initials}
                           </AvatarFallback>
                         </Avatar>
-                        <div>
+                        <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between">
-                            <p className="font-medium text-sm">{message.sender}</p>
-                            <span className="text-xs text-gray-500">{message.time}</span>
+                            <p className="font-medium text-sm truncate">{message.sender}</p>
+                            <span className="text-xs text-gray-500 ml-2">{message.time}</span>
                           </div>
-                          <p className="text-xs text-gray-600 line-clamp-2">{message.preview}</p>
+                          <p className="text-sm text-gray-600 line-clamp-2 mt-1">{message.preview}</p>
                         </div>
                       </div>
                     </div>
                   ))
                 )}
               </div>
-              <div className="p-3 border-t border-gray-200 bg-gray-50">
+              <div className="p-4 border-t border-gray-200 bg-gray-50">
                 <Button 
-                  className="w-full bg-[#1e40af] hover:bg-[#1e40af]/90 text-white text-xs h-8"
+                  className="w-full bg-[#1e40af] hover:bg-[#1e40af]/90 text-white text-base h-10 touch-manipulation"
                   onClick={() => window.location.href = "/student/communications"}
                 >
                   <Mail className="h-4 w-4 mr-2" /> Naar Berichten
@@ -368,11 +368,11 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
           {/* Notificaties */}
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="ghost" size="icon" className="relative">
+              <Button variant="ghost" size="icon" className="relative h-10 w-10 touch-manipulation">
                 <Bell className="h-5 w-5 text-gray-600" />
                 {unreadCount > 0 && (
                   <Badge 
-                    className="absolute -top-1 -right-1 w-4 h-4 p-0 flex items-center justify-center bg-[#1e40af]"
+                    className="absolute -top-1 -right-1 w-4 h-4 p-0 flex items-center justify-center bg-[#1e40af] text-xs"
                     variant="default"
                   >
                     {unreadCount}
@@ -380,57 +380,57 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
                 )}
               </Button>
             </PopoverTrigger>
-            <PopoverContent align="end" className="w-80 p-0">
+            <PopoverContent align="end" className="w-[95vw] max-w-sm p-0 mx-2">
               <div className="p-4 border-b border-gray-200">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-medium text-sm">Notificaties</h3>
+                  <h3 className="font-medium text-base">Notificaties</h3>
                   <button 
-                    className="text-xs text-[#1e40af] hover:underline"
+                    className="text-sm text-[#1e40af] hover:underline touch-manipulation"
                     onClick={() => window.location.href = "/notificaties"}
                   >
                     Alle notificaties
                   </button>
                 </div>
               </div>
-              <div className="max-h-72 overflow-y-auto">
+              <div className="max-h-80 overflow-y-auto">
                 {!notifications || notifications.length === 0 ? (
-                  <div className="py-6 text-center">
-                    <p className="text-sm text-gray-500">Geen notificaties</p>
+                  <div className="py-8 text-center">
+                    <p className="text-base text-gray-500">Geen notificaties</p>
                   </div>
                 ) : (
                   notifications.slice(0, 5).map((notification: any) => (
                     <div 
                       key={notification.id} 
-                      className={`py-2 px-4 hover:bg-gray-50 cursor-pointer border-b border-gray-100 ${!notification.isRead ? 'bg-blue-50' : ''}`}
+                      className={`py-4 px-4 hover:bg-gray-50 active:bg-gray-100 cursor-pointer border-b border-gray-100 touch-manipulation ${!notification.isRead ? 'bg-blue-50' : ''}`}
                     >
                       <div className="flex items-start gap-3">
-                        <div className={`h-2 w-2 mt-2 rounded-full ${
+                        <div className={`h-3 w-3 mt-2 rounded-full ${
                           notification.type === 'info' ? 'bg-blue-500' : 
                           notification.type === 'warning' ? 'bg-amber-500' : 
                           notification.type === 'success' ? 'bg-green-500' : 
                           'bg-red-500'
                         }`}></div>
-                        <div>
+                        <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between">
-                            <p className="font-medium text-sm">{notification.title}</p>
-                            <span className="text-xs text-gray-500">
+                            <p className="font-medium text-sm truncate">{notification.title}</p>
+                            <span className="text-xs text-gray-500 ml-2">
                               {new Date(notification.timestamp).toLocaleTimeString([], {
                                 hour: '2-digit', 
                                 minute: '2-digit'
                               })}
                             </span>
                           </div>
-                          <p className="text-xs text-gray-600">{notification.message}</p>
+                          <p className="text-sm text-gray-600 mt-1">{notification.message}</p>
                         </div>
                       </div>
                     </div>
                   ))
                 )}
               </div>
-              <div className="p-3 border-t border-gray-200 bg-gray-50">
+              <div className="p-4 border-t border-gray-200 bg-gray-50">
                 <Button 
                   variant="outline" 
-                  className="w-full text-xs h-8"
+                  className="w-full text-base h-10 touch-manipulation"
                   onClick={handleMarkAllNotificationsRead}
                   disabled={unreadCount === 0}
                 >
@@ -443,29 +443,35 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
           {/* Gebruiker profiel */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="relative h-8 pl-2 pr-1 ml-1">
-                <Avatar className="h-6 w-6">
+              <Button variant="ghost" className="relative h-10 pl-2 pr-1 ml-0.5 sm:ml-1 touch-manipulation">
+                <Avatar className="h-7 w-7 sm:h-6 sm:w-6">
                   <AvatarFallback className="bg-[#1e40af] text-white text-xs">
                     {userDisplayData.avatar}
                   </AvatarFallback>
                 </Avatar>
-                <span className="ml-1.5 text-sm font-medium hidden md:inline-block">{userDisplayData.name}</span>
-                <ChevronDown className="h-4 w-4 ml-0.5 md:ml-1.5 opacity-70" />
+                <span className="ml-1.5 text-sm font-medium hidden sm:inline-block truncate max-w-20">{userDisplayData.name}</span>
+                <ChevronDown className="h-4 w-4 ml-0.5 sm:ml-1.5 opacity-70" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <div className="px-2 py-1.5 flex flex-col">
-                <span className="text-sm font-medium">{userDisplayData.name}</span>
-                <span className="text-xs text-gray-500">{userDisplayData.role}</span>
+            <DropdownMenuContent align="end" className="w-64 mx-2">
+              <div className="px-3 py-3 flex flex-col">
+                <span className="text-base font-medium truncate">{userDisplayData.name}</span>
+                <span className="text-sm text-gray-500">{userDisplayData.role}</span>
               </div>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => window.location.href = '/student/profile'}>
-                <User className="mr-2 h-4 w-4" />
+              <DropdownMenuItem 
+                onClick={() => window.location.href = '/student/profile'}
+                className="py-3 px-3 text-base touch-manipulation"
+              >
+                <User className="mr-3 h-5 w-5" />
                 <span>Mijn Profiel</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleLogout}>
-                <LogOut className="mr-2 h-4 w-4" />
+              <DropdownMenuItem 
+                onClick={handleLogout}
+                className="py-3 px-3 text-base touch-manipulation"
+              >
+                <LogOut className="mr-3 h-5 w-5" />
                 <span>Uitloggen</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -488,8 +494,8 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
           </button>
         </div>
 
-        {/* Navigation - Exact Admin Style */}
-        <nav className="mt-5 flex-1 px-2 space-y-1">
+        {/* Navigation - Mobile Optimized */}
+        <nav className="mt-5 flex-1 px-3 space-y-2">
           {navigation.map((item) => {
             const Icon = item.icon;
             const isActive = location === item.href;
@@ -497,15 +503,15 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
             return (
               <Link key={item.name} href={item.href}>
                 <div
-                  className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md cursor-pointer ${
+                  className={`group flex items-center px-4 py-4 text-base font-medium rounded-lg cursor-pointer touch-manipulation transition-colors ${
                     isActive
-                      ? 'bg-gray-100 text-gray-900'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                      ? 'bg-[#1e40af] text-white shadow-sm'
+                      : 'text-gray-700 hover:bg-[#f1f5f9] hover:text-[#1e40af] active:bg-gray-200'
                   }`}
                   onClick={() => setSidebarOpen(false)}
                 >
-                  <Icon className={`mr-3 flex-shrink-0 h-5 w-5 ${
-                    isActive ? 'text-gray-500' : 'text-gray-400 group-hover:text-gray-500'
+                  <Icon className={`mr-4 flex-shrink-0 h-6 w-6 ${
+                    isActive ? 'text-white' : 'text-gray-500 group-hover:text-[#1e40af]'
                   }`} />
                   {item.name}
                 </div>
@@ -515,9 +521,9 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
         </nav>
       </div>
 
-      {/* Main content - Admin Style */}
+      {/* Main content - Mobile Optimized */}
       <div className="pt-12 lg:pl-64">
-        <main className="bg-[#f7f9fc] min-h-screen p-6">
+        <main className="bg-[#f7f9fc] min-h-screen p-3 sm:p-4 lg:p-6">
           {children}
         </main>
       </div>

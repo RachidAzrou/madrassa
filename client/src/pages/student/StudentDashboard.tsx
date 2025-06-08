@@ -84,26 +84,26 @@ export default function StudentDashboard() {
   };
 
   return (
-    <div className="space-y-8">
-      {/* Professional Page Header */}
-      <div className="bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 border-b border-gray-200 p-8 mb-8 rounded-xl shadow-sm">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="p-3 bg-blue-500 rounded-xl shadow-lg">
-              <Users className="h-8 w-8 text-white" />
+    <div className="space-y-4 sm:space-y-6 lg:space-y-8">
+      {/* Mobile-Optimized Page Header */}
+      <div className="bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 border-b border-gray-200 p-4 sm:p-6 lg:p-8 mb-4 sm:mb-6 lg:mb-8 rounded-xl shadow-sm">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+          <div className="flex items-center space-x-3 sm:space-x-4">
+            <div className="p-2 sm:p-3 bg-blue-500 rounded-xl shadow-lg">
+              <Home className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
             </div>
             <div>
-              <h1 className="text-4xl font-bold text-gray-900 mb-2">Dashboard</h1>
-              <p className="text-gray-600 text-lg font-medium">Welkom terug! Hier is je overzicht van vandaag.</p>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-1 sm:mb-2">Dashboard</h1>
+              <p className="text-gray-600 text-sm sm:text-base lg:text-lg font-medium">Welkom terug! Hier is je overzicht van vandaag.</p>
             </div>
           </div>
-          <div className="flex items-center space-x-4">
-            <div className="bg-white border border-gray-200 text-gray-800 px-6 py-3 rounded-xl shadow-md">
-              <div className="text-sm font-bold text-blue-600">Vandaag</div>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
+            <div className="bg-white border border-gray-200 text-gray-800 px-3 sm:px-4 lg:px-6 py-2 sm:py-3 rounded-xl shadow-md w-full sm:w-auto">
+              <div className="text-xs sm:text-sm font-bold text-blue-600">Vandaag</div>
               <div className="text-xs text-gray-600 font-medium">{new Date().toLocaleDateString('nl-NL', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
             </div>
-            <div className="bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-3 rounded-xl shadow-md">
-              <div className="text-sm font-bold">Academisch Jaar</div>
+            <div className="bg-gradient-to-r from-green-500 to-green-600 text-white px-3 sm:px-4 lg:px-6 py-2 sm:py-3 rounded-xl shadow-md w-full sm:w-auto">
+              <div className="text-xs sm:text-sm font-bold">Academisch Jaar</div>
               <div className="text-xs opacity-90">2024-2025</div>
             </div>
           </div>

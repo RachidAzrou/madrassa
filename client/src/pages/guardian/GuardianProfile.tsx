@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 
@@ -23,7 +24,13 @@ import {
   Heart,
   Users,
   Calendar,
-  AlertCircle
+  AlertCircle,
+  Lock,
+  Eye,
+  EyeOff,
+  Settings,
+  Home,
+  Briefcase
 } from "lucide-react";
 
 interface Guardian {
@@ -53,9 +60,26 @@ interface Child {
   status: string;
 }
 
+interface PasswordData {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}
+
 export default function GuardianProfile() {
   const [isEditing, setIsEditing] = useState(false);
   const [editedData, setEditedData] = useState<Partial<Guardian>>({});
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [passwordData, setPasswordData] = useState<PasswordData>({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+  const [showPasswords, setShowPasswords] = useState({
+    current: false,
+    new: false,
+    confirm: false
+  });
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -106,6 +130,35 @@ export default function GuardianProfile() {
     },
   });
 
+  // Password update mutation
+  const updatePasswordMutation = useMutation({
+    mutationFn: async (data: { currentPassword: string; newPassword: string }) => {
+      return await apiRequest('/api/guardian/password', {
+        method: 'PUT',
+        body: data
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Wachtwoord gewijzigd",
+        description: "Uw wachtwoord is succesvol bijgewerkt.",
+      });
+      setPasswordData({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      });
+      setIsChangingPassword(false);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Fout bij wachtwoord wijzigen",
+        description: error.message || "Er is een fout opgetreden bij het wijzigen van uw wachtwoord.",
+        variant: "destructive",
+      });
+    }
+  });
+
   const handleEdit = () => {
     setIsEditing(true);
     setEditedData(profile || {});
@@ -127,6 +180,55 @@ export default function GuardianProfile() {
       ...prev,
       [field]: value
     }));
+  };
+
+  // Password management functions
+  const handlePasswordChange = (field: keyof PasswordData, value: string) => {
+    setPasswordData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const togglePasswordVisibility = (field: 'current' | 'new' | 'confirm') => {
+    setShowPasswords(prev => ({
+      ...prev,
+      [field]: !prev[field]
+    }));
+  };
+
+  const handlePasswordSave = () => {
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      toast({
+        title: "Wachtwoorden komen niet overeen",
+        description: "Het nieuwe wachtwoord en bevestiging moeten hetzelfde zijn.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (passwordData.newPassword.length < 8) {
+      toast({
+        title: "Wachtwoord te kort",
+        description: "Het wachtwoord moet minimaal 8 karakters lang zijn.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    updatePasswordMutation.mutate({
+      currentPassword: passwordData.currentPassword,
+      newPassword: passwordData.newPassword
+    });
+  };
+
+  const handlePasswordCancel = () => {
+    setPasswordData({
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: ''
+    });
+    setIsChangingPassword(false);
   };
 
   if (profileLoading || childrenLoading) {

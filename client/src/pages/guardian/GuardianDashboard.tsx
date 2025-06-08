@@ -112,16 +112,7 @@ export default function GuardianDashboard() {
                 Volg de voortgang van uw kinderen, bekijk belangrijke updates en blijf verbonden met hun islamitische onderwijs
               </p>
             </div>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Button className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white border border-white/30 transition-all duration-200">
-                <Calendar className="h-4 w-4 mr-2" />
-                Afspraak Plannen
-              </Button>
-              <Button className="bg-white text-[#1e40af] hover:bg-gray-50 transition-all duration-200">
-                <Bell className="h-4 w-4 mr-2" />
-                Berichten ({dashboardStats.unreadMessages})
-              </Button>
-            </div>
+            
           </div>
         </div>
         {/* Decorative elements */}
@@ -358,39 +349,7 @@ export default function GuardianDashboard() {
         </Card>
       </div>
 
-      {/* Quick Actions - Admin Style */}
-      <div className="mt-8">
-        <h3 className="text-lg font-semibold text-[#1e40af] mb-4">Snelle Acties</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Link href="/guardian/attendance">
-            <Button variant="outline" className="h-16 flex flex-col items-center justify-center border-[#e5e7eb] hover:bg-[#eff6ff] hover:border-[#1e40af]">
-              <UserCheck className="h-6 w-6 mb-1 text-[#1e40af]" />
-              <span className="text-sm text-[#1e40af]">Aanwezigheid</span>
-            </Button>
-          </Link>
-          
-          <Link href="/guardian/grades">
-            <Button variant="outline" className="h-16 flex flex-col items-center justify-center border-[#e5e7eb] hover:bg-[#eff6ff] hover:border-[#1e40af]">
-              <GraduationCap className="h-6 w-6 mb-1 text-[#1e40af]" />
-              <span className="text-sm text-[#1e40af]">Cijfers</span>
-            </Button>
-          </Link>
-          
-          <Link href="/guardian/payments">
-            <Button variant="outline" className="h-16 flex flex-col items-center justify-center border-[#e5e7eb] hover:bg-[#eff6ff] hover:border-[#1e40af]">
-              <CreditCard className="h-6 w-6 mb-1 text-[#1e40af]" />
-              <span className="text-sm text-[#1e40af]">Betalingen</span>
-            </Button>
-          </Link>
-          
-          <Link href="/guardian/reports">
-            <Button variant="outline" className="h-16 flex flex-col items-center justify-center border-[#e5e7eb] hover:bg-[#eff6ff] hover:border-[#1e40af]">
-              <FileText className="h-6 w-6 mb-1 text-[#1e40af]" />
-              <span className="text-sm text-[#1e40af]">Rapporten</span>
-            </Button>
-          </Link>
-          </div>
-        </div>
+      
       </div>
     </div>
   );

@@ -211,7 +211,7 @@ export default function TeacherDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column - 2/3 width */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Quick Actions */}
+            {/* Quick Actions Card */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -263,50 +263,6 @@ export default function TeacherDashboard() {
                     </Button>
                   </Link>
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Today's Lessons */}
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle className="flex items-center gap-2">
-                  <Calendar className="h-5 w-5 text-green-600" />
-                  Vandaag's Lessen
-                </CardTitle>
-                <Link href="/teacher/calendar">
-                  <Button variant="ghost" size="sm">
-                    Alle lessen
-                    <ChevronRight className="h-4 w-4 ml-1" />
-                  </Button>
-                </Link>
-              </CardHeader>
-              <CardContent>
-                {lessons.length > 0 ? (
-                  <div className="space-y-3">
-                    {lessons.slice(0, 5).map((lesson) => (
-                      <div key={lesson.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border">
-                        <div className="flex items-center space-x-4">
-                          <div className="h-10 w-10 bg-green-100 rounded-lg flex items-center justify-center">
-                            <BookText className="h-5 w-5 text-green-600" />
-                          </div>
-                          <div>
-                            <p className="font-medium text-gray-900">{lesson.subject}</p>
-                            <p className="text-sm text-gray-600">{lesson.className}</p>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-sm font-medium text-gray-900">{lesson.time}</p>
-                          <p className="text-xs text-gray-500">{lesson.room}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-500">Geen lessen gepland voor vandaag</p>
-                  </div>
-                )}
               </CardContent>
             </Card>
           </div>
@@ -378,49 +334,56 @@ export default function TeacherDashboard() {
                 )}
               </CardContent>
             </Card>
-
-            {/* Task Summary */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <CheckCircle className="h-5 w-5 text-green-600" />
-                  Taak Samenvatting
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex items-center justify-between p-3 bg-yellow-50 rounded-lg border border-yellow-200">
-                  <div className="flex items-center space-x-2">
-                    <AlertCircle className="h-4 w-4 text-yellow-600" />
-                    <span className="text-sm text-yellow-800">Te beoordelen</span>
-                  </div>
-                  <Badge variant="outline" className="text-yellow-800 border-yellow-300">
-                    {teacherStats.pendingGrades}
-                  </Badge>
-                </div>
-                
-                <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200">
-                  <div className="flex items-center space-x-2">
-                    <MessageCircle className="h-4 w-4 text-blue-600" />
-                    <span className="text-sm text-blue-800">Ongelezen berichten</span>
-                  </div>
-                  <Badge variant="outline" className="text-blue-800 border-blue-300">
-                    {teacherStats.unreadMessages}
-                  </Badge>
-                </div>
-                
-                <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200">
-                  <div className="flex items-center space-x-2">
-                    <Calendar className="h-4 w-4 text-green-600" />
-                    <span className="text-sm text-green-800">Komende lessen</span>
-                  </div>
-                  <Badge variant="outline" className="text-green-800 border-green-300">
-                    {teacherStats.upcomingLessons}
-                  </Badge>
-                </div>
-              </CardContent>
-            </Card>
           </div>
         </div>
+
+        {/* Full Width Agenda Section */}
+        <Card className="mt-6">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <Calendar className="h-5 w-5 text-green-600" />
+              Mijn Agenda
+            </CardTitle>
+            <Link href="/teacher/calendar">
+              <Button variant="ghost" size="sm">
+                Alle lessen
+                <ChevronRight className="h-4 w-4 ml-1" />
+              </Button>
+            </Link>
+          </CardHeader>
+          <CardContent>
+            {lessons.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {lessons.map((lesson) => (
+                  <div key={lesson.id} className="p-4 bg-gray-50 rounded-lg border hover:shadow-md transition-shadow">
+                    <div className="flex items-start space-x-4">
+                      <div className="h-12 w-12 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <BookText className="h-6 w-6 text-green-600" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-medium text-gray-900 mb-1">{lesson.subject}</h4>
+                        <p className="text-sm text-gray-600 mb-2">{lesson.className}</p>
+                        <div className="flex items-center justify-between text-xs text-gray-500">
+                          <span className="flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            {lesson.time}
+                          </span>
+                          <span>{lesson.room}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <Calendar className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                <h3 className="font-medium text-gray-900 mb-2">Geen lessen gepland</h3>
+                <p className="text-gray-500">Er zijn vandaag geen lessen ingepland.</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

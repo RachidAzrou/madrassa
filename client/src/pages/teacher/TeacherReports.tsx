@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { Progress } from '@/components/ui/progress';
-import { FileDown, Users, User, BookMarked, BarChart3, Target, Settings, Eye, Download, TrendingUp, Calculator, School, Calendar, CheckCircle, AlertCircle, Clock, Save, Loader2, Trash2, Edit, BookText, ClipboardCheck, Percent } from 'lucide-react';
+import { FileDown, Users, User, BookMarked, BarChart3, Target, Settings, Eye, Download, TrendingUp, Calculator, School, Calendar, CheckCircle, AlertCircle, Clock, Save, Loader2, Trash2, Edit, BookText, ClipboardCheck, Percent, FileText } from 'lucide-react';
 import { PremiumHeader } from '@/components/layout/premium-header';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { apiRequest } from '@/lib/queryClient';
@@ -469,7 +469,7 @@ export default function TeacherReports() {
     <div className="bg-[#f7f9fc] min-h-screen overflow-visible">
       <PremiumHeader 
         title="Rapportage" 
-        icon={FileText}
+        icon={BookMarked}
         description="Genereer professionele schoolrapporten met cijfers en beoordeling"
         breadcrumbs={{
           parent: "Docent",
@@ -980,7 +980,7 @@ export default function TeacherReports() {
             ) : (
               <div className="text-center py-12">
                 <div className="h-12 w-12 text-gray-400 mx-auto mb-4">
-                  <FileText className="h-full w-full" />
+                  <BookMarked className="h-full w-full" />
                 </div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">Geen rapportgegevens</h3>
                 <p className="text-gray-600 mb-4">Configureer eerst uw rapport instellingen om een voorvertoning te zien.</p>
@@ -1082,7 +1082,7 @@ export default function TeacherReports() {
                   <div className="flex-1">
                     <div className="flex items-center gap-3">
                       <div className="h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                        <FileText className="h-5 w-5 text-blue-600" />
+                        <BookMarked className="h-5 w-5 text-blue-600" />
                       </div>
                       <div>
                         <h4 className="font-medium text-gray-900">{template.name}</h4>

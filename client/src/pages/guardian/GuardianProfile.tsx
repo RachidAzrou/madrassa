@@ -11,7 +11,6 @@ import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
-import GuardianLayout from "@/components/GuardianLayout";
 import {
   User,
   Mail,
@@ -145,36 +144,31 @@ export default function GuardianProfile() {
 
   if (profileLoading || childrenLoading) {
     return (
-      <GuardianLayout>
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-center">
-            <div className="animate-spin w-8 h-8 border-4 border-[#1e40af] border-t-transparent rounded-full mx-auto mb-4"></div>
-            <p className="text-gray-600">Profiel laden...</p>
-          </div>
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <div className="animate-spin w-8 h-8 border-4 border-[#1e40af] border-t-transparent rounded-full mx-auto mb-4"></div>
+          <p className="text-gray-600">Profiel laden...</p>
         </div>
-      </GuardianLayout>
+      </div>
     );
   }
 
   if (!profile) {
     return (
-      <GuardianLayout>
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-center">
-            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Profiel niet gevonden</h3>
-            <p className="text-gray-600">Uw profiel kon niet worden geladen.</p>
-          </div>
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">Profiel niet gevonden</h3>
+          <p className="text-gray-600">Uw profiel kon niet worden geladen.</p>
         </div>
-      </GuardianLayout>
+      </div>
     );
   }
 
   return (
-    <GuardianLayout>
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Mijn Profiel</h1>
             <p className="text-gray-600">Beheer uw persoonlijke informatie en voorkeuren</p>
@@ -490,6 +484,6 @@ export default function GuardianProfile() {
           </div>
         </div>
       </div>
-    </GuardianLayout>
+    </div>
   );
 }

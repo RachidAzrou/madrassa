@@ -103,21 +103,26 @@ export default function StudentGrades() {
 
   return (
     <div className="space-y-6">
-      {/* Enhanced Header */}
-      <div className="border-b border-gray-200 pb-8 mb-8">
+      {/* Professional Page Header */}
+      <div className="bg-gradient-to-r from-purple-50 via-violet-50 to-indigo-50 border-b border-gray-200 p-8 mb-8 rounded-xl shadow-sm">
         <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Mijn Cijfers
-            </h1>
-            <p className="text-gray-600 text-lg">
-              Bekijk al je cijfers en volg je academische vooruitgang
-            </p>
+          <div className="flex items-center space-x-4">
+            <div className="p-3 bg-purple-500 rounded-xl shadow-lg">
+              <GraduationCap className="h-8 w-8 text-white" />
+            </div>
+            <div>
+              <h1 className="text-4xl font-bold text-gray-900 mb-2">Mijn Cijfers</h1>
+              <p className="text-gray-600 text-lg font-medium">Bekijk al je cijfers en volg je academische vooruitgang</p>
+            </div>
           </div>
-          <div className="flex items-center space-x-3">
-            <div className="bg-gradient-to-r from-purple-500 to-purple-600 text-white px-4 py-2 rounded-lg shadow-sm">
-              <div className="text-sm font-medium">{gradeStats?.overallAverage?.toFixed(1) || '0.0'}</div>
-              <div className="text-xs opacity-90">Gemiddeld cijfer</div>
+          <div className="flex items-center space-x-4">
+            <div className="bg-white border border-gray-200 text-gray-800 px-6 py-3 rounded-xl shadow-md">
+              <div className="text-sm font-bold text-purple-600">{gradeStats?.overallAverage?.toFixed(1) || '0.0'}</div>
+              <div className="text-xs text-gray-600 font-medium">Gemiddeld cijfer</div>
+            </div>
+            <div className="bg-gradient-to-r from-violet-500 to-violet-600 text-white px-6 py-3 rounded-xl shadow-md">
+              <div className="text-sm font-bold">Prestatie</div>
+              <div className="text-xs opacity-90">Goed bezig</div>
             </div>
           </div>
         </div>

@@ -113,21 +113,26 @@ export default function StudentAttendance() {
 
   return (
     <div className="space-y-6">
-      {/* Enhanced Header */}
-      <div className="border-b border-gray-200 pb-8 mb-8">
+      {/* Professional Page Header */}
+      <div className="bg-gradient-to-r from-amber-50 via-orange-50 to-yellow-50 border-b border-gray-200 p-8 mb-8 rounded-xl shadow-sm">
         <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Mijn Aanwezigheid
-            </h1>
-            <p className="text-gray-600 text-lg">
-              Volg je aanwezigheid en prestaties dit schooljaar
-            </p>
+          <div className="flex items-center space-x-4">
+            <div className="p-3 bg-amber-500 rounded-xl shadow-lg">
+              <UserCheck className="h-8 w-8 text-white" />
+            </div>
+            <div>
+              <h1 className="text-4xl font-bold text-gray-900 mb-2">Mijn Aanwezigheid</h1>
+              <p className="text-gray-600 text-lg font-medium">Volg je aanwezigheid en prestaties dit schooljaar</p>
+            </div>
           </div>
-          <div className="flex items-center space-x-3">
-            <div className="bg-gradient-to-r from-amber-500 to-amber-600 text-white px-4 py-2 rounded-lg shadow-sm">
-              <div className="text-sm font-medium">{attendanceStats?.attendanceRate || 0}%</div>
-              <div className="text-xs opacity-90">Aanwezigheidspercentage</div>
+          <div className="flex items-center space-x-4">
+            <div className="bg-white border border-gray-200 text-gray-800 px-6 py-3 rounded-xl shadow-md">
+              <div className="text-sm font-bold text-amber-600">{attendanceStats?.attendanceRate || 0}%</div>
+              <div className="text-xs text-gray-600 font-medium">Aanwezigheidspercentage</div>
+            </div>
+            <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-6 py-3 rounded-xl shadow-md">
+              <div className="text-sm font-bold">Status</div>
+              <div className="text-xs opacity-90">Uitstekend</div>
             </div>
           </div>
         </div>

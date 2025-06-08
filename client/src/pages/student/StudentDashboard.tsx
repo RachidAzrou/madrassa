@@ -8,7 +8,8 @@ import {
   Mail,
   GraduationCap,
   Activity,
-  User
+  User,
+  Home
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
@@ -84,17 +85,26 @@ export default function StudentDashboard() {
 
   return (
     <div className="space-y-8">
-      {/* Enhanced Header - Admin Style */}
-      <div className="border-b border-gray-200 pb-8 mb-8">
+      {/* Professional Page Header */}
+      <div className="bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 border-b border-gray-200 p-8 mb-8 rounded-xl shadow-sm">
         <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Dashboard</h1>
-            <p className="text-gray-600 text-lg">Welkom terug! Hier is je overzicht van vandaag.</p>
+          <div className="flex items-center space-x-4">
+            <div className="p-3 bg-blue-500 rounded-xl shadow-lg">
+              <Users className="h-8 w-8 text-white" />
+            </div>
+            <div>
+              <h1 className="text-4xl font-bold text-gray-900 mb-2">Dashboard</h1>
+              <p className="text-gray-600 text-lg font-medium">Welkom terug! Hier is je overzicht van vandaag.</p>
+            </div>
           </div>
-          <div className="flex items-center space-x-3">
-            <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2 rounded-lg shadow-sm">
-              <div className="text-sm font-medium">Vandaag</div>
-              <div className="text-xs opacity-90">{new Date().toLocaleDateString('nl-NL', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
+          <div className="flex items-center space-x-4">
+            <div className="bg-white border border-gray-200 text-gray-800 px-6 py-3 rounded-xl shadow-md">
+              <div className="text-sm font-bold text-blue-600">Vandaag</div>
+              <div className="text-xs text-gray-600 font-medium">{new Date().toLocaleDateString('nl-NL', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
+            </div>
+            <div className="bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-3 rounded-xl shadow-md">
+              <div className="text-sm font-bold">Academisch Jaar</div>
+              <div className="text-xs opacity-90">2024-2025</div>
             </div>
           </div>
         </div>

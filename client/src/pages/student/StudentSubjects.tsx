@@ -66,21 +66,26 @@ export default function StudentSubjects() {
 
   return (
     <div className="space-y-6">
-      {/* Enhanced Header */}
-      <div className="border-b border-gray-200 pb-8 mb-8">
+      {/* Professional Page Header */}
+      <div className="bg-gradient-to-r from-green-50 via-emerald-50 to-teal-50 border-b border-gray-200 p-8 mb-8 rounded-xl shadow-sm">
         <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Mijn Vakken
-            </h1>
-            <p className="text-gray-600 text-lg">
-              Ontdek alle vakken die je dit schooljaar volgt
-            </p>
+          <div className="flex items-center space-x-4">
+            <div className="p-3 bg-green-500 rounded-xl shadow-lg">
+              <BookOpen className="h-8 w-8 text-white" />
+            </div>
+            <div>
+              <h1 className="text-4xl font-bold text-gray-900 mb-2">Mijn Vakken</h1>
+              <p className="text-gray-600 text-lg font-medium">Ontdek alle vakken die je dit schooljaar volgt</p>
+            </div>
           </div>
-          <div className="flex items-center space-x-3">
-            <div className="bg-gradient-to-r from-green-500 to-green-600 text-white px-4 py-2 rounded-lg shadow-sm">
-              <div className="text-sm font-medium">{subjects?.subjects?.length || 0} Vakken</div>
-              <div className="text-xs opacity-90">Actief dit jaar</div>
+          <div className="flex items-center space-x-4">
+            <div className="bg-white border border-gray-200 text-gray-800 px-6 py-3 rounded-xl shadow-md">
+              <div className="text-sm font-bold text-green-600">{subjects?.subjects?.length || 0} Vakken</div>
+              <div className="text-xs text-gray-600 font-medium">Actief dit jaar</div>
+            </div>
+            <div className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-6 py-3 rounded-xl shadow-md">
+              <div className="text-sm font-bold">Voortgang</div>
+              <div className="text-xs opacity-90">Op schema</div>
             </div>
           </div>
         </div>

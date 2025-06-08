@@ -27,7 +27,7 @@ import {
 } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import logoPath from "@assets/myMadrassa.png";
+import myMadrassaLogo from "@assets/myMadrassa.png";
 
 interface TeacherLayoutProps {
   children: React.ReactNode;
@@ -142,7 +142,7 @@ export default function TeacherLayout({ children }: TeacherLayoutProps) {
               <Menu className="w-5 h-5" />
             </button>
             <img 
-              src={logoPath} 
+              src={myMadrassaLogo} 
               alt="myMadrassa Logo" 
               className="w-6 h-6"
             />

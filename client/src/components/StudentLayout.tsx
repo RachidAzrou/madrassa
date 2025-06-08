@@ -22,7 +22,7 @@ import {
   MessageCircle,
   Search
 } from "lucide-react";
-import logoPath from "@assets/myMadrassa.png";
+import myMadrassaLogo from "@assets/myMadrassa.png";
 
 interface StudentLayoutProps {
   children: React.ReactNode;

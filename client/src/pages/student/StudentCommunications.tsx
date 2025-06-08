@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { CustomDialogContent } from "@/components/ui/custom-dialog-content";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -320,7 +321,7 @@ export default function StudentCommunications() {
         {/* Message Details Dialog */}
         {selectedMessage && (
           <Dialog open={!!selectedMessage} onOpenChange={() => setSelectedMessage(null)}>
-            <DialogContent className="max-w-2xl">
+            <CustomDialogContent className="max-w-2xl">
               <DialogHeader>
                 <DialogTitle>{selectedMessage.subject}</DialogTitle>
               </DialogHeader>
@@ -346,13 +347,13 @@ export default function StudentCommunications() {
                   </p>
                 </div>
               </div>
-            </DialogContent>
+            </CustomDialogContent>
           </Dialog>
         )}
 
         {/* Compose Message Dialog */}
         <Dialog open={isComposeOpen} onOpenChange={setIsComposeOpen}>
-          <DialogContent className="max-w-2xl">
+          <CustomDialogContent className="max-w-2xl">
             <DialogHeader>
               <DialogTitle>Nieuw Bericht</DialogTitle>
             </DialogHeader>
@@ -432,7 +433,7 @@ export default function StudentCommunications() {
                 </Button>
               </div>
             </div>
-          </DialogContent>
+          </CustomDialogContent>
         </Dialog>
       </div>
     </div>

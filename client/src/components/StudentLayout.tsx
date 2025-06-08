@@ -102,6 +102,8 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
   ];
 
   const [showSearch, setShowSearch] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [mobileSearchTerm, setMobileSearchTerm] = useState("");
   const [readMessages, setReadMessages] = useState<Set<number>>(new Set());
 
   // Haal ongelezen berichten op van de echte Messages API
@@ -144,6 +146,22 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
     window.location.href = `/student/communications?messageId=${messageId}`;
   };
 
+  const handleMarkAllNotificationsRead = async () => {
+    try {
+      // Call API to mark all notifications as read
+      // This would normally update the backend
+      console.log('Marking all notifications as read');
+    } catch (error) {
+      console.error('Error marking notifications as read:', error);
+    }
+  };
+
+  const handleMobileSearch = () => {
+    if (mobileSearchTerm.trim()) {
+      window.location.href = `/student/search?q=${encodeURIComponent(mobileSearchTerm)}`;
+    }
+  };
+
   // Generate user display data from profile data (preferred) or authenticated user
   const getUserDisplayData = () => {
     const userData = profile || user;
@@ -159,7 +177,7 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
       'guardian': 'Voogd',
       'secretariaat': 'Secretariaat'
     };
-    const role = roleMap[user?.role] || user?.role || 'Student';
+    const role = (user?.role && roleMap[user.role as keyof typeof roleMap]) || user?.role || 'Student';
     const avatar = `${userData.firstName?.[0] || ''}${userData.lastName?.[0] || ''}`.toUpperCase();
     
     return { name, role, avatar };
@@ -202,29 +220,82 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
           <img src={myMadrassaLogo} alt="myMadrassa Logo" className="h-10 sm:h-11" />
         </Link>
 
-        {/* Zoekbalk - midden (optioneel) */}
-        {showSearch && (
-          <div className="mx-4 flex-1 max-w-md relative hidden md:block">
-            <input
-              type="text"
-              placeholder="Zoeken..."
-              className="w-full pl-9 pr-4 py-1.5 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#1e40af] focus:border-transparent"
-            />
-            <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-          </div>
-        )}
+        {/* Zoekbalk - midden */}
+        <div className="mx-4 flex-1 max-w-md relative hidden md:block">
+          <input
+            type="text"
+            placeholder="Zoeken in berichten, cijfers, vakken..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && searchTerm.trim()) {
+                window.location.href = `/student/search?q=${encodeURIComponent(searchTerm)}`;
+              }
+            }}
+            className="w-full pl-9 pr-4 py-1.5 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#1e40af] focus:border-transparent"
+          />
+          <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+          {searchTerm && (
+            <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-md shadow-lg mt-1 z-50">
+              <div className="p-2">
+                <button
+                  onClick={() => {
+                    window.location.href = `/student/search?q=${encodeURIComponent(searchTerm)}`;
+                  }}
+                  className="w-full text-left px-3 py-2 hover:bg-gray-50 rounded text-sm"
+                >
+                  <Search className="inline w-4 h-4 mr-2" />
+                  Zoeken naar "{searchTerm}"
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* Acties - rechts */}
         <div className="flex items-center space-x-1">
           {/* Zoekknop voor mobiel */}
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="md:hidden"
-            onClick={() => setShowSearch(!showSearch)}
-          >
-            <Search className="h-5 w-5 text-gray-600" />
-          </Button>
+          <Popover open={showSearch} onOpenChange={setShowSearch}>
+            <PopoverTrigger asChild>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="md:hidden"
+              >
+                <Search className="h-5 w-5 text-gray-600" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-80 p-0">
+              <div className="p-4">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Zoeken in berichten, cijfers, vakken..."
+                    value={mobileSearchTerm}
+                    onChange={(e) => setMobileSearchTerm(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        handleMobileSearch();
+                        setShowSearch(false);
+                      }
+                    }}
+                    className="w-full pl-9 pr-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#1e40af] focus:border-transparent"
+                    autoFocus
+                  />
+                  <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                </div>
+                <Button 
+                  className="w-full mt-3 bg-[#1e40af] hover:bg-[#1e40af]/90 text-white"
+                  onClick={() => {
+                    handleMobileSearch();
+                    setShowSearch(false);
+                  }}
+                >
+                  Zoeken
+                </Button>
+              </div>
+            </PopoverContent>
+          </Popover>
 
           {/* Berichten knop */}
           <Popover>
@@ -313,9 +384,12 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
               <div className="p-4 border-b border-gray-200">
                 <div className="flex items-center justify-between">
                   <h3 className="font-medium text-sm">Notificaties</h3>
-                  <Link href="/notificaties">
-                    <a className="text-xs text-[#1e40af] hover:underline">Alle notificaties</a>
-                  </Link>
+                  <button 
+                    className="text-xs text-[#1e40af] hover:underline"
+                    onClick={() => window.location.href = "/notificaties"}
+                  >
+                    Alle notificaties
+                  </button>
                 </div>
               </div>
               <div className="max-h-72 overflow-y-auto">
@@ -354,7 +428,12 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
                 )}
               </div>
               <div className="p-3 border-t border-gray-200 bg-gray-50">
-                <Button variant="outline" className="w-full text-xs h-8">
+                <Button 
+                  variant="outline" 
+                  className="w-full text-xs h-8"
+                  onClick={handleMarkAllNotificationsRead}
+                  disabled={unreadCount === 0}
+                >
                   Markeer alles als gelezen
                 </Button>
               </div>

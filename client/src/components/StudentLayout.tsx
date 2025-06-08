@@ -103,33 +103,40 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
         />
       )}
 
-      {/* Top bar - Admin Style - Above everything */}
-      <div className="bg-white shadow-sm border-b border-[#e5e7eb] fixed top-0 left-0 right-0 z-50 h-12">
-        <div className="flex items-center justify-between h-12 px-4 lg:px-6">
+      {/* Enhanced Admin-Style Top bar */}
+      <div className="bg-white shadow-lg border-b border-[#e5e7eb] fixed top-0 left-0 right-0 z-50 h-16">
+        <div className="flex items-center justify-between h-16 px-4 lg:px-6">
           {/* Logo section - Left */}
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-4">
             <button
               onClick={() => setSidebarOpen(true)}
-              className="lg:hidden text-gray-500 hover:text-gray-700 mr-3"
+              className="lg:hidden text-gray-500 hover:text-gray-700 hover:bg-gray-100 p-2 rounded-lg transition-colors mr-2"
             >
               <Menu className="w-5 h-5" />
             </button>
-            <img 
-              src={myMadrassaLogo} 
-              alt="myMadrassa Logo" 
-              className="w-6 h-6"
-            />
-            <span className="text-lg font-bold text-[#1e40af]">myMadrassa</span>
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-sm">
+                <img 
+                  src={myMadrassaLogo} 
+                  alt="myMadrassa Logo" 
+                  className="w-6 h-6 filter brightness-0 invert"
+                />
+              </div>
+              <div>
+                <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">myMadrassa</span>
+                <div className="text-xs text-gray-500">Student Portal</div>
+              </div>
+            </div>
           </div>
 
-          {/* Search bar - Center */}
-          <div className="hidden lg:flex flex-1 max-w-md mx-4">
+          {/* Enhanced Search bar - Center */}
+          <div className="hidden lg:flex flex-1 max-w-lg mx-6">
             <div className="relative w-full">
-              <Search className="absolute left-2.5 top-2 h-4 w-4 text-gray-500" />
+              <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <input
                 type="text"
-                placeholder="Zoeken..."
-                className="w-full pl-9 pr-4 py-1.5 text-sm border border-[#e5e7eb] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e40af] focus:border-transparent"
+                placeholder="Zoek studenten, docenten of vakken..."
+                className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
               />
             </div>
           </div>

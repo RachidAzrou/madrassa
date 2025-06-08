@@ -1,6 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
@@ -9,13 +8,8 @@ import {
   Mail,
   Phone,
   MapPin,
-  Calendar,
-  User,
-  ChevronRight,
-  BookOpen,
-  MessageCircle
+  Calendar
 } from "lucide-react";
-import { Link } from "wouter";
 
 interface ClassInfo {
   id: number;
@@ -87,7 +81,7 @@ export default function StudentClass() {
       </div>
 
       {/* Class Information - Admin Style */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      <div className="mb-8">
         {/* Class Details */}
         <Card className="bg-white border border-[#e5e7eb] shadow-sm">
           <CardHeader className="border-b border-[#e5e7eb] pb-4">
@@ -153,43 +147,6 @@ export default function StudentClass() {
                 Geen klasinformatie beschikbaar
               </p>
             )}
-          </CardContent>
-        </Card>
-
-        {/* Quick Actions */}
-        <Card className="bg-white border border-[#e5e7eb] shadow-sm">
-          <CardHeader className="border-b border-[#e5e7eb] pb-4">
-            <CardTitle className="flex items-center text-[#1e40af] font-semibold">
-              <BookOpen className="h-5 w-5 mr-2 text-[#1e40af]" />
-              Snelle Acties
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pt-4">
-            <div className="space-y-3">
-              <Link href="/student/subjects">
-                <Button variant="outline" className="w-full justify-start border-[#e5e7eb] hover:bg-[#eff6ff] hover:border-[#1e40af]">
-                  <BookOpen className="h-4 w-4 mr-2 text-[#1e40af]" />
-                  Mijn Vakken
-                  <ChevronRight className="h-4 w-4 ml-auto" />
-                </Button>
-              </Link>
-              
-              <Link href="/student/attendance">
-                <Button variant="outline" className="w-full justify-start border-[#e5e7eb] hover:bg-[#eff6ff] hover:border-[#1e40af]">
-                  <Calendar className="h-4 w-4 mr-2 text-[#1e40af]" />
-                  Aanwezigheid
-                  <ChevronRight className="h-4 w-4 ml-auto" />
-                </Button>
-              </Link>
-              
-              <Link href="/student/teachers">
-                <Button variant="outline" className="w-full justify-start border-[#e5e7eb] hover:bg-[#eff6ff] hover:border-[#1e40af]">
-                  <User className="h-4 w-4 mr-2 text-[#1e40af]" />
-                  Mijn Docenten
-                  <ChevronRight className="h-4 w-4 ml-auto" />
-                </Button>
-              </Link>
-            </div>
           </CardContent>
         </Card>
       </div>

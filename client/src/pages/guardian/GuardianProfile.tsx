@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { isUnauthorizedError } from "@/lib/authUtils";
+
 import {
   User,
   Mail,
@@ -484,6 +484,5 @@ export default function GuardianProfile() {
           </div>
         </div>
       </div>
-    </div>
   );
 }

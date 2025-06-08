@@ -21,7 +21,6 @@ interface Subject {
   name: string;
   code: string;
   description?: string;
-  credits: number;
   teacher: {
     id: number;
     firstName: string;
@@ -143,17 +142,17 @@ export default function StudentSubjects() {
 
         <Card className="bg-white border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-            <CardTitle className="text-sm font-medium text-gray-700">Totaal Credits</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-700">Volgende Les</CardTitle>
             <div className="p-2 bg-[#fdf2f8] rounded-lg">
-              <FileText className="h-4 w-4 text-[#be185d]" />
+              <Clock className="h-4 w-4 text-[#be185d]" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-[#be185d]">
-              {subjects?.subjects?.reduce((sum, s) => sum + s.credits, 0) || 0}
+            <div className="text-lg font-bold text-[#be185d]">
+              {subjects?.subjects?.find(s => s.nextLesson)?.nextLesson?.time || 'Geen'}
             </div>
             <p className="text-xs text-gray-600 mt-1">
-              Credits
+              Vandaag
             </p>
           </CardContent>
         </Card>
@@ -173,7 +172,7 @@ export default function StudentSubjects() {
                     <p className="text-sm text-gray-600 mt-1">{subject.code}</p>
                   </div>
                   <Badge className="bg-[#eff6ff] text-[#1e40af] border-[#1e40af] ml-2">
-                    {subject.credits} EC
+                    {subject.code}
                   </Badge>
                 </div>
               </CardHeader>

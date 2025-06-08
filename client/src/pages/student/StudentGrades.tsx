@@ -34,17 +34,16 @@ interface SubjectGrade {
   subjectCode: string;
   currentGrade: string;
   grades: Grade[];
-  credits: number;
   teacher: string;
 }
 
 interface GradeStats {
   overallAverage: number;
-  totalCredits: number;
-  completedCredits: number;
   trend: number; // percentage change from last period
   passedSubjects: number;
   totalSubjects: number;
+  highestGrade: number;
+  lowestGrade: number;
 }
 
 export default function StudentGrades() {
@@ -149,8 +148,8 @@ export default function StudentGrades() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Studiepunten</p>
-                  <p className="text-2xl font-bold text-[#1e40af]">{gradeStats?.completedCredits || 0}/{gradeStats?.totalCredits || 0}</p>
+                  <p className="text-sm font-medium text-gray-600">Hoogste Cijfer</p>
+                  <p className="text-2xl font-bold text-[#1e40af]">{gradeStats?.highestGrade?.toFixed(1) || '0.0'}</p>
                 </div>
                 <div className="h-12 w-12 bg-orange-100 rounded-lg flex items-center justify-center">
                   <TrendingUp className="h-6 w-6 text-orange-600" />

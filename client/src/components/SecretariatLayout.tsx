@@ -7,7 +7,7 @@ import {
   UserCheck, 
   GraduationCap, 
   School,
-  MessageSquare, 
+  MessageCircle, 
   CreditCard, 
   BarChart3, 
   Calendar, 
@@ -15,7 +15,7 @@ import {
   Settings, 
   LogOut, 
   X, 
-  Home,
+  LayoutDashboard,
   Menu,
   Search,
   Bell,
@@ -61,7 +61,7 @@ export default function SecretariatLayout({ children }: SecretariatLayoutProps) 
     {
       name: 'Dashboard',
       href: '/secretariat',
-      icon: Home,
+      icon: LayoutDashboard,
       current: location === '/secretariat',
       resource: 'dashboard' as const
     },
@@ -124,7 +124,7 @@ export default function SecretariatLayout({ children }: SecretariatLayoutProps) 
     {
       name: 'Communicatie',
       href: '/secretariat/communications',
-      icon: MessageSquare,
+      icon: MessageCircle,
       current: location.startsWith('/secretariat/communications'),
       resource: 'communication' as const
     },

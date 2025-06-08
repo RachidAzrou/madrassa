@@ -7,11 +7,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import {
-  Home,
+  LayoutDashboard,
   Users,
   UserCheck,
   BookOpen,
-  ClipboardList,
+  ClipboardCheck,
   FileText,
   GraduationCap,
   CreditCard,
@@ -24,7 +24,9 @@ import {
   ChevronDown,
   MessageCircle,
   Search,
-  Mail
+  Mail,
+  Percent,
+  ClipboardList
 } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -78,7 +80,7 @@ export default function GuardianLayout({ children }: GuardianLayoutProps) {
     {
       name: 'Dashboard',
       href: '/guardian/dashboard',
-      icon: Home,
+      icon: LayoutDashboard,
       current: location === '/guardian/dashboard'
     }
   ];
@@ -93,13 +95,13 @@ export default function GuardianLayout({ children }: GuardianLayoutProps) {
     {
       name: 'Academische Prestaties',
       href: '/guardian/academic-performance',
-      icon: GraduationCap,
+      icon: Percent,
       current: location.startsWith('/guardian/academic-performance')
     },
     {
       name: 'Aanwezigheid',
       href: '/guardian/attendance',
-      icon: ClipboardList,
+      icon: ClipboardCheck,
       current: location.startsWith('/guardian/attendance')
     }
   ];

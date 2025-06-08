@@ -6998,14 +6998,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ********************
   apiRouter.get("/api/student/profile", authenticateToken, async (req: any, res) => {
     try {
-      const userId = req.user?.id;
-      if (!userId) {
-        return res.status(401).json({ message: "User ID required" });
+      const userEmail = req.user?.email;
+      if (!userEmail) {
+        return res.status(401).json({ message: "User email required" });
       }
 
-      // Find student by user ID
+      // Find student by email
       const students = await storage.getStudents();
-      const student = students.find(s => s.userId === userId);
+      const student = students.find(s => s.email === userEmail);
       
       if (!student) {
         return res.status(404).json({ message: "Student profile not found" });
@@ -7019,34 +7019,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const programs = await storage.getPrograms();
       const studentProgram = programs.find(p => p.id === student.programId);
 
-      // Format profile data
+      // Format profile data using available fields
       const profileData = {
         id: student.id,
         studentId: student.studentId,
         firstName: student.firstName,
         lastName: student.lastName,
-        email: student.email,
+        email: student.email || '',
         phone: student.phone || '',
         dateOfBirth: student.dateOfBirth,
         gender: student.gender || '',
-        nationality: student.nationality || '',
+        nationality: '',  // Not in schema
         address: student.address || '',
+        street: student.street || '',
+        houseNumber: student.houseNumber || '',
         postalCode: student.postalCode || '',
         city: student.city || '',
-        country: student.country || 'Nederland',
-        emergencyContactName: student.emergencyContactName || '',
-        emergencyContactPhone: student.emergencyContactPhone || '',
-        emergencyContactRelation: student.emergencyContactRelation || '',
-        medicalInfo: student.medicalInfo || '',
-        allergies: student.allergies || '',
-        specialNeeds: student.specialNeeds || '',
+        country: 'Nederland',
+        emergencyContactName: '',  // Not in schema
+        emergencyContactPhone: '',  // Not in schema
+        emergencyContactRelation: '',  // Not in schema
+        medicalInfo: '',  // Not in schema
+        allergies: '',  // Not in schema
+        specialNeeds: '',  // Not in schema
         notes: student.notes || '',
         className: studentClass?.name || '',
         programName: studentProgram?.name || '',
-        academicYear: student.academicYear || '',
+        academicYear: '',  // Not in schema
+        yearLevel: student.yearLevel || 0,
         enrollmentDate: student.enrollmentDate,
         status: student.status,
-        profilePhoto: student.profilePhoto || ''
+        profilePhoto: student.photoUrl || ''
       };
 
       res.json(profileData);
@@ -7058,14 +7061,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   apiRouter.get("/api/student/profile/stats", authenticateToken, async (req: any, res) => {
     try {
-      const userId = req.user?.id;
-      if (!userId) {
-        return res.status(401).json({ message: "User ID required" });
+      const userEmail = req.user?.email;
+      if (!userEmail) {
+        return res.status(401).json({ message: "User email required" });
       }
 
-      // Find student by user ID
+      // Find student by email
       const students = await storage.getStudents();
-      const student = students.find(s => s.userId === userId);
+      const student = students.find(s => s.email === userEmail);
       
       if (!student) {
         return res.status(404).json({ message: "Student not found" });
@@ -7092,14 +7095,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   apiRouter.put("/api/student/profile", authenticateToken, async (req: any, res) => {
     try {
-      const userId = req.user?.id;
-      if (!userId) {
-        return res.status(401).json({ message: "User ID required" });
+      const userEmail = req.user?.email;
+      if (!userEmail) {
+        return res.status(401).json({ message: "User email required" });
       }
 
-      // Find student by user ID
+      // Find student by email
       const students = await storage.getStudents();
-      const student = students.find(s => s.userId === userId);
+      const student = students.find(s => s.email === userEmail);
       
       if (!student) {
         return res.status(404).json({ message: "Student not found" });

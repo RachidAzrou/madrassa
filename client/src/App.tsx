@@ -43,6 +43,7 @@ import StudentLayout from "@/components/StudentLayout";
 import StudentDashboard from "@/pages/student/StudentDashboard";
 import GuardianLayout from "@/components/GuardianLayout";
 import GuardianDashboard from "@/pages/guardian/GuardianDashboard";
+import GuardianProfile from "@/pages/guardian/GuardianProfile";
 import SecretariatLayout from "@/components/SecretariatLayout";
 import SecretariatDashboard from "@/pages/secretariat/SecretariatDashboard";
 import Admissions from "@/pages/secretariat/Admissions";
@@ -110,7 +111,9 @@ function AuthenticatedRouter() {
     return (
       <GuardianLayout>
         <Switch>
-          <Route path="/" component={() => <AuthenticatedRoute component={Dashboard} />} />
+          <Route path="/" component={() => <AuthenticatedRoute component={GuardianDashboard} />} />
+          <Route path="/guardian/dashboard" component={() => <AuthenticatedRoute component={GuardianDashboard} />} />
+          <Route path="/guardian/profile" component={() => <AuthenticatedRoute component={GuardianProfile} />} />
           <Route path="/guardian/children" component={() => <AuthenticatedRoute component={SecretariatStudents} />} />
           <Route path="/guardian/attendance" component={() => <AuthenticatedRoute component={Attendance} />} />
           <Route path="/guardian/grades" component={() => <AuthenticatedRoute component={Cijfers} />} />

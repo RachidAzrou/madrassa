@@ -150,31 +150,7 @@ export default function TeacherLayout({ children }: TeacherLayoutProps) {
           </button>
         </div>
 
-        {/* User info - Admin Style */}
-        <div className="px-6 py-4 border-b border-[#e5e7eb] bg-[#f8fafc]">
-          <div className="flex items-center space-x-3">
-            <Avatar className="h-10 w-10">
-              <AvatarFallback className="bg-[#1e40af] text-white">
-                {profile?.firstName?.[0] || user?.firstName?.[0]}{profile?.lastName?.[0] || user?.lastName?.[0]}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-gray-900 truncate">
-                {profile?.firstName || user?.firstName} {profile?.lastName || user?.lastName}
-              </p>
-              <div className="flex items-center space-x-2 mt-1">
-                <Badge className="bg-[#10b981] text-white text-xs px-2 py-0.5">
-                  Docent
-                </Badge>
-                {notifications?.length > 0 && (
-                  <Badge variant="destructive" className="text-xs">
-                    {notifications.length}
-                  </Badge>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
+        
 
         {/* Navigation - Admin Style with grouped sections */}
         <nav className="flex-1 px-3 py-4 space-y-4 overflow-y-auto">

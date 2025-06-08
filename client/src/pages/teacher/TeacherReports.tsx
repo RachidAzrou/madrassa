@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -7,9 +7,14 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { FileDown, Users, User, FileText, BarChart3, Target, Settings, Eye, Download, TrendingUp, Calculator, School, Calendar, CheckCircle, AlertCircle, Clock } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { useToast } from '@/hooks/use-toast';
+import { Progress } from '@/components/ui/progress';
+import { FileDown, Users, User, FileText, BarChart3, Target, Settings, Eye, Download, TrendingUp, Calculator, School, Calendar, CheckCircle, AlertCircle, Clock, Save, Loader2, Trash2, Edit } from 'lucide-react';
 import { PremiumHeader } from '@/components/layout/premium-header';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { apiRequest } from '@/lib/queryClient';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import JSZip from 'jszip';
@@ -92,6 +97,18 @@ export default function TeacherReports() {
   const [attendanceComments, setAttendanceComments] = useState('');
   const [reportPreview, setReportPreview] = useState<ReportData[]>([]);
   const [behaviorGrades, setBehaviorGrades] = useState<{[key: number]: BehaviorGrade}>({});
+  
+  // Dialog states - Admin style
+  const [saveTemplateDialog, setSaveTemplateDialog] = useState(false);
+  const [loadTemplateDialog, setLoadTemplateDialog] = useState(false);
+  const [deleteConfirmDialog, setDeleteConfirmDialog] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState<any>(null);
+  const [templateName, setTemplateName] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generationProgress, setGenerationProgress] = useState(0);
+  
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const { data: classesData = [] } = useQuery({ 
     queryKey: ['/api/student-groups']
@@ -158,37 +175,170 @@ export default function TeacherReports() {
       return;
     }
 
-    if (selectedReportType === 'class' && reportPreview.length > 1) {
-      // Voor klassenrapporten: genereer ZIP met aparte PDF's
-      const zip = new JSZip();
-      const className = classes.find((c: StudentGroup) => c.id.toString() === selectedClass)?.name || 'Onbekend';
-      const currentDate = new Date().toLocaleDateString('nl-NL');
+    setIsGenerating(true);
+    setGenerationProgress(0);
 
-      for (const studentData of reportPreview) {
-        const pdf = generateStudentPDF(studentData);
-        const pdfBlob = pdf.output('blob');
-        const fileName = `${studentData.student.firstName}_${studentData.student.lastName}_${studentData.student.studentId}.pdf`;
-        zip.file(fileName, pdfBlob);
+    try {
+      if (selectedReportType === 'class' && reportPreview.length > 1) {
+        // Voor klassenrapporten: genereer ZIP met aparte PDF's
+        const zip = new JSZip();
+        const className = classes.find((c: StudentGroup) => c.id.toString() === selectedClass)?.name || 'Onbekend';
+        const currentDate = new Date().toLocaleDateString('nl-NL');
+
+        for (let i = 0; i < reportPreview.length; i++) {
+          const studentData = reportPreview[i];
+          setGenerationProgress(((i + 1) / reportPreview.length) * 80);
+          
+          const pdf = generateStudentPDF(studentData);
+          const pdfBlob = pdf.output('blob');
+          const fileName = `${studentData.student.firstName}_${studentData.student.lastName}_${studentData.student.studentId}.pdf`;
+          zip.file(fileName, pdfBlob);
+          
+          // Kleine delay voor UX
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+
+        setGenerationProgress(90);
+        const zipBlob = await zip.generateAsync({ type: 'blob' });
+        const zipFileName = `Klasserapport_${className}_${currentDate}.zip`;
+        
+        setGenerationProgress(100);
+        
+        // Download ZIP bestand
+        const url = URL.createObjectURL(zipBlob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = zipFileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+
+        toast({
+          title: "Rapporten gegenereerd",
+          description: `${reportPreview.length} rapporten succesvol gedownload als ZIP.`,
+        });
+      } else {
+        // Voor individuele rapporten: genereer enkele PDF
+        setGenerationProgress(50);
+        const pdf = generateStudentPDF(reportPreview[0]);
+        setGenerationProgress(100);
+        
+        const fileName = `Individueel_Rapport_${reportPreview[0]?.student.firstName}_${reportPreview[0]?.student.lastName}_${new Date().toLocaleDateString('nl-NL')}.pdf`;
+        pdf.save(fileName);
+
+        toast({
+          title: "Rapport gegenereerd",
+          description: "Individueel rapport succesvol gedownload.",
+        });
       }
-
-      const zipBlob = await zip.generateAsync({ type: 'blob' });
-      const zipFileName = `Klasserapport_${className}_${currentDate}.zip`;
-      
-      // Download ZIP bestand
-      const url = URL.createObjectURL(zipBlob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = zipFileName;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-    } else {
-      // Voor individuele rapporten: genereer enkele PDF
-      const pdf = generateStudentPDF(reportPreview[0]);
-      const fileName = `Individueel_Rapport_${reportPreview[0]?.student.firstName}_${reportPreview[0]?.student.lastName}_${new Date().toLocaleDateString('nl-NL')}.pdf`;
-      pdf.save(fileName);
+    } catch (error) {
+      toast({
+        title: "Fout bij genereren",
+        description: "Er is een fout opgetreden bij het genereren van de rapporten.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGenerating(false);
+      setGenerationProgress(0);
     }
+  };
+
+  // Template functies - Admin style
+  const saveTemplate = useMutation({
+    mutationFn: async (data: any) => {
+      return apiRequest('/api/teacher/report-templates', { 
+        method: 'POST', 
+        body: data 
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Template opgeslagen",
+        description: "Rapportsjabloon is succesvol opgeslagen.",
+      });
+      setSaveTemplateDialog(false);
+      setTemplateName('');
+      queryClient.invalidateQueries({ queryKey: ['/api/teacher/report-templates'] });
+    },
+    onError: () => {
+      toast({
+        title: "Fout bij opslaan",
+        description: "Er is een fout opgetreden bij het opslaan van het sjabloon.",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const deleteTemplate = useMutation({
+    mutationFn: async (templateId: string) => {
+      return apiRequest(`/api/teacher/report-templates/${templateId}`, { 
+        method: 'DELETE' 
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Template verwijderd",
+        description: "Rapportsjabloon is succesvol verwijderd.",
+      });
+      setDeleteConfirmDialog(false);
+      setSelectedTemplate(null);
+      queryClient.invalidateQueries({ queryKey: ['/api/teacher/report-templates'] });
+    },
+    onError: () => {
+      toast({
+        title: "Fout bij verwijderen",
+        description: "Er is een fout opgetreden bij het verwijderen van het sjabloon.",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const handleSaveTemplate = () => {
+    if (!templateName.trim()) {
+      toast({
+        title: "Naam vereist",
+        description: "Voer een naam in voor het sjabloon.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const templateData = {
+      name: templateName,
+      reportType: selectedReportType,
+      classId: selectedClass,
+      studentId: selectedStudent,
+      schoolName,
+      reportPeriod,
+      generalComments,
+      attendanceComments,
+      behaviorGrades
+    };
+
+    saveTemplate.mutate(templateData);
+  };
+
+  const handleLoadTemplate = (template: any) => {
+    setSelectedReportType(template.reportType);
+    setSelectedClass(template.classId || '');
+    setSelectedStudent(template.studentId || '');
+    setSchoolName(template.schoolName || 'myMadrassa');
+    setReportPeriod(template.reportPeriod || '');
+    setGeneralComments(template.generalComments || '');
+    setAttendanceComments(template.attendanceComments || '');
+    setBehaviorGrades(template.behaviorGrades || {});
+    
+    setLoadTemplateDialog(false);
+    toast({
+      title: "Template geladen",
+      description: `Sjabloon "${template.name}" is geladen.`,
+    });
+  };
+
+  const handleDeleteTemplate = (template: any) => {
+    setSelectedTemplate(template);
+    setDeleteConfirmDialog(true);
   };
 
   const generateStudentPDF = (studentData: ReportData) => {
@@ -491,13 +641,57 @@ export default function TeacherReports() {
 
                     <Button 
                       onClick={generateReportData}
-                      disabled={!selectedClass && !selectedStudent}
+                      disabled={(!selectedClass && !selectedStudent) || isGenerating}
                       className="w-full"
                       size="lg"
                     >
-                      <FileDown className="h-4 w-4 mr-2" />
-                      {selectedReportType === 'class' ? 'Download ZIP (Alle Rapporten)' : 'Genereer PDF Rapport'}
+                      {isGenerating ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Genereren...
+                        </>
+                      ) : (
+                        <>
+                          <FileDown className="h-4 w-4 mr-2" />
+                          {selectedReportType === 'class' ? 'Download ZIP (Alle Rapporten)' : 'Genereer PDF Rapport'}
+                        </>
+                      )}
                     </Button>
+                    
+                    {isGenerating && (
+                      <div className="w-full">
+                        <div className="flex justify-between text-sm text-gray-600 mb-1">
+                          <span>Voortgang</span>
+                          <span>{generationProgress}%</span>
+                        </div>
+                        <Progress value={generationProgress} className="w-full" />
+                      </div>
+                    )}
+
+                    <div className="border-t pt-4 mt-4">
+                      <h4 className="font-medium text-sm mb-3">Sjabloon Beheer</h4>
+                      <div className="space-y-2">
+                        <Button 
+                          onClick={() => setSaveTemplateDialog(true)}
+                          disabled={!selectedClass && !selectedStudent}
+                          variant="outline"
+                          size="sm"
+                          className="w-full"
+                        >
+                          <Save className="h-4 w-4 mr-2" />
+                          Sjabloon Opslaan
+                        </Button>
+                        <Button 
+                          onClick={() => setLoadTemplateDialog(true)}
+                          variant="outline"
+                          size="sm"
+                          className="w-full"
+                        >
+                          <Download className="h-4 w-4 mr-2" />
+                          Sjabloon Laden
+                        </Button>
+                      </div>
+                    </div>
                     
                     <div className="bg-gray-50 p-4 rounded-lg space-y-2">
                       <h4 className="font-medium text-sm">Rapport bevat:</h4>
@@ -800,6 +994,177 @@ export default function TeacherReports() {
         </Tabs>
         </div>
       </div>
+
+      {/* Admin-style Dialogs */}
+      
+      {/* Save Template Dialog */}
+      <Dialog open={saveTemplateDialog} onOpenChange={setSaveTemplateDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Save className="h-5 w-5 text-blue-600" />
+              Sjabloon Opslaan
+            </DialogTitle>
+            <DialogDescription>
+              Sla uw huidige rapportconfiguratie op als herbruikbaar sjabloon.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="template-name">Sjabloon Naam</Label>
+              <Input
+                id="template-name"
+                value={templateName}
+                onChange={(e) => setTemplateName(e.target.value)}
+                placeholder="Geef uw sjabloon een naam..."
+                className="w-full"
+              />
+            </div>
+            <div className="bg-gray-50 p-3 rounded-lg text-sm">
+              <p className="font-medium text-gray-700 mb-1">Wordt opgeslagen:</p>
+              <ul className="text-gray-600 space-y-1">
+                <li>• Rapport type: {selectedReportType === 'class' ? 'Klasserapport' : 'Individueel rapport'}</li>
+                <li>• School instellingen</li>
+                <li>• Commentaren en opmerkingen</li>
+                <li>• Gedragsbeoordeling instellingen</li>
+              </ul>
+            </div>
+          </div>
+          <DialogFooter className="gap-2">
+            <Button 
+              variant="outline" 
+              onClick={() => setSaveTemplateDialog(false)}
+              disabled={saveTemplate.isPending}
+            >
+              Annuleren
+            </Button>
+            <Button 
+              onClick={handleSaveTemplate}
+              disabled={saveTemplate.isPending || !templateName.trim()}
+            >
+              {saveTemplate.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Opslaan...
+                </>
+              ) : (
+                <>
+                  <Save className="h-4 w-4 mr-2" />
+                  Opslaan
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Load Template Dialog */}
+      <Dialog open={loadTemplateDialog} onOpenChange={setLoadTemplateDialog}>
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Download className="h-5 w-5 text-green-600" />
+              Sjabloon Laden
+            </DialogTitle>
+            <DialogDescription>
+              Kies een opgeslagen sjabloon om uw rapportconfiguratie te laden.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <div className="space-y-3 max-h-96 overflow-y-auto">
+              {/* Mock templates - in werkelijkheid uit API */}
+              {[
+                { id: 1, name: 'Kwartaal 1 - Standaard', reportType: 'class', lastUsed: '2024-01-15' },
+                { id: 2, name: 'Individueel Rapport - Uitgebreid', reportType: 'individual', lastUsed: '2024-01-10' },
+                { id: 3, name: 'Eind van jaar rapport', reportType: 'class', lastUsed: '2024-01-05' }
+              ].map((template) => (
+                <div key={template.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <FileText className="h-5 w-5 text-blue-600" />
+                      </div>
+                      <div>
+                        <h4 className="font-medium text-gray-900">{template.name}</h4>
+                        <div className="flex items-center gap-4 text-sm text-gray-600">
+                          <span>Type: {template.reportType === 'class' ? 'Klasserapport' : 'Individueel'}</span>
+                          <span>Laatst gebruikt: {template.lastUsed}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleLoadTemplate(template)}
+                    >
+                      <Download className="h-4 w-4 mr-1" />
+                      Laden
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleDeleteTemplate(template)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+            {/* Empty state */}
+            <div className="text-center py-8 text-gray-500">
+              <FileText className="h-12 w-12 mx-auto mb-2 text-gray-400" />
+              <p>Geen opgeslagen sjablonen gevonden</p>
+              <p className="text-sm">Maak eerst een rapport en sla het op als sjabloon.</p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setLoadTemplateDialog(false)}>
+              Sluiten
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteConfirmDialog} onOpenChange={setDeleteConfirmDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertCircle className="h-5 w-5 text-red-600" />
+              Sjabloon Verwijderen
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Weet u zeker dat u het sjabloon "{selectedTemplate?.name}" wilt verwijderen? 
+              Deze actie kan niet ongedaan worden gemaakt.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleteTemplate.isPending}>
+              Annuleren
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => selectedTemplate && deleteTemplate.mutate(selectedTemplate.id)}
+              disabled={deleteTemplate.isPending}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {deleteTemplate.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Verwijderen...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Verwijderen
+                </>
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

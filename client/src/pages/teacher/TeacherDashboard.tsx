@@ -1,8 +1,10 @@
+import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
+import { PremiumHeader } from "@/components/layout/premium-header";
 import {
   Users,
   BookOpen,
@@ -10,7 +12,17 @@ import {
   UserCheck,
   Clock,
   Bell,
-  ChevronRight
+  ChevronRight,
+  TrendingUp,
+  CheckCircle,
+  AlertCircle,
+  MessageCircle,
+  FileText,
+  GraduationCap,
+  BarChart3,
+  Award,
+  Target,
+  Activity
 } from "lucide-react";
 import { Link } from "wouter";
 
@@ -56,22 +68,7 @@ export default function TeacherDashboard() {
     retry: false,
   });
 
-  if (statsLoading) {
-    return (
-      <div className="p-6">
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/4 mb-6"></div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[...Array(6)].map((_, i) => (
-              <div key={i} className="h-32 bg-gray-200 rounded-lg"></div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  const dashboardStats = stats?.stats || {
+  const teacherStats = stats?.stats || {
     myClasses: 0,
     totalStudents: 0,
     mySubjects: 0,
@@ -80,223 +77,348 @@ export default function TeacherDashboard() {
     unreadMessages: 0
   };
 
+  const lessons = upcomingLessons?.lessons || [];
+  const activities = recentActivity?.activities || [];
+
+  const getActivityIcon = (type: string) => {
+    switch (type) {
+      case 'grade':
+        return <FileText className="h-4 w-4 text-blue-600" />;
+      case 'attendance':
+        return <UserCheck className="h-4 w-4 text-green-600" />;
+      case 'message':
+        return <MessageCircle className="h-4 w-4 text-purple-600" />;
+      default:
+        return <Activity className="h-4 w-4 text-gray-600" />;
+    }
+  };
+
+  const getActivityColor = (type: string) => {
+    switch (type) {
+      case 'grade':
+        return 'bg-blue-50 border-blue-200';
+      case 'attendance':
+        return 'bg-green-50 border-green-200';
+      case 'message':
+        return 'bg-purple-50 border-purple-200';
+      default:
+        return 'bg-gray-50 border-gray-200';
+    }
+  };
+
   return (
-    <div className="p-6 bg-[#f7f9fc] min-h-screen">
-      {/* Header - Admin Style */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-[#1e40af] mb-2">
-              Welkom terug, {user?.firstName}!
-            </h1>
-            <p className="text-gray-600">
-              Hier is een overzicht van je klassen en activiteiten
-            </p>
-          </div>
-          <div className="flex items-center space-x-3">
-            <Button className="bg-[#1e40af] hover:bg-[#1d3a8a] text-white">
-              <Calendar className="h-4 w-4 mr-2" />
-              Nieuw Rooster
-            </Button>
-          </div>
+    <div className="bg-[#f7f9fc] min-h-screen">
+      <PremiumHeader 
+        title="Docent Dashboard" 
+        icon={GraduationCap}
+        description={`Welkom terug, ${user?.firstName || 'Docent'}! Hier is uw overzicht voor vandaag.`}
+        breadcrumbs={{
+          parent: "Docent",
+          current: "Dashboard"
+        }}
+      />
+      
+      <div className="px-6 py-6 space-y-6">
+        {/* Quick Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+          <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-blue-600 text-sm font-medium">Mijn Klassen</p>
+                  <p className="text-2xl font-bold text-blue-900">{teacherStats.myClasses}</p>
+                </div>
+                <div className="h-12 w-12 bg-blue-500 rounded-lg flex items-center justify-center">
+                  <GraduationCap className="h-6 w-6 text-white" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-green-600 text-sm font-medium">Studenten</p>
+                  <p className="text-2xl font-bold text-green-900">{teacherStats.totalStudents}</p>
+                </div>
+                <div className="h-12 w-12 bg-green-500 rounded-lg flex items-center justify-center">
+                  <Users className="h-6 w-6 text-white" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-purple-600 text-sm font-medium">Vakken</p>
+                  <p className="text-2xl font-bold text-purple-900">{teacherStats.mySubjects}</p>
+                </div>
+                <div className="h-12 w-12 bg-purple-500 rounded-lg flex items-center justify-center">
+                  <BookOpen className="h-6 w-6 text-white" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-orange-600 text-sm font-medium">Komende Lessen</p>
+                  <p className="text-2xl font-bold text-orange-900">{teacherStats.upcomingLessons}</p>
+                </div>
+                <div className="h-12 w-12 bg-orange-500 rounded-lg flex items-center justify-center">
+                  <Calendar className="h-6 w-6 text-white" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-200">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-red-600 text-sm font-medium">Te Beoordelen</p>
+                  <p className="text-2xl font-bold text-red-900">{teacherStats.pendingGrades}</p>
+                </div>
+                <div className="h-12 w-12 bg-red-500 rounded-lg flex items-center justify-center">
+                  <FileText className="h-6 w-6 text-white" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-indigo-50 to-indigo-100 border-indigo-200">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-indigo-600 text-sm font-medium">Berichten</p>
+                  <p className="text-2xl font-bold text-indigo-900">{teacherStats.unreadMessages}</p>
+                </div>
+                <div className="h-12 w-12 bg-indigo-500 rounded-lg flex items-center justify-center">
+                  <MessageCircle className="h-6 w-6 text-white" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
-      </div>
 
-      {/* Stats Grid - Admin Style */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        <Card className="bg-white border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-            <CardTitle className="text-sm font-medium text-gray-700">Mijn Klassen</CardTitle>
-            <div className="p-2 bg-[#eff6ff] rounded-lg">
-              <Users className="h-4 w-4 text-[#1e40af]" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-[#1e40af]">{dashboardStats.myClasses}</div>
-            <p className="text-xs text-gray-600 mt-1">
-              Actieve klassen dit schooljaar
-            </p>
-          </CardContent>
-        </Card>
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Column - 2/3 width */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Quick Actions */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Target className="h-5 w-5 text-blue-600" />
+                  Snelle Acties
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <Link href="/teacher/attendance">
+                    <Button variant="outline" className="w-full h-16 flex-col gap-2 hover:bg-blue-50 hover:border-blue-300">
+                      <UserCheck className="h-5 w-5 text-blue-600" />
+                      <span className="text-sm">Aanwezigheid</span>
+                    </Button>
+                  </Link>
+                  
+                  <Link href="/teacher/grades">
+                    <Button variant="outline" className="w-full h-16 flex-col gap-2 hover:bg-green-50 hover:border-green-300">
+                      <BarChart3 className="h-5 w-5 text-green-600" />
+                      <span className="text-sm">Cijfers</span>
+                    </Button>
+                  </Link>
+                  
+                  <Link href="/teacher/reports">
+                    <Button variant="outline" className="w-full h-16 flex-col gap-2 hover:bg-purple-50 hover:border-purple-300">
+                      <FileText className="h-5 w-5 text-purple-600" />
+                      <span className="text-sm">Rapporten</span>
+                    </Button>
+                  </Link>
+                  
+                  <Link href="/teacher/classes">
+                    <Button variant="outline" className="w-full h-16 flex-col gap-2 hover:bg-orange-50 hover:border-orange-300">
+                      <GraduationCap className="h-5 w-5 text-orange-600" />
+                      <span className="text-sm">Klassen</span>
+                    </Button>
+                  </Link>
+                  
+                  <Link href="/teacher/subjects">
+                    <Button variant="outline" className="w-full h-16 flex-col gap-2 hover:bg-indigo-50 hover:border-indigo-300">
+                      <BookOpen className="h-5 w-5 text-indigo-600" />
+                      <span className="text-sm">Vakken</span>
+                    </Button>
+                  </Link>
+                  
+                  <Link href="/teacher/communications">
+                    <Button variant="outline" className="w-full h-16 flex-col gap-2 hover:bg-pink-50 hover:border-pink-300">
+                      <MessageCircle className="h-5 w-5 text-pink-600" />
+                      <span className="text-sm">Berichten</span>
+                    </Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
 
-        <Card className="bg-white border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-            <CardTitle className="text-sm font-medium text-gray-700">Mijn Studenten</CardTitle>
-            <div className="p-2 bg-[#f0fdf4] rounded-lg">
-              <Users className="h-4 w-4 text-[#16a34a]" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-[#16a34a]">{dashboardStats.totalStudents}</div>
-            <p className="text-xs text-gray-600 mt-1">
-              Studenten in al mijn klassen
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-            <CardTitle className="text-sm font-medium text-gray-700">Mijn Vakken</CardTitle>
-            <div className="p-2 bg-[#fef3c7] rounded-lg">
-              <BookOpen className="h-4 w-4 text-[#d97706]" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-[#d97706]">{dashboardStats.mySubjects}</div>
-            <p className="text-xs text-gray-600 mt-1">
-              Vakken die ik geef
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-            <CardTitle className="text-sm font-medium text-gray-700">Komende Lessen</CardTitle>
-            <div className="p-2 bg-[#fdf2f8] rounded-lg">
-              <Calendar className="h-4 w-4 text-[#be185d]" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-[#be185d]">{dashboardStats.upcomingLessons}</div>
-            <p className="text-xs text-gray-600 mt-1">
-              Vandaag en morgen
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-            <CardTitle className="text-sm font-medium text-gray-700">Te Beoordelen</CardTitle>
-            <div className="p-2 bg-[#f3e8ff] rounded-lg">
-              <UserCheck className="h-4 w-4 text-[#7c3aed]" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-[#7c3aed]">{dashboardStats.pendingGrades}</div>
-            <p className="text-xs text-gray-600 mt-1">
-              Openstaande beoordelingen
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-            <CardTitle className="text-sm font-medium text-gray-700">Berichten</CardTitle>
-            <div className="p-2 bg-[#fef3c7] rounded-lg">
-              <Bell className="h-4 w-4 text-[#dc2626]" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-[#dc2626]">{dashboardStats.unreadMessages}</div>
-            <p className="text-xs text-gray-600 mt-1">
-              Ongelezen berichten
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Content Grid - Admin Style */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Upcoming Lessons - Admin Style */}
-        <Card className="bg-white border border-[#e5e7eb] shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between border-b border-[#e5e7eb] pb-4">
-            <CardTitle className="flex items-center text-[#1e40af] font-semibold">
-              <Clock className="h-5 w-5 mr-2 text-[#1e40af]" />
-              Komende Lessen
-            </CardTitle>
-            <Link href="/teacher/schedule">
-              <Button variant="ghost" size="sm" className="text-[#1e40af] hover:bg-[#eff6ff]">
-                Alles bekijken <ChevronRight className="h-4 w-4 ml-1" />
-              </Button>
-            </Link>
-          </CardHeader>
-          <CardContent>
-            {upcomingLessons?.lessons?.length ? (
-              <div className="space-y-3">
-                {upcomingLessons.lessons.slice(0, 4).map((lesson) => (
-                  <div key={lesson.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <div>
-                      <p className="font-medium text-gray-900">{lesson.className} - {lesson.subject}</p>
-                      <p className="text-sm text-gray-500">{lesson.time} • {lesson.room}</p>
-                    </div>
-                    <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
-                      Vandaag
-                    </Badge>
+            {/* Today's Lessons */}
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <Calendar className="h-5 w-5 text-green-600" />
+                  Vandaag's Lessen
+                </CardTitle>
+                <Link href="/teacher/calendar">
+                  <Button variant="ghost" size="sm">
+                    Alle lessen
+                    <ChevronRight className="h-4 w-4 ml-1" />
+                  </Button>
+                </Link>
+              </CardHeader>
+              <CardContent>
+                {lessons.length > 0 ? (
+                  <div className="space-y-3">
+                    {lessons.slice(0, 5).map((lesson) => (
+                      <div key={lesson.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border">
+                        <div className="flex items-center space-x-4">
+                          <div className="h-10 w-10 bg-green-100 rounded-lg flex items-center justify-center">
+                            <BookOpen className="h-5 w-5 text-green-600" />
+                          </div>
+                          <div>
+                            <p className="font-medium text-gray-900">{lesson.subject}</p>
+                            <p className="text-sm text-gray-600">{lesson.className}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm font-medium text-gray-900">{lesson.time}</p>
+                          <p className="text-xs text-gray-500">{lesson.room}</p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-gray-500 text-center py-8">
-                Geen komende lessen gepland
-              </p>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Recent Activity */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="flex items-center">
-              <Bell className="h-5 w-5 mr-2 text-green-600" />
-              Recente Activiteit
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {recentActivity?.activities?.length ? (
-              <div className="space-y-3">
-                {recentActivity.activities.slice(0, 5).map((activity) => (
-                  <div key={activity.id} className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
-                    <div className={`w-2 h-2 rounded-full mt-2 ${
-                      activity.type === 'grade' ? 'bg-blue-500' :
-                      activity.type === 'attendance' ? 'bg-green-500' : 'bg-purple-500'
-                    }`} />
-                    <div className="flex-1">
-                      <p className="text-sm text-gray-900">{activity.description}</p>
-                      <p className="text-xs text-gray-500">{activity.timestamp}</p>
-                    </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-500">Geen lessen gepland voor vandaag</p>
                   </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-gray-500 text-center py-8">
-                Geen recente activiteit
-              </p>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
 
-      {/* Quick Actions */}
-      <div className="mt-8">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Snelle Acties</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Link href="/teacher/attendance">
-            <Button variant="outline" className="h-16 flex flex-col items-center justify-center">
-              <UserCheck className="h-6 w-6 mb-1" />
-              <span className="text-sm">Aanwezigheid</span>
-            </Button>
-          </Link>
-          
-          <Link href="/teacher/grades">
-            <Button variant="outline" className="h-16 flex flex-col items-center justify-center">
-              <BookOpen className="h-6 w-6 mb-1" />
-              <span className="text-sm">Cijfers</span>
-            </Button>
-          </Link>
-          
-          <Link href="/teacher/reports">
-            <Button variant="outline" className="h-16 flex flex-col items-center justify-center">
-              <Users className="h-6 w-6 mb-1" />
-              <span className="text-sm">Rapporten</span>
-            </Button>
-          </Link>
-          
-          <Link href="/teacher/schedule">
-            <Button variant="outline" className="h-16 flex flex-col items-center justify-center">
-              <Calendar className="h-6 w-6 mb-1" />
-              <span className="text-sm">Rooster</span>
-            </Button>
-          </Link>
+          {/* Right Column - 1/3 width */}
+          <div className="space-y-6">
+            {/* Performance Overview */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5 text-blue-600" />
+                  Prestatie Overzicht
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Klassen beheerd</span>
+                  <Badge variant="secondary">{teacherStats.myClasses}</Badge>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Totaal studenten</span>
+                  <Badge variant="secondary">{teacherStats.totalStudents}</Badge>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Vakken onderwezen</span>
+                  <Badge variant="secondary">{teacherStats.mySubjects}</Badge>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Aanwezigheidspercentage</span>
+                  <Badge className="bg-green-100 text-green-800">85%</Badge>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Recent Activity */}
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <Activity className="h-5 w-5 text-purple-600" />
+                  Recente Activiteit
+                </CardTitle>
+                <Button variant="ghost" size="sm">
+                  Alles bekijken
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
+              </CardHeader>
+              <CardContent>
+                {activities.length > 0 ? (
+                  <div className="space-y-3">
+                    {activities.slice(0, 6).map((activity) => (
+                      <div key={activity.id} className={`p-3 rounded-lg border ${getActivityColor(activity.type)}`}>
+                        <div className="flex items-start space-x-3">
+                          <div className="mt-0.5">
+                            {getActivityIcon(activity.type)}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm text-gray-900 mb-1">{activity.description}</p>
+                            <p className="text-xs text-gray-500">{activity.timestamp}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-6">
+                    <Activity className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                    <p className="text-sm text-gray-500">Geen recente activiteit</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Task Summary */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5 text-green-600" />
+                  Taak Samenvatting
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex items-center justify-between p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                  <div className="flex items-center space-x-2">
+                    <AlertCircle className="h-4 w-4 text-yellow-600" />
+                    <span className="text-sm text-yellow-800">Te beoordelen</span>
+                  </div>
+                  <Badge variant="outline" className="text-yellow-800 border-yellow-300">
+                    {teacherStats.pendingGrades}
+                  </Badge>
+                </div>
+                
+                <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200">
+                  <div className="flex items-center space-x-2">
+                    <MessageCircle className="h-4 w-4 text-blue-600" />
+                    <span className="text-sm text-blue-800">Ongelezen berichten</span>
+                  </div>
+                  <Badge variant="outline" className="text-blue-800 border-blue-300">
+                    {teacherStats.unreadMessages}
+                  </Badge>
+                </div>
+                
+                <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200">
+                  <div className="flex items-center space-x-2">
+                    <Calendar className="h-4 w-4 text-green-600" />
+                    <span className="text-sm text-green-800">Komende lessen</span>
+                  </div>
+                  <Badge variant="outline" className="text-green-800 border-green-300">
+                    {teacherStats.upcomingLessons}
+                  </Badge>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     </div>

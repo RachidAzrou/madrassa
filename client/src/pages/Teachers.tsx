@@ -571,20 +571,17 @@ export default function Teachers() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Premium header component */}
-      <PremiumHeader 
-        title="Docenten" 
-        icon={GraduationCap}
-        description="Beheer alle docenten en hun gegevens, vakken en beschikbaarheid"
-        breadcrumbs={{
-          parent: "Beheer",
-          current: "Docenten"
-        }}
+    <div className="bg-[#f7f9fc] min-h-screen">
+      {/* Professional Page Header */}
+      <PageHeader
+        title="Docenten"
+        icon={<GraduationCap className="h-5 w-5 text-white" />}
+        parent="Beheer"
+        current="Docenten"
       />
       
       {/* Main content area */}
-      <div className="px-6 py-6 flex-1">
+      <div className="px-6 py-6 max-w-7xl mx-auto">
         {/* Zoek- en actiebalk - Desktop style */}
         <div className="bg-white border border-[#e5e7eb] rounded-sm mb-4">
           <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">

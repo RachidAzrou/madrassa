@@ -70,7 +70,7 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
     {
       name: "Mijn Klas",
       href: "/student/class",
-      icon: Users,
+      icon: School,
       current: location === "/student/class"
     },
     {
@@ -94,7 +94,7 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
     {
       name: "Docenten",
       href: "/student/teachers",
-      icon: Users,
+      icon: User,
       current: location === "/student/teachers"
     },
     {
@@ -102,6 +102,12 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
       href: "/student/communications",
       icon: MessageCircle,
       current: location === "/student/communications"
+    },
+    {
+      name: "Rapporten",
+      href: "/student/reports",
+      icon: FileText,
+      current: location === "/student/reports"
     }
   ];
 

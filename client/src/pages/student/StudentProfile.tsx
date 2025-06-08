@@ -82,7 +82,19 @@ export default function StudentProfile() {
 
   const updateProfileMutation = useMutation({
     mutationFn: async (data: Partial<StudentProfile>) => {
-      await apiRequest('PUT', '/api/student/profile', data);
+      const response = await fetch('/api/student/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to update profile');
+      }
+      
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/student/profile'] });

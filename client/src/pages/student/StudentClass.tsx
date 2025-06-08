@@ -12,7 +12,8 @@ import {
   Calendar,
   User,
   ChevronRight,
-  BookOpen
+  BookOpen,
+  MessageCircle
 } from "lucide-react";
 import { Link } from "wouter";
 

@@ -122,7 +122,7 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
               <Menu className="w-5 h-5" />
             </button>
             <img 
-              src={logoPath} 
+              src={myMadrassaLogo} 
               alt="myMadrassa Logo" 
               className="w-6 h-6"
             />

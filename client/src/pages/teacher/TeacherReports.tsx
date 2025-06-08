@@ -1115,7 +1115,7 @@ export default function TeacherReports() {
             </div>
             {/* Empty state */}
             <div className="text-center py-8 text-gray-500">
-              <FileText className="h-12 w-12 mx-auto mb-2 text-gray-400" />
+              <BookMarked className="h-12 w-12 mx-auto mb-2 text-gray-400" />
               <p>Geen opgeslagen sjablonen gevonden</p>
               <p className="text-sm">Maak eerst een rapport en sla het op als sjabloon.</p>
             </div>

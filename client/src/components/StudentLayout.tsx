@@ -484,7 +484,7 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
       </div>
 
       {/* Sidebar - Admin Interface Copy - Starts below topbar */}
-      <div className={`fixed top-12 bottom-0 left-0 z-50 w-56 bg-white shadow-lg transform ${
+      <div className={`fixed top-12 bottom-0 left-0 z-50 w-52 bg-white shadow-lg transform ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       } transition-transform duration-300 ease-in-out lg:translate-x-0 lg:fixed lg:top-12 border-r border-[#e5e7eb]`}>
         
@@ -499,7 +499,7 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
         </div>
 
         {/* Navigation - Mobile Optimized */}
-        <nav className="mt-5 flex-1 px-3 space-y-2">
+        <nav className="mt-4 flex-1 px-2 space-y-1">
           {navigation.map((item) => {
             const Icon = item.icon;
             const isActive = location === item.href;
@@ -507,14 +507,14 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
             return (
               <Link key={item.name} href={item.href}>
                 <div
-                  className={`group flex items-center px-4 py-4 text-base font-medium rounded-lg cursor-pointer touch-manipulation transition-colors ${
+                  className={`group flex items-center px-3 py-3 text-sm font-medium rounded-lg cursor-pointer touch-manipulation transition-colors ${
                     isActive
                       ? 'bg-[#1e40af] text-white shadow-sm'
                       : 'text-gray-700 hover:bg-[#f1f5f9] hover:text-[#1e40af] active:bg-gray-200'
                   }`}
                   onClick={() => setSidebarOpen(false)}
                 >
-                  <Icon className={`mr-4 flex-shrink-0 h-6 w-6 ${
+                  <Icon className={`mr-3 flex-shrink-0 h-5 w-5 ${
                     isActive ? 'text-white' : 'text-gray-500 group-hover:text-[#1e40af]'
                   }`} />
                   {item.name}
@@ -526,7 +526,7 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
       </div>
 
       {/* Main content - Mobile Optimized */}
-      <div className="pt-12 lg:pl-56">
+      <div className="pt-12 lg:pl-52">
         <main className="bg-[#f7f9fc] min-h-screen p-3 sm:p-4 lg:p-6">
           {children}
         </main>

@@ -15,7 +15,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import EmptyState from '@/components/ui/empty-state';
-import { PremiumHeader } from '@/components/layout/premium-header';
+import { PageHeader } from '@/components/layout/page-header';
 import { 
   CustomDialog, 
   DialogFormContainer, 

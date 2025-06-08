@@ -293,7 +293,7 @@ export default function GuardianLayout({ children }: GuardianLayoutProps) {
       </div>
 
       {/* Sidebar - Exact Admin Interface Copy */}
-      <div className={`fixed top-12 bottom-0 left-0 z-50 w-64 bg-white shadow-lg transform ${
+      <div className={`fixed top-12 bottom-0 left-0 z-50 w-52 bg-white shadow-lg transform ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       } transition-transform duration-300 ease-in-out lg:translate-x-0 lg:fixed lg:top-12 border-r border-[#e5e7eb]`}>
         
@@ -432,7 +432,7 @@ export default function GuardianLayout({ children }: GuardianLayoutProps) {
       </div>
 
       {/* Main content - Admin Style */}
-      <div className="pt-12 lg:pl-64">
+      <div className="pt-12 lg:pl-52">
         <main className="bg-[#f7f9fc] min-h-screen p-6">
           {(() => {
             // Pages that don't require child selection

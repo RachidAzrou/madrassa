@@ -162,6 +162,7 @@ function AuthenticatedRouter() {
           <Route path="/teacher/grades" component={() => <AuthenticatedRoute component={Cijfers} />} />
           <Route path="/teacher/communications" component={() => <AuthenticatedRoute component={Messages} />} />
           <Route path="/teacher/reports" component={() => <AuthenticatedRoute component={TeacherReports} />} />
+          <Route path="/teacher/profile" component={() => <AuthenticatedRoute component={Profile} />} />
           <Route path="/notifications" component={() => <AuthenticatedRoute component={Notifications} />} />
           <Route path="/messages" component={() => <AuthenticatedRoute component={Messages} />} />
           <Route path="/mijn-account" component={() => <AuthenticatedRoute component={MyAccount} />} />

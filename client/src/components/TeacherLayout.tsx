@@ -6,14 +6,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import {
-  Home,
+  LayoutDashboard,
   Users,
   Calendar,
-  BookOpen,
-  UserCheck,
-  GraduationCap,
-  FileText,
-  Settings,
+  BookText,
+  ClipboardCheck,
+  School,
+  BookMarked,
+  Percent,
   LogOut,
   Menu,
   X,
@@ -21,7 +21,8 @@ import {
   ChevronDown,
   User,
   MessageCircle,
-  Search
+  Search,
+  Settings
 } from "lucide-react";
 import logoPath from "@assets/myMadrassa.png";
 
@@ -50,7 +51,7 @@ export default function TeacherLayout({ children }: TeacherLayoutProps) {
     {
       name: 'Dashboard',
       href: '/teacher',
-      icon: Home,
+      icon: LayoutDashboard,
       current: location === '/teacher' || location === '/teacher/'
     }
   ];
@@ -65,13 +66,13 @@ export default function TeacherLayout({ children }: TeacherLayoutProps) {
     {
       name: 'Klassen',
       href: '/teacher/classes',
-      icon: GraduationCap,
+      icon: School,
       current: location.startsWith('/teacher/classes')
     },
     {
       name: 'Aanwezigheid',
       href: '/teacher/attendance',
-      icon: UserCheck,
+      icon: ClipboardCheck,
       current: location.startsWith('/teacher/attendance')
     }
   ];
@@ -80,19 +81,19 @@ export default function TeacherLayout({ children }: TeacherLayoutProps) {
     {
       name: 'Cijfers',
       href: '/teacher/grades',
-      icon: FileText,
+      icon: Percent,
       current: location.startsWith('/teacher/grades')
     },
     {
       name: 'Vakken',
       href: '/teacher/subjects',
-      icon: BookOpen,
+      icon: BookText,
       current: location.startsWith('/teacher/subjects')
     },
     {
       name: 'Rapporten',
       href: '/teacher/reports',
-      icon: FileText,
+      icon: BookMarked,
       current: location.startsWith('/teacher/reports')
     },
     {

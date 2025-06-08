@@ -194,7 +194,7 @@ export default function TeacherClasses() {
       <PremiumHeader
         title="Mijn Klassen"
         description="Beheer klassen waar u lesgeeft"
-        icon={GraduationCap}
+        icon={School}
         breadcrumbs={{
           parent: "Docent",
           current: "Klassen"

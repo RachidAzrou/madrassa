@@ -130,7 +130,7 @@ export default function TeacherDashboard() {
                   <p className="text-2xl font-bold text-blue-900">{teacherStats.myClasses}</p>
                 </div>
                 <div className="h-12 w-12 bg-blue-500 rounded-lg flex items-center justify-center">
-                  <GraduationCap className="h-6 w-6 text-white" />
+                  <School className="h-6 w-6 text-white" />
                 </div>
               </div>
             </CardContent>
@@ -186,7 +186,7 @@ export default function TeacherDashboard() {
                   <p className="text-2xl font-bold text-red-900">{teacherStats.pendingGrades}</p>
                 </div>
                 <div className="h-12 w-12 bg-red-500 rounded-lg flex items-center justify-center">
-                  <FileText className="h-6 w-6 text-white" />
+                  <Percent className="h-6 w-6 text-white" />
                 </div>
               </div>
             </CardContent>
@@ -223,7 +223,7 @@ export default function TeacherDashboard() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   <Link href="/teacher/attendance">
                     <Button variant="outline" className="w-full h-16 flex-col gap-2 hover:bg-blue-50 hover:border-blue-300">
-                      <UserCheck className="h-5 w-5 text-blue-600" />
+                      <ClipboardCheck className="h-5 w-5 text-blue-600" />
                       <span className="text-sm">Aanwezigheid</span>
                     </Button>
                   </Link>
@@ -237,21 +237,21 @@ export default function TeacherDashboard() {
                   
                   <Link href="/teacher/reports">
                     <Button variant="outline" className="w-full h-16 flex-col gap-2 hover:bg-purple-50 hover:border-purple-300">
-                      <FileText className="h-5 w-5 text-purple-600" />
+                      <BookMarked className="h-5 w-5 text-purple-600" />
                       <span className="text-sm">Rapporten</span>
                     </Button>
                   </Link>
                   
                   <Link href="/teacher/classes">
                     <Button variant="outline" className="w-full h-16 flex-col gap-2 hover:bg-orange-50 hover:border-orange-300">
-                      <GraduationCap className="h-5 w-5 text-orange-600" />
+                      <School className="h-5 w-5 text-orange-600" />
                       <span className="text-sm">Klassen</span>
                     </Button>
                   </Link>
                   
                   <Link href="/teacher/subjects">
                     <Button variant="outline" className="w-full h-16 flex-col gap-2 hover:bg-indigo-50 hover:border-indigo-300">
-                      <BookOpen className="h-5 w-5 text-indigo-600" />
+                      <BookText className="h-5 w-5 text-indigo-600" />
                       <span className="text-sm">Vakken</span>
                     </Button>
                   </Link>
@@ -287,7 +287,7 @@ export default function TeacherDashboard() {
                       <div key={lesson.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border">
                         <div className="flex items-center space-x-4">
                           <div className="h-10 w-10 bg-green-100 rounded-lg flex items-center justify-center">
-                            <BookOpen className="h-5 w-5 text-green-600" />
+                            <BookText className="h-5 w-5 text-green-600" />
                           </div>
                           <div>
                             <p className="font-medium text-gray-900">{lesson.subject}</p>

@@ -169,52 +169,52 @@ export default function GuardianProfile() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Mijn Profiel</h1>
-            <p className="text-gray-600">Beheer uw persoonlijke informatie en voorkeuren</p>
-          </div>
-          
-          {!isEditing ? (
-            <Button onClick={handleEdit} className="bg-[#1e40af] hover:bg-[#1e40af]/90">
-              <Edit3 className="w-4 h-4 mr-2" />
-              Bewerken
-            </Button>
-          ) : (
-            <div className="flex gap-2">
-              <Button 
-                onClick={handleCancel} 
-                variant="outline"
-                disabled={updateProfileMutation.isPending}
-              >
-                <X className="w-4 h-4 mr-2" />
-                Annuleren
-              </Button>
-              <Button 
-                onClick={handleSave} 
-                className="bg-[#1e40af] hover:bg-[#1e40af]/90"
-                disabled={updateProfileMutation.isPending}
-              >
-                <Save className="w-4 h-4 mr-2" />
-                {updateProfileMutation.isPending ? "Opslaan..." : "Opslaan"}
-              </Button>
-            </div>
-          )}
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Mijn Profiel</h1>
+          <p className="text-gray-600">Beheer uw persoonlijke informatie en voorkeuren</p>
         </div>
+        
+        {!isEditing ? (
+          <Button onClick={handleEdit} className="bg-[#1e40af] hover:bg-[#1e40af]/90">
+            <Edit3 className="w-4 h-4 mr-2" />
+            Bewerken
+          </Button>
+        ) : (
+          <div className="flex gap-2">
+            <Button 
+              onClick={handleCancel} 
+              variant="outline"
+              disabled={updateProfileMutation.isPending}
+            >
+              <X className="w-4 h-4 mr-2" />
+              Annuleren
+            </Button>
+            <Button 
+              onClick={handleSave} 
+              className="bg-[#1e40af] hover:bg-[#1e40af]/90"
+              disabled={updateProfileMutation.isPending}
+            >
+              <Save className="w-4 h-4 mr-2" />
+              {updateProfileMutation.isPending ? "Opslaan..." : "Opslaan"}
+            </Button>
+          </div>
+        )}
+      </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Profile Info Card */}
-          <div className="lg:col-span-2">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <User className="w-5 h-5 text-[#1e40af]" />
-                  Persoonlijke Informatie
-                </CardTitle>
-                <CardDescription>
-                  Uw basis contactgegevens en persoonlijke informatie
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Profile Info Card */}
+        <div className="lg:col-span-2">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <User className="w-5 h-5 text-[#1e40af]" />
+                Persoonlijke Informatie
+              </CardTitle>
+              <CardDescription>
+                Uw basis contactgegevens en persoonlijke informatie
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
                 {/* Avatar and Basic Info */}
                 <div className="flex items-center gap-4">
                   <Avatar className="w-20 h-20">

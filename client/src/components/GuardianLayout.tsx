@@ -273,9 +273,11 @@ export default function GuardianLayout({ children }: GuardianLayoutProps) {
                   <span className="text-xs text-gray-500">Voogd</span>
                 </div>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => setLocation('/guardian/profile')}>
-                  <User className="mr-2 h-4 w-4" />
-                  <span>Mijn Profiel</span>
+                <DropdownMenuItem asChild>
+                  <Link href="/guardian/profile" className="flex items-center">
+                    <User className="mr-2 h-4 w-4" />
+                    <span>Mijn Profiel</span>
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout}>

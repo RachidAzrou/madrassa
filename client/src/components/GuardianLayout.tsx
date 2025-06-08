@@ -23,8 +23,11 @@ import {
   Settings,
   ChevronDown,
   MessageCircle,
-  Search
+  Search,
+  Mail
 } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import logoPath from "@assets/myMadrassa.png";
 
 interface GuardianLayoutProps {
@@ -45,7 +48,7 @@ export default function GuardianLayout({ children }: GuardianLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedChildId, setSelectedChildId] = useState<string>("");
 
-  // Data fetching - admin interface copy
+  // Data fetching - exact admin interface copy
   const { data: notifications = [] } = useQuery<any[]>({
     queryKey: ['/api/notifications/user/1'],
     staleTime: 30000,
@@ -56,14 +59,10 @@ export default function GuardianLayout({ children }: GuardianLayoutProps) {
     staleTime: 60000,
   });
 
-  // Fetch guardian's children
-  const { data: childrenData } = useQuery<{ children: Child[] }>({
+  const { data: children_list = [], isLoading: childrenLoading } = useQuery<Child[]>({
     queryKey: ['/api/guardian/children'],
-    retry: false,
+    staleTime: 60000,
   });
-
-  const children_list = childrenData?.children || [];
-  const selectedChild = children_list.find(child => child.id.toString() === selectedChildId);
 
   // Auto-select first child if none selected
   useEffect(() => {
@@ -72,55 +71,60 @@ export default function GuardianLayout({ children }: GuardianLayoutProps) {
     }
   }, [children_list, selectedChildId]);
 
-  const navigation = [
+  const selectedChild = children_list.find(child => child.id.toString() === selectedChildId);
+
+  // Navigation - exact admin interface structure
+  const mainNavigation = [
     {
-      name: "Dashboard",
-      href: "/",
+      name: 'Dashboard',
+      href: '/guardian/dashboard',
       icon: Home,
-      current: location === "/",
-      disabled: !selectedChild
-    },
-    ...(children_list.length > 1 ? [{
-      name: "Mijn Kinderen",
-      href: "/guardian/children",
-      icon: Users,
-      current: location === "/guardian/children",
-      disabled: false
-    }] : []),
+      current: location === '/guardian/dashboard'
+    }
+  ];
+
+  const studentInfo = [
     {
-      name: "Aanwezigheid",
-      href: "/guardian/attendance",
-      icon: ClipboardList,
-      current: location === "/guardian/attendance",
-      disabled: !selectedChild
+      name: 'Student Profiel',
+      href: '/guardian/student-profile',
+      icon: UserCheck,
+      current: location.startsWith('/guardian/student-profile')
     },
     {
-      name: "Cijfers",
-      href: "/guardian/grades",
+      name: 'Academische Prestaties',
+      href: '/guardian/academic-performance',
       icon: GraduationCap,
-      current: location === "/guardian/grades",
-      disabled: !selectedChild
+      current: location.startsWith('/guardian/academic-performance')
     },
     {
-      name: "Rapportages",
-      href: "/guardian/reports",
-      icon: FileText,
-      current: location === "/guardian/reports",
-      disabled: !selectedChild
-    },
+      name: 'Aanwezigheid',
+      href: '/guardian/attendance',
+      icon: ClipboardList,
+      current: location.startsWith('/guardian/attendance')
+    }
+  ];
+
+  const financialManagement = [
     {
-      name: "Communicatie",
-      href: "/guardian/communications",
-      icon: MessageCircle,
-      current: location === "/guardian/communications",
-      disabled: false
-    },
-    {
-      name: "Betalingen",
-      href: "/guardian/payments",
+      name: 'Schoolgeld',
+      href: '/guardian/fees',
       icon: CreditCard,
-      current: location === "/guardian/payments",
-      disabled: false
+      current: location.startsWith('/guardian/fees')
+    },
+    {
+      name: 'Betalingsgeschiedenis',
+      href: '/guardian/payment-history',
+      icon: FileText,
+      current: location.startsWith('/guardian/payment-history')
+    }
+  ];
+
+  const communication = [
+    {
+      name: 'Berichten',
+      href: '/guardian/communications',
+      icon: MessageCircle,
+      current: location.startsWith('/guardian/communications')
     }
   ];
 
@@ -139,7 +143,7 @@ export default function GuardianLayout({ children }: GuardianLayoutProps) {
         />
       )}
 
-      {/* Top bar - Admin Style - Above everything */}
+      {/* Top bar - Exact Admin Style */}
       <div className="bg-white shadow-sm border-b border-[#e5e7eb] fixed top-0 left-0 right-0 z-50 h-12">
         <div className="flex items-center justify-between h-12 px-4 lg:px-6">
           {/* Logo section - Left */}
@@ -170,43 +174,127 @@ export default function GuardianLayout({ children }: GuardianLayoutProps) {
             </div>
           </div>
 
-          {/* Top bar actions - Right */}
+          {/* Actions - Right */}
           <div className="flex items-center space-x-3">
+            {/* Mobile search button */}
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="md:hidden"
+            >
+              <Search className="h-5 w-5 text-gray-600" />
+            </Button>
+
+            {/* Messages button */}
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="ghost" size="icon" className="relative">
+                  <Mail className="h-5 w-5 text-gray-600" />
+                  {notifications.length > 0 && (
+                    <Badge 
+                      className="absolute -top-1 -right-1 w-4 h-4 p-0 flex items-center justify-center bg-[#1e40af]"
+                      variant="default"
+                    >
+                      {notifications.length}
+                    </Badge>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent align="end" className="w-80 p-0">
+                <div className="p-4 border-b border-gray-200">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-medium text-sm">Berichten</h3>
+                    <button 
+                      className="text-xs text-[#1e40af] hover:underline"
+                      onClick={() => window.location.href = "/guardian/communications"}
+                    >
+                      Alle berichten
+                    </button>
+                  </div>
+                </div>
+                <div className="max-h-72 overflow-y-auto">
+                  <div className="py-6 text-center">
+                    <p className="text-sm text-gray-500">Geen nieuwe berichten</p>
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
+
             {/* Notifications */}
-            <Button variant="ghost" size="sm" className="relative h-8 w-8 p-0">
-              <Bell className="h-4 w-4 text-gray-600" />
-              {notifications?.length > 0 && (
-                <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
-                  {notifications.length}
-                </span>
-              )}
-            </Button>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="ghost" size="icon" className="relative">
+                  <Bell className="h-5 w-5 text-gray-600" />
+                  {notifications.length > 0 && (
+                    <Badge 
+                      className="absolute -top-1 -right-1 w-4 h-4 p-0 flex items-center justify-center bg-[#1e40af]"
+                      variant="default"
+                    >
+                      {notifications.length}
+                    </Badge>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent align="end" className="w-80 p-0">
+                <div className="p-4 border-b border-gray-200">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-medium text-sm">Notificaties</h3>
+                    <button className="text-xs text-[#1e40af] hover:underline">
+                      Alle notificaties
+                    </button>
+                  </div>
+                </div>
+                <div className="max-h-72 overflow-y-auto">
+                  <div className="py-6 text-center">
+                    <p className="text-sm text-gray-500">Geen notificaties</p>
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
 
-            {/* Messages */}
-            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-              <MessageCircle className="h-4 w-4 text-gray-600" />
-            </Button>
-
-            {/* Profile dropdown */}
-            <div className="flex items-center space-x-2">
-              <Avatar className="h-7 w-7">
-                <AvatarFallback className="bg-[#1e40af] text-white text-xs">
-                  {profile?.firstName?.[0] || user?.firstName?.[0]}{profile?.lastName?.[0] || user?.lastName?.[0]}
-                </AvatarFallback>
-              </Avatar>
-              <ChevronDown className="h-3 w-3 text-gray-500 hidden lg:block" />
-            </div>
+            {/* User profile */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative h-8 pl-2 pr-1 ml-1">
+                  <Avatar className="h-6 w-6">
+                    <AvatarFallback className="bg-[#1e40af] text-white text-xs">
+                      {profile?.firstName?.[0] || 'V'}{profile?.lastName?.[0] || 'G'}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="ml-1.5 text-sm font-medium hidden md:inline-block">
+                    {profile?.firstName} {profile?.lastName}
+                  </span>
+                  <ChevronDown className="h-4 w-4 ml-0.5 md:ml-1.5 opacity-70" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <div className="px-2 py-1.5 flex flex-col">
+                  <span className="text-sm font-medium">{profile?.firstName} {profile?.lastName}</span>
+                  <span className="text-xs text-gray-500">Voogd</span>
+                </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => window.location.href = '/guardian/profile'}>
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Mijn Profiel</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Uitloggen</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </div>
 
-      {/* Sidebar - Admin Interface Copy */}
-      <div className={`fixed inset-y-0 left-0 z-40 w-64 bg-white shadow-lg transform ${
+      {/* Sidebar - Exact Admin Interface Copy */}
+      <div className={`fixed top-12 bottom-0 left-0 z-50 w-64 bg-white shadow-lg transform ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      } transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 border-r border-[#e5e7eb] pt-12`}>
+      } transition-transform duration-300 ease-in-out lg:translate-x-0 lg:fixed lg:top-12 border-r border-[#e5e7eb]`}>
         
-        {/* Close button for mobile - Only visible on mobile */}
-        <div className="lg:hidden flex justify-end p-3 border-b border-[#e5e7eb]">
+        {/* Mobile close button */}
+        <div className="lg:hidden p-3 border-b border-[#e5e7eb]">
           <button
             onClick={() => setSidebarOpen(false)}
             className="text-gray-500 hover:text-gray-700"
@@ -215,122 +303,145 @@ export default function GuardianLayout({ children }: GuardianLayoutProps) {
           </button>
         </div>
 
-        {/* User info - Admin Style */}
-        <div className="px-6 py-4 border-b border-[#e5e7eb] bg-[#f8fafc]">
-          <div className="flex items-center space-x-3">
-            <Avatar className="h-10 w-10">
-              <AvatarFallback className="bg-[#1e40af] text-white">
-                {profile?.firstName?.[0] || user?.firstName?.[0]}{profile?.lastName?.[0] || user?.lastName?.[0]}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-gray-900 truncate">
-                {profile?.firstName || user?.firstName} {profile?.lastName || user?.lastName}
-              </p>
-              <div className="flex items-center space-x-2 mt-1">
-                <Badge className="bg-[#8b5cf6] text-white text-xs px-2 py-0.5">
-                  Voogd
-                </Badge>
-                {notifications?.length > 0 && (
-                  <Badge variant="destructive" className="text-xs">
-                    {notifications.length}
-                  </Badge>
-                )}
-              </div>
+        {/* Child selector - Same styling as admin */}
+        <div className="p-4 border-b border-[#e5e7eb]">
+          <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+            Kind selecteren
+          </label>
+          <Select value={selectedChildId} onValueChange={setSelectedChildId}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Selecteer een kind" />
+            </SelectTrigger>
+            <SelectContent>
+              {children_list.map((child) => (
+                <SelectItem key={child.id} value={child.id.toString()}>
+                  {child.firstName} {child.lastName} - {child.studentId}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Navigation - Admin Style with grouped sections */}
+        <nav className="flex-1 px-3 py-4 space-y-4 overflow-y-auto">
+          {/* Main Navigation */}
+          <div className="space-y-1">
+            {mainNavigation.map((item) => {
+              const Icon = item.icon;
+              return (
+                <Link 
+                  key={item.name} 
+                  href={item.href} 
+                  className={`group flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 ${
+                    item.current
+                      ? 'bg-[#1e40af] text-white shadow-sm'
+                      : 'text-gray-700 hover:bg-[#f1f5f9] hover:text-[#1e40af]'
+                  }`}
+                >
+                  <Icon className={`mr-3 h-4 w-4 ${
+                    item.current ? 'text-white' : 'text-gray-500 group-hover:text-[#1e40af]'
+                  }`} />
+                  {item.name}
+                </Link>
+              );
+            })}
+          </div>
+
+          {/* Student Information */}
+          <div className="space-y-1">
+            <div className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              Student Informatie
             </div>
+            {studentInfo.map((item) => {
+              const Icon = item.icon;
+              return (
+                <Link 
+                  key={item.name} 
+                  href={item.href} 
+                  className={`group flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 ${
+                    item.current
+                      ? 'bg-[#1e40af] text-white shadow-sm'
+                      : 'text-gray-700 hover:bg-[#f1f5f9] hover:text-[#1e40af]'
+                  }`}
+                >
+                  <Icon className={`mr-3 h-4 w-4 ${
+                    item.current ? 'text-white' : 'text-gray-500 group-hover:text-[#1e40af]'
+                  }`} />
+                  {item.name}
+                </Link>
+              );
+            })}
           </div>
-        </div>
 
-        {/* Child selection - Admin Style */}
-        {children_list.length > 0 && (
-          <div className="px-6 py-4 border-b border-[#e5e7eb] bg-[#f8fafc]">
-            <label className="text-sm font-medium text-gray-700 block mb-2">
-              Selecteer kind:
-            </label>
-            <Select value={selectedChildId} onValueChange={setSelectedChildId}>
-              <SelectTrigger className="w-full border-[#e5e7eb]">
-                <SelectValue placeholder="Kies een kind" />
-              </SelectTrigger>
-              <SelectContent className="bg-white border-[#e5e7eb]">
-                {children_list.map((child) => (
-                  <SelectItem key={child.id} value={child.id.toString()} className="focus:bg-blue-200 hover:bg-blue-100">
-                    <div className="flex items-center space-x-2">
-                      <User className="w-4 h-4" />
-                      <span>{child.firstName} {child.lastName}</span>
-                      <span className="text-sm text-gray-500">({child.class})</span>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {selectedChild && (
-              <div className="mt-2 text-sm text-gray-600">
-                Student ID: {selectedChild.studentId} • Klas: {selectedChild.class}
-              </div>
-            )}
+          {/* Financial Management */}
+          <div className="space-y-1">
+            <div className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              Financieel Beheer
+            </div>
+            {financialManagement.map((item) => {
+              const Icon = item.icon;
+              return (
+                <Link 
+                  key={item.name} 
+                  href={item.href} 
+                  className={`group flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 ${
+                    item.current
+                      ? 'bg-[#1e40af] text-white shadow-sm'
+                      : 'text-gray-700 hover:bg-[#f1f5f9] hover:text-[#1e40af]'
+                  }`}
+                >
+                  <Icon className={`mr-3 h-4 w-4 ${
+                    item.current ? 'text-white' : 'text-gray-500 group-hover:text-[#1e40af]'
+                  }`} />
+                  {item.name}
+                </Link>
+              );
+            })}
           </div>
-        )}
 
-        {/* Navigation - Admin Style */}
-        <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-          {navigation.map((item) => {
-            const Icon = item.icon;
-            return (
-              <Link key={item.name} href={item.disabled ? "#" : item.href} className={`group flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 ${
-                item.disabled 
-                  ? 'text-gray-400 cursor-not-allowed'
-                  : item.current
-                    ? 'bg-[#1e40af] text-white shadow-sm'
-                    : 'text-gray-700 hover:bg-[#f1f5f9] hover:text-[#1e40af]'
-              }`}>
-                <Icon className={`mr-3 h-4 w-4 ${
-                  item.disabled
-                    ? 'text-gray-300'
-                    : item.current 
-                      ? 'text-white' 
-                      : 'text-gray-500 group-hover:text-[#1e40af]'
-                }`} />
-                <span className="truncate">{item.name}</span>
-              </Link>
-            );
-          })}
+          {/* Communication */}
+          <div className="space-y-1">
+            <div className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              Communicatie
+            </div>
+            {communication.map((item) => {
+              const Icon = item.icon;
+              return (
+                <Link 
+                  key={item.name} 
+                  href={item.href} 
+                  className={`group flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 ${
+                    item.current
+                      ? 'bg-[#1e40af] text-white shadow-sm'
+                      : 'text-gray-700 hover:bg-[#f1f5f9] hover:text-[#1e40af]'
+                  }`}
+                >
+                  <Icon className={`mr-3 h-4 w-4 ${
+                    item.current ? 'text-white' : 'text-gray-500 group-hover:text-[#1e40af]'
+                  }`} />
+                  {item.name}
+                </Link>
+              );
+            })}
+          </div>
         </nav>
-
-        {/* Logout button - Admin Style */}
-        <div className="p-3 border-t border-[#e5e7eb]">
-          <Button
-            onClick={handleLogout}
-            variant="ghost"
-            className="w-full justify-start text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg"
-          >
-            <LogOut className="mr-3 h-4 w-4" />
-            Afmelden
-          </Button>
-        </div>
       </div>
 
       {/* Main content - Admin Style */}
       <div className="pt-12 lg:pl-64">
         <main className="bg-[#f7f9fc] min-h-screen p-6">
-          {children_list.length === 0 ? (
-            <div>
-              <div className="text-center py-12">
-                <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Geen kinderen gevonden</h3>
-                <p className="text-gray-600">
-                  Er zijn geen kinderen gekoppeld aan dit account. Neem contact op met de school om uw kinderen te koppelen.
-                </p>
-              </div>
+          {childrenLoading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin w-8 h-8 border-4 border-[#1e40af] border-t-transparent rounded-full mx-auto mb-4"></div>
+              <p className="text-gray-600">Kinderen laden...</p>
             </div>
           ) : !selectedChild ? (
-            <div className="p-6">
-              <div className="text-center py-12">
-                <User className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Selecteer een kind</h3>
-                <p className="text-gray-600">
-                  Kies een kind uit de lijst om de informatie te bekijken.
-                </p>
-              </div>
+            <div className="text-center py-12">
+              <User className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Selecteer een kind</h3>
+              <p className="text-gray-600 mb-6">
+                Kies een van uw kinderen uit de lijst in de sidebar om hun informatie te bekijken.
+              </p>
             </div>
           ) : (
             children

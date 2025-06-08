@@ -7,9 +7,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { PremiumHeader } from "@/components/layout/premium-header";
 import {
   Users,
-  BookOpen,
+  BookText,
   Calendar,
-  UserCheck,
+  ClipboardCheck,
   Clock,
   Bell,
   ChevronRight,
@@ -17,12 +17,13 @@ import {
   CheckCircle,
   AlertCircle,
   MessageCircle,
-  FileText,
-  GraduationCap,
+  BookMarked,
+  School,
   BarChart3,
   Award,
   Target,
-  Activity
+  Activity,
+  Percent
 } from "lucide-react";
 import { Link } from "wouter";
 
@@ -83,9 +84,9 @@ export default function TeacherDashboard() {
   const getActivityIcon = (type: string) => {
     switch (type) {
       case 'grade':
-        return <FileText className="h-4 w-4 text-blue-600" />;
+        return <Percent className="h-4 w-4 text-blue-600" />;
       case 'attendance':
-        return <UserCheck className="h-4 w-4 text-green-600" />;
+        return <ClipboardCheck className="h-4 w-4 text-green-600" />;
       case 'message':
         return <MessageCircle className="h-4 w-4 text-purple-600" />;
       default:
@@ -110,7 +111,7 @@ export default function TeacherDashboard() {
     <div className="bg-[#f7f9fc] min-h-screen">
       <PremiumHeader 
         title="Docent Dashboard" 
-        icon={GraduationCap}
+        icon={School}
         description={`Welkom terug, ${user?.firstName || 'Docent'}! Hier is uw overzicht voor vandaag.`}
         breadcrumbs={{
           parent: "Docent",
@@ -157,7 +158,7 @@ export default function TeacherDashboard() {
                   <p className="text-2xl font-bold text-purple-900">{teacherStats.mySubjects}</p>
                 </div>
                 <div className="h-12 w-12 bg-purple-500 rounded-lg flex items-center justify-center">
-                  <BookOpen className="h-6 w-6 text-white" />
+                  <BookText className="h-6 w-6 text-white" />
                 </div>
               </div>
             </CardContent>

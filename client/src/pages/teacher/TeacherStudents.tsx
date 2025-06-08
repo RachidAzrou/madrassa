@@ -3,10 +3,10 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { 
   Search, Plus, Download, Filter, Eye, Edit, Trash2, 
-  User, Users, GraduationCap, Phone, Mail, Calendar,
-  MapPin, FileText, AlertTriangle, Star, BookOpen,
-  Settings, Save, X, Upload, UserPlus, NotebookText,
-  Home, MoreHorizontal, PlusCircle
+  User, Users, School, Phone, Mail, Calendar,
+  MapPin, BookMarked, AlertTriangle, Star, BookText,
+  Settings, Save, X, Upload, UserPlus, ClipboardCheck,
+  LayoutDashboard, MoreHorizontal, PlusCircle
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';

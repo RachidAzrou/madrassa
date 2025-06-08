@@ -33,34 +33,42 @@ interface Message {
     id: number;
     name: string;
     role: string;
-    photoUrl?: string;
+    avatar?: string;
   };
-  recipient: {
-    id: number;
-    name: string;
-  };
-  timestamp: string;
   isRead: boolean;
-  isImportant: boolean;
-  hasAttachment: boolean;
+  priority: 'low' | 'normal' | 'high' | 'urgent';
+  createdAt: string;
+  type: 'message' | 'announcement';
 }
 
 interface Announcement {
   id: number;
   title: string;
   content: string;
-  author: {
-    name: string;
-    role: string;
-  };
-  publishDate: string;
-  isImportant: boolean;
+  author: string;
+  publishedAt: string;
+  priority: 'low' | 'normal' | 'high';
   category: string;
 }
 
+interface CommunicationStats {
+  unreadCount: number;
+  importantCount: number;
+}
+
+interface Teacher {
+  id: number;
+  name: string;
+  email: string;
+  subject: string;
+}
+
 export default function StudentCommunications() {
-  const [selectedTab, setSelectedTab] = useState("messages");
-  const [searchTerm, setSearchTerm] = useState("");
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [selectedTab, setSelectedTab] = useState<'messages' | 'announcements'>('messages');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [isComposeOpen, setIsComposeOpen] = useState(false);
   const [newMessage, setNewMessage] = useState({
     title: "",
@@ -71,28 +79,24 @@ export default function StudentCommunications() {
     priority: "normal"
   });
 
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-
-  const { data: messages, isLoading: messagesLoading } = useQuery<{ messages: Message[] }>({
-    queryKey: ['/api/student/messages'],
-    retry: false,
-  });
-
-  const { data: announcements } = useQuery<{ announcements: Announcement[] }>({
-    queryKey: ['/api/student/announcements'],
-    retry: false,
-  });
-
-  const { data: stats } = useQuery<{ unreadCount: number; importantCount: number }>({
+  // Fetch communication stats
+  const { data: stats } = useQuery<{ stats: CommunicationStats }>({
     queryKey: ['/api/student/communications/stats'],
-    retry: false,
   });
 
-  // Get available receivers for students (teachers, staff, classmates)
-  const { data: receivers } = useQuery<{ id: number; role: string; name: string }[]>({
+  // Fetch messages
+  const { data: messages, isLoading: messagesLoading } = useQuery({
+    queryKey: ['/api/student/messages'],
+  });
+
+  // Fetch announcements
+  const { data: announcements } = useQuery({
+    queryKey: ['/api/student/announcements'],
+  });
+
+  // Fetch available message receivers (teachers)
+  const { data: receivers } = useQuery({
     queryKey: ['/api/messages/receivers/student'],
-    retry: false,
   });
 
   // Mutation for sending messages
@@ -115,20 +119,21 @@ export default function StudentCommunications() {
         priority: "normal"
       });
       queryClient.invalidateQueries({ queryKey: ['/api/student/messages'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/student/communications/stats'] });
     },
     onError: (error: any) => {
       toast({
-        title: "Fout",
-        description: "Er is een fout opgetreden bij het verzenden van het bericht.",
+        title: "Fout bij verzenden",
+        description: error.message || "Er ging iets mis bij het verzenden van je bericht.",
         variant: "destructive",
       });
     },
   });
 
   const handleSendMessage = () => {
-    if (!newMessage.title || !newMessage.content || !newMessage.receiverId) {
+    if (!newMessage.title.trim() || !newMessage.content.trim() || !newMessage.receiverId) {
       toast({
-        title: "Velden vereist",
+        title: "Velden ontbreken",
         description: "Vul alle vereiste velden in.",
         variant: "destructive",
       });
@@ -189,7 +194,7 @@ export default function StudentCommunications() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Ongelezen Berichten</p>
-                  <p className="text-2xl font-bold text-[#1e40af]">{stats?.unreadCount || 0}</p>
+                  <p className="text-2xl font-bold text-[#1e40af]">{stats?.stats?.unreadCount || 0}</p>
                 </div>
                 <div className="h-12 w-12 bg-red-100 rounded-lg flex items-center justify-center">
                   <Mail className="h-6 w-6 text-red-600" />
@@ -203,7 +208,7 @@ export default function StudentCommunications() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Belangrijke Berichten</p>
-                  <p className="text-2xl font-bold text-[#1e40af]">{stats?.importantCount || 0}</p>
+                  <p className="text-2xl font-bold text-[#1e40af]">{stats?.stats?.importantCount || 0}</p>
                 </div>
                 <div className="h-12 w-12 bg-blue-100 rounded-lg flex items-center justify-center">
                   <MessageSquare className="h-6 w-6 text-blue-600" />
@@ -239,329 +244,196 @@ export default function StudentCommunications() {
           </Button>
         </div>
 
-        <Card className="bg-white border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-            <CardTitle className="text-sm font-medium text-gray-700">Belangrijke Berichten</CardTitle>
-            <div className="p-2 bg-[#fef3c7] rounded-lg">
-              <Bell className="h-4 w-4 text-[#d97706]" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-[#d97706]">{stats?.importantCount || 0}</div>
-            <p className="text-xs text-gray-600 mt-1">
-              Vereisen aandacht
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-            <CardTitle className="text-sm font-medium text-gray-700">Totaal Berichten</CardTitle>
-            <div className="p-2 bg-[#eff6ff] rounded-lg">
-              <MessageCircle className="h-4 w-4 text-[#1e40af]" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-[#1e40af]">{messages?.messages?.length || 0}</div>
-            <p className="text-xs text-gray-600 mt-1">
-              In totaal
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Tabs and Search - Admin Style */}
-      <div className="mb-6">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex space-x-1 bg-[#f1f5f9] p-1 rounded-lg">
-            <button
-              onClick={() => setSelectedTab("messages")}
-              className={`px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
-                selectedTab === "messages"
-                  ? "bg-white text-[#1e40af] shadow-sm"
-                  : "text-gray-600 hover:text-[#1e40af]"
-              }`}
-            >
-              Berichten
-            </button>
-            <button
-              onClick={() => setSelectedTab("announcements")}
-              className={`px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
-                selectedTab === "announcements"
-                  ? "bg-white text-[#1e40af] shadow-sm"
-                  : "text-gray-600 hover:text-[#1e40af]"
-              }`}
-            >
-              Mededelingen
-            </button>
-          </div>
-
-          <div className="flex items-center space-x-3">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                placeholder="Zoeken..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 w-64"
-              />
-            </div>
-            <Button variant="outline" size="sm" className="border-[#e5e7eb] hover:bg-[#eff6ff] hover:border-[#1e40af]">
-              <Filter className="h-4 w-4 mr-2 text-[#1e40af]" />
-              Filter
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      {/* Content - Admin Style */}
-      {selectedTab === "messages" ? (
-        <Card className="bg-white border border-[#e5e7eb] shadow-sm">
-          <CardHeader className="border-b border-[#e5e7eb] pb-4">
-            <CardTitle className="flex items-center text-[#1e40af] font-semibold">
-              <MessageCircle className="h-5 w-5 mr-2 text-[#1e40af]" />
-              Berichten
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pt-4">
-            {filteredMessages.length > 0 ? (
-              <div className="space-y-3">
-                {filteredMessages.map((message) => (
-                  <div key={message.id} className={`p-4 rounded-lg border transition-all duration-200 hover:shadow-md cursor-pointer ${
-                    !message.isRead 
-                      ? 'bg-[#eff6ff] border-[#1e40af] border-l-4' 
-                      : 'bg-[#f8fafc] border-[#e5e7eb] hover:bg-white'
-                  }`}>
-                    <div className="flex items-start space-x-3">
-                      <Avatar className="h-10 w-10">
-                        {message.sender.photoUrl ? (
-                          <AvatarImage src={message.sender.photoUrl} alt={message.sender.name} />
-                        ) : (
-                          <AvatarFallback className="bg-[#1e40af] text-white text-sm">
-                            {message.sender.name.split(' ').map(n => n[0]).join('')}
-                          </AvatarFallback>
-                        )}
-                      </Avatar>
-                      
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center space-x-2">
-                            <p className="font-medium text-gray-900 truncate">{message.sender.name}</p>
-                            <Badge variant="outline" className="text-xs border-[#e5e7eb]">
-                              {message.sender.role}
-                            </Badge>
-                            {message.isImportant && (
-                              <Badge className="bg-[#fef3c7] text-[#d97706] border-[#d97706] text-xs">
-                                Belangrijk
-                              </Badge>
-                            )}
-                          </div>
-                          <div className="flex items-center space-x-2 text-xs text-gray-500">
-                            <span>{message.timestamp}</span>
-                            {!message.isRead && (
-                              <div className="w-2 h-2 bg-[#1e40af] rounded-full"></div>
-                            )}
-                          </div>
-                        </div>
-                        
-                        <h3 className={`text-sm mb-2 truncate ${
-                          !message.isRead ? 'font-semibold text-gray-900' : 'font-medium text-gray-700'
-                        }`}>
-                          {message.subject}
-                        </h3>
-                        
-                        <p className="text-sm text-gray-600 line-clamp-2">
-                          {message.content}
-                        </p>
-                        
-                        {message.hasAttachment && (
-                          <div className="mt-2">
-                            <Badge variant="outline" className="text-xs border-[#e5e7eb]">
-                              📎 Bijlage
-                            </Badge>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-12">
-                <MessageCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Geen berichten gevonden</h3>
-                <p className="text-gray-500">
-                  {searchTerm ? "Probeer een andere zoekterm." : "Je hebt nog geen berichten ontvangen."}
-                </p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      ) : (
-        <Card className="bg-white border border-[#e5e7eb] shadow-sm">
-          <CardHeader className="border-b border-[#e5e7eb] pb-4">
-            <CardTitle className="flex items-center text-[#1e40af] font-semibold">
-              <Bell className="h-5 w-5 mr-2 text-[#1e40af]" />
-              Mededelingen
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pt-4">
-            {filteredAnnouncements.length > 0 ? (
+        {/* Messages and Announcements */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          {/* Messages */}
+          <Card className="bg-white border border-[#e5e7eb] shadow-sm">
+            <CardHeader>
+              <CardTitle className="text-lg font-semibold text-gray-900">Berichten</CardTitle>
+            </CardHeader>
+            <CardContent>
               <div className="space-y-4">
-                {filteredAnnouncements.map((announcement) => (
-                  <div key={announcement.id} className="p-4 bg-[#f8fafc] rounded-lg border border-[#e5e7eb] hover:shadow-md transition-shadow">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex items-center space-x-2">
-                        <h3 className="font-semibold text-gray-900">{announcement.title}</h3>
-                        {announcement.isImportant && (
-                          <Badge className="bg-[#fef3c7] text-[#d97706] border-[#d97706] text-xs">
-                            Belangrijk
-                          </Badge>
-                        )}
-                        <Badge variant="outline" className="text-xs border-[#e5e7eb]">
+                {filteredMessages.length > 0 ? (
+                  filteredMessages.map((message: Message) => (
+                    <div
+                      key={message.id}
+                      className={`p-4 rounded-lg border cursor-pointer transition-all hover:shadow-md ${
+                        message.isRead ? 'bg-gray-50 border-gray-200' : 'bg-blue-50 border-blue-200'
+                      }`}
+                      onClick={() => setSelectedMessage(message)}
+                    >
+                      <div className="flex justify-between items-start mb-2">
+                        <h4 className="font-medium text-gray-900 text-sm">{message.subject}</h4>
+                        <Badge variant={message.priority === 'high' ? 'destructive' : 'secondary'} className="text-xs">
+                          {message.priority}
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-gray-600 mb-2">Van: {message.sender.name}</p>
+                      <p className="text-xs text-gray-500">
+                        {new Date(message.createdAt).toLocaleDateString('nl-NL')}
+                      </p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-center text-gray-500 py-8">Geen berichten gevonden</p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Announcements */}
+          <Card className="bg-white border border-[#e5e7eb] shadow-sm">
+            <CardHeader>
+              <CardTitle className="text-lg font-semibold text-gray-900">Mededelingen</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {filteredAnnouncements.length > 0 ? (
+                  filteredAnnouncements.map((announcement: Announcement) => (
+                    <div
+                      key={announcement.id}
+                      className="p-4 rounded-lg border border-gray-200 bg-gray-50 hover:shadow-md transition-all"
+                    >
+                      <div className="flex justify-between items-start mb-2">
+                        <h4 className="font-medium text-gray-900 text-sm">{announcement.title}</h4>
+                        <Badge variant="outline" className="text-xs">
                           {announcement.category}
                         </Badge>
                       </div>
-                      <span className="text-xs text-gray-500">{announcement.publishDate}</span>
-                    </div>
-                    
-                    <p className="text-sm text-gray-600 mb-3 line-clamp-3">
-                      {announcement.content}
-                    </p>
-                    
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2 text-xs text-gray-500">
-                        <User className="h-3 w-3" />
-                        <span>{announcement.author.name}</span>
-                        <span>•</span>
-                        <span>{announcement.author.role}</span>
+                      <p className="text-sm text-gray-600 mb-2 line-clamp-2">{announcement.content}</p>
+                      <div className="flex justify-between items-center">
+                        <p className="text-xs text-gray-500">Door: {announcement.author}</p>
+                        <p className="text-xs text-gray-500">
+                          {new Date(announcement.publishedAt).toLocaleDateString('nl-NL')}
+                        </p>
                       </div>
-                      <Button variant="ghost" size="sm" className="text-[#1e40af] hover:bg-[#eff6ff]">
-                        Meer lezen
-                      </Button>
                     </div>
+                  ))
+                ) : (
+                  <p className="text-center text-gray-500 py-8">Geen mededelingen gevonden</p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Message Details Dialog */}
+        {selectedMessage && (
+          <Dialog open={!!selectedMessage} onOpenChange={() => setSelectedMessage(null)}>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>{selectedMessage.subject}</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div className="flex items-center space-x-3">
+                  <Avatar className="h-10 w-10">
+                    <AvatarImage src={selectedMessage.sender.avatar} />
+                    <AvatarFallback>
+                      {selectedMessage.sender.name.split(' ').map(n => n[0]).join('')}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="font-medium">{selectedMessage.sender.name}</p>
+                    <p className="text-sm text-gray-500">{selectedMessage.sender.role}</p>
                   </div>
-                ))}
+                </div>
+                <div className="prose max-w-none">
+                  <p className="text-gray-700">{selectedMessage.content}</p>
+                </div>
+                <div className="flex justify-between items-center pt-4 border-t">
+                  <p className="text-sm text-gray-500">
+                    {new Date(selectedMessage.createdAt).toLocaleString('nl-NL')}
+                  </p>
+                </div>
               </div>
-            ) : (
-              <div className="text-center py-12">
-                <Bell className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Geen mededelingen gevonden</h3>
-                <p className="text-gray-500">
-                  {searchTerm ? "Probeer een andere zoekterm." : "Er zijn momenteel geen mededelingen beschikbaar."}
-                </p>
+            </DialogContent>
+          </Dialog>
+        )}
+
+        {/* Compose Message Dialog */}
+        <Dialog open={isComposeOpen} onOpenChange={setIsComposeOpen}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Nieuw Bericht</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="receiver">Ontvanger</Label>
+                  <Select
+                    value={newMessage.receiverId.toString()}
+                    onValueChange={(value) => {
+                      const receiver = receivers?.receivers?.find((r: Teacher) => r.id.toString() === value);
+                      setNewMessage(prev => ({
+                        ...prev,
+                        receiverId: parseInt(value),
+                        receiverRole: 'teacher'
+                      }));
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecteer ontvanger" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {receivers?.receivers?.map((receiver: Teacher) => (
+                        <SelectItem key={receiver.id} value={receiver.id.toString()}>
+                          {receiver.name} - {receiver.subject}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="priority">Prioriteit</Label>
+                  <Select
+                    value={newMessage.priority}
+                    onValueChange={(value) => setNewMessage(prev => ({ ...prev, priority: value }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="normal">Normaal</SelectItem>
+                      <SelectItem value="high">Hoog</SelectItem>
+                      <SelectItem value="urgent">Urgent</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
-            )}
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Compose Message Dialog */}
-      <Dialog open={isComposeOpen} onOpenChange={setIsComposeOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Nieuw Bericht</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="receiver">Ontvanger</Label>
-              <Select
-                value={newMessage.receiverId.toString()}
-                onValueChange={(value) => {
-                  const receiver = receivers?.find(r => r.id.toString() === value);
-                  setNewMessage(prev => ({
-                    ...prev,
-                    receiverId: parseInt(value),
-                    receiverRole: receiver?.role || ""
-                  }));
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecteer ontvanger" />
-                </SelectTrigger>
-                <SelectContent>
-                  {receivers?.map((receiver) => (
-                    <SelectItem key={receiver.id} value={receiver.id.toString()}>
-                      {receiver.name} ({receiver.role})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Label htmlFor="subject">Onderwerp</Label>
-              <Input
-                id="subject"
-                value={newMessage.title}
-                onChange={(e) => setNewMessage(prev => ({ ...prev, title: e.target.value }))}
-                placeholder="Voer onderwerp in"
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="content">Bericht</Label>
-              <Textarea
-                id="content"
-                value={newMessage.content}
-                onChange={(e) => setNewMessage(prev => ({ ...prev, content: e.target.value }))}
-                placeholder="Typ je bericht hier..."
-                rows={6}
-              />
-            </div>
-
-            <div className="flex items-center space-x-3">
               <div>
-                <Label htmlFor="type">Type</Label>
-                <Select
-                  value={newMessage.type}
-                  onValueChange={(value) => setNewMessage(prev => ({ ...prev, type: value }))}
-                >
-                  <SelectTrigger className="w-40">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="general">Algemeen</SelectItem>
-                    <SelectItem value="academic">Academisch</SelectItem>
-                    <SelectItem value="question">Vraag</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Label htmlFor="title">Onderwerp</Label>
+                <Input
+                  id="title"
+                  value={newMessage.title}
+                  onChange={(e) => setNewMessage(prev => ({ ...prev, title: e.target.value }))}
+                  placeholder="Voer onderwerp in"
+                />
               </div>
-
               <div>
-                <Label htmlFor="priority">Prioriteit</Label>
-                <Select
-                  value={newMessage.priority}
-                  onValueChange={(value) => setNewMessage(prev => ({ ...prev, priority: value }))}
+                <Label htmlFor="content">Bericht</Label>
+                <Textarea
+                  id="content"
+                  value={newMessage.content}
+                  onChange={(e) => setNewMessage(prev => ({ ...prev, content: e.target.value }))}
+                  placeholder="Typ je bericht hier..."
+                  rows={6}
+                />
+              </div>
+              <div className="flex justify-end space-x-3">
+                <Button variant="outline" onClick={() => setIsComposeOpen(false)}>
+                  Annuleren
+                </Button>
+                <Button
+                  onClick={handleSendMessage}
+                  disabled={sendMessageMutation.isPending}
+                  className="bg-[#1e40af] hover:bg-[#1d3a8a] text-white"
                 >
-                  <SelectTrigger className="w-40">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="low">Laag</SelectItem>
-                    <SelectItem value="normal">Normaal</SelectItem>
-                    <SelectItem value="high">Hoog</SelectItem>
-                  </SelectContent>
-                </Select>
+                  {sendMessageMutation.isPending ? "Verzenden..." : "Verzenden"}
+                </Button>
               </div>
             </div>
-
-            <div className="flex justify-end space-x-3 pt-4">
-              <Button variant="outline" onClick={() => setIsComposeOpen(false)}>
-                Annuleren
-              </Button>
-              <Button 
-                onClick={handleSendMessage}
-                disabled={sendMessageMutation.isPending}
-                className="bg-[#1e40af] hover:bg-[#1d3a8a] text-white"
-              >
-                {sendMessageMutation.isPending ? "Verzenden..." : "Verzenden"}
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-      
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

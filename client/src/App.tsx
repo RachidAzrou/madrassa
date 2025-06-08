@@ -151,14 +151,15 @@ function AuthenticatedRouter() {
       <TeacherLayout>
         <Switch>
           <Route path="/" component={() => <AuthenticatedRoute component={TeacherDashboard} />} />
-          <Route path="/teacher/classes" component={() => <AuthenticatedRoute component={TeacherStudents} />} />
-          <Route path="/teacher/schedule" component={() => <AuthenticatedRoute component={Calendar} />} />
+          <Route path="/teacher" component={() => <AuthenticatedRoute component={TeacherDashboard} />} />
+          <Route path="/teacher/students" component={() => <AuthenticatedRoute component={TeacherStudents} />} />
+          <Route path="/teacher/classes" component={() => <AuthenticatedRoute component={Classes} />} />
+          <Route path="/teacher/calendar" component={() => <AuthenticatedRoute component={Calendar} />} />
           <Route path="/teacher/subjects" component={() => <AuthenticatedRoute component={Courses} />} />
-          <Route path="/teacher/guardians" component={() => <AuthenticatedRoute component={Guardians} />} />
           <Route path="/teacher/attendance" component={() => <AuthenticatedRoute component={Attendance} />} />
           <Route path="/teacher/grades" component={() => <AuthenticatedRoute component={Cijfers} />} />
+          <Route path="/teacher/communications" component={() => <AuthenticatedRoute component={Messages} />} />
           <Route path="/teacher/reports" component={() => <AuthenticatedRoute component={Reports} />} />
-          <Route path="/teacher/student-files" component={() => <AuthenticatedRoute component={StudentDossier} />} />
           <Route path="/notifications" component={() => <AuthenticatedRoute component={Notifications} />} />
           <Route path="/messages" component={() => <AuthenticatedRoute component={Messages} />} />
           <Route path="/mijn-account" component={() => <AuthenticatedRoute component={MyAccount} />} />

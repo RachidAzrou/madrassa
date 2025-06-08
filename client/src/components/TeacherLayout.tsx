@@ -90,6 +90,12 @@ export default function TeacherLayout({ children }: TeacherLayoutProps) {
       current: location.startsWith('/teacher/subjects')
     },
     {
+      name: 'Rapporten',
+      href: '/teacher/reports',
+      icon: FileText,
+      current: location.startsWith('/teacher/reports')
+    },
+    {
       name: 'Agenda',
       href: '/teacher/calendar',
       icon: Calendar,

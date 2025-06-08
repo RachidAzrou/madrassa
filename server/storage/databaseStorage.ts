@@ -959,7 +959,7 @@ export class DatabaseStorage implements IStorage {
           receivers.push(...dirSecUsers.map(u => ({ 
             id: u.id, 
             role: u.role || 'user', 
-            name: `${u.first_name} ${u.last_name}` 
+            name: `${u.firstName} ${u.lastName}` 
           })));
 
           // Add their children
@@ -999,7 +999,7 @@ export class DatabaseStorage implements IStorage {
           receivers.push(...studentAdminUsers.map(u => ({ 
             id: u.id, 
             role: u.role || 'user', 
-            name: `${u.first_name} ${u.last_name}` 
+            name: `${u.firstName} ${u.lastName}` 
           })));
 
           // Add all teachers

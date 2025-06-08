@@ -207,134 +207,73 @@ export default function TeacherDashboard() {
           </Card>
         </div>
 
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column - 2/3 width */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Quick Actions Card */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Target className="h-5 w-5 text-blue-600" />
-                  Snelle Acties
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <Link href="/teacher/attendance">
-                    <Button variant="outline" className="w-full h-16 flex-col gap-2 hover:bg-blue-50 hover:border-blue-300">
-                      <ClipboardCheck className="h-5 w-5 text-blue-600" />
-                      <span className="text-sm">Aanwezigheid</span>
-                    </Button>
-                  </Link>
-                  
-                  <Link href="/teacher/grades">
-                    <Button variant="outline" className="w-full h-16 flex-col gap-2 hover:bg-green-50 hover:border-green-300">
-                      <BarChart3 className="h-5 w-5 text-green-600" />
-                      <span className="text-sm">Cijfers</span>
-                    </Button>
-                  </Link>
-                  
-                  <Link href="/teacher/reports">
-                    <Button variant="outline" className="w-full h-16 flex-col gap-2 hover:bg-purple-50 hover:border-purple-300">
-                      <BookMarked className="h-5 w-5 text-purple-600" />
-                      <span className="text-sm">Rapporten</span>
-                    </Button>
-                  </Link>
-                  
-                  <Link href="/teacher/classes">
-                    <Button variant="outline" className="w-full h-16 flex-col gap-2 hover:bg-orange-50 hover:border-orange-300">
-                      <School className="h-5 w-5 text-orange-600" />
-                      <span className="text-sm">Klassen</span>
-                    </Button>
-                  </Link>
-                  
-                  <Link href="/teacher/subjects">
-                    <Button variant="outline" className="w-full h-16 flex-col gap-2 hover:bg-indigo-50 hover:border-indigo-300">
-                      <BookText className="h-5 w-5 text-indigo-600" />
-                      <span className="text-sm">Vakken</span>
-                    </Button>
-                  </Link>
-                  
-                  <Link href="/teacher/communications">
-                    <Button variant="outline" className="w-full h-16 flex-col gap-2 hover:bg-pink-50 hover:border-pink-300">
-                      <MessageCircle className="h-5 w-5 text-pink-600" />
-                      <span className="text-sm">Berichten</span>
-                    </Button>
-                  </Link>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+        {/* Performance Overview and Recent Activity - Side by Side */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Performance Overview */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-blue-600" />
+                Prestatie Overzicht
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600">Klassen beheerd</span>
+                <Badge variant="secondary">{teacherStats.myClasses}</Badge>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600">Totaal studenten</span>
+                <Badge variant="secondary">{teacherStats.totalStudents}</Badge>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600">Vakken onderwezen</span>
+                <Badge variant="secondary">{teacherStats.mySubjects}</Badge>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600">Aanwezigheidspercentage</span>
+                <Badge className="bg-green-100 text-green-800">85%</Badge>
+              </div>
+            </CardContent>
+          </Card>
 
-          {/* Right Column - 1/3 width */}
-          <div className="space-y-6">
-            {/* Performance Overview */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5 text-blue-600" />
-                  Prestatie Overzicht
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Klassen beheerd</span>
-                  <Badge variant="secondary">{teacherStats.myClasses}</Badge>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Totaal studenten</span>
-                  <Badge variant="secondary">{teacherStats.totalStudents}</Badge>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Vakken onderwezen</span>
-                  <Badge variant="secondary">{teacherStats.mySubjects}</Badge>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Aanwezigheidspercentage</span>
-                  <Badge className="bg-green-100 text-green-800">85%</Badge>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Recent Activity */}
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle className="flex items-center gap-2">
-                  <Activity className="h-5 w-5 text-purple-600" />
-                  Recente Activiteit
-                </CardTitle>
-                <Button variant="ghost" size="sm">
-                  Alles bekijken
-                  <ChevronRight className="h-4 w-4 ml-1" />
-                </Button>
-              </CardHeader>
-              <CardContent>
-                {activities.length > 0 ? (
-                  <div className="space-y-3">
-                    {activities.slice(0, 6).map((activity) => (
-                      <div key={activity.id} className={`p-3 rounded-lg border ${getActivityColor(activity.type)}`}>
-                        <div className="flex items-start space-x-3">
-                          <div className="mt-0.5">
-                            {getActivityIcon(activity.type)}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm text-gray-900 mb-1">{activity.description}</p>
-                            <p className="text-xs text-gray-500">{activity.timestamp}</p>
-                          </div>
+          {/* Recent Activity */}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="flex items-center gap-2">
+                <Activity className="h-5 w-5 text-purple-600" />
+                Recente Activiteit
+              </CardTitle>
+              <Button variant="ghost" size="sm">
+                Alles bekijken
+                <ChevronRight className="h-4 w-4 ml-1" />
+              </Button>
+            </CardHeader>
+            <CardContent>
+              {activities.length > 0 ? (
+                <div className="space-y-3">
+                  {activities.slice(0, 6).map((activity) => (
+                    <div key={activity.id} className={`p-3 rounded-lg border ${getActivityColor(activity.type)}`}>
+                      <div className="flex items-start space-x-3">
+                        <div className="mt-0.5">
+                          {getActivityIcon(activity.type)}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm text-gray-900 mb-1">{activity.description}</p>
+                          <p className="text-xs text-gray-500">{activity.timestamp}</p>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-6">
-                    <Activity className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                    <p className="text-sm text-gray-500">Geen recente activiteit</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-6">
+                  <Activity className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                  <p className="text-sm text-gray-500">Geen recente activiteit</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
 
         {/* Full Width Agenda Section */}

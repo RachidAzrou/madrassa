@@ -60,21 +60,26 @@ export default function StudentTeachers() {
 
   return (
     <div className="space-y-6">
-      {/* Enhanced Header */}
-      <div className="border-b border-gray-200 pb-8 mb-8">
+      {/* Professional Page Header */}
+      <div className="bg-gradient-to-r from-indigo-50 via-blue-50 to-cyan-50 border-b border-gray-200 p-8 mb-8 rounded-xl shadow-sm">
         <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Mijn Docenten
-            </h1>
-            <p className="text-gray-600 text-lg">
-              Ontmoet je docenten en vind hun contactinformatie
-            </p>
+          <div className="flex items-center space-x-4">
+            <div className="p-3 bg-indigo-500 rounded-xl shadow-lg">
+              <User className="h-8 w-8 text-white" />
+            </div>
+            <div>
+              <h1 className="text-4xl font-bold text-gray-900 mb-2">Mijn Docenten</h1>
+              <p className="text-gray-600 text-lg font-medium">Ontmoet je docenten en vind hun contactinformatie</p>
+            </div>
           </div>
-          <div className="flex items-center space-x-3">
-            <div className="bg-gradient-to-r from-indigo-500 to-indigo-600 text-white px-4 py-2 rounded-lg shadow-sm">
-              <div className="text-sm font-medium">{teachers?.teachers?.length || 0} Docenten</div>
-              <div className="text-xs opacity-90">Dit schooljaar</div>
+          <div className="flex items-center space-x-4">
+            <div className="bg-white border border-gray-200 text-gray-800 px-6 py-3 rounded-xl shadow-md">
+              <div className="text-sm font-bold text-indigo-600">{teachers?.teachers?.length || 0} Docenten</div>
+              <div className="text-xs text-gray-600 font-medium">Dit schooljaar</div>
+            </div>
+            <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-xl shadow-md">
+              <div className="text-sm font-bold">Contacten</div>
+              <div className="text-xs opacity-90">Beschikbaar</div>
             </div>
           </div>
         </div>

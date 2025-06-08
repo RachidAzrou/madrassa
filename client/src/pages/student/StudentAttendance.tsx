@@ -118,7 +118,7 @@ export default function StudentAttendance() {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <div className="p-3 bg-amber-500 rounded-xl shadow-lg">
-              <UserCheck className="h-8 w-8 text-white" />
+              <Calendar className="h-8 w-8 text-white" />
             </div>
             <div>
               <h1 className="text-4xl font-bold text-gray-900 mb-2">Mijn Aanwezigheid</h1>

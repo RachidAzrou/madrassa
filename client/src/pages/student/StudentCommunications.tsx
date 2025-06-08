@@ -169,21 +169,26 @@ export default function StudentCommunications() {
 
   return (
     <div className="space-y-6">
-      {/* Enhanced Header */}
-      <div className="border-b border-gray-200 pb-8 mb-8">
+      {/* Professional Page Header */}
+      <div className="bg-gradient-to-r from-red-50 via-pink-50 to-rose-50 border-b border-gray-200 p-8 mb-8 rounded-xl shadow-sm">
         <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Communicatie
-            </h1>
-            <p className="text-gray-600 text-lg">
-              Berichten en mededelingen van je school en docenten
-            </p>
+          <div className="flex items-center space-x-4">
+            <div className="p-3 bg-red-500 rounded-xl shadow-lg">
+              <Mail className="h-8 w-8 text-white" />
+            </div>
+            <div>
+              <h1 className="text-4xl font-bold text-gray-900 mb-2">Communicatie</h1>
+              <p className="text-gray-600 text-lg font-medium">Berichten en mededelingen van je school en docenten</p>
+            </div>
           </div>
-          <div className="flex items-center space-x-3">
-            <div className="bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-2 rounded-lg shadow-sm">
-              <div className="text-sm font-medium">{stats?.unreadCount || 0} Ongelezen</div>
-              <div className="text-xs opacity-90">Nieuwe berichten</div>
+          <div className="flex items-center space-x-4">
+            <div className="bg-white border border-gray-200 text-gray-800 px-6 py-3 rounded-xl shadow-md">
+              <div className="text-sm font-bold text-red-600">{stats?.unreadCount || 0} Ongelezen</div>
+              <div className="text-xs text-gray-600 font-medium">Nieuwe berichten</div>
+            </div>
+            <div className="bg-gradient-to-r from-pink-500 to-pink-600 text-white px-6 py-3 rounded-xl shadow-md">
+              <div className="text-sm font-bold">Status</div>
+              <div className="text-xs opacity-90">Verbonden</div>
             </div>
             <Button 
               onClick={() => setIsComposeOpen(true)}

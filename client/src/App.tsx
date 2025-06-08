@@ -47,6 +47,7 @@ import StudentAttendance from "@/pages/student/StudentAttendance";
 import StudentGrades from "@/pages/student/StudentGrades";
 import StudentTeachers from "@/pages/student/StudentTeachers";
 import StudentCommunications from "@/pages/student/StudentCommunications";
+import StudentProfile from "@/pages/student/StudentProfile";
 import GuardianLayout from "@/components/GuardianLayout";
 import GuardianDashboard from "@/pages/guardian/GuardianDashboard";
 import GuardianProfile from "@/pages/guardian/GuardianProfile";
@@ -147,6 +148,7 @@ function AuthenticatedRouter() {
           <Route path="/student/attendance" component={() => <AuthenticatedRoute component={StudentAttendance} />} />
           <Route path="/student/grades" component={() => <AuthenticatedRoute component={StudentGrades} />} />
           <Route path="/student/communications" component={() => <AuthenticatedRoute component={StudentCommunications} />} />
+          <Route path="/student/profile" component={() => <AuthenticatedRoute component={StudentProfile} />} />
           <Route path="/student/reports" component={() => <AuthenticatedRoute component={Reports} />} />
           <Route path="/notifications" component={() => <AuthenticatedRoute component={Notifications} />} />
           <Route path="/messages" component={() => <AuthenticatedRoute component={Messages} />} />

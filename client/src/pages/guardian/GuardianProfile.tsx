@@ -700,49 +700,7 @@ export default function GuardianProfile() {
             </CardContent>
           </Card>
 
-          {/* Account Status Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Shield className="h-5 w-5 text-[#1e40af]" />
-                Account Status
-              </CardTitle>
-              <CardDescription>
-                Uw account informatie en beveiligingsstatus
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-1">
-                    <div className="flex items-center space-x-2 text-gray-500">
-                      <Shield className="h-4 w-4" />
-                      <span className="text-xs font-medium uppercase tracking-wide">Account Status</span>
-                    </div>
-                    <Badge className="bg-green-100 text-green-800">Actief</Badge>
-                  </div>
-                  
-                  <div className="space-y-1">
-                    <div className="flex items-center space-x-2 text-gray-500">
-                      <Users className="h-4 w-4" />
-                      <span className="text-xs font-medium uppercase tracking-wide">Account Type</span>
-                    </div>
-                    <Badge variant="secondary">Voogd</Badge>
-                  </div>
 
-                  <div className="space-y-1">
-                    <div className="flex items-center space-x-2 text-gray-500">
-                      <Heart className="h-4 w-4" />
-                      <span className="text-xs font-medium uppercase tracking-wide">Noodcontact</span>
-                    </div>
-                    <Badge variant={profile.isEmergencyContact ? 'default' : 'secondary'}>
-                      {profile.isEmergencyContact ? 'Ja' : 'Nee'}
-                    </Badge>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
         </TabsContent>
 
         {/* Children Tab */}

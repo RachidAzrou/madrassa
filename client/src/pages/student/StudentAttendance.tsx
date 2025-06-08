@@ -113,31 +113,17 @@ export default function StudentAttendance() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Professional Page Header */}
-      <div className="bg-gradient-to-r from-amber-50 via-orange-50 to-yellow-50 border-b border-gray-200 p-8 mb-8 rounded-xl shadow-sm">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="p-3 bg-amber-500 rounded-xl shadow-lg">
-              <Calendar className="h-8 w-8 text-white" />
-            </div>
-            <div>
-              <h1 className="text-4xl font-bold text-gray-900 mb-2">Mijn Aanwezigheid</h1>
-              <p className="text-gray-600 text-lg font-medium">Volg je aanwezigheid en prestaties dit schooljaar</p>
-            </div>
-          </div>
-          <div className="flex items-center space-x-4">
-            <div className="bg-white border border-gray-200 text-gray-800 px-6 py-3 rounded-xl shadow-md">
-              <div className="text-sm font-bold text-amber-600">{attendanceStats?.attendanceRate || 0}%</div>
-              <div className="text-xs text-gray-600 font-medium">Aanwezigheidspercentage</div>
-            </div>
-            <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-6 py-3 rounded-xl shadow-md">
-              <div className="text-sm font-bold">Status</div>
-              <div className="text-xs opacity-90">Uitstekend</div>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div className="bg-[#f7f9fc] min-h-screen">
+      {/* Clean Page Header - Admin Style */}
+      <PageHeader
+        title="Aanwezigheid"
+        icon={<Target className="h-5 w-5 text-white" />}
+        parent="Student"
+        current="Aanwezigheid"
+      />
+      
+      {/* Main content area */}
+      <div className="px-6 py-6 max-w-7xl mx-auto">
 
       {/* Stats Overview - Admin Style */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
@@ -371,6 +357,8 @@ export default function StudentAttendance() {
             )}
           </CardContent>
         </Card>
+      </div>
+      
       </div>
     </div>
   );

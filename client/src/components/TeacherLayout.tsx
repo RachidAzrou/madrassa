@@ -119,22 +119,19 @@ export default function TeacherLayout({ children }: TeacherLayoutProps) {
   };
 
   return (
-    <div className="min-h-screen bg-[#f7f9fc] lg:flex">
-      {/* Mobile sidebar backdrop */}
-      {sidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-gray-600 bg-opacity-75 z-40 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
-      {/* Sidebar - Admin Interface Copy */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform ${
-        sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      } transition-transform duration-300 ease-in-out lg:translate-x-0 lg:relative lg:flex lg:flex-col border-r border-[#e5e7eb]`}>
-        
-        {/* Logo - Admin Style */}
-        <div className="flex items-center justify-between h-16 px-6 border-b border-[#e5e7eb] bg-white">
+    <div className="min-h-screen bg-[#f7f9fc]">
+      {/* Top bar - Admin Style - Full width above sidebar */}
+      <div className="fixed top-0 left-0 right-0 z-50 h-16 bg-white shadow-sm border-b border-[#e5e7eb]">
+        <div className="flex items-center justify-between h-full px-4 lg:px-6">
+          {/* Mobile menu button */}
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="lg:hidden text-gray-500 hover:text-gray-700"
+          >
+            <Menu className="w-6 h-6" />
+          </button>
+          
+          {/* Logo - Always in topbar */}
           <div className="flex items-center space-x-3">
             <img 
               src={logoPath} 
@@ -143,15 +140,77 @@ export default function TeacherLayout({ children }: TeacherLayoutProps) {
             />
             <span className="text-xl font-bold text-[#1e40af]">myMadrassa</span>
           </div>
+
+          {/* Search bar - Desktop */}
+          <div className="hidden lg:flex flex-1 max-w-md ml-8">
+            <div className="relative w-full">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+              <input
+                type="text"
+                placeholder="Zoeken..."
+                className="w-full pl-9 pr-4 py-2 text-sm border border-[#e5e7eb] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e40af] focus:border-transparent"
+              />
+            </div>
+          </div>
+
+          {/* Right section */}
+          <div className="flex items-center space-x-2 lg:space-x-4">
+            {/* Notifications */}
+            <div className="relative">
+              <Button variant="ghost" size="sm" className="p-2">
+                <Bell className="h-5 w-5 text-gray-600" />
+                {notifications.length > 0 && (
+                  <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 text-xs text-white flex items-center justify-center p-0">
+                    {notifications.length}
+                  </Badge>
+                )}
+              </Button>
+            </div>
+
+            {/* User menu */}
+            <div className="flex items-center space-x-3 pl-2 border-l border-[#e5e7eb]">
+              <Avatar className="h-8 w-8">
+                <AvatarImage src={profile?.profileImage} />
+                <AvatarFallback className="bg-[#1e40af] text-white text-sm">
+                  {profile?.firstName?.[0]}{profile?.lastName?.[0]}
+                </AvatarFallback>
+              </Avatar>
+              <div className="hidden lg:block">
+                <div className="text-sm font-medium text-gray-900">
+                  {profile?.firstName} {profile?.lastName}
+                </div>
+                <div className="text-xs text-gray-500">Docent</div>
+              </div>
+              <Button variant="ghost" size="sm" onClick={handleLogout} className="p-2">
+                <LogOut className="h-4 w-4 text-gray-600" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile sidebar backdrop */}
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-gray-600 bg-opacity-75 z-40 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* Sidebar - Admin Interface Copy - Starts below topbar */}
+      <div className={`fixed top-16 bottom-0 left-0 z-50 w-64 bg-white shadow-lg transform ${
+        sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+      } transition-transform duration-300 ease-in-out lg:translate-x-0 lg:fixed lg:top-16 border-r border-[#e5e7eb]`}>
+        
+        {/* Mobile close button */}
+        <div className="lg:hidden p-3 border-b border-[#e5e7eb]">
           <button
             onClick={() => setSidebarOpen(false)}
-            className="lg:hidden text-gray-500 hover:text-gray-700"
+            className="text-gray-500 hover:text-gray-700"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
-
-        
 
         {/* Navigation - Admin Style with grouped sections */}
         <nav className="flex-1 px-3 py-4 space-y-4 overflow-y-auto">
@@ -271,72 +330,8 @@ export default function TeacherLayout({ children }: TeacherLayoutProps) {
       </div>
 
       {/* Main content - Admin Style */}
-      <div className="flex-1 lg:flex lg:flex-col">
-        {/* Top bar - Admin Style */}
-        <div className="bg-white shadow-sm border-b border-[#e5e7eb] sticky top-0 z-40">
-          <div className="flex items-center justify-between h-16 px-4 lg:px-6">
-            {/* Mobile menu button */}
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="lg:hidden text-gray-500 hover:text-gray-700"
-            >
-              <Menu className="w-6 h-6" />
-            </button>
-            
-            {/* Mobile logo */}
-            <div className="lg:hidden flex items-center space-x-2">
-              <img 
-                src={logoPath} 
-                alt="myMadrassa Logo" 
-                className="w-6 h-6"
-              />
-              <span className="font-semibold text-[#1e40af]">myMadrassa</span>
-            </div>
-
-            {/* Search bar - Desktop */}
-            <div className="hidden lg:flex flex-1 max-w-md ml-4">
-              <div className="relative w-full">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-                <input
-                  type="text"
-                  placeholder="Zoeken..."
-                  className="w-full pl-9 pr-4 py-2 text-sm border border-[#e5e7eb] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e40af] focus:border-transparent"
-                />
-              </div>
-            </div>
-
-            {/* User actions - Admin Style */}
-            <div className="flex items-center space-x-3">
-              {/* Notifications */}
-              <Button variant="ghost" size="sm" className="relative">
-                <Bell className="h-5 w-5 text-gray-600" />
-                {notifications?.length > 0 && (
-                  <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 bg-red-500 text-xs text-white flex items-center justify-center">
-                    {notifications.length}
-                  </Badge>
-                )}
-              </Button>
-
-              {/* User menu */}
-              <div className="flex items-center space-x-3">
-                <Avatar className="h-8 w-8">
-                  <AvatarFallback className="bg-[#1e40af] text-white text-sm">
-                    {profile?.firstName?.[0] || user?.firstName?.[0]}{profile?.lastName?.[0] || user?.lastName?.[0]}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="hidden md:block">
-                  <p className="text-sm font-medium text-gray-900">
-                    {profile?.firstName || user?.firstName} {profile?.lastName || user?.lastName}
-                  </p>
-                  <p className="text-xs text-gray-500">Docent</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Main content area */}
-        <main className="flex-1 overflow-auto">
+      <div className="pt-16 lg:pl-64">
+        <main className="overflow-auto">
           {children}
         </main>
       </div>

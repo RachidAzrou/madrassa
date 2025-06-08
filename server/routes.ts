@@ -4125,9 +4125,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           relationship: guardians.relationship,
           occupation: guardians.occupation,
           isEmergencyContact: guardians.isEmergencyContact,
-          notes: guardians.notes,
-          createdAt: guardians.createdAt,
-          updatedAt: guardians.updatedAt
+          notes: guardians.notes
         })
         .from(guardians)
         .innerJoin(userAccounts, eq(userAccounts.email, guardians.email))
@@ -4165,8 +4163,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         relationship: req.body.relationship,
         occupation: req.body.occupation,
         isEmergencyContact: req.body.isEmergencyContact,
-        notes: req.body.notes,
-        updatedAt: new Date()
+        notes: req.body.notes
       };
 
       const [updatedGuardian] = await db

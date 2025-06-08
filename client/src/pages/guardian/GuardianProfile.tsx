@@ -41,8 +41,6 @@ interface Guardian {
   occupation: string;
   isEmergencyContact: boolean;
   notes: string;
-  createdAt: string;
-  updatedAt: string;
 }
 
 interface Child {
@@ -456,18 +454,7 @@ export default function GuardianProfile() {
                     {profile.isEmergencyContact ? "Ja" : "Nee"}
                   </Badge>
                 </div>
-                <div className="flex items-center justify-between py-2">
-                  <span className="text-sm text-gray-600">Lid sinds</span>
-                  <span className="text-sm font-medium">
-                    {new Date(profile.createdAt).toLocaleDateString('nl-NL')}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between py-2">
-                  <span className="text-sm text-gray-600">Laatst bijgewerkt</span>
-                  <span className="text-sm font-medium">
-                    {new Date(profile.updatedAt).toLocaleDateString('nl-NL')}
-                  </span>
-                </div>
+
               </CardContent>
             </Card>
           </div>

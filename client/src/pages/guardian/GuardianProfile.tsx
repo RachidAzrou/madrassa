@@ -63,7 +63,7 @@ export default function GuardianProfile() {
 
   // Data fetching
   const { data: profile, isLoading: profileLoading } = useQuery<Guardian>({
-    queryKey: ['/api/guardian/profile'],
+    queryKey: ['/api/profile'],
     retry: false,
   });
 
@@ -75,7 +75,7 @@ export default function GuardianProfile() {
   // Update profile mutation
   const updateProfileMutation = useMutation({
     mutationFn: async (data: Partial<Guardian>) => {
-      const response = await fetch('/api/guardian/profile', {
+      const response = await fetch('/api/profile', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -97,20 +97,9 @@ export default function GuardianProfile() {
       });
       setIsEditing(false);
       setEditedData({});
-      queryClient.invalidateQueries({ queryKey: ['/api/guardian/profile'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/profile'] });
     },
     onError: (error) => {
-      if (isUnauthorizedError(error)) {
-        toast({
-          title: "Unauthorized",
-          description: "You are logged out. Logging in again...",
-          variant: "destructive",
-        });
-        setTimeout(() => {
-          window.location.href = "/api/login";
-        }, 500);
-        return;
-      }
       toast({
         title: "Fout",
         description: "Er is een fout opgetreden bij het bijwerken van uw profiel.",

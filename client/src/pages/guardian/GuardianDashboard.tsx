@@ -13,7 +13,8 @@ import {
   ChevronRight,
   CreditCard,
   FileText,
-  GraduationCap
+  GraduationCap,
+  User
 } from "lucide-react";
 import { Link } from "wouter";
 

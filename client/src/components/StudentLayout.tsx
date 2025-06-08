@@ -102,12 +102,6 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
       href: "/student/communications",
       icon: MessageCircle,
       current: location === "/student/communications"
-    },
-    {
-      name: "Profiel",
-      href: "/student/profile",
-      icon: User,
-      current: location === "/student/profile"
     }
   ];
 

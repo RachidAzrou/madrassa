@@ -6993,6 +6993,132 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ********************
+  // Student Profile API endpoints
+  // ********************
+  apiRouter.get("/api/student/profile", authenticateToken, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "User ID required" });
+      }
+
+      // Find student by user ID
+      const students = await storage.getStudents();
+      const student = students.find(s => s.userId === userId);
+      
+      if (!student) {
+        return res.status(404).json({ message: "Student profile not found" });
+      }
+
+      // Get student's class information
+      const classes = await storage.getClasses();
+      const studentClass = classes.find(c => c.id === student.classId);
+
+      // Get student's program information  
+      const programs = await storage.getPrograms();
+      const studentProgram = programs.find(p => p.id === student.programId);
+
+      // Format profile data
+      const profileData = {
+        id: student.id,
+        studentId: student.studentId,
+        firstName: student.firstName,
+        lastName: student.lastName,
+        email: student.email,
+        phone: student.phone || '',
+        dateOfBirth: student.dateOfBirth,
+        gender: student.gender || '',
+        nationality: student.nationality || '',
+        address: student.address || '',
+        postalCode: student.postalCode || '',
+        city: student.city || '',
+        country: student.country || 'Nederland',
+        emergencyContactName: student.emergencyContactName || '',
+        emergencyContactPhone: student.emergencyContactPhone || '',
+        emergencyContactRelation: student.emergencyContactRelation || '',
+        medicalInfo: student.medicalInfo || '',
+        allergies: student.allergies || '',
+        specialNeeds: student.specialNeeds || '',
+        notes: student.notes || '',
+        className: studentClass?.name || '',
+        programName: studentProgram?.name || '',
+        academicYear: student.academicYear || '',
+        enrollmentDate: student.enrollmentDate,
+        status: student.status,
+        profilePhoto: student.profilePhoto || ''
+      };
+
+      res.json(profileData);
+    } catch (error) {
+      console.error("Error fetching student profile:", error);
+      res.status(500).json({ message: "Error fetching student profile" });
+    }
+  });
+
+  apiRouter.get("/api/student/profile/stats", authenticateToken, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "User ID required" });
+      }
+
+      // Find student by user ID
+      const students = await storage.getStudents();
+      const student = students.find(s => s.userId === userId);
+      
+      if (!student) {
+        return res.status(404).json({ message: "Student not found" });
+      }
+
+      // Get basic stats
+      const statsData = {
+        totalCourses: 0,
+        completedCourses: 0,
+        currentGPA: 0,
+        attendanceRate: 95,
+        upcomingAssignments: 0,
+        missedClasses: 0,
+        totalCredits: 0,
+        earnedCredits: 0
+      };
+
+      res.json(statsData);
+    } catch (error) {
+      console.error("Error fetching student stats:", error);
+      res.status(500).json({ message: "Error fetching student stats" });
+    }
+  });
+
+  apiRouter.put("/api/student/profile", authenticateToken, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "User ID required" });
+      }
+
+      // Find student by user ID
+      const students = await storage.getStudents();
+      const student = students.find(s => s.userId === userId);
+      
+      if (!student) {
+        return res.status(404).json({ message: "Student not found" });
+      }
+
+      // Update student profile
+      const updateData = {
+        ...req.body,
+        updatedAt: new Date()
+      };
+
+      const updatedStudent = await storage.updateStudent(student.id, updateData);
+      res.json(updatedStudent);
+    } catch (error) {
+      console.error("Error updating student profile:", error);
+      res.status(500).json({ message: "Error updating student profile" });
+    }
+  });
+
   // creëer HTTP server
   const server = createServer(app);
 

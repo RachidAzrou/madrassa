@@ -7120,6 +7120,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Change password endpoint for students
+  apiRouter.put("/api/student/change-password", authenticateToken, async (req: any, res: Response) => {
+    try {
+      const authUser = req.user as AuthUser;
+      const { currentPassword, newPassword, confirmPassword } = req.body;
+
+      // Validate input
+      if (!currentPassword || !newPassword || !confirmPassword) {
+        return res.status(400).json({ message: "Alle velden zijn verplicht" });
+      }
+
+      if (newPassword !== confirmPassword) {
+        return res.status(400).json({ message: "Wachtwoorden komen niet overeen" });
+      }
+
+      if (newPassword.length < 6) {
+        return res.status(400).json({ message: "Nieuw wachtwoord moet minimaal 6 tekens bevatten" });
+      }
+
+      // Find user in database
+      const user = await storage.getUserByEmail(authUser.email);
+      if (!user) {
+        return res.status(404).json({ message: "Gebruiker niet gevonden" });
+      }
+
+      // Verify current password
+      const bcrypt = require('bcryptjs');
+      const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.password);
+      if (!isCurrentPasswordValid) {
+        return res.status(400).json({ message: "Huidig wachtwoord is onjuist" });
+      }
+
+      // Hash new password
+      const saltRounds = 12;
+      const hashedNewPassword = await bcrypt.hash(newPassword, saltRounds);
+
+      // Update password in database
+      await storage.updateUserPassword(user.id, hashedNewPassword);
+
+      res.json({ message: "Wachtwoord succesvol gewijzigd" });
+    } catch (error) {
+      console.error("Error changing password:", error);
+      res.status(500).json({ message: "Er is een fout opgetreden bij het wijzigen van het wachtwoord" });
+    }
+  });
+
   // creëer HTTP server
   const server = createServer(app);
 

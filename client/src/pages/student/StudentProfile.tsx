@@ -255,9 +255,10 @@ export default function StudentProfile() {
       </div>
 
       <Tabs defaultValue="personal" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="personal">Persoonlijke Gegevens</TabsTrigger>
           <TabsTrigger value="academic">Academische Informatie</TabsTrigger>
+          <TabsTrigger value="security">Beveiliging</TabsTrigger>
           <TabsTrigger value="contact">Contact & Noodgeval</TabsTrigger>
         </TabsList>
 
@@ -647,6 +648,70 @@ export default function StudentProfile() {
               </CardContent>
             </Card>
           </div>
+        </TabsContent>
+
+        <TabsContent value="security" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center text-[#1e40af]">
+                <UserCheck className="h-5 w-5 mr-2" />
+                Wachtwoord wijzigen
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="currentPassword">Huidig wachtwoord</Label>
+                <Input
+                  id="currentPassword"
+                  type="password"
+                  value={passwordData.currentPassword}
+                  onChange={(e) => setPasswordData(prev => ({
+                    ...prev,
+                    currentPassword: e.target.value
+                  }))}
+                  placeholder="Voer je huidige wachtwoord in"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="newPassword">Nieuw wachtwoord</Label>
+                <Input
+                  id="newPassword"
+                  type="password"
+                  value={passwordData.newPassword}
+                  onChange={(e) => setPasswordData(prev => ({
+                    ...prev,
+                    newPassword: e.target.value
+                  }))}
+                  placeholder="Voer een nieuw wachtwoord in (minimaal 6 tekens)"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword">Bevestig nieuw wachtwoord</Label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  value={passwordData.confirmPassword}
+                  onChange={(e) => setPasswordData(prev => ({
+                    ...prev,
+                    confirmPassword: e.target.value
+                  }))}
+                  placeholder="Bevestig je nieuwe wachtwoord"
+                />
+              </div>
+
+              <div className="flex justify-end pt-4">
+                <Button 
+                  onClick={handleChangePassword}
+                  disabled={changePasswordMutation.isPending || !passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword}
+                  className="bg-[#1e40af] hover:bg-[#1e40af]/90"
+                >
+                  {changePasswordMutation.isPending ? "Wijzigen..." : "Wachtwoord wijzigen"}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>

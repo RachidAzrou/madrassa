@@ -69,6 +69,12 @@ export default function StudentProfile() {
   const queryClient = useQueryClient();
   const [isEditing, setIsEditing] = useState(false);
   const [editedProfile, setEditedProfile] = useState<Partial<StudentProfile>>({});
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
 
   const { data: profile, isLoading } = useQuery<StudentProfile>({
     queryKey: ['/api/student/profile'],
@@ -114,6 +120,40 @@ export default function StudentProfile() {
     },
   });
 
+  const changePasswordMutation = useMutation({
+    mutationFn: async (passwordData: { currentPassword: string; newPassword: string; confirmPassword: string }) => {
+      const response = await fetch('/api/student/change-password', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(passwordData),
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to change password');
+      }
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      setIsChangingPassword(false);
+      setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+      toast({
+        title: "Wachtwoord gewijzigd",
+        description: "Je wachtwoord is succesvol gewijzigd.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Fout bij wachtwoord wijzigen",
+        description: error.message || "Er is een fout opgetreden bij het wijzigen van je wachtwoord.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleEdit = () => {
     setEditedProfile(profile || {});
     setIsEditing(true);
@@ -142,6 +182,28 @@ export default function StudentProfile() {
     }
   };
 
+  const handleChangePassword = () => {
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      toast({
+        title: "Wachtwoorden komen niet overeen",
+        description: "Het nieuwe wachtwoord en bevestiging moeten hetzelfde zijn.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (passwordData.newPassword.length < 6) {
+      toast({
+        title: "Wachtwoord te kort",
+        description: "Het nieuwe wachtwoord moet minimaal 6 tekens bevatten.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    changePasswordMutation.mutate(passwordData);
+  };
+
   if (isLoading) {
     return (
       <div className="h-screen flex items-center justify-center">
@@ -166,8 +228,8 @@ export default function StudentProfile() {
     <div className="p-6 max-w-6xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Mijn Profiel</h1>
-          <p className="text-gray-600">Bekijk en bewerk je persoonlijke gegevens</p>
+          <h1 className="text-3xl font-bold tracking-tight">Mijn Profiel</h1>
+          <p className="text-muted-foreground">Bekijk en bewerk je persoonlijke gegevens</p>
         </div>
         <div className="flex gap-2">
           {isEditing ? (

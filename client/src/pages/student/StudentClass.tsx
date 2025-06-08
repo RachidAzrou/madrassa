@@ -82,9 +82,9 @@ export default function StudentClass() {
             </p>
           </div>
           <div className="flex items-center space-x-3">
-            <Button className="bg-[#1e40af] hover:bg-[#1d3a8a] text-white">
-              <Users className="h-4 w-4 mr-2" />
-              Klassenoverzicht
+            <Button variant="outline" className="border-[#e5e7eb] hover:bg-[#eff6ff] hover:border-[#1e40af]">
+              <MessageCircle className="h-4 w-4 mr-2 text-[#1e40af]" />
+              Contact Klasgenoten
             </Button>
           </div>
         </div>

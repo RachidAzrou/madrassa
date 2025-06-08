@@ -78,7 +78,7 @@ export default function StudentClass() {
           </div>
           <div className="flex items-center space-x-3">
             <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2 rounded-lg shadow-sm">
-              <div className="text-sm font-medium">Klas {myClass?.className || 'Onbekend'}</div>
+              <div className="text-sm font-medium">Klas {myClass?.name || 'Onbekend'}</div>
               <div className="text-xs opacity-90">{myClass?.academicYear || 'Huidig jaar'}</div>
             </div>
           </div>

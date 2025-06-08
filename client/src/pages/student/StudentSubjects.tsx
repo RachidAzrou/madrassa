@@ -66,18 +66,23 @@ export default function StudentSubjects() {
 
   return (
     <div className="space-y-6">
-      {/* Header - Admin Style */}
-      <div>
+      {/* Enhanced Header */}
+      <div className="border-b border-gray-200 pb-8 mb-8">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
               Mijn Vakken
             </h1>
-            <p className="text-gray-600">
-              Overzicht van alle vakken die je volgt dit schooljaar
+            <p className="text-gray-600 text-lg">
+              Ontdek alle vakken die je dit schooljaar volgt
             </p>
           </div>
-
+          <div className="flex items-center space-x-3">
+            <div className="bg-gradient-to-r from-green-500 to-green-600 text-white px-4 py-2 rounded-lg shadow-sm">
+              <div className="text-sm font-medium">{subjects?.subjects?.length || 0} Vakken</div>
+              <div className="text-xs opacity-90">Actief dit jaar</div>
+            </div>
+          </div>
         </div>
       </div>
 

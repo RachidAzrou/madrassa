@@ -4109,8 +4109,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Unauthorized" });
       }
 
-      // Get guardian profile based on user ID
-      const [guardian] = await db
+      // Get guardian profile - Find guardian by matching user account
+      const [guardianProfile] = await db
         .select({
           id: guardians.id,
           firstName: guardians.firstName,
@@ -4130,13 +4130,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
           updatedAt: guardians.updatedAt
         })
         .from(guardians)
-        .where(eq(guardians.id, userId));
+        .innerJoin(userAccounts, eq(userAccounts.email, guardians.email))
+        .where(eq(userAccounts.id, userId))
+        .limit(1);
 
-      if (!guardian) {
+      if (!guardianProfile) {
         return res.status(404).json({ message: "Guardian profile not found" });
       }
 
-      res.json(guardian);
+      res.json(guardianProfile);
     } catch (error) {
       console.error("Error fetching guardian profile:", error);
       res.status(500).json({ message: "Error fetching guardian profile" });

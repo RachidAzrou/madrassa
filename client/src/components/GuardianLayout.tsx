@@ -43,7 +43,7 @@ interface Child {
 }
 
 export default function GuardianLayout({ children }: GuardianLayoutProps) {
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
   const { user, logout } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedChildId, setSelectedChildId] = useState<string>("");
@@ -273,7 +273,7 @@ export default function GuardianLayout({ children }: GuardianLayoutProps) {
                   <span className="text-xs text-gray-500">Voogd</span>
                 </div>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => window.location.href = '/guardian/profile'}>
+                <DropdownMenuItem onClick={() => setLocation('/guardian/profile')}>
                   <User className="mr-2 h-4 w-4" />
                   <span>Mijn Profiel</span>
                 </DropdownMenuItem>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -13,12 +13,11 @@ import {
   UserCheck,
   GraduationCap,
   FileText,
-  FolderOpen,
+  Settings,
   LogOut,
   Menu,
   X,
   Bell,
-  Settings,
   ChevronDown,
   User,
   MessageCircle,
@@ -35,7 +34,7 @@ export default function TeacherLayout({ children }: TeacherLayoutProps) {
   const { user, logout } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // Data fetching for notifications (admin interface copy)
+  // Data fetching for notifications
   const { data: notifications = [] } = useQuery<any[]>({
     queryKey: ['/api/notifications/user/1'],
     staleTime: 30000,
@@ -46,54 +45,64 @@ export default function TeacherLayout({ children }: TeacherLayoutProps) {
     staleTime: 60000,
   });
 
-  const navigation = [
+  // Navigation sections - Admin style structure
+  const mainNavigation = [
     {
-      name: "Dashboard",
-      href: "/",
+      name: 'Dashboard',
+      href: '/teacher',
       icon: Home,
-      current: location === "/"
-    },
+      current: location === '/teacher' || location === '/teacher/'
+    }
+  ];
+
+  const studentManagement = [
     {
-      name: "Mijn Klassen",
-      href: "/teacher/classes",
+      name: 'Studenten',
+      href: '/teacher/students',
       icon: Users,
-      current: location === "/teacher/classes"
+      current: location.startsWith('/teacher/students')
     },
     {
-      name: "Mijn Rooster",
-      href: "/teacher/schedule",
-      icon: Calendar,
-      current: location === "/teacher/schedule"
-    },
-    {
-      name: "Mijn Vakken",
-      href: "/teacher/subjects",
-      icon: BookOpen,
-      current: location === "/teacher/subjects"
-    },
-    {
-      name: "Aanwezigheid",
-      href: "/teacher/attendance",
-      icon: UserCheck,
-      current: location === "/teacher/attendance"
-    },
-    {
-      name: "Cijfers",
-      href: "/teacher/grades",
+      name: 'Klassen',
+      href: '/teacher/classes',
       icon: GraduationCap,
-      current: location === "/teacher/grades"
+      current: location.startsWith('/teacher/classes')
     },
     {
-      name: "Rapportages",
-      href: "/teacher/reports",
+      name: 'Aanwezigheid',
+      href: '/teacher/attendance',
+      icon: UserCheck,
+      current: location.startsWith('/teacher/attendance')
+    }
+  ];
+
+  const academic = [
+    {
+      name: 'Cijfers',
+      href: '/teacher/grades',
       icon: FileText,
-      current: location === "/teacher/reports"
+      current: location.startsWith('/teacher/grades')
     },
     {
-      name: "Communicatie",
-      href: "/teacher/communications",
+      name: 'Vakken',
+      href: '/teacher/subjects',
+      icon: BookOpen,
+      current: location.startsWith('/teacher/subjects')
+    },
+    {
+      name: 'Agenda',
+      href: '/teacher/calendar',
+      icon: Calendar,
+      current: location.startsWith('/teacher/calendar')
+    }
+  ];
+
+  const communication = [
+    {
+      name: 'Berichten',
+      href: '/teacher/communications',
       icon: MessageCircle,
-      current: location === "/teacher/communications"
+      current: location.startsWith('/teacher/communications')
     }
   ];
 
@@ -161,34 +170,119 @@ export default function TeacherLayout({ children }: TeacherLayoutProps) {
           </div>
         </div>
 
-        {/* Navigation - Admin Style */}
-        <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-          {navigation.map((item) => {
-            const Icon = item.icon;
-            return (
-              <Link key={item.name} href={item.href} className={`group flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 ${
-                item.current
-                  ? 'bg-[#1e40af] text-white shadow-sm'
-                  : 'text-gray-700 hover:bg-[#f1f5f9] hover:text-[#1e40af]'
-              }`}>
-                <Icon className={`mr-3 h-4 w-4 ${
-                  item.current ? 'text-white' : 'text-gray-500 group-hover:text-[#1e40af]'
-                }`} />
-                {item.name}
-              </Link>
-            );
-          })}
+        {/* Navigation - Admin Style with grouped sections */}
+        <nav className="flex-1 px-3 py-4 space-y-4 overflow-y-auto">
+          {/* Main Navigation */}
+          <div className="space-y-1">
+            {mainNavigation.map((item) => {
+              const Icon = item.icon;
+              return (
+                <Link 
+                  key={item.name} 
+                  href={item.href} 
+                  className={`group flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 ${
+                    item.current
+                      ? 'bg-[#1e40af] text-white shadow-sm'
+                      : 'text-gray-700 hover:bg-[#f1f5f9] hover:text-[#1e40af]'
+                  }`}
+                >
+                  <Icon className={`mr-3 h-4 w-4 ${
+                    item.current ? 'text-white' : 'text-gray-500 group-hover:text-[#1e40af]'
+                  }`} />
+                  {item.name}
+                </Link>
+              );
+            })}
+          </div>
+
+          {/* Student Management */}
+          <div className="space-y-1">
+            <div className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              Studentenbeheer
+            </div>
+            {studentManagement.map((item) => {
+              const Icon = item.icon;
+              return (
+                <Link 
+                  key={item.name} 
+                  href={item.href} 
+                  className={`group flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 ${
+                    item.current
+                      ? 'bg-[#1e40af] text-white shadow-sm'
+                      : 'text-gray-700 hover:bg-[#f1f5f9] hover:text-[#1e40af]'
+                  }`}
+                >
+                  <Icon className={`mr-3 h-4 w-4 ${
+                    item.current ? 'text-white' : 'text-gray-500 group-hover:text-[#1e40af]'
+                  }`} />
+                  {item.name}
+                </Link>
+              );
+            })}
+          </div>
+
+          {/* Academic */}
+          <div className="space-y-1">
+            <div className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              Academisch
+            </div>
+            {academic.map((item) => {
+              const Icon = item.icon;
+              return (
+                <Link 
+                  key={item.name} 
+                  href={item.href} 
+                  className={`group flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 ${
+                    item.current
+                      ? 'bg-[#1e40af] text-white shadow-sm'
+                      : 'text-gray-700 hover:bg-[#f1f5f9] hover:text-[#1e40af]'
+                  }`}
+                >
+                  <Icon className={`mr-3 h-4 w-4 ${
+                    item.current ? 'text-white' : 'text-gray-500 group-hover:text-[#1e40af]'
+                  }`} />
+                  {item.name}
+                </Link>
+              );
+            })}
+          </div>
+
+          {/* Communication */}
+          <div className="space-y-1">
+            <div className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              Communicatie
+            </div>
+            {communication.map((item) => {
+              const Icon = item.icon;
+              return (
+                <Link 
+                  key={item.name} 
+                  href={item.href} 
+                  className={`group flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 ${
+                    item.current
+                      ? 'bg-[#1e40af] text-white shadow-sm'
+                      : 'text-gray-700 hover:bg-[#f1f5f9] hover:text-[#1e40af]'
+                  }`}
+                >
+                  <Icon className={`mr-3 h-4 w-4 ${
+                    item.current ? 'text-white' : 'text-gray-500 group-hover:text-[#1e40af]'
+                  }`} />
+                  {item.name}
+                </Link>
+              );
+            })}
+          </div>
         </nav>
 
         {/* Logout button - Admin Style */}
         <div className="p-3 border-t border-[#e5e7eb]">
           <Button
-            onClick={handleLogout}
             variant="ghost"
-            className="w-full justify-start text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg"
+            onClick={handleLogout}
+            className="w-full justify-start text-gray-700 hover:bg-red-50 hover:text-red-600"
           >
             <LogOut className="mr-3 h-4 w-4" />
-            Afmelden
+            Uitloggen
           </Button>
         </div>
       </div>
@@ -228,38 +322,38 @@ export default function TeacherLayout({ children }: TeacherLayoutProps) {
               </div>
             </div>
 
-            {/* Top bar actions - Admin Style */}
+            {/* User actions - Admin Style */}
             <div className="flex items-center space-x-3">
               {/* Notifications */}
               <Button variant="ghost" size="sm" className="relative">
                 <Bell className="h-5 w-5 text-gray-600" />
                 {notifications?.length > 0 && (
-                  <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                  <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 bg-red-500 text-xs text-white flex items-center justify-center">
                     {notifications.length}
-                  </span>
+                  </Badge>
                 )}
               </Button>
 
-              {/* Settings */}
-              <Button variant="ghost" size="sm">
-                <Settings className="h-5 w-5 text-gray-600" />
-              </Button>
-
-              {/* Profile dropdown */}
-              <div className="flex items-center space-x-2">
+              {/* User menu */}
+              <div className="flex items-center space-x-3">
                 <Avatar className="h-8 w-8">
-                  <AvatarFallback className="bg-[#1e40af] text-white text-xs">
+                  <AvatarFallback className="bg-[#1e40af] text-white text-sm">
                     {profile?.firstName?.[0] || user?.firstName?.[0]}{profile?.lastName?.[0] || user?.lastName?.[0]}
                   </AvatarFallback>
                 </Avatar>
-                <ChevronDown className="h-4 w-4 text-gray-500 hidden lg:block" />
+                <div className="hidden md:block">
+                  <p className="text-sm font-medium text-gray-900">
+                    {profile?.firstName || user?.firstName} {profile?.lastName || user?.lastName}
+                  </p>
+                  <p className="text-xs text-gray-500">Docent</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Page content */}
-        <main className="flex-1 bg-[#f7f9fc] min-h-screen">
+        {/* Main content area */}
+        <main>
           {children}
         </main>
       </div>

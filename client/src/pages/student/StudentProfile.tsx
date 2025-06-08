@@ -70,7 +70,7 @@ export default function StudentProfile() {
   const [isEditing, setIsEditing] = useState(false);
   const [editedProfile, setEditedProfile] = useState<Partial<StudentProfile>>({});
 
-  const { data: profile, isLoading } = useQuery<StudentProfile>({
+  const { data: profile, isLoading, error } = useQuery<StudentProfile>({
     queryKey: ['/api/student/profile'],
     staleTime: 60000,
   });
@@ -79,6 +79,11 @@ export default function StudentProfile() {
     queryKey: ['/api/student/profile/stats'],
     staleTime: 60000,
   });
+
+  // Debug logging
+  console.log('Profile data:', profile);
+  console.log('Profile loading:', isLoading);
+  console.log('Profile error:', error);
 
   const updateProfileMutation = useMutation({
     mutationFn: async (data: Partial<StudentProfile>) => {

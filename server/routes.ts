@@ -4100,6 +4100,135 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // ********************
+  // Guardian Profile API endpoints
+  // ********************
+  apiRouter.get("/api/guardian/profile", authenticateToken, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      // Get guardian profile based on user ID
+      const [guardian] = await db
+        .select({
+          id: guardians.id,
+          firstName: guardians.firstName,
+          lastName: guardians.lastName,
+          email: guardians.email,
+          phone: guardians.phone,
+          address: guardians.address,
+          street: guardians.street,
+          houseNumber: guardians.houseNumber,
+          postalCode: guardians.postalCode,
+          city: guardians.city,
+          relationship: guardians.relationship,
+          occupation: guardians.occupation,
+          isEmergencyContact: guardians.isEmergencyContact,
+          notes: guardians.notes,
+          createdAt: guardians.createdAt,
+          updatedAt: guardians.updatedAt
+        })
+        .from(guardians)
+        .where(eq(guardians.id, userId));
+
+      if (!guardian) {
+        return res.status(404).json({ message: "Guardian profile not found" });
+      }
+
+      res.json(guardian);
+    } catch (error) {
+      console.error("Error fetching guardian profile:", error);
+      res.status(500).json({ message: "Error fetching guardian profile" });
+    }
+  });
+
+  apiRouter.put("/api/guardian/profile", authenticateToken, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      const updateData = {
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        email: req.body.email,
+        phone: req.body.phone,
+        address: req.body.address,
+        street: req.body.street,
+        houseNumber: req.body.houseNumber,
+        postalCode: req.body.postalCode,
+        city: req.body.city,
+        relationship: req.body.relationship,
+        occupation: req.body.occupation,
+        isEmergencyContact: req.body.isEmergencyContact,
+        notes: req.body.notes,
+        updatedAt: new Date()
+      };
+
+      const [updatedGuardian] = await db
+        .update(guardians)
+        .set(updateData)
+        .where(eq(guardians.id, userId))
+        .returning();
+
+      if (!updatedGuardian) {
+        return res.status(404).json({ message: "Guardian profile not found" });
+      }
+
+      res.json(updatedGuardian);
+    } catch (error) {
+      console.error("Error updating guardian profile:", error);
+      res.status(500).json({ message: "Error updating guardian profile" });
+    }
+  });
+
+  apiRouter.get("/api/guardian/children", authenticateToken, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      // Get children associated with this guardian
+      const children = await db
+        .select({
+          id: students.id,
+          firstName: students.firstName,
+          lastName: students.lastName,
+          studentId: students.studentId,
+          class: sql`COALESCE(${studentGroups.name}, 'Geen klas')`.as('class'),
+          dateOfBirth: students.dateOfBirth,
+          status: students.status
+        })
+        .from(students)
+        .innerJoin(
+          schema.studentGuardians,
+          eq(schema.studentGuardians.studentId, students.id)
+        )
+        .leftJoin(
+          studentGroupEnrollments,
+          and(
+            eq(studentGroupEnrollments.studentId, students.id),
+            eq(studentGroupEnrollments.status, 'active')
+          )
+        )
+        .leftJoin(
+          studentGroups,
+          eq(studentGroups.id, studentGroupEnrollments.groupId)
+        )
+        .where(eq(schema.studentGuardians.guardianId, userId))
+        .orderBy(students.firstName, students.lastName);
+
+      res.json(children);
+    } catch (error) {
+      console.error("Error fetching guardian children:", error);
+      res.status(500).json({ message: "Error fetching guardian children" });
+    }
+  });
+
+  // ********************
   // Student Program API endpoints
   // ********************
   apiRouter.get("/api/student-programs", async (_req, res) => {

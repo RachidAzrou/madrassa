@@ -76,13 +76,20 @@ export default function GuardianProfile() {
   // Update profile mutation
   const updateProfileMutation = useMutation({
     mutationFn: async (data: Partial<Guardian>) => {
-      return await apiRequest('/api/guardian/profile', {
+      const response = await fetch('/api/guardian/profile', {
         method: 'PUT',
-        body: JSON.stringify(data),
         headers: {
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify(data),
       });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(`${response.status}: ${errorData.message || 'Update failed'}`);
+      }
+
+      return response.json();
     },
     onSuccess: () => {
       toast({

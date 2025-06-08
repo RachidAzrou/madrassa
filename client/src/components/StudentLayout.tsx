@@ -76,7 +76,7 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
     {
       name: "Vakken",
       href: "/student/subjects",
-      icon: School,
+      icon: BookOpen,
       current: location === "/student/subjects"
     },
     {

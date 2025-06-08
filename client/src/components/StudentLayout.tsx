@@ -180,9 +180,9 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
       </div>
 
       {/* Exact Admin-Style Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow transform ${
+      <div className={`fixed top-16 bottom-0 left-0 z-50 w-64 bg-white shadow border-r border-gray-200 transform ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      } transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0`}>
+      } transition-transform duration-300 ease-in-out lg:translate-x-0 lg:fixed lg:top-16`}>
         
         {/* Mobile header */}
         <div className="lg:hidden flex items-center justify-between p-4 border-b border-gray-200">
@@ -223,8 +223,8 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
       </div>
 
       {/* Main content - Admin Style */}
-      <div className="pt-16 lg:pl-64">
-        <main className="bg-gray-50 min-h-screen p-6">
+      <div className="lg:pl-64">
+        <main className="bg-gray-50 min-h-screen pt-16 p-6">
           {children}
         </main>
       </div>

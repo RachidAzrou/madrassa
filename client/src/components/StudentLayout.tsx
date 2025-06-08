@@ -33,7 +33,6 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
   const { user, logout } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // Data fetching - admin interface copy
   const { data: notifications = [] } = useQuery<any[]>({
     queryKey: ['/api/notifications/user/1'],
     staleTime: 30000,
@@ -58,13 +57,7 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
       current: location === "/student/class"
     },
     {
-      name: "Mijn Docenten",
-      href: "/student/teachers",
-      icon: UserCheck,
-      current: location === "/student/teachers"
-    },
-    {
-      name: "Mijn Vakken",
+      name: "Vakken",
       href: "/student/subjects",
       icon: BookOpen,
       current: location === "/student/subjects"
@@ -72,7 +65,7 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
     {
       name: "Aanwezigheid",
       href: "/student/attendance",
-      icon: ClipboardList,
+      icon: UserCheck,
       current: location === "/student/attendance"
     },
     {
@@ -82,16 +75,16 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
       current: location === "/student/grades"
     },
     {
+      name: "Docenten",
+      href: "/student/teachers",
+      icon: ClipboardList,
+      current: location === "/student/teachers"
+    },
+    {
       name: "Communicatie",
       href: "/student/communications",
       icon: MessageCircle,
       current: location === "/student/communications"
-    },
-    {
-      name: "Rapportages",
-      href: "/student/reports",
-      icon: FileText,
-      current: location === "/student/reports"
     }
   ];
 
@@ -101,7 +94,7 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
   };
 
   return (
-    <div className="min-h-screen bg-[#f7f9fc]">
+    <div className="min-h-screen bg-gray-50 flex">
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
         <div 
@@ -110,83 +103,28 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
         />
       )}
 
-      {/* Top bar - Admin Style - Above everything */}
-      <div className="bg-white shadow-sm border-b border-[#e5e7eb] fixed top-0 left-0 right-0 z-50 h-12">
-        <div className="flex items-center justify-between h-12 px-4 lg:px-6">
-          {/* Logo section - Left */}
-          <div className="flex items-center space-x-3">
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="lg:hidden text-gray-500 hover:text-gray-700 mr-3"
-            >
-              <Menu className="w-5 h-5" />
-            </button>
-            <img 
-              src={myMadrassaLogo} 
-              alt="myMadrassa Logo" 
-              className="w-6 h-6"
-            />
-            <span className="text-lg font-bold text-[#1e40af]">myMadrassa</span>
-          </div>
-
-          {/* Search bar - Center */}
-          <div className="hidden lg:flex flex-1 max-w-md mx-4">
-            <div className="relative w-full">
-              <Search className="absolute left-2.5 top-2 h-4 w-4 text-gray-500" />
-              <input
-                type="text"
-                placeholder="Zoeken..."
-                className="w-full pl-9 pr-4 py-1.5 text-sm border border-[#e5e7eb] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e40af] focus:border-transparent"
-              />
-            </div>
-          </div>
-
-          {/* Top bar actions - Right */}
-          <div className="flex items-center space-x-3">
-            {/* Notifications */}
-            <Button variant="ghost" size="sm" className="relative h-8 w-8 p-0">
-              <Bell className="h-4 w-4 text-gray-600" />
-              {notifications?.length > 0 && (
-                <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
-                  {notifications.length}
-                </span>
-              )}
-            </Button>
-
-            {/* Messages */}
-            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-              <MessageCircle className="h-4 w-4 text-gray-600" />
-            </Button>
-
-            {/* Profile dropdown */}
-            <div className="flex items-center space-x-2">
-              <Avatar className="h-7 w-7">
-                <AvatarFallback className="bg-[#1e40af] text-white text-xs">
-                  {profile?.firstName?.[0] || user?.firstName?.[0]}{profile?.lastName?.[0] || user?.lastName?.[0]}
-                </AvatarFallback>
-              </Avatar>
-              <ChevronDown className="h-3 w-3 text-gray-500 hidden lg:block" />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Sidebar - Admin Interface Copy */}
-      <div className={`fixed inset-y-0 left-0 z-40 w-64 bg-white shadow-lg transform ${
+      {/* Sidebar - Full height like admin */}
+      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      } transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 border-r border-[#e5e7eb] pt-12`}>
+      } transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 border-r border-[#e5e7eb]`}>
         
-        {/* Close button for mobile - Only visible on mobile */}
-        <div className="lg:hidden flex justify-end p-3 border-b border-[#e5e7eb]">
+        {/* Logo section at top */}
+        <div className="flex items-center px-6 py-4 border-b border-[#e5e7eb]">
+          <img 
+            src={myMadrassaLogo} 
+            alt="myMadrassa Logo" 
+            className="w-8 h-8"
+          />
+          <span className="ml-3 text-xl font-bold text-[#1e40af]">myMadrassa</span>
           <button
             onClick={() => setSidebarOpen(false)}
-            className="text-gray-500 hover:text-gray-700"
+            className="ml-auto lg:hidden text-gray-500 hover:text-gray-700"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* User info - Admin Style */}
+        {/* User info section */}
         <div className="px-6 py-4 border-b border-[#e5e7eb] bg-[#f8fafc]">
           <div className="flex items-center space-x-3">
             <Avatar className="h-10 w-10">
@@ -212,18 +150,18 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
           </div>
         </div>
 
-        {/* Navigation - Admin Style */}
+        {/* Navigation */}
         <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
           {navigation.map((item) => {
             const Icon = item.icon;
             return (
               <Link key={item.name} href={item.href} className={`group flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 ${
                 item.current
-                  ? 'bg-[#1e40af] text-white shadow-sm'
-                  : 'text-gray-700 hover:bg-[#f1f5f9] hover:text-[#1e40af]'
+                  ? 'bg-[#eff6ff] text-[#1e40af] border border-[#bfdbfe]'
+                  : 'text-gray-700 hover:bg-[#f3f4f6] hover:text-[#1e40af]'
               }`}>
-                <Icon className={`mr-3 h-4 w-4 ${
-                  item.current ? 'text-white' : 'text-gray-500 group-hover:text-[#1e40af]'
+                <Icon className={`mr-3 h-5 w-5 ${
+                  item.current ? 'text-[#1e40af]' : 'text-gray-500 group-hover:text-[#1e40af]'
                 }`} />
                 {item.name}
               </Link>
@@ -231,22 +169,76 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
           })}
         </nav>
 
-        {/* Logout button - Admin Style */}
+        {/* Logout button at bottom */}
         <div className="p-3 border-t border-[#e5e7eb]">
           <Button
             onClick={handleLogout}
             variant="ghost"
-            className="w-full justify-start text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg"
+            className="w-full justify-start text-gray-700 hover:bg-red-50 hover:text-red-700"
           >
-            <LogOut className="mr-3 h-4 w-4" />
-            Afmelden
+            <LogOut className="mr-3 h-5 w-5" />
+            Uitloggen
           </Button>
         </div>
       </div>
 
-      {/* Main content - Admin Style */}
-      <div className="pt-12 lg:pl-64">
-        <main className="bg-[#f7f9fc] min-h-screen p-6">
+      {/* Main content area */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Top bar */}
+        <div className="bg-white shadow-sm border-b border-[#e5e7eb] h-16">
+          <div className="flex items-center justify-between h-16 px-4 lg:px-6">
+            {/* Mobile menu button */}
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="lg:hidden text-gray-500 hover:text-gray-700"
+            >
+              <Menu className="w-6 h-6" />
+            </button>
+
+            {/* Search bar */}
+            <div className="hidden lg:flex flex-1 max-w-md">
+              <div className="relative w-full">
+                <Search className="absolute left-3 top-3 h-4 w-4 text-gray-500" />
+                <input
+                  type="text"
+                  placeholder="Zoeken..."
+                  className="w-full pl-10 pr-4 py-2 text-sm border border-[#e5e7eb] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e40af] focus:border-transparent"
+                />
+              </div>
+            </div>
+
+            {/* Top bar actions */}
+            <div className="flex items-center space-x-3">
+              {/* Notifications */}
+              <Button variant="ghost" size="sm" className="relative h-10 w-10 p-0">
+                <Bell className="h-5 w-5 text-gray-600" />
+                {notifications?.length > 0 && (
+                  <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                    {notifications.length}
+                  </span>
+                )}
+              </Button>
+
+              {/* Settings */}
+              <Button variant="ghost" size="sm" className="h-10 w-10 p-0">
+                <Settings className="h-5 w-5 text-gray-600" />
+              </Button>
+
+              {/* User Profile */}
+              <div className="flex items-center space-x-2">
+                <Avatar className="h-8 w-8">
+                  <AvatarFallback className="bg-[#1e40af] text-white text-xs">
+                    {profile?.firstName?.[0] || user?.firstName?.[0]}{profile?.lastName?.[0] || user?.lastName?.[0]}
+                  </AvatarFallback>
+                </Avatar>
+                <ChevronDown className="h-4 w-4 text-gray-500" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Page content */}
+        <main className="flex-1 overflow-y-auto p-6">
           {children}
         </main>
       </div>

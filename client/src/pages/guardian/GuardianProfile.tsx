@@ -63,7 +63,7 @@ export default function GuardianProfile() {
 
   // Data fetching
   const { data: profile, isLoading: profileLoading } = useQuery<Guardian>({
-    queryKey: ['/api/profile'],
+    queryKey: ['/api/guardian/profile'],
     retry: false,
   });
 
@@ -75,7 +75,7 @@ export default function GuardianProfile() {
   // Update profile mutation
   const updateProfileMutation = useMutation({
     mutationFn: async (data: Partial<Guardian>) => {
-      const response = await fetch('/api/profile', {
+      const response = await fetch('/api/guardian/profile', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -97,7 +97,7 @@ export default function GuardianProfile() {
       });
       setIsEditing(false);
       setEditedData({});
-      queryClient.invalidateQueries({ queryKey: ['/api/profile'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/guardian/profile'] });
     },
     onError: (error) => {
       toast({

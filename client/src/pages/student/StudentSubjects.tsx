@@ -83,16 +83,16 @@ export default function StudentSubjects() {
 
       {/* Stats Overview - Admin Style */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card className="bg-white border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
+        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-sm hover:shadow-lg transition-all duration-200 hover:scale-[1.02]">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-            <CardTitle className="text-sm font-medium text-gray-700">Totaal Vakken</CardTitle>
-            <div className="p-2 bg-[#eff6ff] rounded-lg">
-              <BookOpen className="h-4 w-4 text-[#1e40af]" />
+            <CardTitle className="text-sm font-medium text-blue-700">Totaal Vakken</CardTitle>
+            <div className="p-3 bg-blue-500 rounded-xl shadow-sm">
+              <BookOpen className="h-5 w-5 text-white" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-[#1e40af]">{subjects?.subjects?.length || 0}</div>
-            <p className="text-xs text-gray-600 mt-1">
+            <div className="text-2xl font-bold text-blue-900">{subjects?.subjects?.length || 0}</div>
+            <p className="text-xs text-blue-600 mt-1">
               Dit schooljaar
             </p>
           </CardContent>

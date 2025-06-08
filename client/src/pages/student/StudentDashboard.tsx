@@ -113,33 +113,33 @@ export default function StudentDashboard() {
         </div>
       </div>
 
-      {/* Stats Grid - Admin Style */}
+      {/* Enhanced Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <Card className="bg-white border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
+        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-sm hover:shadow-lg transition-all duration-200 hover:scale-[1.02]">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-            <CardTitle className="text-sm font-medium text-gray-700">Mijn Klas</CardTitle>
-            <div className="p-2 bg-[#eff6ff] rounded-lg">
-              <Users className="h-4 w-4 text-[#1e40af]" />
+            <CardTitle className="text-sm font-medium text-blue-700">Mijn Klas</CardTitle>
+            <div className="p-3 bg-blue-500 rounded-xl shadow-sm">
+              <Users className="h-5 w-5 text-white" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-[#1e40af]">{dashboardStats.myClass}</div>
-            <p className="text-xs text-gray-600 mt-1">
+            <div className="text-2xl font-bold text-blue-900">{dashboardStats.myClass}</div>
+            <p className="text-xs text-blue-600 mt-1">
               Huidige klas
             </p>
           </CardContent>
         </Card>
 
-        <Card className="bg-white border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
+        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-sm hover:shadow-lg transition-all duration-200 hover:scale-[1.02]">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-            <CardTitle className="text-sm font-medium text-gray-700">Mijn Vakken</CardTitle>
-            <div className="p-2 bg-[#f0fdf4] rounded-lg">
-              <BookOpen className="h-4 w-4 text-[#16a34a]" />
+            <CardTitle className="text-sm font-medium text-green-700">Mijn Vakken</CardTitle>
+            <div className="p-3 bg-green-500 rounded-xl shadow-sm">
+              <BookOpen className="h-5 w-5 text-white" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-[#16a34a]">{dashboardStats.totalSubjects}</div>
-            <p className="text-xs text-gray-600 mt-1">
+            <div className="text-2xl font-bold text-green-900">{dashboardStats.totalSubjects}</div>
+            <p className="text-xs text-green-600 mt-1">
               Actieve vakken
             </p>
           </CardContent>

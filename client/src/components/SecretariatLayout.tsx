@@ -196,82 +196,251 @@ export default function SecretariatLayout({ children }: SecretariatLayoutProps) 
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Top Bar - Admin Style */}
-      <div className="fixed top-0 left-0 right-0 z-50 w-full h-12 border-b border-gray-200 bg-white px-4 flex items-center justify-between">
-        {/* Menu voor mobiel (links) */}
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          className="mr-2 lg:hidden"
-          onClick={() => setSidebarOpen(true)}
-        >
-          <Menu className="h-6 w-6 text-gray-600" />
-        </Button>
-        
-        {/* Logo sectie in sidebar ruimte - links */}
-        <div className="hidden lg:block w-64 pr-4">
-          <Link href="/secretariat" className="flex items-center h-full">
-            <img src={myMadrassaLogo} alt="myMadrassa Logo" className="h-8" />
-          </Link>
-        </div>
-        
-        {/* Logo voor mobiel - center */}
-        <Link href="/secretariat" className="flex items-center h-full lg:hidden">
-          <img src={myMadrassaLogo} alt="myMadrassa Logo" className="h-8" />
-        </Link>
+    <div className="min-h-screen bg-[#f7f9fc]">
+      {/* Mobile sidebar backdrop */}
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-gray-600 bg-opacity-75 z-40 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
 
-        {/* Acties - rechts */}
-        <div className="flex items-center space-x-1">
-          {/* Zoekknop voor mobiel */}
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="md:hidden"
-          >
-            <Search className="h-5 w-5 text-gray-600" />
-          </Button>
+      {/* Top bar - Admin Style - Above everything */}
+      <div className="bg-white shadow-sm border-b border-[#e5e7eb] fixed top-0 left-0 right-0 z-50 h-12">
+        <div className="flex items-center justify-between h-12 px-4 lg:px-6">
+          {/* Logo section - Left */}
+          <div className="flex items-center space-x-3">
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="lg:hidden text-gray-500 hover:text-gray-700 mr-3"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+            <img 
+              src={myMadrassaLogo} 
+              alt="myMadrassa Logo" 
+              className="w-6 h-6"
+            />
+            <span className="text-lg font-bold text-[#1e40af]">myMadrassa</span>
+          </div>
 
-          {/* Berichten knop */}
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="ghost" size="icon" className="relative">
-                <Mail className="h-5 w-5 text-gray-600" />
-                {unreadMessages.length > 0 && (
-                  <Badge 
-                    className="absolute -top-1 -right-1 w-4 h-4 p-0 flex items-center justify-center bg-blue-600"
-                    variant="default"
-                  >
-                    {unreadMessages.length}
-                  </Badge>
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent align="end" className="w-80 p-0">
-              <div className="p-4 border-b border-gray-200">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-medium text-sm">Berichten</h3>
-                  <button 
-                    className="text-xs text-blue-600 hover:underline"
-                    onClick={() => window.location.href = "/messages"}
-                  >
-                    Alle berichten
-                  </button>
+          {/* Search bar - Center */}
+          <div className="hidden lg:flex flex-1 max-w-md mx-4">
+            <div className="relative w-full">
+              <Search className="absolute left-2.5 top-2 h-4 w-4 text-gray-500" />
+              <input
+                type="text"
+                placeholder="Zoeken..."
+                className="w-full pl-9 pr-4 py-1.5 text-sm border border-[#e5e7eb] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e40af] focus:border-transparent"
+              />
+            </div>
+          </div>
+
+          {/* Top bar actions - Right */}
+          <div className="flex items-center space-x-3">
+            {/* Notifications */}
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="ghost" size="sm" className="relative h-8 w-8 p-0">
+                  <Bell className="h-4 w-4 text-gray-600" />
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                      {unreadCount}
+                    </span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-80 p-0 bg-white border border-[#e5e7eb]">
+                <div className="p-3 border-b border-[#e5e7eb]">
+                  <h3 className="font-semibold text-gray-900">Meldingen</h3>
                 </div>
-              </div>
-              <div className="max-h-72 overflow-y-auto">
-                {unreadMessages.length === 0 ? (
-                  <div className="py-6 text-center">
-                    <p className="text-sm text-gray-500">Geen nieuwe berichten</p>
+                <div className="max-h-80 overflow-y-auto">
+                  {notifications.length === 0 ? (
+                    <div className="p-4 text-center text-gray-500">
+                      Geen nieuwe meldingen
+                    </div>
+                  ) : (
+                    notifications.slice(0, 5).map((notification: any) => (
+                      <div key={notification.id} className="p-3 border-b border-gray-100 hover:bg-gray-50">
+                        <p className="text-sm text-gray-900">{notification.title}</p>
+                        <p className="text-xs text-gray-500 mt-1">{notification.message}</p>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </PopoverContent>
+            </Popover>
+
+            {/* Messages */}
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="ghost" size="sm" className="relative h-8 w-8 p-0">
+                  <Mail className="h-4 w-4 text-gray-600" />
+                  {unreadMessages.length > 0 && (
+                    <span className="absolute -top-1 -right-1 h-3 w-3 bg-blue-500 text-white text-xs rounded-full flex items-center justify-center">
+                      {unreadMessages.length}
+                    </span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-80 p-0 bg-white border border-[#e5e7eb]">
+                <div className="p-3 border-b border-[#e5e7eb]">
+                  <h3 className="font-semibold text-gray-900">Berichten</h3>
+                </div>
+                <div className="max-h-80 overflow-y-auto">
+                  {unreadMessages.length === 0 ? (
+                    <div className="p-4 text-center text-gray-500">
+                      Geen nieuwe berichten
+                    </div>
+                  ) : (
+                    unreadMessages.map((message) => (
+                      <div 
+                        key={message.id} 
+                        className="p-3 border-b border-gray-100 hover:bg-gray-50 cursor-pointer"
+                        onClick={() => handleMessageClick(message.id)}
+                      >
+                        <div className="flex items-start space-x-3">
+                          <div className={`w-8 h-8 rounded-full ${message.bgColor} flex items-center justify-center`}>
+                            <span className={`text-xs font-medium ${message.textColor}`}>
+                              {message.initials}
+                            </span>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-gray-900 truncate">
+                              {message.sender}
+                            </p>
+                            <p className="text-xs text-gray-500 truncate">
+                              {message.preview}
+                            </p>
+                            <p className="text-xs text-gray-400 mt-1">
+                              {message.time}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </PopoverContent>
+            </Popover>
+
+            {/* Profile dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative h-8 w-8 rounded-full p-0">
+                  <Avatar className="h-7 w-7">
+                    <AvatarFallback className="bg-[#1e40af] text-white text-xs">
+                      {userDisplayData.avatar}
+                    </AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56 bg-white border border-[#e5e7eb]" align="end" forceMount>
+                <div className="flex items-center justify-start gap-2 p-2">
+                  <div className="flex flex-col space-y-1 leading-none">
+                    <p className="font-medium">{userDisplayData.name}</p>
+                    <p className="w-[200px] truncate text-sm text-muted-foreground">
+                      {userDisplayData.role}
+                    </p>
                   </div>
-                ) : (
-                  unreadMessages.map((message) => (
-                    <div 
-                      key={message.id}
-                      className="py-2 px-4 hover:bg-gray-50 cursor-pointer border-b border-gray-100"
-                      onClick={() => handleMessageClick(message.id)}
-                    >
-                      <div className="flex items-start gap-3">
+                </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => setLocation('/profile')}>
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Profiel</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setLocation('/settings')}>
+                  <Settings className="mr-2 h-4 w-4" />
+                  <span>Instellingen</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Uitloggen</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
+      </div>
+
+      {/* Sidebar - Admin Interface Copy */}
+      <div className={`fixed inset-y-0 left-0 z-40 w-64 bg-white shadow-lg transform ${
+        sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+      } transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 border-r border-[#e5e7eb] pt-12`}>
+        
+        {/* Close button for mobile - Only visible on mobile */}
+        <div className="lg:hidden flex justify-end p-3 border-b border-[#e5e7eb]">
+          <button
+            onClick={() => setSidebarOpen(false)}
+            className="text-gray-500 hover:text-gray-700"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* User info - Admin Style */}
+        <div className="px-6 py-4 border-b border-[#e5e7eb] bg-[#f8fafc]">
+          <div className="flex items-center space-x-3">
+            <Avatar className="h-10 w-10">
+              <AvatarFallback className="bg-[#1e40af] text-white">
+                {userDisplayData.avatar}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-gray-900 truncate">
+                {userDisplayData.name}
+              </p>
+              <div className="flex items-center space-x-2 mt-1">
+                <Badge className="bg-[#3b82f6] text-white text-xs px-2 py-0.5">
+                  {userDisplayData.role}
+                </Badge>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Navigation - Admin Style */}
+        <nav className="flex-1 px-3 py-4 space-y-1">
+          {navigation.map((item) => {
+            const Icon = item.icon;
+            return (
+              <Link key={item.name} href={item.href} className={`group flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 ${
+                item.current
+                  ? 'bg-[#1e40af] text-white shadow-sm'
+                  : 'text-gray-700 hover:bg-[#f1f5f9] hover:text-[#1e40af]'
+              }`}>
+                <Icon className={`mr-3 h-4 w-4 ${
+                  item.current ? 'text-white' : 'text-gray-500 group-hover:text-[#1e40af]'
+                }`} />
+                {item.name}
+              </Link>
+            );
+          })}
+        </nav>
+
+        {/* Logout button - Admin Style */}
+        <div className="p-3 border-t border-[#e5e7eb]">
+          <Button
+            onClick={handleLogout}
+            variant="ghost"
+            className="w-full justify-start text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg"
+          >
+            <LogOut className="mr-3 h-4 w-4" />
+            Afmelden
+          </Button>
+        </div>
+      </div>
+
+      {/* Main content - Admin Style */}
+      <div className="pt-12 lg:pl-64">
+        <main className="overflow-auto">
+          {children}
+        </main>
+      </div>
+    </div>
+  );
+}
                         <Avatar className="h-8 w-8 mt-1">
                           <AvatarFallback className={`${message.bgColor} ${message.textColor}`}>
                             {message.initials}

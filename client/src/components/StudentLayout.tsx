@@ -110,24 +110,77 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
         />
       )}
 
-      {/* Sidebar - Admin Interface Copy */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform ${
-        sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      } transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 border-r border-[#e5e7eb]`}>
-        
-        {/* Logo - Admin Style */}
-        <div className="flex items-center justify-between h-16 px-6 border-b border-[#e5e7eb] bg-white">
+      {/* Top bar - Admin Style - Above everything */}
+      <div className="bg-white shadow-sm border-b border-[#e5e7eb] fixed top-0 left-0 right-0 z-50 h-12">
+        <div className="flex items-center justify-between h-12 px-4 lg:px-6">
+          {/* Logo section - Left */}
           <div className="flex items-center space-x-3">
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="lg:hidden text-gray-500 hover:text-gray-700 mr-3"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
             <img 
               src={logoPath} 
               alt="myMadrassa Logo" 
-              className="w-8 h-8"
+              className="w-6 h-6"
             />
-            <span className="text-xl font-bold text-[#1e40af]">myMadrassa</span>
+            <span className="text-lg font-bold text-[#1e40af]">myMadrassa</span>
           </div>
+
+          {/* Search bar - Center */}
+          <div className="hidden lg:flex flex-1 max-w-md mx-4">
+            <div className="relative w-full">
+              <Search className="absolute left-2.5 top-2 h-4 w-4 text-gray-500" />
+              <input
+                type="text"
+                placeholder="Zoeken..."
+                className="w-full pl-9 pr-4 py-1.5 text-sm border border-[#e5e7eb] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e40af] focus:border-transparent"
+              />
+            </div>
+          </div>
+
+          {/* Top bar actions - Right */}
+          <div className="flex items-center space-x-3">
+            {/* Notifications */}
+            <Button variant="ghost" size="sm" className="relative h-8 w-8 p-0">
+              <Bell className="h-4 w-4 text-gray-600" />
+              {notifications?.length > 0 && (
+                <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                  {notifications.length}
+                </span>
+              )}
+            </Button>
+
+            {/* Messages */}
+            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+              <MessageCircle className="h-4 w-4 text-gray-600" />
+            </Button>
+
+            {/* Profile dropdown */}
+            <div className="flex items-center space-x-2">
+              <Avatar className="h-7 w-7">
+                <AvatarFallback className="bg-[#1e40af] text-white text-xs">
+                  {profile?.firstName?.[0] || user?.firstName?.[0]}{profile?.lastName?.[0] || user?.lastName?.[0]}
+                </AvatarFallback>
+              </Avatar>
+              <ChevronDown className="h-3 w-3 text-gray-500 hidden lg:block" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Sidebar - Admin Interface Copy */}
+      <div className={`fixed inset-y-0 left-0 z-40 w-64 bg-white shadow-lg transform ${
+        sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+      } transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 border-r border-[#e5e7eb] pt-12`}>
+        
+        {/* Close button for mobile - Only visible on mobile */}
+        <div className="lg:hidden flex justify-end p-3 border-b border-[#e5e7eb]">
           <button
             onClick={() => setSidebarOpen(false)}
-            className="lg:hidden text-gray-500 hover:text-gray-700"
+            className="text-gray-500 hover:text-gray-700"
           >
             <X className="w-5 h-5" />
           </button>
@@ -192,72 +245,8 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
       </div>
 
       {/* Main content - Admin Style */}
-      <div className="lg:pl-64">
-        {/* Top bar - Admin Style */}
-        <div className="bg-white shadow-sm border-b border-[#e5e7eb] sticky top-0 z-40">
-          <div className="flex items-center justify-between h-16 px-4 lg:px-6">
-            {/* Mobile menu button */}
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="lg:hidden text-gray-500 hover:text-gray-700"
-            >
-              <Menu className="w-6 h-6" />
-            </button>
-            
-            {/* Mobile logo */}
-            <div className="lg:hidden flex items-center space-x-2">
-              <img 
-                src={logoPath} 
-                alt="myMadrassa Logo" 
-                className="w-6 h-6"
-              />
-              <span className="font-semibold text-[#1e40af]">myMadrassa</span>
-            </div>
-
-            {/* Search bar - Desktop */}
-            <div className="hidden lg:flex flex-1 max-w-md ml-4">
-              <div className="relative w-full">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-                <input
-                  type="text"
-                  placeholder="Zoeken..."
-                  className="w-full pl-9 pr-4 py-2 text-sm border border-[#e5e7eb] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e40af] focus:border-transparent"
-                />
-              </div>
-            </div>
-
-            {/* Top bar actions - Admin Style */}
-            <div className="flex items-center space-x-3">
-              {/* Notifications */}
-              <Button variant="ghost" size="sm" className="relative">
-                <Bell className="h-5 w-5 text-gray-600" />
-                {notifications?.length > 0 && (
-                  <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
-                    {notifications.length}
-                  </span>
-                )}
-              </Button>
-
-              {/* Settings */}
-              <Button variant="ghost" size="sm">
-                <Settings className="h-5 w-5 text-gray-600" />
-              </Button>
-
-              {/* Profile dropdown */}
-              <div className="flex items-center space-x-2">
-                <Avatar className="h-8 w-8">
-                  <AvatarFallback className="bg-[#1e40af] text-white text-xs">
-                    {profile?.firstName?.[0] || user?.firstName?.[0]}{profile?.lastName?.[0] || user?.lastName?.[0]}
-                  </AvatarFallback>
-                </Avatar>
-                <ChevronDown className="h-4 w-4 text-gray-500 hidden lg:block" />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Page content */}
-        <main className="flex-1 bg-[#f7f9fc] min-h-screen">
+      <div className="pt-12 lg:pl-64">
+        <main className="overflow-auto">
           {children}
         </main>
       </div>

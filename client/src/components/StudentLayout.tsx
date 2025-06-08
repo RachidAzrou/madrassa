@@ -33,7 +33,7 @@ import {
   Settings,
   ChevronDown,
   Mail,
-  Search,
+
   School,
   ClipboardCheck,
   MessageCircle,
@@ -105,9 +105,7 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
     }
   ];
 
-  const [showSearch, setShowSearch] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [mobileSearchTerm, setMobileSearchTerm] = useState("");
+
   const [readMessages, setReadMessages] = useState<Set<number>>(new Set());
 
   // Haal ongelezen berichten op van de echte Messages API

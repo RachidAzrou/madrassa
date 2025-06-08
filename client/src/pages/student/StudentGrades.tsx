@@ -103,33 +103,82 @@ export default function StudentGrades() {
     : subjects?.subjects?.filter(s => s.subjectId.toString() === selectedSubject) || [];
 
   return (
-    <div className="space-y-6">
-      {/* Professional Page Header */}
-      <div className="bg-gradient-to-r from-purple-50 via-violet-50 to-indigo-50 border-b border-gray-200 p-8 mb-8 rounded-xl shadow-sm">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="p-3 bg-purple-500 rounded-xl shadow-lg">
-              <GraduationCap className="h-8 w-8 text-white" />
-            </div>
-            <div>
-              <h1 className="text-4xl font-bold text-gray-900 mb-2">Mijn Cijfers</h1>
-              <p className="text-gray-600 text-lg font-medium">Bekijk al je cijfers en volg je academische vooruitgang</p>
-            </div>
-          </div>
-          <div className="flex items-center space-x-4">
-            <div className="bg-white border border-gray-200 text-gray-800 px-6 py-3 rounded-xl shadow-md">
-              <div className="text-sm font-bold text-purple-600">{gradeStats?.overallAverage?.toFixed(1) || '0.0'}</div>
-              <div className="text-xs text-gray-600 font-medium">Gemiddeld cijfer</div>
-            </div>
-            <div className="bg-gradient-to-r from-violet-500 to-violet-600 text-white px-6 py-3 rounded-xl shadow-md">
-              <div className="text-sm font-bold">Prestatie</div>
-              <div className="text-xs opacity-90">Goed bezig</div>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div className="bg-[#f7f9fc] min-h-screen">
+      {/* Clean Page Header - Admin Style */}
+      <PageHeader
+        title="Mijn Cijfers"
+        icon={<GraduationCap className="h-5 w-5 text-white" />}
+        parent="Student"
+        current="Mijn Cijfers"
+      />
+      
+      {/* Main content area */}
+      <div className="px-6 py-6 max-w-7xl mx-auto">
+        
+        {/* Stats Overview - Admin Style */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <Card className="bg-white border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Gemiddeld Cijfer</p>
+                  <p className="text-2xl font-bold text-[#1e40af]">{gradeStats?.overallAverage?.toFixed(1) || '0.0'}</p>
+                </div>
+                <div className="h-12 w-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <Target className="h-6 w-6 text-[#1e40af]" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
-      {/* Filters - Admin Style */}
+          <Card className="bg-white border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Vakken Gehaald</p>
+                  <p className="text-2xl font-bold text-[#1e40af]">{gradeStats?.passedSubjects || 0}</p>
+                </div>
+                <div className="h-12 w-12 bg-green-100 rounded-lg flex items-center justify-center">
+                  <BookOpen className="h-6 w-6 text-green-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Studiepunten</p>
+                  <p className="text-2xl font-bold text-[#1e40af]">{gradeStats?.completedCredits || 0}/{gradeStats?.totalCredits || 0}</p>
+                </div>
+                <div className="h-12 w-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                  <TrendingUp className="h-6 w-6 text-orange-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Trend</p>
+                  <p className="text-2xl font-bold text-[#1e40af]">{gradeStats?.trend >= 0 ? '+' : ''}{gradeStats?.trend || 0}%</p>
+                </div>
+                <div className="h-12 w-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                  {(gradeStats?.trend || 0) >= 0 ? (
+                    <TrendingUp className="h-6 w-6 text-green-600" />
+                  ) : (
+                    <TrendingDown className="h-6 w-6 text-red-600" />
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Filters - Admin Style */}
       <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card className="bg-white border border-[#e5e7eb] shadow-sm">
           <CardContent className="p-4">
@@ -346,6 +395,8 @@ export default function StudentGrades() {
             )}
           </CardContent>
         </Card>
+      </div>
+      
       </div>
     </div>
   );

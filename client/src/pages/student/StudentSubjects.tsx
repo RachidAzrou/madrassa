@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useQuery } from "@tanstack/react-query";
+import { PageHeader } from '@/components/layout/page-header';
 import {
   BookOpen,
   User,
@@ -65,34 +66,20 @@ export default function StudentSubjects() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Professional Page Header */}
-      <div className="bg-gradient-to-r from-green-50 via-emerald-50 to-teal-50 border-b border-gray-200 p-8 mb-8 rounded-xl shadow-sm">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="p-3 bg-green-500 rounded-xl shadow-lg">
-              <BookOpen className="h-8 w-8 text-white" />
-            </div>
-            <div>
-              <h1 className="text-4xl font-bold text-gray-900 mb-2">Mijn Vakken</h1>
-              <p className="text-gray-600 text-lg font-medium">Ontdek alle vakken die je dit schooljaar volgt</p>
-            </div>
-          </div>
-          <div className="flex items-center space-x-4">
-            <div className="bg-white border border-gray-200 text-gray-800 px-6 py-3 rounded-xl shadow-md">
-              <div className="text-sm font-bold text-green-600">{subjects?.subjects?.length || 0} Vakken</div>
-              <div className="text-xs text-gray-600 font-medium">Actief dit jaar</div>
-            </div>
-            <div className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-6 py-3 rounded-xl shadow-md">
-              <div className="text-sm font-bold">Voortgang</div>
-              <div className="text-xs opacity-90">Op schema</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Stats Overview - Admin Style */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+    <div className="bg-[#f7f9fc] min-h-screen">
+      {/* Clean Page Header - Admin Style */}
+      <PageHeader
+        title="Mijn Vakken"
+        icon={<BookOpen className="h-5 w-5 text-white" />}
+        parent="Student"
+        current="Mijn Vakken"
+      />
+      
+      {/* Main content area */}
+      <div className="px-6 py-6 max-w-7xl mx-auto">
+        
+      {/* Subjects Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-sm hover:shadow-lg transition-all duration-200 hover:scale-[1.02]">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
             <CardTitle className="text-sm font-medium text-blue-700">Totaal Vakken</CardTitle>
@@ -299,6 +286,8 @@ export default function StudentSubjects() {
             </Card>
           </div>
         )}
+      </div>
+      
       </div>
     </div>
   );

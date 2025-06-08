@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
+import { PageHeader } from '@/components/layout/page-header';
 import {
   Users,
   Mail,
@@ -64,31 +65,17 @@ export default function StudentClass() {
   const myClass = classInfo?.class;
 
   return (
-    <div className="space-y-6">
-      {/* Professional Page Header */}
-      <div className="bg-gradient-to-r from-blue-50 via-indigo-50 to-cyan-50 border-b border-gray-200 p-8 mb-8 rounded-xl shadow-sm">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="p-3 bg-blue-500 rounded-xl shadow-lg">
-              <Users className="h-8 w-8 text-white" />
-            </div>
-            <div>
-              <h1 className="text-4xl font-bold text-gray-900 mb-2">Mijn Klas</h1>
-              <p className="text-gray-600 text-lg font-medium">Ontdek je klasinformatie en ontmoet je klasgenoten</p>
-            </div>
-          </div>
-          <div className="flex items-center space-x-4">
-            <div className="bg-white border border-gray-200 text-gray-800 px-6 py-3 rounded-xl shadow-md">
-              <div className="text-sm font-bold text-blue-600">Klas {myClass?.name || 'Onbekend'}</div>
-              <div className="text-xs text-gray-600 font-medium">{myClass?.academicYear || 'Huidig jaar'}</div>
-            </div>
-            <div className="bg-gradient-to-r from-cyan-500 to-cyan-600 text-white px-6 py-3 rounded-xl shadow-md">
-              <div className="text-sm font-bold">Klasgenoten</div>
-              <div className="text-xs opacity-90">{classmates?.classmates?.length || 0} studenten</div>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div className="bg-[#f7f9fc] min-h-screen">
+      {/* Clean Page Header - Admin Style */}
+      <PageHeader
+        title="Mijn Klas"
+        icon={<Users className="h-5 w-5 text-white" />}
+        parent="Student"
+        current="Mijn Klas"
+      />
+      
+      {/* Main content area */}
+      <div className="px-6 py-6 max-w-7xl mx-auto">
 
       {/* Class Information - Admin Style */}
       <div className="mb-8">
@@ -208,6 +195,8 @@ export default function StudentClass() {
           )}
         </CardContent>
       </Card>
+      
+      </div>
     </div>
   );
 }

@@ -82,73 +82,83 @@ export default function StudentDashboard() {
 
   return (
     <div className="space-y-8">
-      {/* Header - Admin Style */}
-      <div className="border-b border-[#e5e7eb] pb-6">
+      {/* Enhanced Header - Admin Style */}
+      <div className="border-b border-gray-200 pb-8 mb-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Student Dashboard</h1>
-            <p className="text-gray-600 mt-1">Overzicht van je schoolactiviteiten</p>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Dashboard</h1>
+            <p className="text-gray-600 text-lg">Welkom terug! Hier is je overzicht van vandaag.</p>
+          </div>
+          <div className="flex items-center space-x-3">
+            <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2 rounded-lg shadow-sm">
+              <div className="text-sm font-medium">Vandaag</div>
+              <div className="text-xs opacity-90">{new Date().toLocaleDateString('nl-NL', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Stats Grid - Admin Style */}
+      {/* Enhanced Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="bg-white border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-            <CardTitle className="text-sm font-medium text-gray-700">Mijn Klas</CardTitle>
-            <div className="p-2 bg-[#eff6ff] rounded-lg">
-              <Users className="h-4 w-4 text-[#1e40af]" />
+        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-20 h-20 bg-blue-200 rounded-full -mr-10 -mt-10 opacity-50"></div>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 relative z-10">
+            <CardTitle className="text-sm font-semibold text-blue-800">Mijn Klas</CardTitle>
+            <div className="p-3 bg-blue-500 rounded-xl shadow-md">
+              <Users className="h-5 w-5 text-white" />
             </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-[#1e40af]">{stats.myClass}</div>
-            <p className="text-xs text-gray-600 mt-1">
+          <CardContent className="relative z-10">
+            <div className="text-3xl font-bold text-blue-900 mb-1">{stats.myClass}</div>
+            <p className="text-sm text-blue-700 font-medium">
               Huidige klas
             </p>
           </CardContent>
         </Card>
 
-        <Card className="bg-white border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-            <CardTitle className="text-sm font-medium text-gray-700">Mijn Vakken</CardTitle>
-            <div className="p-2 bg-[#f0fdf4] rounded-lg">
-              <BookOpen className="h-4 w-4 text-[#16a34a]" />
+        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-20 h-20 bg-green-200 rounded-full -mr-10 -mt-10 opacity-50"></div>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 relative z-10">
+            <CardTitle className="text-sm font-semibold text-green-800">Mijn Vakken</CardTitle>
+            <div className="p-3 bg-green-500 rounded-xl shadow-md">
+              <BookOpen className="h-5 w-5 text-white" />
             </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-[#16a34a]">{stats.totalSubjects}</div>
-            <p className="text-xs text-gray-600 mt-1">
+          <CardContent className="relative z-10">
+            <div className="text-3xl font-bold text-green-900 mb-1">{stats.totalSubjects}</div>
+            <p className="text-sm text-green-700 font-medium">
               Actieve vakken
             </p>
           </CardContent>
         </Card>
 
-        <Card className="bg-white border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-            <CardTitle className="text-sm font-medium text-gray-700">Aanwezigheid</CardTitle>
-            <div className="p-2 bg-[#fef3c7] rounded-lg">
-              <UserCheck className="h-4 w-4 text-[#d97706]" />
+        <Card className="bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-20 h-20 bg-amber-200 rounded-full -mr-10 -mt-10 opacity-50"></div>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 relative z-10">
+            <CardTitle className="text-sm font-semibold text-amber-800">Aanwezigheid</CardTitle>
+            <div className="p-3 bg-amber-500 rounded-xl shadow-md">
+              <UserCheck className="h-5 w-5 text-white" />
             </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-[#d97706]">{stats.attendanceRate}%</div>
-            <p className="text-xs text-gray-600 mt-1">
+          <CardContent className="relative z-10">
+            <div className="text-3xl font-bold text-amber-900 mb-1">{stats.attendanceRate}%</div>
+            <p className="text-sm text-amber-700 font-medium">
               Dit schooljaar
             </p>
           </CardContent>
         </Card>
 
-        <Card className="bg-white border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-            <CardTitle className="text-sm font-medium text-gray-700">Berichten</CardTitle>
-            <div className="p-2 bg-[#f5f3ff] rounded-lg">
-              <Mail className="h-4 w-4 text-[#7c3aed]" />
+        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-20 h-20 bg-purple-200 rounded-full -mr-10 -mt-10 opacity-50"></div>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 relative z-10">
+            <CardTitle className="text-sm font-semibold text-purple-800">Berichten</CardTitle>
+            <div className="p-3 bg-purple-500 rounded-xl shadow-md">
+              <Mail className="h-5 w-5 text-white" />
             </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-[#7c3aed]">{stats.unreadMessages}</div>
-            <p className="text-xs text-gray-600 mt-1">
+          <CardContent className="relative z-10">
+            <div className="text-3xl font-bold text-purple-900 mb-1">{stats.unreadMessages}</div>
+            <p className="text-sm text-purple-700 font-medium">
               Ongelezen berichten
             </p>
           </CardContent>
@@ -157,61 +167,83 @@ export default function StudentDashboard() {
 
       {/* Two Column Layout - Admin Style */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Upcoming Lessons */}
-        <Card className="bg-white border border-[#e5e7eb] shadow-sm">
-          <CardHeader className="border-b border-[#e5e7eb] pb-4">
-            <CardTitle className="flex items-center text-[#1e40af] font-semibold">
-              <Calendar className="h-5 w-5 mr-2 text-[#1e40af]" />
+        {/* Enhanced Upcoming Lessons */}
+        <Card className="bg-white border border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300">
+          <CardHeader className="border-b border-gray-100 pb-4 bg-gradient-to-r from-blue-50 to-indigo-50">
+            <CardTitle className="flex items-center text-blue-800 font-bold text-lg">
+              <div className="p-2 bg-blue-500 rounded-lg mr-3 shadow-md">
+                <Calendar className="h-5 w-5 text-white" />
+              </div>
               Komende Lessen
+              <Badge variant="secondary" className="ml-auto bg-blue-100 text-blue-800">
+                {upcomingLessons?.lessons?.length || 0}
+              </Badge>
             </CardTitle>
           </CardHeader>
-          <CardContent className="pt-4">
+          <CardContent className="pt-6">
             {upcomingLessons?.lessons?.length ? (
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {upcomingLessons.lessons.slice(0, 5).map((lesson: any) => (
-                  <div key={lesson.id} className="flex items-center justify-between p-3 bg-[#f8fafc] rounded-lg border border-[#e5e7eb]">
+                  <div key={lesson.id} className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl border border-blue-100 hover:shadow-md transition-all duration-200">
                     <div className="flex-1">
-                      <p className="font-medium text-gray-900">{lesson.subject}</p>
-                      <p className="text-sm text-gray-600">{lesson.teacher}</p>
-                      <p className="text-xs text-gray-500">{lesson.room}</p>
+                      <div className="font-bold text-gray-900 text-lg">{lesson.subject}</div>
+                      <div className="text-sm text-gray-600 flex items-center mt-1">
+                        <User className="h-4 w-4 mr-1" />
+                        {lesson.teacher}
+                      </div>
+                      <div className="text-xs text-gray-500 mt-1">{lesson.room}</div>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-medium text-[#1e40af]">{lesson.time}</p>
+                      <div className="text-sm font-bold text-blue-600 bg-blue-100 px-3 py-1 rounded-full">{lesson.time}</div>
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-gray-500 text-center py-8">Geen komende lessen</p>
+              <div className="text-center py-12 text-gray-500">
+                <div className="bg-gray-100 p-4 rounded-full w-20 h-20 mx-auto mb-4 flex items-center justify-center">
+                  <Calendar className="h-10 w-10 text-gray-400" />
+                </div>
+                <p className="text-lg font-medium">Geen komende lessen vandaag</p>
+                <p className="text-sm text-gray-400">Geniet van je vrije tijd!</p>
+              </div>
             )}
           </CardContent>
         </Card>
 
-        {/* Recent Grades */}
-        <Card className="bg-white border border-[#e5e7eb] shadow-sm">
-          <CardHeader className="border-b border-[#e5e7eb] pb-4">
-            <CardTitle className="flex items-center text-[#1e40af] font-semibold">
-              <GraduationCap className="h-5 w-5 mr-2 text-[#1e40af]" />
+        {/* Enhanced Recent Grades */}
+        <Card className="bg-white border border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300">
+          <CardHeader className="border-b border-gray-100 pb-4 bg-gradient-to-r from-green-50 to-emerald-50">
+            <CardTitle className="flex items-center text-green-800 font-bold text-lg">
+              <div className="p-2 bg-green-500 rounded-lg mr-3 shadow-md">
+                <GraduationCap className="h-5 w-5 text-white" />
+              </div>
               Recente Cijfers
+              <Badge variant="secondary" className="ml-auto bg-green-100 text-green-800">
+                {recentGrades?.grades?.length || 0}
+              </Badge>
             </CardTitle>
           </CardHeader>
-          <CardContent className="pt-4">
+          <CardContent className="pt-6">
             {recentGrades?.grades?.length ? (
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {recentGrades.grades.slice(0, 5).map((grade: any) => (
-                  <div key={grade.id} className="flex items-center justify-between p-3 bg-[#f8fafc] rounded-lg border border-[#e5e7eb]">
+                  <div key={grade.id} className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-green-50 rounded-xl border border-green-100 hover:shadow-md transition-all duration-200">
                     <div className="flex-1">
-                      <p className="font-medium text-gray-900">{grade.subject}</p>
-                      <p className="text-sm text-gray-600">{grade.description}</p>
-                      <p className="text-xs text-gray-500">{grade.date}</p>
+                      <div className="font-bold text-gray-900 text-lg">{grade.subject}</div>
+                      <div className="text-sm text-gray-600 mt-1">{grade.description}</div>
+                      <div className="text-xs text-gray-500 mt-1 flex items-center">
+                        <Calendar className="h-3 w-3 mr-1" />
+                        {grade.date}
+                      </div>
                     </div>
                     <div className="text-right">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                      <span className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-bold shadow-sm ${
                         parseFloat(grade.grade) >= 7.0 
-                          ? 'bg-green-100 text-green-800'
+                          ? 'bg-green-500 text-white'
                           : parseFloat(grade.grade) >= 5.5
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : 'bg-red-100 text-red-800'
+                          ? 'bg-amber-500 text-white'
+                          : 'bg-red-500 text-white'
                       }`}>
                         {grade.grade}
                       </span>
@@ -220,7 +252,13 @@ export default function StudentDashboard() {
                 ))}
               </div>
             ) : (
-              <p className="text-gray-500 text-center py-8">Geen recente cijfers</p>
+              <div className="text-center py-12 text-gray-500">
+                <div className="bg-gray-100 p-4 rounded-full w-20 h-20 mx-auto mb-4 flex items-center justify-center">
+                  <GraduationCap className="h-10 w-10 text-gray-400" />
+                </div>
+                <p className="text-lg font-medium">Geen recente cijfers</p>
+                <p className="text-sm text-gray-400">Cijfers verschijnen hier zodra ze beschikbaar zijn</p>
+              </div>
             )}
           </CardContent>
         </Card>

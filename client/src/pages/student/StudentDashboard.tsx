@@ -7,8 +7,10 @@ import {
   Calendar,
   Mail,
   GraduationCap,
-  Activity
+  Activity,
+  User
 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 interface StudentStats {
   myClass: string;
@@ -175,9 +177,9 @@ export default function StudentDashboard() {
                 <Calendar className="h-5 w-5 text-white" />
               </div>
               Komende Lessen
-              <Badge variant="secondary" className="ml-auto bg-blue-100 text-blue-800">
+              <span className="ml-auto bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
                 {upcomingLessons?.lessons?.length || 0}
-              </Badge>
+              </span>
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-6">
@@ -219,9 +221,9 @@ export default function StudentDashboard() {
                 <GraduationCap className="h-5 w-5 text-white" />
               </div>
               Recente Cijfers
-              <Badge variant="secondary" className="ml-auto bg-green-100 text-green-800">
+              <span className="ml-auto bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
                 {recentGrades?.grades?.length || 0}
-              </Badge>
+              </span>
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-6">

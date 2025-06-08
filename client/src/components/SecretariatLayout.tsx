@@ -75,7 +75,7 @@ export default function SecretariatLayout({ children }: SecretariatLayoutProps) 
     {
       name: 'Docenten',
       href: '/secretariat/teachers',
-      icon: UserCheck,
+      icon: User,
       current: location.startsWith('/secretariat/teachers'),
       resource: 'teacher' as const
     },
@@ -110,7 +110,7 @@ export default function SecretariatLayout({ children }: SecretariatLayoutProps) 
     {
       name: 'Rapporten',
       href: '/secretariat/reports',
-      icon: BarChart3,
+      icon: FileText,
       current: location.startsWith('/secretariat/reports'),
       resource: 'report' as const
     },

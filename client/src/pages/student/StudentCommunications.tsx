@@ -3,8 +3,14 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useQuery } from "@tanstack/react-query";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 import {
   MessageCircle,
   Send,
@@ -53,6 +59,18 @@ interface Announcement {
 export default function StudentCommunications() {
   const [selectedTab, setSelectedTab] = useState("messages");
   const [searchTerm, setSearchTerm] = useState("");
+  const [isComposeOpen, setIsComposeOpen] = useState(false);
+  const [newMessage, setNewMessage] = useState({
+    title: "",
+    content: "",
+    receiverId: 0,
+    receiverRole: "",
+    type: "general",
+    priority: "normal"
+  });
+
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const { data: messages, isLoading: messagesLoading } = useQuery<{ messages: Message[] }>({
     queryKey: ['/api/student/messages'],
@@ -68,6 +86,62 @@ export default function StudentCommunications() {
     queryKey: ['/api/student/communications/stats'],
     retry: false,
   });
+
+  // Get available receivers for students (teachers, staff, classmates)
+  const { data: receivers } = useQuery<{ id: number; role: string; name: string }[]>({
+    queryKey: ['/api/messages/receivers/student'],
+    retry: false,
+  });
+
+  // Mutation for sending messages
+  const sendMessageMutation = useMutation({
+    mutationFn: async (messageData: any) => {
+      return apiRequest("POST", "/api/messages", messageData);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Bericht verzonden",
+        description: "Je bericht is succesvol verzonden.",
+      });
+      setIsComposeOpen(false);
+      setNewMessage({
+        title: "",
+        content: "",
+        receiverId: 0,
+        receiverRole: "",
+        type: "general",
+        priority: "normal"
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/student/messages'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Fout",
+        description: "Er is een fout opgetreden bij het verzenden van het bericht.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleSendMessage = () => {
+    if (!newMessage.title || !newMessage.content || !newMessage.receiverId) {
+      toast({
+        title: "Velden vereist",
+        description: "Vul alle vereiste velden in.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    sendMessageMutation.mutate({
+      subject: newMessage.title,
+      content: newMessage.content,
+      receiverId: newMessage.receiverId,
+      receiverRole: newMessage.receiverRole,
+      type: newMessage.type,
+      priority: newMessage.priority,
+    });
+  };
 
   if (messagesLoading) {
     return (
@@ -106,7 +180,15 @@ export default function StudentCommunications() {
               Berichten en mededelingen van je school
             </p>
           </div>
-
+          <div className="flex items-center space-x-3">
+            <Button 
+              onClick={() => setIsComposeOpen(true)}
+              className="bg-[#1e40af] hover:bg-[#1d3a8a] text-white"
+            >
+              <Send className="h-4 w-4 mr-2" />
+              Nieuw Bericht
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -343,6 +425,112 @@ export default function StudentCommunications() {
           </CardContent>
         </Card>
       )}
+
+      {/* Compose Message Dialog */}
+      <Dialog open={isComposeOpen} onOpenChange={setIsComposeOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Nieuw Bericht</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="receiver">Ontvanger</Label>
+              <Select
+                value={newMessage.receiverId.toString()}
+                onValueChange={(value) => {
+                  const receiver = receivers?.find(r => r.id.toString() === value);
+                  setNewMessage(prev => ({
+                    ...prev,
+                    receiverId: parseInt(value),
+                    receiverRole: receiver?.role || ""
+                  }));
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecteer ontvanger" />
+                </SelectTrigger>
+                <SelectContent>
+                  {receivers?.map((receiver) => (
+                    <SelectItem key={receiver.id} value={receiver.id.toString()}>
+                      {receiver.name} ({receiver.role})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="subject">Onderwerp</Label>
+              <Input
+                id="subject"
+                value={newMessage.title}
+                onChange={(e) => setNewMessage(prev => ({ ...prev, title: e.target.value }))}
+                placeholder="Voer onderwerp in"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="content">Bericht</Label>
+              <Textarea
+                id="content"
+                value={newMessage.content}
+                onChange={(e) => setNewMessage(prev => ({ ...prev, content: e.target.value }))}
+                placeholder="Typ je bericht hier..."
+                rows={6}
+              />
+            </div>
+
+            <div className="flex items-center space-x-3">
+              <div>
+                <Label htmlFor="type">Type</Label>
+                <Select
+                  value={newMessage.type}
+                  onValueChange={(value) => setNewMessage(prev => ({ ...prev, type: value }))}
+                >
+                  <SelectTrigger className="w-40">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="general">Algemeen</SelectItem>
+                    <SelectItem value="academic">Academisch</SelectItem>
+                    <SelectItem value="question">Vraag</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="priority">Prioriteit</Label>
+                <Select
+                  value={newMessage.priority}
+                  onValueChange={(value) => setNewMessage(prev => ({ ...prev, priority: value }))}
+                >
+                  <SelectTrigger className="w-40">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="low">Laag</SelectItem>
+                    <SelectItem value="normal">Normaal</SelectItem>
+                    <SelectItem value="high">Hoog</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="flex justify-end space-x-3 pt-4">
+              <Button variant="outline" onClick={() => setIsComposeOpen(false)}>
+                Annuleren
+              </Button>
+              <Button 
+                onClick={handleSendMessage}
+                disabled={sendMessageMutation.isPending}
+                className="bg-[#1e40af] hover:bg-[#1d3a8a] text-white"
+              >
+                {sendMessageMutation.isPending ? "Verzenden..." : "Verzenden"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -109,12 +109,7 @@ export default function StudentDashboard() {
               Hier is een overzicht van je schoolactiviteiten
             </p>
           </div>
-          <div className="flex items-center space-x-3">
-            <Button variant="outline" className="border-[#e5e7eb] hover:bg-[#eff6ff] hover:border-[#1e40af]">
-              <Calendar className="h-4 w-4 mr-2 text-[#1e40af]" />
-              Mijn Rooster
-            </Button>
-          </div>
+
         </div>
       </div>
 

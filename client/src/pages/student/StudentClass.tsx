@@ -82,12 +82,7 @@ export default function StudentClass() {
               Informatie over je klas en klasgenoten
             </p>
           </div>
-          <div className="flex items-center space-x-3">
-            <Button variant="outline" className="border-[#e5e7eb] hover:bg-[#eff6ff] hover:border-[#1e40af]">
-              <MessageCircle className="h-4 w-4 mr-2 text-[#1e40af]" />
-              Contact Klasgenoten
-            </Button>
-          </div>
+
         </div>
       </div>
 

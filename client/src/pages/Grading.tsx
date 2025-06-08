@@ -15,6 +15,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { CustomDialogContent } from "@/components/ui/custom-dialog-content";
 import {
   Form,
   FormControl,

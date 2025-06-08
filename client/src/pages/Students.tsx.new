@@ -1278,14 +1278,14 @@ export default function Students() {
                 {deleteStudentMutation.isPending ? "Bezig met verwijderen..." : "Student Verwijderen"}
               </Button>
             </DialogFooter>
-          </DialogContent>
+          </CustomDialogContent>
         </Dialog>
       )}
 
       {/* Link Guardian Dialog */}
       {selectedStudent && (
         <Dialog open={isLinkGuardianDialogOpen} onOpenChange={setIsLinkGuardianDialogOpen}>
-          <DialogContent>
+          <CustomDialogContent>
             <DialogHeader>
               <DialogTitle>Voogd Koppelen aan {selectedStudent.firstName} {selectedStudent.lastName}</DialogTitle>
               <DialogDescription>
@@ -1367,7 +1367,7 @@ export default function Students() {
                 </Button>
               </DialogFooter>
             </form>
-          </DialogContent>
+          </CustomDialogContent>
         </Dialog>
       )}
 

@@ -21,7 +21,8 @@ import {
   Bell,
   Mail,
   Phone,
-  Filter
+  Filter,
+  MessageSquare
 } from "lucide-react";
 
 interface Message {
@@ -169,55 +170,74 @@ export default function StudentCommunications() {
   ) || [];
 
   return (
-    <div className="space-y-6">
-      {/* Professional Page Header */}
-      <div className="bg-gradient-to-r from-red-50 via-pink-50 to-rose-50 border-b border-gray-200 p-8 mb-8 rounded-xl shadow-sm">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="p-3 bg-red-500 rounded-xl shadow-lg">
-              <Mail className="h-8 w-8 text-white" />
-            </div>
-            <div>
-              <h1 className="text-4xl font-bold text-gray-900 mb-2">Communicatie</h1>
-              <p className="text-gray-600 text-lg font-medium">Berichten en mededelingen van je school en docenten</p>
-            </div>
-          </div>
-          <div className="flex items-center space-x-4">
-            <div className="bg-white border border-gray-200 text-gray-800 px-6 py-3 rounded-xl shadow-md">
-              <div className="text-sm font-bold text-red-600">{stats?.unreadCount || 0} Ongelezen</div>
-              <div className="text-xs text-gray-600 font-medium">Nieuwe berichten</div>
-            </div>
-            <div className="bg-gradient-to-r from-pink-500 to-pink-600 text-white px-6 py-3 rounded-xl shadow-md">
-              <div className="text-sm font-bold">Status</div>
-              <div className="text-xs opacity-90">Verbonden</div>
-            </div>
-            <Button 
-              onClick={() => setIsComposeOpen(true)}
-              className="bg-[#1e40af] hover:bg-[#1d3a8a] text-white"
-            >
-              <Send className="h-4 w-4 mr-2" />
-              Nieuw Bericht
-            </Button>
-          </div>
-        </div>
-      </div>
+    <div className="bg-[#f7f9fc] min-h-screen">
+      {/* Clean Page Header - Admin Style */}
+      <PageHeader
+        title="Communicatie"
+        icon={<Mail className="h-5 w-5 text-white" />}
+        parent="Student"
+        current="Communicatie"
+      />
+      
+      {/* Main content area */}
+      <div className="px-6 py-6 max-w-7xl mx-auto">
+        
+        {/* Stats Overview - Admin Style */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <Card className="bg-white border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Ongelezen Berichten</p>
+                  <p className="text-2xl font-bold text-[#1e40af]">{stats?.unreadCount || 0}</p>
+                </div>
+                <div className="h-12 w-12 bg-red-100 rounded-lg flex items-center justify-center">
+                  <Mail className="h-6 w-6 text-red-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
-      {/* Stats Overview - Admin Style */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <Card className="bg-white border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-            <CardTitle className="text-sm font-medium text-gray-700">Ongelezen Berichten</CardTitle>
-            <div className="p-2 bg-[#fef2f2] rounded-lg">
-              <Mail className="h-4 w-4 text-[#dc2626]" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-[#dc2626]">{stats?.unreadCount || 0}</div>
-            <p className="text-xs text-gray-600 mt-1">
-              Nieuwe berichten
-            </p>
-          </CardContent>
-        </Card>
+          <Card className="bg-white border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Belangrijke Berichten</p>
+                  <p className="text-2xl font-bold text-[#1e40af]">{stats?.importantCount || 0}</p>
+                </div>
+                <div className="h-12 w-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <MessageSquare className="h-6 w-6 text-blue-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Mededelingen</p>
+                  <p className="text-2xl font-bold text-[#1e40af]">{announcements?.announcements?.length || 0}</p>
+                </div>
+                <div className="h-12 w-12 bg-green-100 rounded-lg flex items-center justify-center">
+                  <Bell className="h-6 w-6 text-green-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Action Button */}
+        <div className="mb-6 flex justify-between items-center">
+          <div></div>
+          <Button 
+            onClick={() => setIsComposeOpen(true)}
+            className="bg-[#1e40af] hover:bg-[#1d3a8a] text-white"
+          >
+            <Send className="h-4 w-4 mr-2" />
+            Nieuw Bericht
+          </Button>
+        </div>
 
         <Card className="bg-white border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
@@ -541,6 +561,8 @@ export default function StudentCommunications() {
           </div>
         </DialogContent>
       </Dialog>
+      
+      </div>
     </div>
   );
 }

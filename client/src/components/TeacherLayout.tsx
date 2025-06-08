@@ -380,17 +380,7 @@ export default function TeacherLayout({ children }: TeacherLayoutProps) {
           </div>
         </nav>
 
-        {/* Logout button - Admin Style */}
-        <div className="p-3 border-t border-[#e5e7eb]">
-          <Button
-            variant="ghost"
-            onClick={handleLogout}
-            className="w-full justify-start text-gray-700 hover:bg-red-50 hover:text-red-600"
-          >
-            <LogOut className="mr-3 h-4 w-4" />
-            Uitloggen
-          </Button>
-        </div>
+        
       </div>
 
       {/* Main content - Admin Style */}

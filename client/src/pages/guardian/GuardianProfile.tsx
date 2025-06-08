@@ -255,46 +255,37 @@ export default function GuardianProfile() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto">
-      {/* Header - Teacher Style */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Mijn Profiel</h1>
-            <p className="text-gray-600 mt-1">Beheer uw persoonlijke informatie en accountinstellingen</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-12 h-12 bg-gradient-to-br from-[#1e40af] to-[#3b82f6] rounded-xl flex items-center justify-center">
-              <User className="h-6 w-6 text-white" />
-            </div>
-          </div>
+    <div className="space-y-6">
+      {/* Header - App Style */}
+      <div className="flex justify-between items-start">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Mijn Profiel</h1>
+          <p className="text-gray-600 mt-2">Beheer uw persoonlijke informatie en accountinstellingen</p>
         </div>
       </div>
 
-      {/* Profile Header Card - Teacher Style */}
-      <Card className="bg-gradient-to-r from-[#1e40af] to-[#3b82f6] text-white mb-8">
+      {/* Profile Header Card - App Style */}
+      <Card>
         <CardContent className="p-6">
           <div className="flex items-center gap-6">
-            <Avatar className="w-24 h-24 border-4 border-white/20">
-              <AvatarFallback className="bg-white/20 text-white text-2xl font-bold">
+            <Avatar className="w-20 h-20">
+              <AvatarFallback className="bg-[#1e40af] text-white text-xl font-bold">
                 {profile.firstName[0]}{profile.lastName[0]}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1">
-              <h2 className="text-2xl font-bold">{profile.firstName} {profile.lastName}</h2>
-              <p className="text-blue-100 text-lg capitalize">{profile.relationship}</p>
+              <h2 className="text-2xl font-bold text-gray-900">{profile.firstName} {profile.lastName}</h2>
+              <p className="text-gray-600 text-lg capitalize">{profile.relationship}</p>
               <div className="flex items-center gap-4 mt-3">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 text-gray-600">
                   <Mail className="h-4 w-4" />
-                  <span className="text-blue-100">{profile.email}</span>
+                  <span>{profile.email}</span>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 text-gray-600">
                   <Phone className="h-4 w-4" />
-                  <span className="text-blue-100">{profile.phone}</span>
+                  <span>{profile.phone}</span>
                 </div>
-                <Badge className={`${profile.isEmergencyContact 
-                  ? 'bg-yellow-500/20 text-yellow-100 border-yellow-300' 
-                  : 'bg-white/20 text-white border-white/30'}`}>
+                <Badge variant={profile.isEmergencyContact ? 'default' : 'secondary'}>
                   {profile.isEmergencyContact ? 'Noodcontact' : 'Reguliere voogd'}
                 </Badge>
               </div>
@@ -361,182 +352,168 @@ export default function GuardianProfile() {
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Basic Information */}
-              <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
-                <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
-                  <User className="h-4 w-4 mr-2" />
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium text-gray-900 flex items-center">
+                  <User className="h-5 w-5 mr-2 text-[#1e40af]" />
                   Basis Informatie
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  <div className="space-y-1">
-                    <div className="flex items-center space-x-2 text-gray-500">
-                      <span className="text-xs font-medium uppercase tracking-wide">Voornaam</span>
-                    </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="firstName">Voornaam</Label>
                     {isEditing ? (
                       <Input
+                        id="firstName"
                         value={editedData.firstName || ''}
                         onChange={(e) => handleInputChange('firstName', e.target.value)}
-                        className="text-sm font-medium text-gray-900"
                       />
                     ) : (
-                      <p className="text-sm font-medium text-gray-900">{profile.firstName}</p>
+                      <div className="py-2 px-3 bg-gray-50 rounded-md">{profile.firstName}</div>
                     )}
                   </div>
                   
-                  <div className="space-y-1">
-                    <div className="flex items-center space-x-2 text-gray-500">
-                      <span className="text-xs font-medium uppercase tracking-wide">Achternaam</span>
-                    </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="lastName">Achternaam</Label>
                     {isEditing ? (
                       <Input
+                        id="lastName"
                         value={editedData.lastName || ''}
                         onChange={(e) => handleInputChange('lastName', e.target.value)}
-                        className="text-sm font-medium text-gray-900"
                       />
                     ) : (
-                      <p className="text-sm font-medium text-gray-900">{profile.lastName}</p>
+                      <div className="py-2 px-3 bg-gray-50 rounded-md">{profile.lastName}</div>
                     )}
                   </div>
 
-                  <div className="space-y-1">
-                    <div className="flex items-center space-x-2 text-gray-500">
-                      <Briefcase className="h-4 w-4" />
-                      <span className="text-xs font-medium uppercase tracking-wide">Beroep</span>
-                    </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="occupation">Beroep</Label>
                     {isEditing ? (
                       <Input
+                        id="occupation"
                         value={editedData.occupation || ''}
                         onChange={(e) => handleInputChange('occupation', e.target.value)}
-                        className="text-sm font-medium text-gray-900"
                       />
                     ) : (
-                      <p className="text-sm font-medium text-gray-900">{profile.occupation || 'Niet opgegeven'}</p>
+                      <div className="py-2 px-3 bg-gray-50 rounded-md">{profile.occupation || 'Niet opgegeven'}</div>
                     )}
                   </div>
 
-                  <div className="space-y-1">
-                    <div className="flex items-center space-x-2 text-gray-500">
-                      <Heart className="h-4 w-4" />
-                      <span className="text-xs font-medium uppercase tracking-wide">Relatie</span>
-                    </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="relationship">Relatie</Label>
                     {isEditing ? (
                       <Input
+                        id="relationship"
                         value={editedData.relationship || ''}
                         onChange={(e) => handleInputChange('relationship', e.target.value)}
-                        className="text-sm font-medium text-gray-900"
                       />
                     ) : (
-                      <p className="text-sm font-medium text-gray-900 capitalize">{profile.relationship}</p>
+                      <div className="py-2 px-3 bg-gray-50 rounded-md capitalize">{profile.relationship}</div>
                     )}
                   </div>
                 </div>
               </div>
 
+              <Separator />
+
               {/* Contact Information */}
-              <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
-                <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
-                  <Mail className="h-4 w-4 mr-2" />
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium text-gray-900 flex items-center">
+                  <Mail className="h-5 w-5 mr-2 text-[#1e40af]" />
                   Contact Informatie
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-1">
-                    <div className="flex items-center space-x-2 text-gray-500">
-                      <Mail className="h-4 w-4" />
-                      <span className="text-xs font-medium uppercase tracking-wide">Email</span>
-                    </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
                     {isEditing ? (
                       <Input
+                        id="email"
                         type="email"
                         value={editedData.email || ''}
                         onChange={(e) => handleInputChange('email', e.target.value)}
-                        className="text-sm font-medium text-gray-900"
                       />
                     ) : (
-                      <p className="text-sm font-medium text-gray-900 break-all">{profile.email}</p>
+                      <div className="py-2 px-3 bg-gray-50 rounded-md flex items-center gap-2">
+                        <Mail className="w-4 h-4 text-gray-500" />
+                        {profile.email}
+                      </div>
                     )}
                   </div>
                   
-                  <div className="space-y-1">
-                    <div className="flex items-center space-x-2 text-gray-500">
-                      <Phone className="h-4 w-4" />
-                      <span className="text-xs font-medium uppercase tracking-wide">Telefoon</span>
-                    </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="phone">Telefoon</Label>
                     {isEditing ? (
                       <Input
+                        id="phone"
                         value={editedData.phone || ''}
                         onChange={(e) => handleInputChange('phone', e.target.value)}
-                        className="text-sm font-medium text-gray-900"
                       />
                     ) : (
-                      <p className="text-sm font-medium text-gray-900">{profile.phone}</p>
+                      <div className="py-2 px-3 bg-gray-50 rounded-md flex items-center gap-2">
+                        <Phone className="w-4 h-4 text-gray-500" />
+                        {profile.phone}
+                      </div>
                     )}
                   </div>
                 </div>
               </div>
 
+              <Separator />
+
               {/* Address Information */}
-              <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
-                <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
-                  <Home className="h-4 w-4 mr-2" />
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium text-gray-900 flex items-center">
+                  <Home className="h-5 w-5 mr-2 text-[#1e40af]" />
                   Adres Informatie
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  <div className="space-y-1">
-                    <div className="flex items-center space-x-2 text-gray-500">
-                      <span className="text-xs font-medium uppercase tracking-wide">Straat</span>
-                    </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="street">Straat</Label>
                     {isEditing ? (
                       <Input
+                        id="street"
                         value={editedData.street || ''}
                         onChange={(e) => handleInputChange('street', e.target.value)}
-                        className="text-sm font-medium text-gray-900"
                       />
                     ) : (
-                      <p className="text-sm font-medium text-gray-900">{profile.street || 'Niet opgegeven'}</p>
+                      <div className="py-2 px-3 bg-gray-50 rounded-md">{profile.street || 'Niet opgegeven'}</div>
                     )}
                   </div>
 
-                  <div className="space-y-1">
-                    <div className="flex items-center space-x-2 text-gray-500">
-                      <span className="text-xs font-medium uppercase tracking-wide">Huisnummer</span>
-                    </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="houseNumber">Huisnummer</Label>
                     {isEditing ? (
                       <Input
+                        id="houseNumber"
                         value={editedData.houseNumber || ''}
                         onChange={(e) => handleInputChange('houseNumber', e.target.value)}
-                        className="text-sm font-medium text-gray-900"
                       />
                     ) : (
-                      <p className="text-sm font-medium text-gray-900">{profile.houseNumber || 'Niet opgegeven'}</p>
+                      <div className="py-2 px-3 bg-gray-50 rounded-md">{profile.houseNumber || 'Niet opgegeven'}</div>
                     )}
                   </div>
 
-                  <div className="space-y-1">
-                    <div className="flex items-center space-x-2 text-gray-500">
-                      <span className="text-xs font-medium uppercase tracking-wide">Postcode</span>
-                    </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="postalCode">Postcode</Label>
                     {isEditing ? (
                       <Input
+                        id="postalCode"
                         value={editedData.postalCode || ''}
                         onChange={(e) => handleInputChange('postalCode', e.target.value)}
-                        className="text-sm font-medium text-gray-900"
                       />
                     ) : (
-                      <p className="text-sm font-medium text-gray-900">{profile.postalCode || 'Niet opgegeven'}</p>
+                      <div className="py-2 px-3 bg-gray-50 rounded-md">{profile.postalCode || 'Niet opgegeven'}</div>
                     )}
                   </div>
 
-                  <div className="space-y-1">
-                    <div className="flex items-center space-x-2 text-gray-500">
-                      <span className="text-xs font-medium uppercase tracking-wide">Stad</span>
-                    </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="city">Stad</Label>
                     {isEditing ? (
                       <Input
+                        id="city"
                         value={editedData.city || ''}
                         onChange={(e) => handleInputChange('city', e.target.value)}
-                        className="text-sm font-medium text-gray-900"
                       />
                     ) : (
-                      <p className="text-sm font-medium text-gray-900">{profile.city || 'Niet opgegeven'}</p>
+                      <div className="py-2 px-3 bg-gray-50 rounded-md">{profile.city || 'Niet opgegeven'}</div>
                     )}
                   </div>
                 </div>
@@ -544,28 +521,31 @@ export default function GuardianProfile() {
 
               {/* Notes */}
               {(isEditing || profile.notes) && (
-                <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
-                  <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
-                    <Settings className="h-4 w-4 mr-2" />
-                    Aanvullende Informatie
-                  </h3>
-                  <div className="space-y-1">
-                    <div className="flex items-center space-x-2 text-gray-500">
-                      <span className="text-xs font-medium uppercase tracking-wide">Opmerkingen</span>
+                <>
+                  <Separator />
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-medium text-gray-900 flex items-center">
+                      <Settings className="h-5 w-5 mr-2 text-[#1e40af]" />
+                      Aanvullende Informatie
+                    </h3>
+                    <div className="space-y-2">
+                      <Label htmlFor="notes">Opmerkingen</Label>
+                      {isEditing ? (
+                        <Textarea
+                          id="notes"
+                          value={editedData.notes || ''}
+                          onChange={(e) => handleInputChange('notes', e.target.value)}
+                          rows={3}
+                          placeholder="Aanvullende opmerkingen..."
+                        />
+                      ) : (
+                        <div className="py-2 px-3 bg-gray-50 rounded-md min-h-[80px]">
+                          {profile.notes || 'Geen opmerkingen'}
+                        </div>
+                      )}
                     </div>
-                    {isEditing ? (
-                      <Textarea
-                        value={editedData.notes || ''}
-                        onChange={(e) => handleInputChange('notes', e.target.value)}
-                        rows={3}
-                        placeholder="Aanvullende opmerkingen..."
-                        className="text-sm font-medium text-gray-900"
-                      />
-                    ) : (
-                      <p className="text-sm font-medium text-gray-900">{profile.notes || 'Geen opmerkingen'}</p>
-                    )}
                   </div>
-                </div>
+                </>
               )}
             </CardContent>
           </Card>
@@ -718,7 +698,7 @@ export default function GuardianProfile() {
             <CardContent>
               <div className="space-y-4">
                 {children.map((child) => (
-                  <div key={child.id} className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                  <div key={child.id} className="p-4 bg-gray-50 rounded-lg border">
                     <div className="flex items-center gap-4">
                       <Avatar className="w-12 h-12">
                         <AvatarFallback className="bg-[#1e40af] text-white text-sm font-medium">
@@ -726,24 +706,18 @@ export default function GuardianProfile() {
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
-                        <h4 className="font-semibold text-gray-900">{child.firstName} {child.lastName}</h4>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
+                        <h4 className="font-semibold text-gray-900 text-lg">{child.firstName} {child.lastName}</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3">
                           <div className="space-y-1">
-                            <div className="flex items-center space-x-2 text-gray-500">
-                              <span className="text-xs font-medium uppercase tracking-wide">Student ID</span>
-                            </div>
+                            <Label className="text-sm text-gray-600">Student ID</Label>
                             <p className="text-sm font-medium text-gray-900">{child.studentId}</p>
                           </div>
                           <div className="space-y-1">
-                            <div className="flex items-center space-x-2 text-gray-500">
-                              <span className="text-xs font-medium uppercase tracking-wide">Klas</span>
-                            </div>
+                            <Label className="text-sm text-gray-600">Klas</Label>
                             <p className="text-sm font-medium text-gray-900">{child.class}</p>
                           </div>
                           <div className="space-y-1">
-                            <div className="flex items-center space-x-2 text-gray-500">
-                              <span className="text-xs font-medium uppercase tracking-wide">Status</span>
-                            </div>
+                            <Label className="text-sm text-gray-600">Status</Label>
                             <Badge variant={child.status === 'active' ? 'default' : 'secondary'}>
                               {child.status === 'active' ? 'Actief' : 'Inactief'}
                             </Badge>
@@ -754,9 +728,10 @@ export default function GuardianProfile() {
                   </div>
                 ))}
                 {children.length === 0 && (
-                  <div className="text-center py-8 text-gray-500">
+                  <div className="text-center py-12 text-gray-500">
                     <Users className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                    <p>Geen kinderen gevonden</p>
+                    <p className="text-lg">Geen kinderen gevonden</p>
+                    <p className="text-sm">Er zijn momenteel geen kinderen gekoppeld aan uw account.</p>
                   </div>
                 )}
               </div>

@@ -55,7 +55,7 @@ export default function GuardianLayout({ children }: GuardianLayoutProps) {
   });
 
   const { data: profile } = useQuery<any>({
-    queryKey: ['/api/profile'],
+    queryKey: ['/api/guardian/profile'],
     staleTime: 60000,
   });
 

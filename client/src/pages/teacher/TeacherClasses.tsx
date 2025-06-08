@@ -290,7 +290,7 @@ export default function TeacherClasses() {
                   <TableRow>
                     <TableCell colSpan={7} className="h-24 text-center">
                       <EmptyState
-                        icon={<GraduationCap className="w-12 h-12" />}
+                        icon={<School className="w-12 h-12" />}
                         title="Geen klassen gevonden"
                         description="Er zijn geen klassen die voldoen aan uw zoekcriteria."
                       />
@@ -317,7 +317,7 @@ export default function TeacherClasses() {
                       <TableCell>
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-                            <GraduationCap className="w-5 h-5 text-primary" />
+                            <School className="w-5 h-5 text-primary" />
                           </div>
                           <div>
                             <div className="font-medium">{cls.name}</div>

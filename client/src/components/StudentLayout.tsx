@@ -184,71 +184,76 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       } transition-transform duration-300 ease-in-out lg:translate-x-0 lg:fixed lg:top-16 border-r border-gray-200`}>
         
-        {/* Mobile close button */}
-        <div className="lg:hidden p-3 border-b border-[#e5e7eb]">
+        {/* Mobile header */}
+        <div className="lg:hidden flex items-center justify-between p-4 border-b border-gray-200">
+          <span className="text-lg font-semibold text-gray-900">Menu</span>
           <button
             onClick={() => setSidebarOpen(false)}
-            className="text-gray-500 hover:text-gray-700"
+            className="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* User info - Admin Style */}
-        <div className="px-6 py-4 border-b border-[#e5e7eb] bg-[#f8fafc]">
-          <div className="flex items-center space-x-3">
-            <Avatar className="h-10 w-10">
-              <AvatarFallback className="bg-[#1e40af] text-white">
-                {profile?.firstName?.[0] || user?.firstName?.[0]}{profile?.lastName?.[0] || user?.lastName?.[0]}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-gray-900 truncate">
-                {profile?.firstName || user?.firstName} {profile?.lastName || user?.lastName}
-              </p>
-              <div className="flex items-center space-x-2 mt-1">
-                <Badge className="bg-[#3b82f6] text-white text-xs px-2 py-0.5">
-                  Student
-                </Badge>
-                {notifications?.length > 0 && (
-                  <Badge variant="destructive" className="text-xs">
-                    {notifications.length}
-                  </Badge>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Navigation - Admin Style */}
-        <nav className="flex-1 px-3 py-4 space-y-1">
+        {/* Navigation - Exact Admin Style */}
+        <nav className="mt-5 flex-1 px-2 pb-4 space-y-1">
           {navigation.map((item) => {
             const Icon = item.icon;
+            const isActive = location === item.href;
+            
             return (
-              <Link key={item.name} href={item.href} className={`group flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 ${
-                item.current
-                  ? 'bg-[#1e40af] text-white shadow-sm'
-                  : 'text-gray-700 hover:bg-[#f1f5f9] hover:text-[#1e40af]'
-              }`}>
-                <Icon className={`mr-3 h-4 w-4 ${
-                  item.current ? 'text-white' : 'text-gray-500 group-hover:text-[#1e40af]'
-                }`} />
-                {item.name}
+              <Link key={item.name} href={item.href}>
+                <a
+                  className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${
+                    isActive
+                      ? 'bg-gray-100 text-gray-900'
+                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                  }`}
+                  onClick={() => setSidebarOpen(false)}
+                >
+                  <Icon className={`mr-3 flex-shrink-0 h-5 w-5 ${
+                    isActive ? 'text-gray-500' : 'text-gray-400 group-hover:text-gray-500'
+                  }`} />
+                  {item.name}
+                  {item.badge && (
+                    <Badge variant="secondary" className="ml-auto bg-gray-100 text-gray-600 text-xs">
+                      {item.badge}
+                    </Badge>
+                  )}
+                </a>
               </Link>
             );
           })}
         </nav>
 
-        {/* Logout button - Admin Style */}
-        <div className="p-3 border-t border-[#e5e7eb]">
-          <Button
-            onClick={handleLogout}
-            variant="ghost"
-            className="w-full justify-start text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg"
-          >
-            <LogOut className="mr-3 h-4 w-4" />
-            Afmelden
-          </Button>
+        {/* User info at bottom - Admin Style */}
+        <div className="flex-shrink-0 flex border-t border-gray-200 p-4">
+          <div className="flex-shrink-0 w-full group block">
+            <div className="flex items-center">
+              <div>
+                <Avatar className="inline-block h-9 w-9">
+                  {profile?.photoUrl ? (
+                    <AvatarImage src={profile.photoUrl} alt={`${profile?.firstName} ${profile?.lastName}`} />
+                  ) : (
+                    <AvatarFallback className="bg-gray-600 text-white text-sm">
+                      {profile?.firstName?.[0] || user?.firstName?.[0]}{profile?.lastName?.[0] || user?.lastName?.[0]}
+                    </AvatarFallback>
+                  )}
+                </Avatar>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm font-medium text-gray-700 group-hover:text-gray-900">
+                  {profile?.firstName || user?.firstName} {profile?.lastName || user?.lastName}
+                </p>
+                <button
+                  onClick={handleLogout}
+                  className="text-xs font-medium text-gray-500 group-hover:text-gray-700 hover:underline"
+                >
+                  Afmelden
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 

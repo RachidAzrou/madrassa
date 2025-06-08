@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { CustomDialogContent } from "@/components/ui/custom-dialog-content";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -550,7 +551,7 @@ export default function Students() {
 
       {/* Create Student Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="sm:max-w-[600px]">
+        <CustomDialogContent className="sm:max-w-[600px]">
           <DialogHeader>
             <DialogTitle>Student Toevoegen</DialogTitle>
             <DialogDescription>
@@ -791,13 +792,13 @@ export default function Students() {
               </Button>
             </DialogFooter>
           </form>
-        </DialogContent>
+        </CustomDialogContent>
       </Dialog>
 
       {/* View Student Dialog */}
       {selectedStudent && (
         <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-          <DialogContent className="sm:max-w-[700px]">
+          <CustomDialogContent className="sm:max-w-[700px]">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <Avatar className="h-8 w-8">
@@ -1002,14 +1003,14 @@ export default function Students() {
                 </div>
               </TabsContent>
             </Tabs>
-          </DialogContent>
+          </CustomDialogContent>
         </Dialog>
       )}
 
       {/* Edit Student Dialog */}
       {selectedStudent && (
         <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-          <DialogContent className="sm:max-w-[600px]">
+          <CustomDialogContent className="sm:max-w-[600px]">
             <DialogHeader>
               <DialogTitle>Student Bewerken</DialogTitle>
               <DialogDescription>
@@ -1250,14 +1251,14 @@ export default function Students() {
                 </Button>
               </DialogFooter>
             </form>
-          </DialogContent>
+          </CustomDialogContent>
         </Dialog>
       )}
 
       {/* Delete Student Dialog */}
       {selectedStudent && (
         <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-          <DialogContent>
+          <CustomDialogContent>
             <DialogHeader>
               <DialogTitle>Student Verwijderen</DialogTitle>
               <DialogDescription>

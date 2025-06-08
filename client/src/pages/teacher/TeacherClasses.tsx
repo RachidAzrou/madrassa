@@ -84,28 +84,6 @@ const QuickActions = ({ onView, onEdit, onDelete }: { onView: () => void, onEdit
         <TooltipContent>Bekijken</TooltipContent>
       </Tooltip>
     </TooltipProvider>
-    
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={onEdit}>
-            <Edit className="h-3 w-3" />
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>Bewerken</TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
-    
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant="ghost" size="sm" className="h-6 w-6 p-0 text-red-600 hover:text-red-700" onClick={onDelete}>
-            <Trash2 className="h-3 w-3" />
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>Verwijderen</TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
   </div>
 );
 
@@ -247,11 +225,6 @@ export default function TeacherClasses() {
               <Button variant="outline" size="sm">
                 <Download className="w-4 h-4 mr-2" />
                 Export
-              </Button>
-
-              <Button size="sm" onClick={handleCreateClass}>
-                <Plus className="w-4 h-4 mr-2" />
-                Nieuwe Klas
               </Button>
             </div>
           </SearchActionBar>

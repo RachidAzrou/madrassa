@@ -69,12 +69,12 @@ export default function StudentClass() {
   const myClass = classInfo?.class;
 
   return (
-    <div className="p-6 bg-[#f7f9fc] min-h-screen">
+    <div className="space-y-6">
       {/* Header - Admin Style */}
-      <div className="mb-8">
+      <div>
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-[#1e40af] mb-2">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
               Mijn Klas
             </h1>
             <p className="text-gray-600">

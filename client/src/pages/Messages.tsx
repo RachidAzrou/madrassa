@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { CustomDialogContent } from "@/components/ui/custom-dialog-content";
 import { Label } from "@/components/ui/label";
 import { 
   Loader2, Send, Mail, MailOpen, Trash2, Reply, UserPlus, 
@@ -484,7 +485,7 @@ export default function Messages() {
 
       {/* Nieuw bericht dialog */}
       <Dialog open={isComposeOpen} onOpenChange={setIsComposeOpen}>
-        <DialogContent className="sm:max-w-[600px]">
+        <CustomDialogContent className="sm:max-w-[600px]">
           <DialogHeader className="border-b pb-3">
             <DialogTitle className="text-lg font-semibold text-primary">Nieuw bericht</DialogTitle>
             <DialogDescription>
@@ -581,7 +582,7 @@ export default function Messages() {
               Versturen
             </Button>
           </DialogFooter>
-        </DialogContent>
+        </CustomDialogContent>
       </Dialog>
     </div>
   );

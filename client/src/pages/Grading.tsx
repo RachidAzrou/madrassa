@@ -1329,7 +1329,7 @@ export default function Grading() {
 
       {/* Add Assessment Dialog */}
       <Dialog open={isAddAssessmentOpen} onOpenChange={setIsAddAssessmentOpen}>
-        <DialogContent className="sm:max-w-[525px]">
+        <CustomDialogContent className="sm:max-w-[525px]">
           <DialogHeader>
             <DialogTitle>Nieuwe beoordeling</DialogTitle>
             <DialogDescription>
@@ -1502,12 +1502,12 @@ export default function Grading() {
               </DialogFooter>
             </form>
           </Form>
-        </DialogContent>
+        </CustomDialogContent>
       </Dialog>
 
       {/* Edit Assessment Dialog */}
       <Dialog open={isEditAssessmentOpen} onOpenChange={setIsEditAssessmentOpen}>
-        <DialogContent className="sm:max-w-[525px]">
+        <CustomDialogContent className="sm:max-w-[525px]">
           <DialogHeader>
             <DialogTitle>Beoordeling bewerken</DialogTitle>
             <DialogDescription>
@@ -1680,12 +1680,12 @@ export default function Grading() {
               </DialogFooter>
             </form>
           </Form>
-        </DialogContent>
+        </CustomDialogContent>
       </Dialog>
 
       {/* Delete Assessment Dialog */}
       <Dialog open={isDeleteAssessmentOpen} onOpenChange={setIsDeleteAssessmentOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+        <CustomDialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Beoordeling verwijderen</DialogTitle>
             <DialogDescription>
@@ -1706,7 +1706,7 @@ export default function Grading() {
               {deleteAssessmentMutation.isPending ? "Bezig met verwijderen..." : "Verwijderen"}
             </Button>
           </DialogFooter>
-        </DialogContent>
+        </CustomDialogContent>
       </Dialog>
     </div>
   );

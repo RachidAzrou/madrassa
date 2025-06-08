@@ -158,11 +158,7 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
     }
   };
 
-  const handleMobileSearch = () => {
-    if (mobileSearchTerm.trim()) {
-      window.location.href = `/student/search?q=${encodeURIComponent(mobileSearchTerm)}`;
-    }
-  };
+
 
   // Generate user display data from profile data (preferred) or authenticated user
   const getUserDisplayData = () => {
@@ -222,82 +218,11 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
           <img src={myMadrassaLogo} alt="myMadrassa Logo" className="h-8 sm:h-10 lg:h-11" />
         </Link>
 
-        {/* Zoekbalk - midden */}
-        <div className="mx-4 flex-1 max-w-md relative hidden md:block">
-          <input
-            type="text"
-            placeholder="Zoeken in berichten, cijfers, vakken..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && searchTerm.trim()) {
-                window.location.href = `/student/search?q=${encodeURIComponent(searchTerm)}`;
-              }
-            }}
-            className="w-full pl-9 pr-4 py-1.5 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#1e40af] focus:border-transparent"
-          />
-          <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-          {searchTerm && (
-            <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-md shadow-lg mt-1 z-50">
-              <div className="p-2">
-                <button
-                  onClick={() => {
-                    window.location.href = `/student/search?q=${encodeURIComponent(searchTerm)}`;
-                  }}
-                  className="w-full text-left px-3 py-2 hover:bg-gray-50 rounded text-sm"
-                >
-                  <Search className="inline w-4 h-4 mr-2" />
-                  Zoeken naar "{searchTerm}"
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
+
 
         {/* Acties - rechts */}
         <div className="flex items-center space-x-0.5 sm:space-x-1">
-          {/* Zoekknop voor mobiel */}
-          <Popover open={showSearch} onOpenChange={setShowSearch}>
-            <PopoverTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="md:hidden h-10 w-10 touch-manipulation"
-              >
-                <Search className="h-5 w-5 text-gray-600" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent align="end" className="w-[95vw] max-w-sm p-0 mx-2">
-              <div className="p-4">
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder="Zoeken..."
-                    value={mobileSearchTerm}
-                    onChange={(e) => setMobileSearchTerm(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        handleMobileSearch();
-                        setShowSearch(false);
-                      }
-                    }}
-                    className="w-full pl-9 pr-4 py-3 text-base rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#1e40af] focus:border-transparent"
-                    autoFocus
-                  />
-                  <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                </div>
-                <Button 
-                  className="w-full mt-3 bg-[#1e40af] hover:bg-[#1e40af]/90 text-white py-3 text-base touch-manipulation"
-                  onClick={() => {
-                    handleMobileSearch();
-                    setShowSearch(false);
-                  }}
-                >
-                  Zoeken
-                </Button>
-              </div>
-            </PopoverContent>
-          </Popover>
+
 
           {/* Berichten knop */}
           <Popover>

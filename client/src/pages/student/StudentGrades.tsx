@@ -245,17 +245,17 @@ export default function StudentGrades() {
 
         <Card className="bg-white border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-            <CardTitle className="text-sm font-medium text-gray-700">Behaalde Credits</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-700">Laagste Cijfer</CardTitle>
             <div className="p-2 bg-[#f0fdf4] rounded-lg">
               <Target className="h-4 w-4 text-[#16a34a]" />
             </div>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-[#16a34a]">
-              {gradeStats.completedCredits}/{gradeStats.totalCredits}
+              {gradeStats?.lowestGrade?.toFixed(1) || '0.0'}
             </div>
             <p className="text-xs text-gray-600 mt-1">
-              EC behaald
+              Laagste score
             </p>
           </CardContent>
         </Card>
@@ -286,10 +286,10 @@ export default function StudentGrades() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-[#be185d]">
-              {Math.round((gradeStats.completedCredits / gradeStats.totalCredits) * 100)}%
+              {Math.round((gradeStats?.passedSubjects / gradeStats?.totalSubjects) * 100) || 0}%
             </div>
             <p className="text-xs text-gray-600 mt-1">
-              Jaar voltooid
+              Vakken gehaald
             </p>
           </CardContent>
         </Card>
@@ -320,7 +320,7 @@ export default function StudentGrades() {
                           <Badge className={getGradeColor(subject.currentGrade)}>
                             {subject.currentGrade}
                           </Badge>
-                          <p className="text-xs text-gray-600 mt-1">{subject.credits} EC</p>
+                          <p className="text-xs text-gray-600 mt-1">{subject.subjectCode}</p>
                         </div>
                       </div>
 

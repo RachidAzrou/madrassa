@@ -171,8 +171,8 @@ export default function StudentSubjects() {
                     </CardTitle>
                     <p className="text-sm text-gray-600 mt-1">{subject.code}</p>
                   </div>
-                  <Badge className="bg-[#eff6ff] text-[#1e40af] border-[#1e40af] ml-2">
-                    {subject.code}
+                  <Badge variant="secondary" className="ml-2">
+                    Ingeschreven
                   </Badge>
                 </div>
               </CardHeader>

@@ -96,7 +96,7 @@ export default function StudentCommunications() {
   // Mutation for sending messages
   const sendMessageMutation = useMutation({
     mutationFn: async (messageData: any) => {
-      return apiRequest("POST", "/api/messages", messageData);
+      return apiRequest("POST", "/api/messages", { body: messageData });
     },
     onSuccess: () => {
       toast({

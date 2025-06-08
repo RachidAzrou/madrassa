@@ -103,78 +103,86 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
         />
       )}
 
-      {/* Enhanced Admin-Style Top bar */}
-      <div className="bg-white shadow-lg border-b border-[#e5e7eb] fixed top-0 left-0 right-0 z-50 h-16">
-        <div className="flex items-center justify-between h-16 px-4 lg:px-6">
-          {/* Logo section - Left */}
+      {/* Admin-Style Top bar */}
+      <div className="bg-white shadow-sm border-b border-[#e5e7eb] fixed top-0 left-0 right-0 z-50 h-16">
+        <div className="flex items-center justify-between h-full px-4 lg:px-6">
+          {/* Left section - Logo */}
           <div className="flex items-center space-x-4">
             <button
               onClick={() => setSidebarOpen(true)}
-              className="lg:hidden text-gray-500 hover:text-gray-700 hover:bg-gray-100 p-2 rounded-lg transition-colors mr-2"
+              className="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
             >
-              <Menu className="w-5 h-5" />
+              <Menu className="h-5 w-5" />
             </button>
+            
             <div className="flex items-center space-x-3">
-              <div className="p-2 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-sm">
-                <img 
-                  src={myMadrassaLogo} 
-                  alt="myMadrassa Logo" 
-                  className="w-6 h-6 filter brightness-0 invert"
-                />
-              </div>
-              <div>
-                <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">myMadrassa</span>
-                <div className="text-xs text-gray-500">Student Portal</div>
-              </div>
+              <img 
+                src={myMadrassaLogo} 
+                alt="myMadrassa" 
+                className="h-8 w-8"
+              />
+              <span className="text-xl font-semibold text-gray-900">myMadrassa</span>
             </div>
           </div>
 
-          {/* Enhanced Search bar - Center */}
-          <div className="hidden lg:flex flex-1 max-w-lg mx-6">
+          {/* Center section - Search */}
+          <div className="hidden md:flex flex-1 max-w-md mx-8">
             <div className="relative w-full">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Search className="h-4 w-4 text-gray-400" />
+              </div>
               <input
                 type="text"
-                placeholder="Zoek studenten, docenten of vakken..."
-                className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
+                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                placeholder="Zoeken..."
               />
             </div>
           </div>
 
-          {/* Top bar actions - Right */}
-          <div className="flex items-center space-x-3">
+          {/* Right section - Actions */}
+          <div className="flex items-center space-x-4">
             {/* Notifications */}
-            <Button variant="ghost" size="sm" className="relative h-8 w-8 p-0">
-              <Bell className="h-4 w-4 text-gray-600" />
+            <button className="relative p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-md">
+              <Bell className="h-5 w-5" />
               {notifications?.length > 0 && (
-                <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
-                  {notifications.length}
-                </span>
+                <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-400 ring-2 ring-white" />
               )}
-            </Button>
+            </button>
 
             {/* Settings */}
-            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-              <Settings className="h-4 w-4 text-gray-600" />
-            </Button>
+            <button className="p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-md">
+              <Settings className="h-5 w-5" />
+            </button>
 
-            {/* User Profile Dropdown */}
-            <div className="flex items-center space-x-2">
-              <Avatar className="h-8 w-8">
-                <AvatarFallback className="bg-[#1e40af] text-white text-xs">
-                  {profile?.firstName?.[0] || user?.firstName?.[0]}{profile?.lastName?.[0] || user?.lastName?.[0]}
-                </AvatarFallback>
-              </Avatar>
-              <ChevronDown className="h-3 w-3 text-gray-500" />
+            {/* Profile dropdown */}
+            <div className="relative">
+              <button className="flex items-center space-x-3 text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                <Avatar className="h-8 w-8">
+                  {profile?.photoUrl ? (
+                    <AvatarImage src={profile.photoUrl} alt={`${profile?.firstName} ${profile?.lastName}`} />
+                  ) : (
+                    <AvatarFallback className="bg-blue-600 text-white text-sm">
+                      {profile?.firstName?.[0] || user?.firstName?.[0]}{profile?.lastName?.[0] || user?.lastName?.[0]}
+                    </AvatarFallback>
+                  )}
+                </Avatar>
+                <div className="hidden lg:block text-left">
+                  <p className="text-sm font-medium text-gray-700">
+                    {profile?.firstName || user?.firstName} {profile?.lastName || user?.lastName}
+                  </p>
+                  <p className="text-xs text-gray-500">Student</p>
+                </div>
+                <ChevronDown className="hidden lg:block h-4 w-4 text-gray-400" />
+              </button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Sidebar - Admin Interface Copy */}
-      <div className={`fixed top-12 bottom-0 left-0 z-50 w-64 bg-white shadow-lg transform ${
+      {/* Admin-Style Sidebar */}
+      <div className={`fixed top-16 bottom-0 left-0 z-50 w-64 bg-white shadow-lg transform ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      } transition-transform duration-300 ease-in-out lg:translate-x-0 lg:fixed lg:top-12 border-r border-[#e5e7eb]`}>
+      } transition-transform duration-300 ease-in-out lg:translate-x-0 lg:fixed lg:top-16 border-r border-gray-200`}>
         
         {/* Mobile close button */}
         <div className="lg:hidden p-3 border-b border-[#e5e7eb]">
@@ -245,8 +253,8 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
       </div>
 
       {/* Main content - Admin Style */}
-      <div className="pt-12 lg:pl-64">
-        <main className="bg-[#f7f9fc] min-h-screen p-6">
+      <div className="pt-16 lg:pl-64">
+        <main className="bg-gray-50 min-h-screen p-6">
           {children}
         </main>
       </div>

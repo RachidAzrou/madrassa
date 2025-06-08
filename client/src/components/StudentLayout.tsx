@@ -10,7 +10,7 @@ import {
   Users,
   UserCheck,
   BookOpen,
-  ClipboardList,
+  User,
   FileText,
   GraduationCap,
   LogOut,
@@ -19,7 +19,7 @@ import {
   Bell,
   Settings,
   ChevronDown,
-  MessageCircle,
+  Mail,
   Search
 } from "lucide-react";
 import myMadrassaLogo from "@assets/myMadrassa.png";
@@ -77,13 +77,13 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
     {
       name: "Docenten",
       href: "/student/teachers",
-      icon: ClipboardList,
+      icon: User,
       current: location === "/student/teachers"
     },
     {
       name: "Communicatie",
       href: "/student/communications",
-      icon: MessageCircle,
+      icon: Mail,
       current: location === "/student/communications"
     }
   ];

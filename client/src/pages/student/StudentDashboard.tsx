@@ -5,9 +5,9 @@ import {
   BookOpen,
   UserCheck,
   Calendar,
-  MessageCircle,
+  Mail,
   GraduationCap,
-  ClipboardList
+  Activity
 } from "lucide-react";
 
 interface StudentStats {
@@ -143,7 +143,7 @@ export default function StudentDashboard() {
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
             <CardTitle className="text-sm font-medium text-gray-700">Berichten</CardTitle>
             <div className="p-2 bg-[#f5f3ff] rounded-lg">
-              <MessageCircle className="h-4 w-4 text-[#7c3aed]" />
+              <Mail className="h-4 w-4 text-[#7c3aed]" />
             </div>
           </CardHeader>
           <CardContent>
@@ -230,7 +230,7 @@ export default function StudentDashboard() {
       <Card className="bg-white border border-[#e5e7eb] shadow-sm">
         <CardHeader className="border-b border-[#e5e7eb] pb-4">
           <CardTitle className="flex items-center text-[#1e40af] font-semibold">
-            <ClipboardList className="h-5 w-5 mr-2 text-[#1e40af]" />
+            <Activity className="h-5 w-5 mr-2 text-[#1e40af]" />
             Recente Activiteit
           </CardTitle>
         </CardHeader>

@@ -321,10 +321,7 @@ export default function StudentCommunications() {
         {/* Message Details Dialog */}
         {selectedMessage && (
           <Dialog open={!!selectedMessage} onOpenChange={() => setSelectedMessage(null)}>
-            <CustomDialogContent className="max-w-2xl">
-              <DialogHeader>
-                <DialogTitle>{selectedMessage.subject}</DialogTitle>
-              </DialogHeader>
+            <CustomDialogContent className="max-w-2xl" title={selectedMessage.subject} withBlueHeader={true}>
               <div className="space-y-4">
                 <div className="flex items-center space-x-3">
                   <Avatar className="h-10 w-10">
@@ -353,10 +350,7 @@ export default function StudentCommunications() {
 
         {/* Compose Message Dialog */}
         <Dialog open={isComposeOpen} onOpenChange={setIsComposeOpen}>
-          <CustomDialogContent className="max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>Nieuw Bericht</DialogTitle>
-            </DialogHeader>
+          <CustomDialogContent className="max-w-2xl" title="Nieuw Bericht" withBlueHeader={true}>
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>

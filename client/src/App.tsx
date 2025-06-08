@@ -37,6 +37,7 @@ import Accounts from "@/pages/Accounts";
 import TeacherLayout from "@/components/TeacherLayout";
 import TeacherDashboard from "@/pages/teacher/TeacherDashboard";
 import TeacherStudents from "@/pages/teacher/TeacherStudents";
+import TeacherClasses from "@/pages/teacher/TeacherClasses";
 import StudentLayout from "@/components/StudentLayout";
 import StudentDashboard from "@/pages/student/StudentDashboard";
 import GuardianLayout from "@/components/GuardianLayout";
@@ -153,7 +154,7 @@ function AuthenticatedRouter() {
           <Route path="/" component={() => <AuthenticatedRoute component={TeacherDashboard} />} />
           <Route path="/teacher" component={() => <AuthenticatedRoute component={TeacherDashboard} />} />
           <Route path="/teacher/students" component={() => <AuthenticatedRoute component={TeacherStudents} />} />
-          <Route path="/teacher/classes" component={() => <AuthenticatedRoute component={Classes} />} />
+          <Route path="/teacher/classes" component={() => <AuthenticatedRoute component={TeacherClasses} />} />
           <Route path="/teacher/calendar" component={() => <AuthenticatedRoute component={Calendar} />} />
           <Route path="/teacher/subjects" component={() => <AuthenticatedRoute component={Courses} />} />
           <Route path="/teacher/attendance" component={() => <AuthenticatedRoute component={Attendance} />} />

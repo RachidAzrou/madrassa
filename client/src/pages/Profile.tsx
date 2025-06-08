@@ -101,7 +101,10 @@ export default function Profile() {
   // Password update mutation
   const updatePasswordMutation = useMutation({
     mutationFn: async (data: { currentPassword: string; newPassword: string }) => {
-      return await apiRequest('PUT', '/api/profile/password', data);
+      return await apiRequest('/api/profile/password', {
+        method: 'PUT',
+        body: data
+      });
     },
     onSuccess: () => {
       toast({
@@ -129,10 +132,7 @@ export default function Profile() {
     mutationFn: async ({ imageData, fileName }: { imageData: string; fileName: string }) => {
       return await apiRequest('/api/profile/upload-image', {
         method: 'POST',
-        body: JSON.stringify({ imageData, fileName }),
-        headers: {
-          'Content-Type': 'application/json'
-        }
+        body: { imageData, fileName }
       });
     },
     onSuccess: () => {

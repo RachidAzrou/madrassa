@@ -49,27 +49,20 @@ export default function TeacherLayout({ children }: TeacherLayoutProps) {
     staleTime: 60000,
   });
 
-  // Navigation sections - Admin style structure
   const mainNavigation = [
     {
       name: 'Dashboard',
-      href: '/teacher',
+      href: '/teacher/dashboard',
       icon: LayoutDashboard,
-      current: location === '/teacher' || location === '/teacher/'
+      current: location === '/teacher/dashboard'
     }
   ];
 
   const studentManagement = [
     {
-      name: 'Studenten',
-      href: '/teacher/students',
-      icon: Users,
-      current: location.startsWith('/teacher/students')
-    },
-    {
-      name: 'Klassen',
+      name: 'Mijn Klassen',
       href: '/teacher/classes',
-      icon: School,
+      icon: Users,
       current: location.startsWith('/teacher/classes')
     },
     {
@@ -82,16 +75,22 @@ export default function TeacherLayout({ children }: TeacherLayoutProps) {
 
   const academic = [
     {
-      name: 'Cijfers',
-      href: '/teacher/grades',
-      icon: Percent,
-      current: location.startsWith('/teacher/grades')
+      name: 'Lessen',
+      href: '/teacher/lessons',
+      icon: BookText,
+      current: location.startsWith('/teacher/lessons')
     },
     {
       name: 'Vakken',
       href: '/teacher/subjects',
-      icon: BookText,
+      icon: School,
       current: location.startsWith('/teacher/subjects')
+    },
+    {
+      name: 'Cijfers',
+      href: '/teacher/grades',
+      icon: Percent,
+      current: location.startsWith('/teacher/grades')
     },
     {
       name: 'Rapporten',
@@ -164,7 +163,7 @@ export default function TeacherLayout({ children }: TeacherLayoutProps) {
 
           {/* Top bar actions - Right */}
           <div className="flex items-center space-x-3">
-            {/* Zoekknop voor mobiel */}
+            {/* Mobile search button */}
             <Button 
               variant="ghost" 
               size="icon" 
@@ -173,7 +172,7 @@ export default function TeacherLayout({ children }: TeacherLayoutProps) {
               <Search className="h-5 w-5 text-gray-600" />
             </Button>
 
-            {/* Berichten knop */}
+            {/* Messages button */}
             <Popover>
               <PopoverTrigger asChild>
                 <Button variant="ghost" size="icon" className="relative">
@@ -208,7 +207,7 @@ export default function TeacherLayout({ children }: TeacherLayoutProps) {
               </PopoverContent>
             </Popover>
 
-            {/* Notificaties */}
+            {/* Notifications */}
             <Popover>
               <PopoverTrigger asChild>
                 <Button variant="ghost" size="icon" className="relative">
@@ -240,7 +239,7 @@ export default function TeacherLayout({ children }: TeacherLayoutProps) {
               </PopoverContent>
             </Popover>
 
-            {/* Gebruiker profiel */}
+            {/* User profile */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-8 pl-2 pr-1 ml-1">
@@ -275,14 +274,6 @@ export default function TeacherLayout({ children }: TeacherLayoutProps) {
           </div>
         </div>
       </div>
-
-      {/* Mobile sidebar backdrop */}
-      {sidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-gray-600 bg-opacity-75 z-40 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
 
       {/* Sidebar - Admin Interface Copy - Starts below topbar */}
       <div className={`fixed top-12 bottom-0 left-0 z-50 w-64 bg-white shadow-lg transform ${
@@ -402,8 +393,6 @@ export default function TeacherLayout({ children }: TeacherLayoutProps) {
             })}
           </div>
         </nav>
-
-        
       </div>
 
       {/* Main content - Admin Style */}

@@ -221,6 +221,19 @@ export class DatabaseStorage implements IStorage {
       .returning();
     return user;
   }
+
+  async updateUserPassword(id: number, hashedPassword: string): Promise<boolean> {
+    try {
+      const result = await db
+        .update(users)
+        .set({ password: hashedPassword })
+        .where(eq(users.id, id));
+      return true;
+    } catch (error) {
+      console.error('Error updating user password:', error);
+      return false;
+    }
+  }
   
   // Fee operations
   async getFees(): Promise<Fee[]> {

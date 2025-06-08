@@ -19,7 +19,7 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import {
-  Home,
+  LayoutDashboard,
   Users,
   UserCheck,
   BookOpen,
@@ -33,7 +33,11 @@ import {
   Settings,
   ChevronDown,
   Mail,
-  Search
+  Search,
+  School,
+  ClipboardCheck,
+  MessageCircle,
+  Percent
 } from "lucide-react";
 import myMadrassaLogo from "@assets/myMadrassa.png";
 
@@ -60,7 +64,7 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
     {
       name: "Dashboard",
       href: "/",
-      icon: Home,
+      icon: LayoutDashboard,
       current: location === "/"
     },
     {
@@ -72,19 +76,19 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
     {
       name: "Vakken",
       href: "/student/subjects",
-      icon: BookOpen,
+      icon: School,
       current: location === "/student/subjects"
     },
     {
       name: "Aanwezigheid",
       href: "/student/attendance",
-      icon: UserCheck,
+      icon: ClipboardCheck,
       current: location === "/student/attendance"
     },
     {
       name: "Cijfers",
       href: "/student/grades",
-      icon: GraduationCap,
+      icon: Percent,
       current: location === "/student/grades"
     },
     {
@@ -96,7 +100,7 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
     {
       name: "Communicatie",
       href: "/student/communications",
-      icon: Mail,
+      icon: MessageCircle,
       current: location === "/student/communications"
     }
   ];

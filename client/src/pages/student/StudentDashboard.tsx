@@ -74,7 +74,7 @@ export default function StudentDashboard() {
 
   if (statsLoading) {
     return (
-      <div className="p-6 bg-[#f7f9fc] min-h-screen">
+      <div className="space-y-6">
         <div className="animate-pulse">
           <div className="h-8 bg-gray-200 rounded w-1/4 mb-6"></div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -97,12 +97,12 @@ export default function StudentDashboard() {
   };
 
   return (
-    <div className="p-6 bg-[#f7f9fc] min-h-screen">
+    <div className="space-y-6">
       {/* Header - Admin Style */}
-      <div className="mb-8">
+      <div>
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-[#1e40af] mb-2">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
               Welkom terug, {user?.firstName}!
             </h1>
             <p className="text-gray-600">
@@ -110,8 +110,8 @@ export default function StudentDashboard() {
             </p>
           </div>
           <div className="flex items-center space-x-3">
-            <Button className="bg-[#1e40af] hover:bg-[#1d3a8a] text-white">
-              <Calendar className="h-4 w-4 mr-2" />
+            <Button variant="outline" className="border-[#e5e7eb] hover:bg-[#eff6ff] hover:border-[#1e40af]">
+              <Calendar className="h-4 w-4 mr-2 text-[#1e40af]" />
               Mijn Rooster
             </Button>
           </div>
@@ -119,7 +119,7 @@ export default function StudentDashboard() {
       </div>
 
       {/* Stats Grid - Admin Style */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <Card className="bg-white border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
             <CardTitle className="text-sm font-medium text-gray-700">Mijn Klas</CardTitle>

@@ -65,12 +65,12 @@ export default function StudentSubjects() {
   }
 
   return (
-    <div className="p-6 bg-[#f7f9fc] min-h-screen">
+    <div className="space-y-6">
       {/* Header - Admin Style */}
-      <div className="mb-8">
+      <div>
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-[#1e40af] mb-2">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
               Mijn Vakken
             </h1>
             <p className="text-gray-600">
@@ -87,7 +87,7 @@ export default function StudentSubjects() {
       </div>
 
       {/* Stats Overview - Admin Style */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card className="bg-white border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
             <CardTitle className="text-sm font-medium text-gray-700">Totaal Vakken</CardTitle>

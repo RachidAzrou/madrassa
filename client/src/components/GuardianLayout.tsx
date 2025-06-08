@@ -432,22 +432,45 @@ export default function GuardianLayout({ children }: GuardianLayoutProps) {
       {/* Main content - Admin Style */}
       <div className="pt-12 lg:pl-64">
         <main className="bg-[#f7f9fc] min-h-screen p-6">
-          {childrenLoading ? (
-            <div className="text-center py-12">
-              <div className="animate-spin w-8 h-8 border-4 border-[#1e40af] border-t-transparent rounded-full mx-auto mb-4"></div>
-              <p className="text-gray-600">Kinderen laden...</p>
-            </div>
-          ) : !selectedChild ? (
-            <div className="text-center py-12">
-              <User className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Selecteer een kind</h3>
-              <p className="text-gray-600 mb-6">
-                Kies een van uw kinderen uit de lijst in de sidebar om hun informatie te bekijken.
-              </p>
-            </div>
-          ) : (
-            children
-          )}
+          {(() => {
+            // Pages that don't require child selection
+            const noChildRequiredPages = [
+              '/guardian/dashboard', 
+              '/guardian/profile',
+              '/guardian/payments',
+              '/guardian/communications',
+              '/messages',
+              '/notifications',
+              '/mijn-account'
+            ];
+            
+            const requiresChildSelection = !noChildRequiredPages.some(path => 
+              location === path || location.startsWith(path)
+            );
+            
+            if (childrenLoading) {
+              return (
+                <div className="text-center py-12">
+                  <div className="animate-spin w-8 h-8 border-4 border-[#1e40af] border-t-transparent rounded-full mx-auto mb-4"></div>
+                  <p className="text-gray-600">Kinderen laden...</p>
+                </div>
+              );
+            }
+            
+            if (requiresChildSelection && !selectedChild) {
+              return (
+                <div className="text-center py-12">
+                  <User className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">Selecteer een kind</h3>
+                  <p className="text-gray-600 mb-6">
+                    Kies een van uw kinderen uit de lijst in de sidebar om hun informatie te bekijken.
+                  </p>
+                </div>
+              );
+            }
+            
+            return children;
+          })()}
         </main>
       </div>
     </div>

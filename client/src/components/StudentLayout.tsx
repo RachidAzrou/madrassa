@@ -480,7 +480,7 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
       </div>
 
       {/* Sidebar - Admin Interface Copy - Starts below topbar */}
-      <div className={`fixed top-12 bottom-0 left-0 z-50 w-64 bg-white shadow-lg transform ${
+      <div className={`fixed top-12 bottom-0 left-0 z-50 w-56 bg-white shadow-lg transform ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       } transition-transform duration-300 ease-in-out lg:translate-x-0 lg:fixed lg:top-12 border-r border-[#e5e7eb]`}>
         
@@ -522,7 +522,7 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
       </div>
 
       {/* Main content - Mobile Optimized */}
-      <div className="pt-12 lg:pl-64">
+      <div className="pt-12 lg:pl-56">
         <main className="bg-[#f7f9fc] min-h-screen p-3 sm:p-4 lg:p-6">
           {children}
         </main>

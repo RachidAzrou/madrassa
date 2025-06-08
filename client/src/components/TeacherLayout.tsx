@@ -22,8 +22,11 @@ import {
   User,
   MessageCircle,
   Search,
-  Settings
+  Settings,
+  Mail
 } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import logoPath from "@assets/myMadrassa.png";
 
 interface TeacherLayoutProps {
@@ -120,72 +123,133 @@ export default function TeacherLayout({ children }: TeacherLayoutProps) {
 
   return (
     <div className="min-h-screen bg-[#f7f9fc]">
-      {/* Top bar - Admin Style - Full width above sidebar */}
-      <div className="fixed top-0 left-0 right-0 z-50 h-16 bg-white shadow-sm border-b border-[#e5e7eb]">
-        <div className="flex items-center justify-between h-full px-4 lg:px-6">
-          {/* Mobile menu button */}
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="lg:hidden text-gray-500 hover:text-gray-700"
+      {/* Top bar - Exact Admin Style */}
+      <div className="fixed top-0 left-0 right-0 z-50 w-full h-12 border-b border-gray-200 bg-white px-4 flex items-center justify-between">
+        {/* Menu voor mobiel (links) */}
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="mr-2 lg:hidden"
+          onClick={() => setSidebarOpen(true)}
+        >
+          <Menu className="h-6 w-6 text-gray-600" />
+        </Button>
+        
+        {/* Logo sectie - links */}
+        <div className="flex items-center h-full">
+          <img src={logoPath} alt="myMadrassa Logo" className="h-10 sm:h-11" />
+        </div>
+
+        {/* Acties - rechts */}
+        <div className="flex items-center space-x-1">
+          {/* Zoekknop voor mobiel */}
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="md:hidden"
           >
-            <Menu className="w-6 h-6" />
-          </button>
-          
-          {/* Logo - Always in topbar */}
-          <div className="flex items-center space-x-3">
-            <img 
-              src={logoPath} 
-              alt="myMadrassa Logo" 
-              className="w-8 h-8"
-            />
-            <span className="text-xl font-bold text-[#1e40af]">myMadrassa</span>
-          </div>
+            <Search className="h-5 w-5 text-gray-600" />
+          </Button>
 
-          {/* Search bar - Desktop */}
-          <div className="hidden lg:flex flex-1 max-w-md ml-8">
-            <div className="relative w-full">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-              <input
-                type="text"
-                placeholder="Zoeken..."
-                className="w-full pl-9 pr-4 py-2 text-sm border border-[#e5e7eb] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e40af] focus:border-transparent"
-              />
-            </div>
-          </div>
-
-          {/* Right section */}
-          <div className="flex items-center space-x-2 lg:space-x-4">
-            {/* Notifications */}
-            <div className="relative">
-              <Button variant="ghost" size="sm" className="p-2">
-                <Bell className="h-5 w-5 text-gray-600" />
+          {/* Berichten knop */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="ghost" size="icon" className="relative">
+                <Mail className="h-5 w-5 text-gray-600" />
                 {notifications.length > 0 && (
-                  <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 text-xs text-white flex items-center justify-center p-0">
+                  <Badge 
+                    className="absolute -top-1 -right-1 w-4 h-4 p-0 flex items-center justify-center bg-[#1e40af]"
+                    variant="default"
+                  >
                     {notifications.length}
                   </Badge>
                 )}
               </Button>
-            </div>
-
-            {/* User menu */}
-            <div className="flex items-center space-x-3 pl-2 border-l border-[#e5e7eb]">
-              <Avatar className="h-8 w-8">
-                <AvatarImage src={profile?.profileImage} />
-                <AvatarFallback className="bg-[#1e40af] text-white text-sm">
-                  {profile?.firstName?.[0]}{profile?.lastName?.[0]}
-                </AvatarFallback>
-              </Avatar>
-              <div className="hidden lg:block">
-                <div className="text-sm font-medium text-gray-900">
-                  {profile?.firstName} {profile?.lastName}
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-80 p-0">
+              <div className="p-4 border-b border-gray-200">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-medium text-sm">Berichten</h3>
+                  <button 
+                    className="text-xs text-[#1e40af] hover:underline"
+                    onClick={() => window.location.href = "/teacher/communications"}
+                  >
+                    Alle berichten
+                  </button>
                 </div>
-                <div className="text-xs text-gray-500">Docent</div>
               </div>
-              <Button variant="ghost" size="sm" onClick={handleLogout} className="p-2">
-                <LogOut className="h-4 w-4 text-gray-600" />
+              <div className="max-h-72 overflow-y-auto">
+                <div className="py-6 text-center">
+                  <p className="text-sm text-gray-500">Geen nieuwe berichten</p>
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
+
+          {/* Notificaties */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="ghost" size="icon" className="relative">
+                <Bell className="h-5 w-5 text-gray-600" />
+                {notifications.length > 0 && (
+                  <Badge 
+                    className="absolute -top-1 -right-1 w-4 h-4 p-0 flex items-center justify-center bg-[#1e40af]"
+                    variant="default"
+                  >
+                    {notifications.length}
+                  </Badge>
+                )}
               </Button>
-            </div>
-          </div>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-80 p-0">
+              <div className="p-4 border-b border-gray-200">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-medium text-sm">Notificaties</h3>
+                  <button className="text-xs text-[#1e40af] hover:underline">
+                    Alle notificaties
+                  </button>
+                </div>
+              </div>
+              <div className="max-h-72 overflow-y-auto">
+                <div className="py-6 text-center">
+                  <p className="text-sm text-gray-500">Geen notificaties</p>
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
+
+          {/* Gebruiker profiel */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="relative h-8 pl-2 pr-1 ml-1">
+                <Avatar className="h-6 w-6">
+                  <AvatarFallback className="bg-[#1e40af] text-white text-xs">
+                    {profile?.firstName?.[0] || 'D'}{profile?.lastName?.[0] || 'T'}
+                  </AvatarFallback>
+                </Avatar>
+                <span className="ml-1.5 text-sm font-medium hidden md:inline-block">
+                  {profile?.firstName} {profile?.lastName}
+                </span>
+                <ChevronDown className="h-4 w-4 ml-0.5 md:ml-1.5 opacity-70" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <div className="px-2 py-1.5 flex flex-col">
+                <span className="text-sm font-medium">{profile?.firstName} {profile?.lastName}</span>
+                <span className="text-xs text-gray-500">Docent</span>
+              </div>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => window.location.href = '/teacher/profile'}>
+                <User className="mr-2 h-4 w-4" />
+                <span>Mijn Profiel</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleLogout}>
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Uitloggen</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
@@ -198,9 +262,9 @@ export default function TeacherLayout({ children }: TeacherLayoutProps) {
       )}
 
       {/* Sidebar - Admin Interface Copy - Starts below topbar */}
-      <div className={`fixed top-16 bottom-0 left-0 z-50 w-64 bg-white shadow-lg transform ${
+      <div className={`fixed top-12 bottom-0 left-0 z-50 w-64 bg-white shadow-lg transform ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      } transition-transform duration-300 ease-in-out lg:translate-x-0 lg:fixed lg:top-16 border-r border-[#e5e7eb]`}>
+      } transition-transform duration-300 ease-in-out lg:translate-x-0 lg:fixed lg:top-12 border-r border-[#e5e7eb]`}>
         
         {/* Mobile close button */}
         <div className="lg:hidden p-3 border-b border-[#e5e7eb]">
@@ -330,7 +394,7 @@ export default function TeacherLayout({ children }: TeacherLayoutProps) {
       </div>
 
       {/* Main content - Admin Style */}
-      <div className="pt-16 lg:pl-64">
+      <div className="pt-12 lg:pl-64">
         <main className="overflow-auto">
           {children}
         </main>

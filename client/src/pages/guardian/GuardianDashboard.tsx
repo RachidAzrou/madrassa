@@ -87,119 +87,188 @@ export default function GuardianDashboard() {
   };
 
   return (
-    <div className="p-6 bg-[#f7f9fc] min-h-screen">
-      {/* Header - Admin Style */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-[#1e40af] mb-2">
-              Welkom terug, {user?.firstName}!
-            </h1>
-            <p className="text-gray-600">
-              Hier is een overzicht van de schoolprestaties van uw kinderen
-            </p>
-          </div>
-          <div className="flex items-center space-x-3">
-            <Button className="bg-[#1e40af] hover:bg-[#1d3a8a] text-white">
-              <Calendar className="h-4 w-4 mr-2" />
-              Afspraak Maken
-            </Button>
+    <div className="bg-gradient-to-br from-[#f7f9fc] to-[#e7f3ff] min-h-screen">
+      {/* Hero Header */}
+      <div className="relative overflow-hidden bg-gradient-to-r from-[#1e40af] via-[#3b82f6] to-[#1e40af] p-8 mb-8">
+        <div className="absolute inset-0 bg-black/5"></div>
+        <div className="relative z-10">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+            <div className="mb-6 lg:mb-0">
+              <div className="flex items-center mb-3">
+                <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center mr-4">
+                  <User className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-3xl font-bold text-white mb-1">
+                    Assalamu alaikum, {user?.firstName}!
+                  </h1>
+                  <p className="text-blue-100 text-lg">
+                    Welkom bij uw voogd dashboard
+                  </p>
+                </div>
+              </div>
+              <p className="text-blue-50 max-w-2xl">
+                Volg de voortgang van uw kinderen, bekijk belangrijke updates en blijf verbonden met hun islamitische onderwijs
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Button className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white border border-white/30 transition-all duration-200">
+                <Calendar className="h-4 w-4 mr-2" />
+                Afspraak Plannen
+              </Button>
+              <Button className="bg-white text-[#1e40af] hover:bg-gray-50 transition-all duration-200">
+                <Bell className="h-4 w-4 mr-2" />
+                Berichten ({dashboardStats.unreadMessages})
+              </Button>
+            </div>
           </div>
         </div>
+        {/* Decorative elements */}
+        <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-16 translate-x-16"></div>
+        <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-12 -translate-x-12"></div>
       </div>
 
-      {/* Stats Grid - Admin Style */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        <Card className="bg-white border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-            <CardTitle className="text-sm font-medium text-gray-700">Mijn Kinderen</CardTitle>
-            <div className="p-2 bg-[#eff6ff] rounded-lg">
-              <Users className="h-4 w-4 text-[#1e40af]" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-[#1e40af]">{dashboardStats.totalChildren}</div>
-            <p className="text-xs text-gray-600 mt-1">
-              Ingeschreven kinderen
-            </p>
-          </CardContent>
-        </Card>
+      <div className="px-6 pb-8">
+        {/* Enhanced Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          {/* Children Card */}
+          <Card className="group relative overflow-hidden bg-gradient-to-br from-white to-blue-50/30 border border-blue-100 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-blue-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 relative z-10">
+              <div>
+                <CardTitle className="text-sm font-semibold text-gray-700 group-hover:text-blue-700 transition-colors">Mijn Kinderen</CardTitle>
+                <p className="text-xs text-gray-500 mt-1">Ingeschreven leerlingen</p>
+              </div>
+              <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
+                <Users className="h-5 w-5 text-white" />
+              </div>
+            </CardHeader>
+            <CardContent className="relative z-10">
+              <div className="text-3xl font-bold text-blue-600 group-hover:text-blue-700 transition-colors">
+                {dashboardStats.totalChildren}
+              </div>
+              <div className="mt-2 flex items-center text-xs text-green-600">
+                <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                Actief ingeschreven
+              </div>
+            </CardContent>
+          </Card>
 
-        <Card className="bg-white border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-            <CardTitle className="text-sm font-medium text-gray-700">Aanwezigheid</CardTitle>
-            <div className="p-2 bg-[#f0fdf4] rounded-lg">
-              <UserCheck className="h-4 w-4 text-[#16a34a]" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-[#16a34a]">{dashboardStats.attendanceRate}%</div>
-            <p className="text-xs text-gray-600 mt-1">
-              Gemiddelde aanwezigheid
-            </p>
-          </CardContent>
-        </Card>
+          {/* Attendance Card */}
+          <Card className="group relative overflow-hidden bg-gradient-to-br from-white to-green-50/30 border border-green-100 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-green-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 relative z-10">
+              <div>
+                <CardTitle className="text-sm font-semibold text-gray-700 group-hover:text-green-700 transition-colors">Aanwezigheid</CardTitle>
+                <p className="text-xs text-gray-500 mt-1">Gemiddelde score</p>
+              </div>
+              <div className="p-3 bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
+                <UserCheck className="h-5 w-5 text-white" />
+              </div>
+            </CardHeader>
+            <CardContent className="relative z-10">
+              <div className="text-3xl font-bold text-green-600 group-hover:text-green-700 transition-colors">
+                {dashboardStats.attendanceRate}%
+              </div>
+              <div className="mt-2 flex items-center text-xs text-green-600">
+                <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                Uitstekende aanwezigheid
+              </div>
+            </CardContent>
+          </Card>
 
-        <Card className="bg-white border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-            <CardTitle className="text-sm font-medium text-gray-700">Komende Events</CardTitle>
-            <div className="p-2 bg-[#fef3c7] rounded-lg">
-              <Calendar className="h-4 w-4 text-[#d97706]" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-[#d97706]">{dashboardStats.upcomingEvents}</div>
-            <p className="text-xs text-gray-600 mt-1">
-              Deze week
-            </p>
-          </CardContent>
-        </Card>
+          {/* Events Card */}
+          <Card className="group relative overflow-hidden bg-gradient-to-br from-white to-amber-50/30 border border-amber-100 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-amber-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 relative z-10">
+              <div>
+                <CardTitle className="text-sm font-semibold text-gray-700 group-hover:text-amber-700 transition-colors">Komende Events</CardTitle>
+                <p className="text-xs text-gray-500 mt-1">Deze week</p>
+              </div>
+              <div className="p-3 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
+                <Calendar className="h-5 w-5 text-white" />
+              </div>
+            </CardHeader>
+            <CardContent className="relative z-10">
+              <div className="text-3xl font-bold text-amber-600 group-hover:text-amber-700 transition-colors">
+                {dashboardStats.upcomingEvents}
+              </div>
+              <div className="mt-2 flex items-center text-xs text-amber-600">
+                <div className="w-2 h-2 bg-amber-500 rounded-full mr-2"></div>
+                Geplande activiteiten
+              </div>
+            </CardContent>
+          </Card>
 
-        <Card className="bg-white border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-            <CardTitle className="text-sm font-medium text-gray-700">Openstaande Betalingen</CardTitle>
-            <div className="p-2 bg-[#fdf2f8] rounded-lg">
-              <CreditCard className="h-4 w-4 text-[#be185d]" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-[#be185d]">{dashboardStats.pendingPayments}</div>
-            <p className="text-xs text-gray-600 mt-1">
-              Te betalen facturen
-            </p>
-          </CardContent>
-        </Card>
+          {/* Payments Card */}
+          <Card className="group relative overflow-hidden bg-gradient-to-br from-white to-pink-50/30 border border-pink-100 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            <div className="absolute inset-0 bg-gradient-to-br from-pink-500/5 to-pink-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 relative z-10">
+              <div>
+                <CardTitle className="text-sm font-semibold text-gray-700 group-hover:text-pink-700 transition-colors">Openstaande Betalingen</CardTitle>
+                <p className="text-xs text-gray-500 mt-1">Te betalen facturen</p>
+              </div>
+              <div className="p-3 bg-gradient-to-br from-pink-500 to-pink-600 rounded-xl shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
+                <CreditCard className="h-5 w-5 text-white" />
+              </div>
+            </CardHeader>
+            <CardContent className="relative z-10">
+              <div className="text-3xl font-bold text-pink-600 group-hover:text-pink-700 transition-colors">
+                {dashboardStats.pendingPayments}
+              </div>
+              <div className="mt-2 flex items-center text-xs text-pink-600">
+                <div className="w-2 h-2 bg-pink-500 rounded-full mr-2"></div>
+                {dashboardStats.pendingPayments > 0 ? 'Actie vereist' : 'Alles betaald'}
+              </div>
+            </CardContent>
+          </Card>
 
-        <Card className="bg-white border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-            <CardTitle className="text-sm font-medium text-gray-700">Nieuwe Cijfers</CardTitle>
-            <div className="p-2 bg-[#f3e8ff] rounded-lg">
-              <GraduationCap className="h-4 w-4 text-[#7c3aed]" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-[#7c3aed]">{dashboardStats.recentGrades}</div>
-            <p className="text-xs text-gray-600 mt-1">
-              Afgelopen week
-            </p>
-          </CardContent>
-        </Card>
+          {/* Grades Card */}
+          <Card className="group relative overflow-hidden bg-gradient-to-br from-white to-purple-50/30 border border-purple-100 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-purple-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 relative z-10">
+              <div>
+                <CardTitle className="text-sm font-semibold text-gray-700 group-hover:text-purple-700 transition-colors">Nieuwe Cijfers</CardTitle>
+                <p className="text-xs text-gray-500 mt-1">Afgelopen week</p>
+              </div>
+              <div className="p-3 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
+                <GraduationCap className="h-5 w-5 text-white" />
+              </div>
+            </CardHeader>
+            <CardContent className="relative z-10">
+              <div className="text-3xl font-bold text-purple-600 group-hover:text-purple-700 transition-colors">
+                {dashboardStats.recentGrades}
+              </div>
+              <div className="mt-2 flex items-center text-xs text-purple-600">
+                <div className="w-2 h-2 bg-purple-500 rounded-full mr-2"></div>
+                Recente beoordelingen
+              </div>
+            </CardContent>
+          </Card>
 
-        <Card className="bg-white border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-            <CardTitle className="text-sm font-medium text-gray-700">Berichten</CardTitle>
-            <div className="p-2 bg-[#fef3c7] rounded-lg">
-              <Bell className="h-4 w-4 text-[#dc2626]" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-[#dc2626]">{dashboardStats.unreadMessages}</div>
-            <p className="text-xs text-gray-600 mt-1">
-              Ongelezen berichten
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+          {/* Messages Card */}
+          <Card className="group relative overflow-hidden bg-gradient-to-br from-white to-red-50/30 border border-red-100 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 to-red-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 relative z-10">
+              <div>
+                <CardTitle className="text-sm font-semibold text-gray-700 group-hover:text-red-700 transition-colors">Berichten</CardTitle>
+                <p className="text-xs text-gray-500 mt-1">Ongelezen berichten</p>
+              </div>
+              <div className="p-3 bg-gradient-to-br from-red-500 to-red-600 rounded-xl shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
+                <Bell className="h-5 w-5 text-white" />
+              </div>
+            </CardHeader>
+            <CardContent className="relative z-10">
+              <div className="text-3xl font-bold text-red-600 group-hover:text-red-700 transition-colors">
+                {dashboardStats.unreadMessages}
+              </div>
+              <div className="mt-2 flex items-center text-xs text-red-600">
+                <div className="w-2 h-2 bg-red-500 rounded-full mr-2"></div>
+                {dashboardStats.unreadMessages > 0 ? 'Nieuwe berichten' : 'Alle berichten gelezen'}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
       {/* Content Grid - Admin Style */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -319,6 +388,7 @@ export default function GuardianDashboard() {
               <span className="text-sm text-[#1e40af]">Rapporten</span>
             </Button>
           </Link>
+          </div>
         </div>
       </div>
     </div>

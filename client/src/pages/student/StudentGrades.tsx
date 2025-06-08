@@ -103,18 +103,23 @@ export default function StudentGrades() {
 
   return (
     <div className="space-y-6">
-      {/* Header - Admin Style */}
-      <div>
+      {/* Enhanced Header */}
+      <div className="border-b border-gray-200 pb-8 mb-8">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
               Mijn Cijfers
             </h1>
-            <p className="text-gray-600">
-              Overzicht van al je behaalde cijfers en voortgang
+            <p className="text-gray-600 text-lg">
+              Bekijk al je cijfers en volg je academische vooruitgang
             </p>
           </div>
-
+          <div className="flex items-center space-x-3">
+            <div className="bg-gradient-to-r from-purple-500 to-purple-600 text-white px-4 py-2 rounded-lg shadow-sm">
+              <div className="text-sm font-medium">{gradeStats?.overallAverage?.toFixed(1) || '0.0'}</div>
+              <div className="text-xs opacity-90">Gemiddeld cijfer</div>
+            </div>
+          </div>
         </div>
       </div>
 

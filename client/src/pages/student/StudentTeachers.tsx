@@ -60,18 +60,23 @@ export default function StudentTeachers() {
 
   return (
     <div className="space-y-6">
-      {/* Header - Admin Style */}
-      <div>
+      {/* Enhanced Header */}
+      <div className="border-b border-gray-200 pb-8 mb-8">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
               Mijn Docenten
             </h1>
-            <p className="text-gray-600">
-              Overzicht van alle docenten die je les geven
+            <p className="text-gray-600 text-lg">
+              Ontmoet je docenten en vind hun contactinformatie
             </p>
           </div>
-
+          <div className="flex items-center space-x-3">
+            <div className="bg-gradient-to-r from-indigo-500 to-indigo-600 text-white px-4 py-2 rounded-lg shadow-sm">
+              <div className="text-sm font-medium">{teachers?.teachers?.length || 0} Docenten</div>
+              <div className="text-xs opacity-90">Dit schooljaar</div>
+            </div>
+          </div>
         </div>
       </div>
 

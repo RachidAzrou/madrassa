@@ -96,7 +96,7 @@ export default function StudentCommunications() {
   // Mutation for sending messages
   const sendMessageMutation = useMutation({
     mutationFn: async (messageData: any) => {
-      return apiRequest("POST", "/api/messages", { body: messageData });
+      return apiRequest("POST", "/api/messages", messageData);
     },
     onSuccess: () => {
       toast({
@@ -169,18 +169,22 @@ export default function StudentCommunications() {
 
   return (
     <div className="space-y-6">
-      {/* Header - Admin Style */}
-      <div>
+      {/* Enhanced Header */}
+      <div className="border-b border-gray-200 pb-8 mb-8">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
               Communicatie
             </h1>
-            <p className="text-gray-600">
-              Berichten en mededelingen van je school
+            <p className="text-gray-600 text-lg">
+              Berichten en mededelingen van je school en docenten
             </p>
           </div>
           <div className="flex items-center space-x-3">
+            <div className="bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-2 rounded-lg shadow-sm">
+              <div className="text-sm font-medium">{stats?.unreadCount || 0} Ongelezen</div>
+              <div className="text-xs opacity-90">Nieuwe berichten</div>
+            </div>
             <Button 
               onClick={() => setIsComposeOpen(true)}
               className="bg-[#1e40af] hover:bg-[#1d3a8a] text-white"

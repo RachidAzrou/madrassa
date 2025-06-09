@@ -11,7 +11,6 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { CustomDialogContent } from "@/components/ui/custom-dialog-content";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import { PageHeader } from '@/components/layout/page-header';
 import {
   User,
   Mail,
@@ -226,23 +225,13 @@ export default function StudentProfile() {
   const currentProfile = isEditing ? { ...profile, ...editedProfile } : profile;
 
   return (
-    <div className="bg-[#f7f9fc] min-h-screen">
-      {/* Clean Page Header - Admin Style */}
-      <PageHeader
-        title="Mijn Profiel"
-        icon={<User className="h-5 w-5 text-white" />}
-        parent="Student"
-        current="Mijn Profiel"
-      />
-      
-      {/* Main content area */}
-      <div className="px-6 py-6 max-w-7xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <div className="space-y-1">
-            <h1 className="text-2xl font-bold tracking-tight text-gray-900">Profiel Instellingen</h1>
-            <p className="text-gray-600 text-sm">Bekijk en bewerk je persoonlijke gegevens</p>
-          </div>
-          <div className="flex gap-2">
+    <div className="p-6 max-w-6xl mx-auto space-y-6">
+      <div className="flex items-center justify-between">
+        <div className="space-y-1">
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900">Mijn Profiel</h1>
+          <p className="text-muted-foreground text-sm">Bekijk en bewerk je persoonlijke gegevens</p>
+        </div>
+        <div className="flex gap-2">
           {isEditing ? (
             <>
               <Button variant="outline" onClick={handleCancel}>
@@ -262,10 +251,10 @@ export default function StudentProfile() {
               Bewerken
             </Button>
           )}
-          </div>
         </div>
+      </div>
 
-        <Tabs defaultValue="personal" className="space-y-6">
+      <Tabs defaultValue="personal" className="space-y-6">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="personal">Persoonlijke Gegevens</TabsTrigger>
           <TabsTrigger value="academic">Academische Informatie</TabsTrigger>
@@ -725,7 +714,6 @@ export default function StudentProfile() {
           </Card>
         </TabsContent>
       </Tabs>
-      </div>
     </div>
   );
 }

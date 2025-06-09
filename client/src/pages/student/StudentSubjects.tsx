@@ -77,8 +77,8 @@ export default function StudentSubjects() {
       {/* Main content area */}
       <div className="px-6 py-6 max-w-7xl mx-auto">
         
-      {/* Stats Overview - Admin Style */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      {/* Subjects Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-sm hover:shadow-lg transition-all duration-200 hover:scale-[1.02]">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
             <CardTitle className="text-sm font-medium text-blue-700">Totaal Vakken</CardTitle>
@@ -94,15 +94,15 @@ export default function StudentSubjects() {
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-sm hover:shadow-lg transition-all duration-200 hover:scale-[1.02]">
+        <Card className="bg-white border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-            <CardTitle className="text-sm font-medium text-green-700">Gem. Cijfer</CardTitle>
-            <div className="p-3 bg-green-500 rounded-xl shadow-sm">
-              <GraduationCap className="h-5 w-5 text-white" />
+            <CardTitle className="text-sm font-medium text-gray-700">Gem. Cijfer</CardTitle>
+            <div className="p-2 bg-[#f0fdf4] rounded-lg">
+              <GraduationCap className="h-4 w-4 text-[#16a34a]" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-900">
+            <div className="text-2xl font-bold text-[#16a34a]">
               {subjects?.subjects?.length ? 
                 (subjects.subjects
                   .filter(s => s.currentGrade)
@@ -111,21 +111,21 @@ export default function StudentSubjects() {
                 ).toFixed(1) : 'N/A'
               }
             </div>
-            <p className="text-xs text-green-600 mt-1">
+            <p className="text-xs text-gray-600 mt-1">
               Alle vakken
             </p>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 shadow-sm hover:shadow-lg transition-all duration-200 hover:scale-[1.02]">
+        <Card className="bg-white border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-            <CardTitle className="text-sm font-medium text-purple-700">Aanwezigheid</CardTitle>
-            <div className="p-3 bg-purple-500 rounded-xl shadow-sm">
-              <Target className="h-5 w-5 text-white" />
+            <CardTitle className="text-sm font-medium text-gray-700">Aanwezigheid</CardTitle>
+            <div className="p-2 bg-[#fef3c7] rounded-lg">
+              <Target className="h-4 w-4 text-[#d97706]" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-purple-900">
+            <div className="text-2xl font-bold text-[#d97706]">
               {subjects?.subjects?.length ? 
                 Math.round(subjects.subjects
                   .filter(s => s.attendance !== undefined)
@@ -134,24 +134,24 @@ export default function StudentSubjects() {
                 ) : 0
               }%
             </div>
-            <p className="text-xs text-purple-600 mt-1">
+            <p className="text-xs text-gray-600 mt-1">
               Gemiddeld
             </p>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200 shadow-sm hover:shadow-lg transition-all duration-200 hover:scale-[1.02]">
+        <Card className="bg-white border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-            <CardTitle className="text-sm font-medium text-orange-700">Volgende Les</CardTitle>
-            <div className="p-3 bg-orange-500 rounded-xl shadow-sm">
-              <Clock className="h-5 w-5 text-white" />
+            <CardTitle className="text-sm font-medium text-gray-700">Volgende Les</CardTitle>
+            <div className="p-2 bg-[#fdf2f8] rounded-lg">
+              <Clock className="h-4 w-4 text-[#be185d]" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-lg font-bold text-orange-900">
+            <div className="text-lg font-bold text-[#be185d]">
               {subjects?.subjects?.find(s => s.nextLesson)?.nextLesson?.time || 'Geen'}
             </div>
-            <p className="text-xs text-orange-600 mt-1">
+            <p className="text-xs text-gray-600 mt-1">
               Vandaag
             </p>
           </CardContent>

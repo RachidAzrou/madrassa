@@ -4,7 +4,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PageHeader } from '@/components/layout/page-header';
 import {
   FileText,
   Download,
@@ -15,8 +14,7 @@ import {
   BookOpen,
   TrendingUp,
   Clock,
-  CheckCircle,
-  BookMarked
+  CheckCircle
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 
@@ -128,84 +126,25 @@ export default function StudentReports() {
   };
 
   return (
-    <div className="bg-[#f7f9fc] min-h-screen">
-      {/* Clean Page Header - Admin Style */}
-      <PageHeader
-        title="Rapporten"
-        icon={<BookMarked className="h-5 w-5 text-white" />}
-        parent="Student"
-        current="Rapporten"
-      />
-      
-      {/* Main content area */}
-      <div className="px-6 py-6 max-w-7xl mx-auto">
-        
-        {/* Stats Overview - Admin Style */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-sm hover:shadow-lg transition-all duration-200 hover:scale-[1.02]">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-              <CardTitle className="text-sm font-medium text-blue-700">Beschikbare Rapporten</CardTitle>
-              <div className="p-3 bg-blue-500 rounded-xl shadow-sm">
-                <FileText className="h-5 w-5 text-white" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-blue-900">{reports.length}</div>
-              <p className="text-xs text-blue-600 mt-1">
-                Dit schooljaar
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex items-center gap-4">
+            <div className="p-3 rounded-lg bg-[#1e40af] text-white">
+              <FileText className="h-6 w-6" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Rapporten</h1>
+              <p className="text-sm text-gray-600 mt-1">
+                Bekijk en download je academische rapporten en beoordelingen
               </p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-sm hover:shadow-lg transition-all duration-200 hover:scale-[1.02]">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-              <CardTitle className="text-sm font-medium text-green-700">Rapportcijfers</CardTitle>
-              <div className="p-3 bg-green-500 rounded-xl shadow-sm">
-                <TrendingUp className="h-5 w-5 text-white" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-900">{reportCards.length}</div>
-              <p className="text-xs text-green-600 mt-1">
-                Uitgegeven
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 shadow-sm hover:shadow-lg transition-all duration-200 hover:scale-[1.02]">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-              <CardTitle className="text-sm font-medium text-purple-700">Voortgangsrapporten</CardTitle>
-              <div className="p-3 bg-purple-500 rounded-xl shadow-sm">
-                <BookOpen className="h-5 w-5 text-white" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-purple-900">
-                {reports.filter(r => r.type === 'progress').length}
-              </div>
-              <p className="text-xs text-purple-600 mt-1">
-                Beschikbaar
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200 shadow-sm hover:shadow-lg transition-all duration-200 hover:scale-[1.02]">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-              <CardTitle className="text-sm font-medium text-orange-700">Toetsrapporten</CardTitle>
-              <div className="p-3 bg-orange-500 rounded-xl shadow-sm">
-                <CheckCircle className="h-5 w-5 text-white" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-orange-900">
-                {reports.filter(r => r.type === 'assessment').length}
-              </div>
-              <p className="text-xs text-orange-600 mt-1">
-                Dit semester
-              </p>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
+      </div>
+
+      <div className="px-4 sm:px-6 lg:px-8 py-8">
         <Tabs defaultValue="reports" className="space-y-6">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="reports">Rapporten & Documenten</TabsTrigger>
@@ -285,11 +224,11 @@ export default function StudentReports() {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredReports.map((report) => (
-                  <Card key={report.id} className="bg-white border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
-                    <CardHeader className="border-b border-[#e5e7eb] pb-4">
+                  <Card key={report.id} className="hover:shadow-md transition-shadow">
+                    <CardHeader className="pb-3">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <CardTitle className="text-lg font-semibold text-[#1e40af] mb-1">
+                          <CardTitle className="text-lg font-semibold text-gray-900 mb-1">
                             {report.title}
                           </CardTitle>
                           <CardDescription className="text-sm text-gray-600">

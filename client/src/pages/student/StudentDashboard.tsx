@@ -269,37 +269,48 @@ export default function StudentDashboard() {
             </div>
           </div>
 
-          {/* Recent Activity - Admin Style */}
-          <div className="bg-white border border-[#e5e7eb] rounded-sm">
-            <div className="flex items-center justify-between px-4 py-2 border-b border-[#e5e7eb] bg-[#f9fafc]">
-              <div className="flex items-center gap-2">
-                <Activity className="h-3.5 w-3.5 text-[#1e40af]" />
-                <h3 className="text-xs font-medium text-gray-700 tracking-tight">Recente Activiteit</h3>
+          {/* Recente Activiteit - Modern Style */}
+          <div className="bg-white/70 backdrop-blur-sm border border-slate-200/50 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300">
+            <div className="flex items-center justify-between p-6 border-b border-slate-200/50">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg">
+                  <Activity className="h-4 w-4 text-white" />
+                </div>
+                <h3 className="text-lg font-semibold text-slate-800">Recente Activiteit</h3>
+              </div>
+              <div className="px-3 py-1 bg-purple-50 rounded-full">
+                <span className="text-sm font-medium text-purple-700">Live updates</span>
               </div>
             </div>
             
-            <div className="p-4">
+            <div className="p-6">
               {recentActivity?.activities?.length ? (
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {recentActivity.activities.slice(0, 8).map((activity: any) => (
-                    <div key={activity.id} className="flex items-start space-x-3 p-3 bg-[#f8fafc] rounded border border-[#e5e7eb]">
-                      <div className={`flex-shrink-0 w-2 h-2 rounded-full mt-2 ${
-                        activity.type === 'grade' ? 'bg-green-400' :
-                        activity.type === 'attendance' ? 'bg-blue-400' :
-                        activity.type === 'assignment' ? 'bg-yellow-400' :
-                        'bg-purple-400'
-                      }`} />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm text-gray-900">{activity.description}</p>
-                        <p className="text-xs text-gray-500 mt-1">{activity.timestamp}</p>
+                    <div key={activity.id} className="group relative">
+                      <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 to-indigo-500/5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                      <div className="relative flex items-start space-x-4 p-4 bg-slate-50/50 rounded-xl border border-slate-200/50 group-hover:border-purple-200/50 transition-all duration-300">
+                        <div className={`flex-shrink-0 w-3 h-3 rounded-full mt-1.5 shadow-lg ${
+                          activity.type === 'grade' ? 'bg-gradient-to-r from-emerald-400 to-green-500' :
+                          activity.type === 'attendance' ? 'bg-gradient-to-r from-blue-400 to-blue-500' :
+                          activity.type === 'assignment' ? 'bg-gradient-to-r from-yellow-400 to-orange-500' :
+                          'bg-gradient-to-r from-purple-400 to-pink-500'
+                        }`} />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-slate-800">{activity.description}</p>
+                          <p className="text-xs text-slate-500 mt-1 font-medium">{activity.timestamp}</p>
+                        </div>
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-8 text-gray-500">
-                  <Activity className="h-8 w-8 text-gray-300 mx-auto mb-2" />
-                  <p className="text-sm">Geen recente activiteit</p>
+                <div className="text-center py-12">
+                  <div className="p-4 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-2xl inline-block mb-4">
+                    <Activity className="h-12 w-12 text-purple-400" />
+                  </div>
+                  <h4 className="text-lg font-semibold text-slate-800 mb-2">Geen activiteit</h4>
+                  <p className="text-slate-600">Je recente activiteiten verschijnen hier</p>
                 </div>
               )}
             </div>

@@ -245,7 +245,7 @@ const NotificationsPage: React.FC = () => {
         )}
         
         {notificationList.map((notification) => (
-          <Card key={notification.id} className={`border group relative ${!notification.isRead ? 'border-l-4 border-l-blue-500 bg-blue-50' : ''}`}>
+          <Card key={notification.id} className={`border group relative transition-all duration-200 hover:shadow-md ${!notification.isRead ? 'border-l-4 border-l-blue-500 bg-blue-50/50' : 'hover:bg-gray-50'}`}>
             <CardHeader className="p-4">
               <div className="flex justify-between items-start">
                 <div className="flex items-start gap-3">
@@ -259,21 +259,33 @@ const NotificationsPage: React.FC = () => {
                       />
                     </div>
                   )}
-                  <div className="mt-1">
+                  <div className="mt-1 flex items-center gap-2">
                     {getNotificationIcon(notification.type)}
+                    {notification.category && (
+                      <div className="text-gray-400">
+                        {getCategoryIcon(notification.category)}
+                      </div>
+                    )}
                   </div>
-                  <div>
-                    <CardTitle className="text-base">{notification.title}</CardTitle>
-                    <span className="text-xs text-gray-500">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <CardTitle className="text-base font-medium">{notification.title}</CardTitle>
+                      {!notification.isRead && (
+                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                      )}
+                      {notification.category && (
+                        <span className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-full capitalize">
+                          {notification.category}
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-xs text-gray-500 block mb-2">
                       {formatDate(notification.createdAt)}
                     </span>
-                    <CardDescription className="text-sm mt-2">
+                    <CardDescription className="text-sm text-gray-700 leading-relaxed">
                       {notification.message}
                     </CardDescription>
                   </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  {/* Badge ongelezen verwijderd */}
                 </div>
               </div>
               {!selectMode && (
@@ -305,27 +317,49 @@ const NotificationsPage: React.FC = () => {
     );
   };
 
+  // Get notification counts for tabs
+  const getTabNotificationCount = (tab: string) => {
+    switch (tab) {
+      case 'all': return notifications.length;
+      case 'unread': return unreadNotifications.length;
+      case 'read': return readNotifications.length;
+      default: return 0;
+    }
+  };
+
+  const getCategoryIcon = (category: string) => {
+    switch (category?.toLowerCase()) {
+      case 'grades': return <GraduationCap className="h-4 w-4" />;
+      case 'attendance': return <ClipboardCheck className="h-4 w-4" />;
+      case 'messages': return <Mail className="h-4 w-4" />;
+      case 'payments': return <CreditCard className="h-4 w-4" />;
+      case 'general': return <Briefcase className="h-4 w-4" />;
+      default: return <BookOpen className="h-4 w-4" />;
+    }
+  };
+
   return (
     <div className="container max-w-6xl p-6">
-      <PremiumHeader 
-        title="Notificaties"
-        description="Beheer hier al uw notificaties"
-        icon={Bell}
-        breadcrumbs={{ current: "Notificaties" }}
-        actions={
-          unreadNotifications.length > 0 ? (
-            <Button
-              variant="outline"
-              onClick={handleMarkAllAsRead}
-              className="h-9 p-2 flex items-center gap-2 bg-white/10 text-white border-white/20 hover:bg-white/20"
-              title="Markeer alles als gelezen"
-            >
-              <CheckCircle className="h-4 w-4" />
-              <span>Markeer alles als gelezen</span>
-            </Button>
-          ) : undefined
-        }
-      />
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+            <Bell className="h-8 w-8 text-blue-600" />
+            Notificaties
+          </h1>
+          <p className="text-gray-600 mt-2">Beheer hier al uw notificaties en meldingen</p>
+        </div>
+        {unreadNotifications.length > 0 && (
+          <Button
+            variant="outline"
+            onClick={handleMarkAllAsRead}
+            className="h-9 p-2 flex items-center gap-2"
+            title="Markeer alles als gelezen"
+          >
+            <CheckCircle className="h-4 w-4" />
+            <span>Markeer alles als gelezen</span>
+          </Button>
+        )}
+      </div>
 
       <div className="mt-6 mb-6">
         <div className="flex gap-3 items-center">

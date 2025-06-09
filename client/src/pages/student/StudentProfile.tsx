@@ -262,10 +262,10 @@ export default function StudentProfile() {
               Bewerken
             </Button>
           )}
+          </div>
         </div>
-      </div>
 
-      <Tabs defaultValue="personal" className="space-y-6">
+        <Tabs defaultValue="personal" className="space-y-6">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="personal">Persoonlijke Gegevens</TabsTrigger>
           <TabsTrigger value="academic">Academische Informatie</TabsTrigger>
@@ -725,6 +725,7 @@ export default function StudentProfile() {
           </Card>
         </TabsContent>
       </Tabs>
+      </div>
     </div>
   );
 }

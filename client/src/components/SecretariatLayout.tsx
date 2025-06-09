@@ -12,6 +12,8 @@ import {
   BarChart3, 
   Calendar, 
   BookOpen, 
+  BookText,
+  BookMarked,
   FileText,
   Settings, 
   LogOut, 

@@ -76,7 +76,7 @@ export default function SecretariatLayout({ children }: SecretariatLayoutProps) 
     {
       name: 'Docenten',
       href: '/secretariat/teachers',
-      icon: User,
+      icon: GraduationCap,
       current: location.startsWith('/secretariat/teachers'),
       resource: 'teacher' as const
     },
@@ -97,7 +97,7 @@ export default function SecretariatLayout({ children }: SecretariatLayoutProps) 
     {
       name: 'Cursussen',
       href: '/secretariat/courses',
-      icon: BookOpen,
+      icon: BookText,
       current: location.startsWith('/secretariat/courses'),
       resource: 'course' as const
     },
@@ -111,7 +111,7 @@ export default function SecretariatLayout({ children }: SecretariatLayoutProps) 
     {
       name: 'Rapporten',
       href: '/secretariat/reports',
-      icon: FileText,
+      icon: BookMarked,
       current: location.startsWith('/secretariat/reports'),
       resource: 'report' as const
     },

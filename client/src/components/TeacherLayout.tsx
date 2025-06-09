@@ -10,11 +10,9 @@ import {
   Users,
   Calendar,
   BookText,
-  BookOpen,
   ClipboardCheck,
   School,
   BookMarked,
-  FileText,
   Percent,
   LogOut,
   Menu,
@@ -85,7 +83,7 @@ export default function TeacherLayout({ children }: TeacherLayoutProps) {
     {
       name: 'Vakken',
       href: '/teacher/subjects',
-      icon: BookOpen,
+      icon: BookText,
       current: location.startsWith('/teacher/subjects')
     },
     {
@@ -97,7 +95,7 @@ export default function TeacherLayout({ children }: TeacherLayoutProps) {
     {
       name: 'Rapporten',
       href: '/teacher/reports',
-      icon: FileText,
+      icon: BookMarked,
       current: location.startsWith('/teacher/reports')
     },
     {

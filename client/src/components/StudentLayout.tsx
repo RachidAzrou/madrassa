@@ -192,30 +192,30 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
   };
 
   return (
-    <div className="min-h-screen bg-[#f7f9fc]">
+    <div className="min-h-screen bg-slate-50">
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
         <div 
-          className="fixed inset-0 bg-gray-600 bg-opacity-75 z-40 lg:hidden"
+          className="fixed inset-0 bg-black bg-opacity-25 z-40 lg:hidden transition-opacity duration-200"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
-      {/* Top bar - Mobile Optimized */}
-      <div className="w-full h-12 border-b border-gray-200 bg-white px-2 sm:px-4 flex items-center justify-between fixed top-0 left-0 right-0 z-50">
+      {/* Top bar - Modern SaaS Header */}
+      <div className="w-full h-16 border-b border-slate-200 bg-white px-4 sm:px-6 flex items-center justify-between fixed top-0 left-0 right-0 z-50 shadow-sm">
         {/* Menu voor mobiel (links) */}
         <Button 
           variant="ghost" 
           size="icon" 
-          className="mr-1 sm:mr-2 lg:hidden h-10 w-10 touch-manipulation"
+          className="mr-2 lg:hidden h-12 w-12 rounded-xl hover:bg-slate-100 transition-colors duration-200"
           onClick={() => setSidebarOpen(true)}
         >
-          <Menu className="h-5 w-5 sm:h-6 sm:w-6 text-gray-600" />
+          <Menu className="h-6 w-6 text-slate-600" />
         </Button>
         
         {/* Logo sectie - links */}
         <Link href="/student" className="flex items-center h-full">
-          <img src={myMadrassaLogo} alt="myMadrassa Logo" className="h-8 sm:h-10 lg:h-11" />
+          <img src={myMadrassaLogo} alt="myMadrassa Logo" className="h-10 lg:h-12" />
         </Link>
 
 

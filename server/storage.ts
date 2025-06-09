@@ -11,7 +11,8 @@ import {
   studentGroupEnrollments,
   grades, type Grade, type InsertGrade,
   assessments, type Assessment, type InsertAssessment,
-  attendance, teacherAttendance, type Attendance, type TeacherAttendance, type InsertAttendance, type InsertTeacherAttendance
+  attendance, teacherAttendance, type Attendance, type TeacherAttendance, type InsertAttendance, type InsertTeacherAttendance,
+  notifications, type Notification, type InsertNotification
 } from "@shared/schema";
 import { db } from "./db";
 import { and, eq, sql, count, desc, inArray } from "drizzle-orm";
@@ -194,6 +195,15 @@ export interface IStorage {
   createMessage(message: InsertMessage): Promise<Message>;
   markMessageAsRead(id: number): Promise<Message | undefined>;
   deleteMessage(id: number): Promise<boolean>;
+  
+  // Notification operations
+  getNotificationsByUser(userId: number): Promise<Notification[]>;
+  getUnreadNotificationsByUser(userId: number): Promise<Notification[]>;
+  createNotification(notification: InsertNotification): Promise<Notification>;
+  markNotificationAsRead(id: number): Promise<Notification | undefined>;
+  markNotificationAsUnread(id: number): Promise<Notification | undefined>;
+  markAllNotificationsAsRead(userId: number): Promise<boolean>;
+  deleteNotification(id: number): Promise<boolean>;
 }
 
 // DatabaseStorage implementatie die gebruik maakt van de database
@@ -1983,6 +1993,78 @@ export class DatabaseStorage implements IStorage {
       return result.rowCount > 0;
     } catch (error) {
       console.error('Error deleting tuition rate:', error);
+      return false;
+    }
+  }
+
+  // Notification operations
+  async getNotificationsByUser(userId: number): Promise<Notification[]> {
+    return await db.select().from(notifications)
+      .where(eq(notifications.userId, userId))
+      .orderBy(desc(notifications.createdAt));
+  }
+
+  async getUnreadNotificationsByUser(userId: number): Promise<Notification[]> {
+    return await db.select().from(notifications)
+      .where(and(eq(notifications.userId, userId), eq(notifications.isRead, false)))
+      .orderBy(desc(notifications.createdAt));
+  }
+
+  async createNotification(notification: InsertNotification): Promise<Notification> {
+    const [newNotification] = await db
+      .insert(notifications)
+      .values(notification)
+      .returning();
+    return newNotification;
+  }
+
+  async markNotificationAsRead(id: number): Promise<Notification | undefined> {
+    try {
+      const [updatedNotification] = await db
+        .update(notifications)
+        .set({ isRead: true })
+        .where(eq(notifications.id, id))
+        .returning();
+      return updatedNotification || undefined;
+    } catch (error) {
+      console.error('Error marking notification as read:', error);
+      return undefined;
+    }
+  }
+
+  async markNotificationAsUnread(id: number): Promise<Notification | undefined> {
+    try {
+      const [updatedNotification] = await db
+        .update(notifications)
+        .set({ isRead: false })
+        .where(eq(notifications.id, id))
+        .returning();
+      return updatedNotification || undefined;
+    } catch (error) {
+      console.error('Error marking notification as unread:', error);
+      return undefined;
+    }
+  }
+
+  async markAllNotificationsAsRead(userId: number): Promise<boolean> {
+    try {
+      await db
+        .update(notifications)
+        .set({ isRead: true })
+        .where(eq(notifications.userId, userId));
+      return true;
+    } catch (error) {
+      console.error('Error marking all notifications as read:', error);
+      return false;
+    }
+  }
+
+  async deleteNotification(id: number): Promise<boolean> {
+    try {
+      const result = await db.delete(notifications).where(eq(notifications.id, id));
+      return result.rowCount! > 0;
+    } catch (error) {
+      console.error('Error deleting notification:', error);
       return false;
     }
   }

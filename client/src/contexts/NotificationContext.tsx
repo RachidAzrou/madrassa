@@ -123,7 +123,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   // Toggle notification read status
   const toggleReadStatus = (id: number) => {
-    const notification = notifications.find(n => n.id === id);
+    const notification = notifications.find((n: Notification) => n.id === id);
     if (notification) {
       if (notification.isRead) {
         markAsUnreadMutation.mutate(id);

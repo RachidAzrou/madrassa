@@ -86,104 +86,127 @@ export default function Login() {
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-gradient-to-r from-[#6B8DD6]/15 to-[#4A6FA5]/20 rounded-full blur-2xl"></div>
       </div>
 
-      {/* School subject notes doodles */}
+      {/* School doodles pattern */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {/* Math notes */}
+        {/* Atom */}
         <div className="absolute top-20 left-16 opacity-12 transform rotate-12">
-          <div className="text-[#3a5b9a] text-sm" style={{ fontFamily: 'cursive, "Comic Sans MS", sans-serif' }}>
-            <div>2x + 5 = 13</div>
-            <div className="mt-1">x = 4</div>
-          </div>
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none" className="text-[#3a5b9a]">
+            <circle cx="20" cy="20" r="3" fill="currentColor"/>
+            <ellipse cx="20" cy="20" rx="15" ry="6" stroke="currentColor" strokeWidth="2" fill="none"/>
+            <ellipse cx="20" cy="20" rx="15" ry="6" stroke="currentColor" strokeWidth="2" fill="none" transform="rotate(60 20 20)"/>
+            <ellipse cx="20" cy="20" rx="15" ry="6" stroke="currentColor" strokeWidth="2" fill="none" transform="rotate(120 20 20)"/>
+          </svg>
         </div>
 
-        {/* Arabic notes */}
+        {/* Lightbulb */}
         <div className="absolute top-32 right-20 opacity-10 transform -rotate-6">
-          <div className="text-[#4A6FA5] text-sm text-right" style={{ fontFamily: 'cursive, "Comic Sans MS", sans-serif' }}>
-            <div>الحمد لله</div>
-            <div className="mt-1">بسم الله</div>
-          </div>
+          <svg width="30" height="40" viewBox="0 0 30 40" fill="none" className="text-[#4A6FA5]">
+            <path d="M15 5c-5.5 0-10 4.5-10 10 0 3.5 1.8 6.6 4.5 8.4V30h11v-6.6c2.7-1.8 4.5-4.9 4.5-8.4 0-5.5-4.5-10-10-10z" stroke="currentColor" strokeWidth="2" fill="none"/>
+            <path d="M11 32h8M12 34h6" stroke="currentColor" strokeWidth="2"/>
+          </svg>
         </div>
 
-        {/* Dutch notes */}
+        {/* Notebook */}
         <div className="absolute bottom-32 left-20 opacity-12 transform rotate-6">
-          <div className="text-[#5A7BC4] text-xs" style={{ fontFamily: 'cursive, "Comic Sans MS", sans-serif' }}>
-            <div>Nederlands</div>
-            <div className="mt-1">werkwoorden</div>
-            <div className="mt-1">lopen, liep</div>
-          </div>
+          <svg width="30" height="40" viewBox="0 0 30 40" fill="none" className="text-[#5A7BC4]">
+            <rect x="5" y="5" width="20" height="30" stroke="currentColor" strokeWidth="2" fill="none"/>
+            <path d="M9 12h12M9 16h12M9 20h10M9 24h12M9 28h8" stroke="currentColor" strokeWidth="1.5"/>
+          </svg>
         </div>
 
-        {/* History notes */}
+        {/* Globe */}
         <div className="absolute top-40 right-32 opacity-10 transform -rotate-12">
-          <div className="text-[#3a5b9a] text-xs" style={{ fontFamily: 'cursive, "Comic Sans MS", sans-serif' }}>
-            <div>Geschiedenis</div>
-            <div className="mt-1">1492 - Columbus</div>
-          </div>
+          <svg width="35" height="35" viewBox="0 0 35 35" fill="none" className="text-[#3a5b9a]">
+            <circle cx="17.5" cy="17.5" r="15" stroke="currentColor" strokeWidth="2" fill="none"/>
+            <path d="M2.5 17.5h30M17.5 2.5c-5 5-5 20 0 30M17.5 2.5c5 5 5 20 0 30" stroke="currentColor" strokeWidth="2"/>
+            <path d="M7 10c3-2 8-2 11 0M7 25c3 2 8 2 11 0" stroke="currentColor" strokeWidth="1.5"/>
+          </svg>
         </div>
 
-        {/* Islamic Studies notes */}
-        <div className="absolute bottom-20 right-16 opacity-12 transform rotate-8">
-          <div className="text-[#4A6FA5] text-xs" style={{ fontFamily: 'cursive, "Comic Sans MS", sans-serif' }}>
-            <div>Islamkunde</div>
-            <div className="mt-1">5 zuilen</div>
-            <div className="mt-1">Shahada</div>
-          </div>
+        {/* Pencil */}
+        <div className="absolute bottom-20 right-16 opacity-12 transform rotate-45">
+          <svg width="60" height="8" viewBox="0 0 60 8" fill="none" className="text-[#4A6FA5]">
+            <rect x="0" y="2" width="50" height="4" fill="currentColor"/>
+            <polygon points="50,0 60,4 50,8" fill="currentColor"/>
+            <circle cx="55" cy="4" r="1" fill="white"/>
+          </svg>
         </div>
 
-        {/* Geography notes */}
+        {/* Music note */}
         <div className="absolute top-60 left-32 opacity-8 transform -rotate-8">
-          <div className="text-[#5A7BC4] text-xs" style={{ fontFamily: 'cursive, "Comic Sans MS", sans-serif' }}>
-            <div>Aardrijkskunde</div>
-            <div className="mt-1">Europa</div>
-            <div className="mt-1">Nederland</div>
-          </div>
+          <svg width="20" height="30" viewBox="0 0 20 30" fill="none" className="text-[#5A7BC4]">
+            <circle cx="6" cy="22" r="4" fill="currentColor"/>
+            <rect x="10" y="8" width="2" height="14" fill="currentColor"/>
+            <path d="M12 8c0-4 2-6 6-6v2c-2 0-4 1-4 4" stroke="currentColor" strokeWidth="2" fill="none"/>
+          </svg>
         </div>
 
-        {/* Science notes */}
+        {/* Protractor */}
         <div className="absolute bottom-40 left-8 opacity-10 transform rotate-15">
-          <div className="text-[#3a5b9a] text-xs" style={{ fontFamily: 'cursive, "Comic Sans MS", sans-serif' }}>
-            <div>Wetenschap</div>
-            <div className="mt-1">H₂O = water</div>
-          </div>
+          <svg width="40" height="25" viewBox="0 0 40 25" fill="none" className="text-[#3a5b9a]">
+            <path d="M5 20c0-8.3 6.7-15 15-15s15 6.7 15 15" stroke="currentColor" strokeWidth="2" fill="none"/>
+            <path d="M20 20L20 5M15 20L12 12M25 20L28 12" stroke="currentColor" strokeWidth="1"/>
+          </svg>
         </div>
 
-        {/* English notes */}
+        {/* Paper airplane */}
         <div className="absolute top-80 right-8 opacity-12 transform -rotate-10">
-          <div className="text-[#4A6FA5] text-xs" style={{ fontFamily: 'cursive, "Comic Sans MS", sans-serif' }}>
-            <div>English</div>
-            <div className="mt-1">I am, you are</div>
-            <div className="mt-1">he/she is</div>
-          </div>
+          <svg width="35" height="25" viewBox="0 0 35 25" fill="none" className="text-[#4A6FA5]">
+            <path d="M5 12L30 5L20 12L30 19L5 12Z" stroke="currentColor" strokeWidth="2" fill="none"/>
+            <path d="M20 12L15 20" stroke="currentColor" strokeWidth="2"/>
+          </svg>
         </div>
 
-        {/* Quick study notes */}
+        {/* Percentage symbol */}
         <div className="absolute top-16 right-40 opacity-15 transform rotate-5">
-          <div className="text-[#5A7BC4] text-xs" style={{ fontFamily: 'cursive, "Comic Sans MS", sans-serif' }}>
-            <div>Huiswerk:</div>
-            <div className="mt-1">pg. 24-26</div>
-          </div>
+          <svg width="30" height="30" viewBox="0 0 30 30" fill="none" className="text-[#5A7BC4]">
+            <circle cx="8" cy="8" r="4" stroke="currentColor" strokeWidth="2" fill="none"/>
+            <circle cx="22" cy="22" r="4" stroke="currentColor" strokeWidth="2" fill="none"/>
+            <path d="M6 24L24 6" stroke="currentColor" strokeWidth="2"/>
+          </svg>
         </div>
 
+        {/* Compass */}
         <div className="absolute bottom-16 left-40 opacity-12 transform -rotate-5">
-          <div className="text-[#3a5b9a] text-xs" style={{ fontFamily: 'cursive, "Comic Sans MS", sans-serif' }}>
-            <div>Test vrijdag!</div>
-            <div className="mt-1">Hoofdstuk 3</div>
-          </div>
+          <svg width="25" height="35" viewBox="0 0 25 35" fill="none" className="text-[#3a5b9a]">
+            <circle cx="12.5" cy="8" r="3" stroke="currentColor" strokeWidth="2" fill="none"/>
+            <path d="M12.5 11L12.5 30M9 27L16 27" stroke="currentColor" strokeWidth="2"/>
+            <path d="M12.5 30L8 25M12.5 30L17 25" stroke="currentColor" strokeWidth="2"/>
+          </svg>
         </div>
 
-        {/* Small reminder notes */}
+        {/* Test tube */}
         <div className="absolute top-96 left-20 opacity-8 transform rotate-20">
-          <div className="text-[#4A6FA5] text-xs" style={{ fontFamily: 'cursive, "Comic Sans MS", sans-serif' }}>
-            <div>Les 2: 10:30</div>
-          </div>
+          <svg width="15" height="40" viewBox="0 0 15 40" fill="none" className="text-[#4A6FA5]">
+            <rect x="5" y="5" width="5" height="30" rx="2.5" stroke="currentColor" strokeWidth="2" fill="none"/>
+            <circle cx="7.5" cy="25" r="2" fill="currentColor" opacity="0.3"/>
+            <path d="M4 8h7" stroke="currentColor" strokeWidth="2"/>
+          </svg>
         </div>
 
+        {/* Calculator */}
         <div className="absolute bottom-60 right-28 opacity-10 transform -rotate-15">
-          <div className="text-[#5A7BC4] text-xs" style={{ fontFamily: 'cursive, "Comic Sans MS", sans-serif' }}>
-            <div>Examen</div>
-            <div className="mt-1">20 juni</div>
-          </div>
+          <svg width="20" height="30" viewBox="0 0 20 30" fill="none" className="text-[#5A7BC4]">
+            <rect x="2" y="2" width="16" height="26" stroke="currentColor" strokeWidth="2" fill="none" rx="2"/>
+            <rect x="4" y="4" width="12" height="4" fill="currentColor" opacity="0.3"/>
+            <circle cx="7" cy="12" r="1.5" fill="currentColor"/>
+            <circle cx="13" cy="12" r="1.5" fill="currentColor"/>
+            <circle cx="7" cy="16" r="1.5" fill="currentColor"/>
+            <circle cx="13" cy="16" r="1.5" fill="currentColor"/>
+          </svg>
         </div>
+
+        {/* Dashed connecting lines */}
+        <svg className="absolute inset-0 w-full h-full opacity-8">
+          <defs>
+            <pattern id="dashed" patternUnits="userSpaceOnUse" width="10" height="2">
+              <rect width="5" height="2" fill="currentColor" className="text-[#4A6FA5]"/>
+            </pattern>
+          </defs>
+          <path d="M60 80 Q150 120 200 180 T320 240" stroke="url(#dashed)" strokeWidth="2" fill="none"/>
+          <path d="M320 100 Q250 150 180 200 T80 280" stroke="url(#dashed)" strokeWidth="2" fill="none"/>
+          <path d="M100 300 Q200 250 300 300 T500 350" stroke="url(#dashed)" strokeWidth="2" fill="none"/>
+        </svg>
       </div>
       {/* Centered login form */}
       <div className="relative z-10 w-full max-w-md mx-auto p-6">

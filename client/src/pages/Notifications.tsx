@@ -20,7 +20,7 @@ import { PremiumHeader } from '@/components/layout/premium-header';
 import { 
   Search, BellOff, CheckCircle, Trash2, Check, Bell, Info, 
   AlertTriangle, AlertCircle, X, Eye, EyeOff, XCircle, Briefcase, 
-  GraduationCap, BookOpen, CreditCard, ClipboardCheck
+  GraduationCap, BookOpen, CreditCard, ClipboardCheck, MessageSquare
 } from 'lucide-react';
 
 const NotificationsPage: React.FC = () => {
@@ -331,7 +331,7 @@ const NotificationsPage: React.FC = () => {
     switch (category?.toLowerCase()) {
       case 'grades': return <GraduationCap className="h-4 w-4" />;
       case 'attendance': return <ClipboardCheck className="h-4 w-4" />;
-      case 'messages': return <Mail className="h-4 w-4" />;
+      case 'messages': return <MessageSquare className="h-4 w-4" />;
       case 'payments': return <CreditCard className="h-4 w-4" />;
       case 'general': return <Briefcase className="h-4 w-4" />;
       default: return <BookOpen className="h-4 w-4" />;

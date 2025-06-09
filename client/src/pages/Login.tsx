@@ -96,7 +96,10 @@ export default function Login() {
               alt="myMadrassa Logo" 
               className="w-20 h-20 mx-auto mb-4"
             />
-            <h1 className="text-3xl font-light text-slate-900 mb-2">myMadrassa</h1>
+            <h1 className="text-3xl font-light text-slate-900 mb-2">
+              <span className="text-slate-600">my</span>
+              <span className="text-[#4A6FA5] font-medium">Madrassa</span>
+            </h1>
             <p className="text-slate-500 text-sm">Welkom terug</p>
           </div>
 

@@ -151,6 +151,7 @@ function AuthenticatedRouter() {
           <Route path="/student/communications" component={() => <AuthenticatedRoute component={StudentCommunications} />} />
           <Route path="/student/profile" component={() => <AuthenticatedRoute component={StudentProfile} />} />
           <Route path="/notifications" component={() => <AuthenticatedRoute component={Notifications} />} />
+          <Route path="/notificaties" component={() => <AuthenticatedRoute component={Notifications} />} />
           <Route path="/messages" component={() => <AuthenticatedRoute component={Messages} />} />
           <Route path="/mijn-account" component={() => <AuthenticatedRoute component={MyAccount} />} />
           <Route component={NotFound} />
@@ -176,6 +177,7 @@ function AuthenticatedRouter() {
           <Route path="/teacher/reports" component={() => <AuthenticatedRoute component={TeacherReports} />} />
           <Route path="/teacher/profile" component={() => <AuthenticatedRoute component={Profile} />} />
           <Route path="/notifications" component={() => <AuthenticatedRoute component={Notifications} />} />
+          <Route path="/notificaties" component={() => <AuthenticatedRoute component={Notifications} />} />
           <Route path="/messages" component={() => <AuthenticatedRoute component={Messages} />} />
           <Route path="/mijn-account" component={() => <AuthenticatedRoute component={MyAccount} />} />
           <Route component={NotFound} />
@@ -211,6 +213,7 @@ function AuthenticatedRouter() {
         <Route path="/profiel" component={() => <AuthenticatedRoute component={Profile} />} />
         <Route path="/profile" component={() => <AuthenticatedRoute component={Profile} />} />
         <Route path="/notifications" component={() => <AuthenticatedRoute component={Notifications} />} />
+        <Route path="/notificaties" component={() => <AuthenticatedRoute component={Notifications} />} />
         <Route path="/messages" component={() => <AuthenticatedRoute component={Messages} />} />
         <Route path="/mijn-account" component={() => <AuthenticatedRoute component={MyAccount} />} />
         <Route component={NotFound} />

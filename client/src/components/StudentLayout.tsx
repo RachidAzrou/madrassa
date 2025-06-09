@@ -239,7 +239,7 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
                 )}
               </Button>
             </PopoverTrigger>
-            <PopoverContent align="end" className="w-[95vw] max-w-sm p-0 mx-2">
+            <PopoverContent align="end" className="w-80 max-w-[85vw] p-0 mx-2">
               <div className="p-4 border-b border-gray-200">
                 <div className="flex items-center justify-between">
                   <h3 className="font-medium text-base">Berichten</h3>
@@ -307,7 +307,7 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
                 )}
               </Button>
             </PopoverTrigger>
-            <PopoverContent align="end" className="w-[95vw] max-w-sm p-0 mx-2">
+            <PopoverContent align="end" className="w-80 max-w-[85vw] p-0 mx-2">
               <div className="p-4 border-b border-gray-200">
                 <div className="flex items-center justify-between">
                   <h3 className="font-medium text-base">Notificaties</h3>

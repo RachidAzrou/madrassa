@@ -78,222 +78,86 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex relative overflow-hidden">
-      {/* Blurred background image */}
-      <div 
-        className="absolute inset-0"
-        style={{
-          backgroundColor: '#93c5fd',
-          backgroundImage: `url("${backgroundImageUrl}")`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          filter: 'blur(3px)',
-          transform: 'scale(1.1)'
-        }}
-      ></div>
-      {/* Educational overlay for better contrast */}
-      <div 
-        className="absolute inset-0"
-        style={{
-          background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(147, 197, 253, 0.3) 100%)'
-        }}
-      ></div>
-      <style dangerouslySetInnerHTML={{
-        __html: `
-          @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-          }
-          .float-animation {
-            animation: float 6s ease-in-out infinite;
-          }
-        `
-      }} />
-      {/* Left side - Illustration */}
-      <div className="hidden lg:flex lg:w-1/2 relative items-center justify-center p-8 z-10">
-        <div className="max-w-md text-center">
-          <div className="mb-8">
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+      {/* Beautiful background pattern */}
+      <div className="absolute inset-0">
+        <div className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-blue-400/20 to-indigo-500/20 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 right-0 w-80 h-80 bg-gradient-to-tl from-purple-400/20 to-pink-500/20 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-gradient-to-r from-cyan-400/15 to-blue-400/15 rounded-full blur-2xl"></div>
+      </div>
+
+      {/* Centered login form */}
+      <div className="relative z-10 w-full max-w-md mx-auto p-6">
+        <div className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 p-8">
+          {/* Logo and branding */}
+          <div className="text-center mb-8">
             <img 
               src={logoPath} 
               alt="myMadrassa Logo" 
-              className="w-32 h-32 mx-auto mb-6 drop-shadow-lg"
+              className="w-20 h-20 mx-auto mb-4"
             />
-            <h1 className="text-4xl font-bold text-slate-800 mb-4 drop-shadow-sm">
-              myMadrassa
-            </h1>
-            <p className="text-lg text-slate-700 font-medium drop-shadow-sm">
-              Educatief Beheersysteem voor Islamitische Onderwijsinstellingen
-            </p>
+            <h1 className="text-3xl font-light text-slate-900 mb-2">myMadrassa</h1>
+            <p className="text-slate-500 text-sm">Welkom terug</p>
           </div>
 
-          {/* Educational Icons */}
-          <div className="grid grid-cols-3 gap-6 mt-12">
-            <div className="text-center float-animation">
-              <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-2 shadow-lg">
-                <GraduationCap className="w-8 h-8 text-slate-700" />
-              </div>
-              <p className="text-sm text-slate-700 font-medium">Onderwijs</p>
-            </div>
-            <div className="text-center float-animation" style={{ animationDelay: '2s' }}>
-              <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-2 shadow-lg">
-                <Users className="w-8 h-8 text-slate-700" />
-              </div>
-              <p className="text-sm text-slate-700 font-medium">Studenten</p>
-            </div>
-            <div className="text-center float-animation" style={{ animationDelay: '4s' }}>
-              <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-2 shadow-lg">
-                <CreditCard className="w-8 h-8 text-slate-700" />
-              </div>
-              <p className="text-sm text-slate-700 font-medium">Betalingen</p>
-            </div>
-          </div>
-
-          {/* Role descriptions */}
-          <div className="mt-12 space-y-4 text-left">
-            <div className="flex items-start space-x-3 bg-white/15 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-white/20">
-              <Shield className="w-6 h-6 text-red-600 mt-0.5 flex-shrink-0" />
-              <div>
-                <h4 className="text-sm font-semibold text-slate-800 mb-1">Administrator</h4>
-                <p className="text-xs text-slate-700 leading-relaxed">Volledige systeemtoegang, gebruikersbeheer en configuratie</p>
-              </div>
-            </div>
-            <div className="flex items-start space-x-3 bg-white/15 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-white/20">
-              <BookOpen className="w-6 h-6 text-green-600 mt-0.5 flex-shrink-0" />
-              <div>
-                <h4 className="text-sm font-semibold text-slate-800 mb-1">Secretariaat</h4>
-                <p className="text-xs text-slate-700 leading-relaxed">Studentenbeheer, inschrijvingen en administratieve taken</p>
-              </div>
-            </div>
-            <div className="flex items-start space-x-3 bg-white/15 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-white/20">
-              <GraduationCap className="w-6 h-6 text-blue-600 mt-0.5 flex-shrink-0" />
-              <div>
-                <h4 className="text-sm font-semibold text-slate-800 mb-1">Docent</h4>
-                <p className="text-xs text-slate-700 leading-relaxed">Onderwijs, klassenbeheer en studentenevaluaties</p>
-              </div>
-            </div>
-            <div className="flex items-start space-x-3 bg-white/15 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-white/20">
-              <UserCheck className="w-6 h-6 text-purple-600 mt-0.5 flex-shrink-0" />
-              <div>
-                <h4 className="text-sm font-semibold text-slate-800 mb-1">Voogd</h4>
-                <p className="text-xs text-slate-700 leading-relaxed">Studentinformatie, voortgang en communicatie met school</p>
-              </div>
-            </div>
-            <div className="flex items-start space-x-3 bg-white/15 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-white/20">
-              <School className="w-6 h-6 text-orange-600 mt-0.5 flex-shrink-0" />
-              <div>
-                <h4 className="text-sm font-semibold text-slate-800 mb-1">Student</h4>
-                <p className="text-xs text-slate-700 leading-relaxed">Persoonlijk dashboard, lessen en studievoortgang</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      {/* Right side - Login Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 z-10">
-        <Card className="w-full max-w-md bg-white/95 backdrop-blur-sm border-0 shadow-2xl rounded-2xl overflow-hidden">
-          <CardHeader className="text-center pb-6 pt-8">
-            <div className="lg:hidden mb-4">
-              <img 
-                src={logoPath} 
-                alt="myMadrassa Logo" 
-                className="w-20 h-20 mx-auto mb-3 drop-shadow-sm"
-              />
-              <img 
-                src={logoTextPath} 
-                alt="myMadrassa" 
-                className="h-12 mx-auto"
+          <form onSubmit={handleLogin} className="space-y-6">
+            <div>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="E-mailadres"
+                required
+                className="h-12 border-0 bg-slate-50/80 focus:bg-white rounded-xl text-base placeholder:text-slate-400 transition-all duration-200 focus:ring-2 focus:ring-blue-500/20"
               />
             </div>
-            <div className="mb-6">
-              <h1 className="text-2xl font-bold text-slate-800 mb-2">Welkom Terug</h1>
-              <CardDescription className="text-slate-600 text-base">
-                Log in om toegang te krijgen tot uw dashboard
-              </CardDescription>
+
+            <div className="relative">
+              <Input
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Wachtwoord"
+                required
+                className="h-12 border-0 bg-slate-50/80 focus:bg-white rounded-xl text-base placeholder:text-slate-400 pr-12 transition-all duration-200 focus:ring-2 focus:ring-blue-500/20"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+              >
+                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
             </div>
-          </CardHeader>
 
-          <CardContent className="px-8 pb-8">
-            <form onSubmit={handleLogin} className="space-y-6">
-              <div className="space-y-3">
-                <Label htmlFor="email" className="text-slate-700 font-semibold text-sm">
-                  E-mailadres
-                </Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="uw.email@mymadrassa.nl"
-                  required
-                  className="h-12 border-2 border-slate-200 focus:border-[#1e40af] focus:ring-2 focus:ring-[#1e40af]/20 rounded-xl text-base transition-all duration-200 bg-slate-50/50 focus:bg-white"
-                />
-              </div>
-
-              <div className="space-y-3">
-                <Label htmlFor="password" className="text-slate-700 font-semibold text-sm">
-                  Wachtwoord
-                </Label>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    type={showPassword ? 'text' : 'password'}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Voer uw wachtwoord in"
-                    required
-                    className="h-12 border-2 border-slate-200 focus:border-[#1e40af] focus:ring-2 focus:ring-[#1e40af]/20 rounded-xl text-base pr-12 transition-all duration-200 bg-slate-50/50 focus:bg-white"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-500 hover:text-[#1e40af] transition-colors duration-200"
-                  >
-                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                  </button>
+            <Button
+              type="submit"
+              disabled={isLoading}
+              className="w-full h-12 bg-[#1e40af] hover:bg-[#1d4ed8] text-white font-medium rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl"
+            >
+              {isLoading ? (
+                <div className="flex items-center justify-center space-x-2">
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <span>Inloggen...</span>
                 </div>
-              </div>
+              ) : (
+                <span>Inloggen</span>
+              )}
+            </Button>
 
-              <div className="pt-2">
-                <Button
-                  type="submit"
-                  disabled={isLoading}
-                  className="w-full h-12 bg-gradient-to-r from-[#1e40af] to-[#3b82f6] hover:from-[#1d4ed8] hover:to-[#2563eb] text-white font-semibold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98]"
-                >
-                  {isLoading ? (
-                    <div className="flex items-center justify-center space-x-2">
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      <span>Inloggen...</span>
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-center space-x-2">
-                      <LogIn className="w-5 h-5" />
-                      <span>Inloggen</span>
-                    </div>
-                  )}
-                </Button>
-              </div>
-
-              {/* Wachtwoord vergeten link */}
-              <div className="text-center pt-4">
-                <button
-                  type="button"
-                  onClick={() => setShowForgotPassword(true)}
-                  className="text-sm text-[#1e40af] hover:text-[#1d4ed8] hover:underline font-medium transition-colors duration-200"
-                >
-                  Wachtwoord vergeten?
-                </button>
-              </div>
-
-              {/* Additional info */}
-              <div className="text-center pt-6 border-t border-slate-100">
-                <p className="text-xs text-slate-500">
-                  Veilig inloggen met uw myMadrassa account
-                </p>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
+            <div className="text-center pt-2">
+              <button
+                type="button"
+                onClick={() => setShowForgotPassword(true)}
+                className="text-sm text-slate-500 hover:text-slate-700 transition-colors"
+              >
+                Wachtwoord vergeten?
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
       {/* Wachtwoord Vergeten Modal */}
       <Dialog open={showForgotPassword} onOpenChange={setShowForgotPassword}>

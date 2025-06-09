@@ -206,75 +206,92 @@ export default function Dashboard() {
   const navigateToGroups = () => setLocation('/student-groups');
 
   return (
-    <div className="bg-[#f7f9fc] min-h-screen">
-      {/* Desktop application header bar - Professionele stijl - Premium variant */}
-      <PageHeader
-        title="Dashboard"
-        icon={<LayoutDashboard className="h-5 w-5 text-white" />}
-        parent="Beheer"
-        current="Dashboard"
-      />
-      
-      {/* Main content area */}
-      <div className="px-6 py-6 max-w-7xl mx-auto">{/* Start main content wrapper */}
+    <div className="space-y-8">
+      {/* Modern Header Section */}
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">Dashboard</h1>
+          <p className="text-lg text-slate-600">
+            Overzicht van uw onderwijsinstelling - {new Date().toLocaleDateString('nl-NL', { 
+              weekday: 'long', 
+              year: 'numeric', 
+              month: 'long', 
+              day: 'numeric' 
+            })}
+          </p>
+        </div>
+        <div className="mt-4 lg:mt-0 flex gap-3">
+          <Button 
+            onClick={navigateToCalendar}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl shadow-lg shadow-blue-600/25 transition-all duration-200"
+          >
+            <Calendar className="mr-2 h-5 w-5" />
+            Kalender
+          </Button>
+        </div>
+      </div>
 
-      {/* Stats Overview - Desktop-applicatie stijl */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      {/* Modern Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Studenten kaart */}
-        <div className="bg-white border border-[#e5e7eb] rounded-sm">
-          <div className="flex h-full">
-            <div className="flex items-center justify-center w-14 bg-[#f5f7fc] border-r border-[#e5e7eb]">
-              <Users className="h-5 w-5 text-[#1e40af]" />
-            </div>
-            <div className="flex-1 p-3">
-              <div className="flex flex-col">
-                <h3 className="text-xs font-medium text-gray-500">Studenten</h3>
-                <p className="text-lg font-medium text-gray-800 mt-1">{stats.totalStudents}</p>
+        <div className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-lg shadow-blue-100/50 rounded-2xl border">
+          <div className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-blue-700">Studenten</p>
+                <p className="text-3xl font-bold text-blue-900">{stats.totalStudents}</p>
+                <p className="text-xs text-blue-600 mt-1">Actieve studenten</p>
+              </div>
+              <div className="h-12 w-12 bg-blue-600 rounded-xl flex items-center justify-center">
+                <Users className="h-6 w-6 text-white" />
               </div>
             </div>
           </div>
         </div>
         
         {/* Klassen kaart */}
-        <div className="bg-white border border-[#e5e7eb] rounded-sm">
-          <div className="flex h-full">
-            <div className="flex items-center justify-center w-14 bg-[#f5f7fc] border-r border-[#e5e7eb]">
-              <ChalkBoard className="h-5 w-5 text-[#1e40af]" />
-            </div>
-            <div className="flex-1 p-3">
-              <div className="flex flex-col">
-                <h3 className="text-xs font-medium text-gray-500">Klassen</h3>
-                <p className="text-lg font-medium text-gray-800 mt-1">{stats.studentGroups}</p>
+        <div className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-lg shadow-green-100/50 rounded-2xl border">
+          <div className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-green-700">Klassen</p>
+                <p className="text-3xl font-bold text-green-900">{stats.studentGroups}</p>
+                <p className="text-xs text-green-600 mt-1">Actieve klassen</p>
+              </div>
+              <div className="h-12 w-12 bg-green-600 rounded-xl flex items-center justify-center">
+                <ChalkBoard className="h-6 w-6 text-white" />
               </div>
             </div>
           </div>
         </div>
         
         {/* Docenten kaart */}
-        <div className="bg-white border border-[#e5e7eb] rounded-sm">
-          <div className="flex h-full">
-            <div className="flex items-center justify-center w-14 bg-[#f5f7fc] border-r border-[#e5e7eb]">
-              <GraduationCap className="h-5 w-5 text-[#1e40af]" />
-            </div>
-            <div className="flex-1 p-3">
-              <div className="flex flex-col">
-                <h3 className="text-xs font-medium text-gray-500">Docenten</h3>
-                <p className="text-lg font-medium text-gray-800 mt-1">{stats.totalTeachers}</p>
+        <div className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 shadow-lg shadow-purple-100/50 rounded-2xl border">
+          <div className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-purple-700">Docenten</p>
+                <p className="text-3xl font-bold text-purple-900">{stats.totalTeachers}</p>
+                <p className="text-xs text-purple-600 mt-1">Actieve docenten</p>
+              </div>
+              <div className="h-12 w-12 bg-purple-600 rounded-xl flex items-center justify-center">
+                <GraduationCap className="h-6 w-6 text-white" />
               </div>
             </div>
           </div>
         </div>
         
         {/* Vakken kaart */}
-        <div className="bg-white border border-[#e5e7eb] rounded-sm">
-          <div className="flex h-full">
-            <div className="flex items-center justify-center w-14 bg-[#f5f7fc] border-r border-[#e5e7eb]">
-              <BookOpen className="h-5 w-5 text-[#1e40af]" />
-            </div>
-            <div className="flex-1 p-3">
-              <div className="flex flex-col">
-                <h3 className="text-xs font-medium text-gray-500">Vakken</h3>
-                <p className="text-lg font-medium text-gray-800 mt-1">{stats.activeCourses}</p>
+        <div className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200 shadow-lg shadow-orange-100/50 rounded-2xl border">
+          <div className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-orange-700">Vakken</p>
+                <p className="text-3xl font-bold text-orange-900">{stats.activeCourses}</p>
+                <p className="text-xs text-orange-600 mt-1">Actieve vakken</p>
+              </div>
+              <div className="h-12 w-12 bg-orange-600 rounded-xl flex items-center justify-center">
+                <BookOpen className="h-6 w-6 text-white" />
               </div>
             </div>
           </div>
@@ -605,7 +622,6 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
-      </div>
       </div>
     </div>
   );

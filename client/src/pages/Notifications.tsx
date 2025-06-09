@@ -182,7 +182,7 @@ const NotificationsPage: React.FC = () => {
                   )}
                   
                   <div className="flex items-center justify-center w-10 h-10 bg-[#f5f7fc] border border-[#e5e7eb] rounded-sm">
-                    {getCategoryIcon(notification.category)}
+                    {getCategoryIcon(notification.category || 'general')}
                   </div>
                   
                   <div className="flex-1">
@@ -241,15 +241,15 @@ const NotificationsPage: React.FC = () => {
       />
       
       {/* Main content area - Dashboard Style */}
-      <div className="px-6 py-6 max-w-7xl mx-auto">
+      <div className="px-6 py-6 max-w-6xl mx-auto">
         
-        {/* Stats Overview Cards - Dashboard Style */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        {/* Stats Overview Cards - Compact Dashboard Style */}
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
           {/* Totaal */}
           <div className="bg-white border border-[#e5e7eb] rounded-sm">
             <div className="flex h-full">
-              <div className="flex items-center justify-center w-14 bg-[#f5f7fc] border-r border-[#e5e7eb]">
-                <Bell className="h-5 w-5 text-[#1e40af]" />
+              <div className="flex items-center justify-center w-12 bg-[#f5f7fc] border-r border-[#e5e7eb]">
+                <Bell className="h-4 w-4 text-[#1e40af]" />
               </div>
               <div className="flex-1 p-3">
                 <div className="flex flex-col">
@@ -263,8 +263,8 @@ const NotificationsPage: React.FC = () => {
           {/* Ongelezen */}
           <div className="bg-white border border-[#e5e7eb] rounded-sm">
             <div className="flex h-full">
-              <div className="flex items-center justify-center w-14 bg-[#f5f7fc] border-r border-[#e5e7eb]">
-                <AlertCircle className="h-5 w-5 text-[#1e40af]" />
+              <div className="flex items-center justify-center w-12 bg-[#f5f7fc] border-r border-[#e5e7eb]">
+                <AlertCircle className="h-4 w-4 text-[#1e40af]" />
               </div>
               <div className="flex-1 p-3">
                 <div className="flex flex-col">
@@ -275,26 +275,11 @@ const NotificationsPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Gelezen */}
-          <div className="bg-white border border-[#e5e7eb] rounded-sm">
-            <div className="flex h-full">
-              <div className="flex items-center justify-center w-14 bg-[#f5f7fc] border-r border-[#e5e7eb]">
-                <CheckCircle className="h-5 w-5 text-[#1e40af]" />
-              </div>
-              <div className="flex-1 p-3">
-                <div className="flex flex-col">
-                  <h3 className="text-xs font-medium text-gray-500">Gelezen</h3>
-                  <p className="text-lg font-medium text-gray-800 mt-1">{readNotifications.length}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
           {/* Acties */}
-          <div className="bg-white border border-[#e5e7eb] rounded-sm">
+          <div className="bg-white border border-[#e5e7eb] rounded-sm col-span-2 lg:col-span-1">
             <div className="flex h-full">
-              <div className="flex items-center justify-center w-14 bg-[#f5f7fc] border-r border-[#e5e7eb]">
-                <Check className="h-5 w-5 text-[#1e40af]" />
+              <div className="flex items-center justify-center w-12 bg-[#f5f7fc] border-r border-[#e5e7eb]">
+                <Check className="h-4 w-4 text-[#1e40af]" />
               </div>
               <div className="flex-1 p-3 flex items-center">
                 {unreadNotifications.length > 0 ? (

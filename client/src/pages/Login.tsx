@@ -78,12 +78,12 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-      {/* Beautiful background pattern */}
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-blue-50 via-blue-100 to-indigo-100">
+      {/* Beautiful background pattern with myMadrassa blue theme */}
       <div className="absolute inset-0">
-        <div className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-blue-400/20 to-indigo-500/20 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 right-0 w-80 h-80 bg-gradient-to-tl from-purple-400/20 to-pink-500/20 rounded-full blur-3xl"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-gradient-to-r from-cyan-400/15 to-blue-400/15 rounded-full blur-2xl"></div>
+        <div className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-[#4A6FA5]/25 to-[#2563eb]/20 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 right-0 w-80 h-80 bg-gradient-to-tl from-[#5A7BC4]/20 to-[#4A6FA5]/25 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-gradient-to-r from-[#6B8DD6]/15 to-[#4A6FA5]/20 rounded-full blur-2xl"></div>
       </div>
 
       {/* Centered login form */}
@@ -109,7 +109,7 @@ export default function Login() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="E-mailadres"
                 required
-                className="h-12 border-0 bg-slate-50/80 focus:bg-white rounded-xl text-base placeholder:text-slate-400 transition-all duration-200 focus:ring-2 focus:ring-blue-500/20"
+                className="h-12 border-0 bg-slate-50/80 focus:bg-white rounded-xl text-base placeholder:text-slate-400 transition-all duration-200 focus:ring-2 focus:ring-[#4A6FA5]/30"
               />
             </div>
 
@@ -121,12 +121,12 @@ export default function Login() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Wachtwoord"
                 required
-                className="h-12 border-0 bg-slate-50/80 focus:bg-white rounded-xl text-base placeholder:text-slate-400 pr-12 transition-all duration-200 focus:ring-2 focus:ring-blue-500/20"
+                className="h-12 border-0 bg-slate-50/80 focus:bg-white rounded-xl text-base placeholder:text-slate-400 pr-12 transition-all duration-200 focus:ring-2 focus:ring-[#4A6FA5]/30"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-[#4A6FA5] transition-colors"
               >
                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
@@ -135,7 +135,7 @@ export default function Login() {
             <Button
               type="submit"
               disabled={isLoading}
-              className="w-full h-12 bg-[#1e40af] hover:bg-[#1d4ed8] text-white font-medium rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl"
+              className="w-full h-12 bg-gradient-to-r from-[#4A6FA5] to-[#5A7BC4] hover:from-[#3D5B8F] hover:to-[#4A6FA5] text-white font-medium rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl"
             >
               {isLoading ? (
                 <div className="flex items-center justify-center space-x-2">
@@ -151,7 +151,7 @@ export default function Login() {
               <button
                 type="button"
                 onClick={() => setShowForgotPassword(true)}
-                className="text-sm text-slate-500 hover:text-slate-700 transition-colors"
+                className="text-sm text-slate-500 hover:text-[#4A6FA5] transition-colors"
               >
                 Wachtwoord vergeten?
               </button>

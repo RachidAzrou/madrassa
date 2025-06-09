@@ -221,17 +221,15 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
 
 
         {/* Acties - rechts */}
-        <div className="flex items-center space-x-0.5 sm:space-x-1">
-
-
+        <div className="flex items-center space-x-2">
           {/* Berichten knop */}
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="ghost" size="icon" className="relative h-10 w-10 touch-manipulation">
-                <Mail className="h-5 w-5 text-gray-600" />
+              <Button variant="ghost" size="icon" className="relative h-12 w-12 rounded-xl hover:bg-slate-100 transition-colors duration-200">
+                <Mail className="h-6 w-6 text-slate-600" />
                 {unreadMessages.length > 0 && (
                   <Badge 
-                    className="absolute -top-1 -right-1 w-4 h-4 p-0 flex items-center justify-center bg-[#1e40af] text-xs"
+                    className="absolute -top-1 -right-1 w-5 h-5 p-0 flex items-center justify-center bg-blue-600 text-white text-xs font-medium border-2 border-white"
                     variant="default"
                   >
                     {unreadMessages.length}
@@ -239,7 +237,7 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
                 )}
               </Button>
             </PopoverTrigger>
-            <PopoverContent align="end" className="w-[95vw] max-w-sm p-0 mx-2">
+            <PopoverContent align="end" className="w-96 p-0 mx-2 shadow-xl border-slate-200 rounded-2xl">
               <div className="p-4 border-b border-gray-200">
                 <div className="flex items-center justify-between">
                   <h3 className="font-medium text-base">Berichten</h3>
@@ -406,23 +404,23 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
         </div>
       </div>
 
-      {/* Sidebar - Admin Interface Copy - Starts below topbar */}
-      <div className={`fixed top-12 bottom-0 left-0 z-50 w-52 bg-white shadow-lg transform ${
+      {/* Modern SaaS Sidebar */}
+      <div className={`fixed top-16 bottom-0 left-0 z-50 w-72 bg-white shadow-xl border-r border-slate-200 transform ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      } transition-transform duration-300 ease-in-out lg:translate-x-0 lg:fixed lg:top-12 border-r border-[#e5e7eb]`}>
+      } transition-transform duration-300 ease-in-out lg:translate-x-0 lg:fixed lg:top-16`}>
         
         {/* Mobile close button */}
-        <div className="lg:hidden p-3 border-b border-[#e5e7eb]">
+        <div className="lg:hidden p-4 border-b border-slate-200">
           <button
             onClick={() => setSidebarOpen(false)}
-            className="text-gray-500 hover:text-gray-700"
+            className="p-2 rounded-xl text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-colors duration-200"
           >
-            <X className="w-5 h-5" />
+            <X className="w-6 h-6" />
           </button>
         </div>
 
-        {/* Navigation - Mobile Optimized */}
-        <nav className="mt-4 flex-1 px-2 space-y-1">
+        {/* Modern Navigation */}
+        <nav className="mt-6 flex-1 px-4 space-y-2">
           {navigation.map((item) => {
             const Icon = item.icon;
             const isActive = location === item.href;
@@ -430,17 +428,17 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
             return (
               <Link key={item.name} href={item.href}>
                 <div
-                  className={`group flex items-center px-3 py-3 text-sm font-medium rounded-lg cursor-pointer touch-manipulation transition-colors ${
+                  className={`group flex items-center px-4 py-3 text-sm font-medium rounded-xl cursor-pointer transition-all duration-200 ${
                     isActive
-                      ? 'bg-[#1e40af] text-white shadow-sm'
-                      : 'text-gray-700 hover:bg-[#f1f5f9] hover:text-[#1e40af] active:bg-gray-200'
+                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
+                      : 'text-slate-700 hover:bg-slate-100 hover:text-blue-600 active:bg-slate-200'
                   }`}
                   onClick={() => setSidebarOpen(false)}
                 >
-                  <Icon className={`mr-3 flex-shrink-0 h-5 w-5 ${
-                    isActive ? 'text-white' : 'text-gray-500 group-hover:text-[#1e40af]'
+                  <Icon className={`mr-4 flex-shrink-0 h-5 w-5 ${
+                    isActive ? 'text-white' : 'text-slate-500 group-hover:text-blue-600'
                   }`} />
-                  {item.name}
+                  <span className="font-medium">{item.name}</span>
                 </div>
               </Link>
             );
@@ -448,10 +446,12 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
         </nav>
       </div>
 
-      {/* Main content - Mobile Optimized */}
-      <div className="pt-12 lg:pl-52">
-        <main className="bg-[#f7f9fc] min-h-screen p-3 sm:p-4 lg:p-6">
-          {children}
+      {/* Modern Main Content Area */}
+      <div className="pt-16 lg:pl-72">
+        <main className="bg-slate-50 min-h-screen p-6 lg:p-8">
+          <div className="max-w-7xl mx-auto">
+            {children}
+          </div>
         </main>
       </div>
     </div>

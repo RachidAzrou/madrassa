@@ -90,7 +90,7 @@ export default function Login() {
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {/* Math notes */}
         <div className="absolute top-20 left-16 opacity-12 transform rotate-12">
-          <div className="text-[#3a5b9a] font-handwriting text-sm">
+          <div className="text-[#3a5b9a] text-sm" style={{ fontFamily: 'cursive, "Comic Sans MS", sans-serif' }}>
             <div>2x + 5 = 13</div>
             <div className="mt-1">x = 4</div>
           </div>
@@ -98,7 +98,7 @@ export default function Login() {
 
         {/* Arabic notes */}
         <div className="absolute top-32 right-20 opacity-10 transform -rotate-6">
-          <div className="text-[#4A6FA5] font-handwriting text-sm text-right">
+          <div className="text-[#4A6FA5] text-sm text-right" style={{ fontFamily: 'cursive, "Comic Sans MS", sans-serif' }}>
             <div>الحمد لله</div>
             <div className="mt-1">بسم الله</div>
           </div>
@@ -106,7 +106,7 @@ export default function Login() {
 
         {/* Dutch notes */}
         <div className="absolute bottom-32 left-20 opacity-12 transform rotate-6">
-          <div className="text-[#5A7BC4] font-handwriting text-xs">
+          <div className="text-[#5A7BC4] text-xs" style={{ fontFamily: 'cursive, "Comic Sans MS", sans-serif' }}>
             <div>Nederlands</div>
             <div className="mt-1">werkwoorden</div>
             <div className="mt-1">lopen, liep</div>
@@ -115,7 +115,7 @@ export default function Login() {
 
         {/* History notes */}
         <div className="absolute top-40 right-32 opacity-10 transform -rotate-12">
-          <div className="text-[#3a5b9a] font-handwriting text-xs">
+          <div className="text-[#3a5b9a] text-xs" style={{ fontFamily: 'cursive, "Comic Sans MS", sans-serif' }}>
             <div>Geschiedenis</div>
             <div className="mt-1">1492 - Columbus</div>
           </div>
@@ -123,7 +123,7 @@ export default function Login() {
 
         {/* Islamic Studies notes */}
         <div className="absolute bottom-20 right-16 opacity-12 transform rotate-8">
-          <div className="text-[#4A6FA5] font-handwriting text-xs">
+          <div className="text-[#4A6FA5] text-xs" style={{ fontFamily: 'cursive, "Comic Sans MS", sans-serif' }}>
             <div>Islamkunde</div>
             <div className="mt-1">5 zuilen</div>
             <div className="mt-1">Shahada</div>
@@ -132,7 +132,7 @@ export default function Login() {
 
         {/* Geography notes */}
         <div className="absolute top-60 left-32 opacity-8 transform -rotate-8">
-          <div className="text-[#5A7BC4] font-handwriting text-xs">
+          <div className="text-[#5A7BC4] text-xs" style={{ fontFamily: 'cursive, "Comic Sans MS", sans-serif' }}>
             <div>Aardrijkskunde</div>
             <div className="mt-1">Europa</div>
             <div className="mt-1">Nederland</div>
@@ -141,7 +141,7 @@ export default function Login() {
 
         {/* Science notes */}
         <div className="absolute bottom-40 left-8 opacity-10 transform rotate-15">
-          <div className="text-[#3a5b9a] font-handwriting text-xs">
+          <div className="text-[#3a5b9a] text-xs" style={{ fontFamily: 'cursive, "Comic Sans MS", sans-serif' }}>
             <div>Wetenschap</div>
             <div className="mt-1">H₂O = water</div>
           </div>
@@ -149,7 +149,7 @@ export default function Login() {
 
         {/* English notes */}
         <div className="absolute top-80 right-8 opacity-12 transform -rotate-10">
-          <div className="text-[#4A6FA5] font-handwriting text-xs">
+          <div className="text-[#4A6FA5] text-xs" style={{ fontFamily: 'cursive, "Comic Sans MS", sans-serif' }}>
             <div>English</div>
             <div className="mt-1">I am, you are</div>
             <div className="mt-1">he/she is</div>
@@ -158,14 +158,14 @@ export default function Login() {
 
         {/* Quick study notes */}
         <div className="absolute top-16 right-40 opacity-15 transform rotate-5">
-          <div className="text-[#5A7BC4] font-handwriting text-xs">
+          <div className="text-[#5A7BC4] text-xs" style={{ fontFamily: 'cursive, "Comic Sans MS", sans-serif' }}>
             <div>Huiswerk:</div>
             <div className="mt-1">pg. 24-26</div>
           </div>
         </div>
 
         <div className="absolute bottom-16 left-40 opacity-12 transform -rotate-5">
-          <div className="text-[#3a5b9a] font-handwriting text-xs">
+          <div className="text-[#3a5b9a] text-xs" style={{ fontFamily: 'cursive, "Comic Sans MS", sans-serif' }}>
             <div>Test vrijdag!</div>
             <div className="mt-1">Hoofdstuk 3</div>
           </div>
@@ -173,13 +173,13 @@ export default function Login() {
 
         {/* Small reminder notes */}
         <div className="absolute top-96 left-20 opacity-8 transform rotate-20">
-          <div className="text-[#4A6FA5] font-handwriting text-xs">
+          <div className="text-[#4A6FA5] text-xs" style={{ fontFamily: 'cursive, "Comic Sans MS", sans-serif' }}>
             <div>Les 2: 10:30</div>
           </div>
         </div>
 
         <div className="absolute bottom-60 right-28 opacity-10 transform -rotate-15">
-          <div className="text-[#5A7BC4] font-handwriting text-xs">
+          <div className="text-[#5A7BC4] text-xs" style={{ fontFamily: 'cursive, "Comic Sans MS", sans-serif' }}>
             <div>Examen</div>
             <div className="mt-1">20 juni</div>
           </div>

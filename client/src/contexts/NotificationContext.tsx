@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { toast } from '@/hooks/use-toast';
+import { useAuth } from './AuthContext';
 
 // Type voor notificaties
 export interface Notification {
@@ -32,25 +33,23 @@ interface NotificationContextType {
 
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
 
-// Huidige gebruikers-ID (dit zou normaal uit een auth-context komen)
-// Voor demo-doeleinden gebruiken we een vaste waarde
-const CURRENT_USER_ID = 1;
-
 export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const queryClient = useQueryClient();
   const [unreadCount, setUnreadCount] = useState(0);
+  const { user } = useAuth();
 
-  // Haal alle notificaties op
+  // Haal alle notificaties op - gebruik daadwerkelijke gebruiker ID
   const { data: notifications = [], isLoading, error, refetch } = useQuery({
-    queryKey: ['/api/notifications/user', CURRENT_USER_ID],
-    queryFn: () => apiRequest(`/api/notifications/user/${CURRENT_USER_ID}`),
+    queryKey: ['/api/notifications/user', user?.id],
+    queryFn: () => apiRequest(`/api/notifications/user/${user?.id}`),
+    enabled: !!user?.id,
   });
 
   // Markeer notificatie als gelezen
   const markAsReadMutation = useMutation({
     mutationFn: (id: number) => apiRequest(`/api/notifications/${id}/mark-read`, { method: 'PATCH' }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/notifications/user', CURRENT_USER_ID] });
+      queryClient.invalidateQueries({ queryKey: ['/api/notifications/user', user?.id] });
     },
     onError: () => {
       toast({
@@ -65,7 +64,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const markAsUnreadMutation = useMutation({
     mutationFn: (id: number) => apiRequest(`/api/notifications/${id}/mark-unread`, { method: 'PATCH' }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/notifications/user', CURRENT_USER_ID] });
+      queryClient.invalidateQueries({ queryKey: ['/api/notifications/user', user?.id] });
     },
     onError: () => {
       toast({
@@ -78,9 +77,9 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   // Markeer alle notificaties als gelezen
   const markAllAsReadMutation = useMutation({
-    mutationFn: () => apiRequest(`/api/notifications/user/${CURRENT_USER_ID}/mark-all-read`, { method: 'PATCH' }),
+    mutationFn: () => apiRequest(`/api/notifications/user/${user?.id}/mark-all-read`, { method: 'PATCH' }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/notifications/user', CURRENT_USER_ID] });
+      queryClient.invalidateQueries({ queryKey: ['/api/notifications/user', user?.id] });
       toast({
         title: "Succes",
         description: "Alle notificaties zijn als gelezen gemarkeerd."
@@ -99,7 +98,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const deleteNotificationMutation = useMutation({
     mutationFn: (id: number) => apiRequest(`/api/notifications/${id}`, { method: 'DELETE' }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/notifications/user', CURRENT_USER_ID] });
+      queryClient.invalidateQueries({ queryKey: ['/api/notifications/user', user?.id] });
       toast({
         title: "Succes",
         description: "Notificatie is verwijderd."

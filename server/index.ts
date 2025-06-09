@@ -83,4 +83,13 @@ if (process.env.NODE_ENV === "development") {
 }
 
 // Exporteer voor Vercel serverless
-export default initApp;
+let appPromise: Promise<express.Application> | null = null;
+
+export default async function handler(req: any, res: any) {
+  if (!appPromise) {
+    appPromise = initApp();
+  }
+  
+  const app = await appPromise;
+  return app(req, res);
+}

@@ -85,7 +85,7 @@ interface StudentGroupEnrollment {
   studentGroupId: number;
 }
 
-export default function Dashboard() {
+export default function ModernDashboardComplete() {
   const [_, setLocation] = useLocation();
   const [selectedDate, setSelectedDate] = useState(new Date());
   const weekdays = getCurrentWeekDays();

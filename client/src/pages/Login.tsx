@@ -86,6 +86,94 @@ export default function Login() {
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-gradient-to-r from-[#6B8DD6]/15 to-[#4A6FA5]/20 rounded-full blur-2xl"></div>
       </div>
 
+      {/* School-themed doodles */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {/* Book doodle */}
+        <div className="absolute top-20 left-16 opacity-10">
+          <svg width="40" height="30" viewBox="0 0 40 30" fill="none" className="text-[#3a5b9a]">
+            <path d="M8 6h24v18H8V6z" stroke="currentColor" strokeWidth="2" fill="none"/>
+            <path d="M12 10h16M12 14h16M12 18h12" stroke="currentColor" strokeWidth="1.5"/>
+          </svg>
+        </div>
+
+        {/* Pencil doodle */}
+        <div className="absolute top-32 right-20 opacity-15 rotate-45">
+          <svg width="60" height="8" viewBox="0 0 60 8" fill="none" className="text-[#4A6FA5]">
+            <rect x="0" y="2" width="50" height="4" fill="currentColor"/>
+            <polygon points="50,0 60,4 50,8" fill="currentColor"/>
+          </svg>
+        </div>
+
+        {/* Apple doodle */}
+        <div className="absolute bottom-32 left-20 opacity-12">
+          <svg width="24" height="28" viewBox="0 0 24 28" fill="none" className="text-[#5A7BC4]">
+            <circle cx="12" cy="16" r="8" stroke="currentColor" strokeWidth="2" fill="none"/>
+            <path d="M12 8c0-2 1-4 3-4" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+            <circle cx="10" cy="14" r="1" fill="currentColor"/>
+          </svg>
+        </div>
+
+        {/* Calculator doodle */}
+        <div className="absolute top-40 right-32 opacity-10">
+          <svg width="20" height="28" viewBox="0 0 20 28" fill="none" className="text-[#3a5b9a]">
+            <rect x="2" y="2" width="16" height="24" stroke="currentColor" strokeWidth="2" fill="none"/>
+            <rect x="4" y="4" width="12" height="4" fill="currentColor" opacity="0.3"/>
+            <circle cx="7" cy="12" r="1.5" fill="currentColor"/>
+            <circle cx="13" cy="12" r="1.5" fill="currentColor"/>
+            <circle cx="7" cy="16" r="1.5" fill="currentColor"/>
+            <circle cx="13" cy="16" r="1.5" fill="currentColor"/>
+            <circle cx="7" cy="20" r="1.5" fill="currentColor"/>
+            <circle cx="13" cy="20" r="1.5" fill="currentColor"/>
+          </svg>
+        </div>
+
+        {/* Graduation cap doodle */}
+        <div className="absolute bottom-20 right-16 opacity-12">
+          <svg width="32" height="24" viewBox="0 0 32 24" fill="none" className="text-[#4A6FA5]">
+            <polygon points="16,4 4,10 16,16 28,10" stroke="currentColor" strokeWidth="2" fill="none"/>
+            <path d="M8 12v6l8 4 8-4v-6" stroke="currentColor" strokeWidth="2" fill="none"/>
+            <path d="M24 12v8" stroke="currentColor" strokeWidth="2"/>
+          </svg>
+        </div>
+
+        {/* Globe doodle */}
+        <div className="absolute top-60 left-32 opacity-8">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none" className="text-[#5A7BC4]">
+            <circle cx="14" cy="14" r="12" stroke="currentColor" strokeWidth="2" fill="none"/>
+            <path d="M2 14h24M14 2c-4 4-4 20 0 24M14 2c4 4 4 20 0 24" stroke="currentColor" strokeWidth="1.5"/>
+          </svg>
+        </div>
+
+        {/* Math symbols doodle */}
+        <div className="absolute bottom-40 left-8 opacity-10">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="text-[#3a5b9a]">
+            <text x="2" y="8" fontSize="8" fill="currentColor" fontWeight="bold">+</text>
+            <text x="12" y="8" fontSize="8" fill="currentColor" fontWeight="bold">×</text>
+            <text x="2" y="18" fontSize="8" fill="currentColor" fontWeight="bold">=</text>
+            <text x="12" y="18" fontSize="8" fill="currentColor" fontWeight="bold">÷</text>
+          </svg>
+        </div>
+
+        {/* Clock doodle */}
+        <div className="absolute top-80 right-8 opacity-12">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-[#4A6FA5]">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none"/>
+            <path d="M12 6v6l4 2" stroke="currentColor" strokeWidth="2"/>
+          </svg>
+        </div>
+
+        {/* Star doodles */}
+        <div className="absolute top-16 right-40 opacity-15">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="text-[#5A7BC4]">
+            <polygon points="6,1 7,4 10,4 8,6 9,9 6,7 3,9 4,6 2,4 5,4" fill="currentColor"/>
+          </svg>
+        </div>
+        <div className="absolute bottom-16 left-40 opacity-12">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" className="text-[#3a5b9a]">
+            <polygon points="5,1 6,3 8,3 7,4 8,7 5,6 2,7 3,4 2,3 4,3" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
       {/* Centered login form */}
       <div className="relative z-10 w-full max-w-md mx-auto p-6">
         <div className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 p-8">
@@ -98,7 +186,7 @@ export default function Login() {
             />
             <h1 className="text-3xl font-light text-slate-900 mb-2">
               <span className="text-slate-600">my</span>
-              <span className="text-[#4A6FA5] font-medium">Madrassa</span>
+              <span className="font-bold text-[#3a5b9a]">madrassa</span>
             </h1>
             <p className="text-slate-500 text-sm">Welkom terug</p>
           </div>

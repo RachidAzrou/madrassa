@@ -283,17 +283,17 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
                   onClick={handleLinkClick}
                 />
                 <SidebarLink
-                  href="/student-dossier"
+                  href="/leerlingendossier"
                   icon={<UserRound className="h-4 w-4" />}
                   label="Leerlingendossier"
-                  isActive={location.startsWith("/student-dossier")}
+                  isActive={location.startsWith("/leerlingendossier")}
                   onClick={handleLinkClick}
                 />
                 <SidebarLink
-                  href="/re-enrollment"
+                  href="/herinschrijvingen"
                   icon={<RefreshCw className="h-4 w-4" />}
                   label="Herinschrijvingen"
-                  isActive={location.startsWith("/re-enrollment")}
+                  isActive={location.startsWith("/herinschrijvingen")}
                   onClick={handleLinkClick}
                 />
               </div>

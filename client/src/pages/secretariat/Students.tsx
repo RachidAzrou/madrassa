@@ -191,14 +191,45 @@ export default function Students() {
 
       return newStudent;
     },
-    onSuccess: () => {
+    onSuccess: (newStudent) => {
       queryClient.invalidateQueries({ queryKey: ['/api/students'] });
       setIsCreateDialogOpen(false);
       resetForm();
-      toast({
-        title: "Succes",
-        description: "Student succesvol toegevoegd.",
-      });
+      
+      // Check if fee details are included (payment was created)
+      if (newStudent.feeCreated && newStudent.feeDetails) {
+        // Set up invoice popup data
+        setCreatedStudent({
+          firstName: newStudent.firstName,
+          lastName: newStudent.lastName,
+          studentId: newStudent.studentId
+        });
+        
+        setInvoiceDetails({
+          id: newStudent.feeDetails.id,
+          invoiceNumber: newStudent.feeDetails.invoiceNumber,
+          amount: newStudent.feeDetails.amount,
+          originalAmount: newStudent.feeDetails.originalAmount,
+          dueDate: newStudent.feeDetails.dueDate,
+          hasDiscount: newStudent.feeDetails.hasDiscount,
+          discountInfo: newStudent.feeDetails.discountInfo,
+          qrCode: newStudent.feeDetails.qrCode,
+          paymentUrl: newStudent.feeDetails.paymentUrl
+        });
+        
+        // Show invoice popup
+        setIsInvoicePopupOpen(true);
+        
+        toast({
+          title: "Student en factuur aangemaakt",
+          description: "Student succesvol toegevoegd. Factuur met QR-code is gegenereerd.",
+        });
+      } else {
+        toast({
+          title: "Succes",
+          description: "Student succesvol toegevoegd.",
+        });
+      }
     },
     onError: (error: Error) => {
       toast({
@@ -1230,6 +1261,20 @@ export default function Students() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Invoice Popup */}
+      {invoiceDetails && createdStudent && (
+        <InvoicePopup
+          isOpen={isInvoicePopupOpen}
+          onClose={() => {
+            setIsInvoicePopupOpen(false);
+            setInvoiceDetails(null);
+            setCreatedStudent(null);
+          }}
+          invoice={invoiceDetails}
+          student={createdStudent}
+        />
+      )}
     </div>
   );
 }

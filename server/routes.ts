@@ -804,10 +804,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (discountInfo.hasDiscount) {
           finalAmount = discountInfo.finalAmount;
           appliedDiscount = discountInfo.discount;
-          feeRecord.originalAmount = defaultTuition;
+          // Note: For now we'll store the final amount, discount tracking can be added later
           feeRecord.amount = finalAmount;
-          feeRecord.discountId = discountInfo.discount.id;
-          feeRecord.discountAmount = discountInfo.discountAmount;
         }
         
         // Sla het collegegeldrecord op

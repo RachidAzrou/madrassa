@@ -912,57 +912,59 @@ export default function Students() {
 
 
                   
-                  <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
-                    <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
-                      <User className="h-4 w-4 mr-2" />
-                      Voogd Koppeling
-                    </h3>
-                    <div>
-                      <Label htmlFor="guardianId" className="text-xs font-medium text-gray-700">Voogd selecteren</Label>
-                      <Select value={formData.guardianId} onValueChange={(value) => handleSelectChange('guardianId', value)}>
-                        <SelectTrigger className="mt-1">
-                          <SelectValue placeholder="Selecteer een voogd..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {guardians.map((guardian) => (
-                            <SelectItem key={guardian.id} value={guardian.id.toString()}>
-                              {guardian.firstName} {guardian.lastName} - {guardian.relationship}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  {potentialSiblings.length > 0 && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
                       <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
-                        <Users className="h-4 w-4 mr-2" />
-                        Broers/Zussen Koppeling
+                        <User className="h-4 w-4 mr-2" />
+                        Voogd Koppeling
                       </h3>
-                      <div className="space-y-2">
-                        <Label className="text-xs font-medium text-gray-700">
-                          Gevonden studenten met dezelfde achternaam:
-                        </Label>
-                        <div className="space-y-2 max-h-32 overflow-y-auto">
-                          {potentialSiblings.map((sibling) => (
-                            <div key={sibling.id} className="flex items-center space-x-2">
-                              <input
-                                type="checkbox"
-                                id={`sibling-${sibling.id}`}
-                                checked={formData.selectedSiblings.includes(sibling.id)}
-                                onChange={() => handleSiblingToggle(sibling.id)}
-                                className="rounded border-gray-300"
-                              />
-                              <Label htmlFor={`sibling-${sibling.id}`} className="text-xs cursor-pointer">
-                                {sibling.firstName} {sibling.lastName} ({sibling.studentId})
-                              </Label>
-                            </div>
-                          ))}
-                        </div>
+                      <div>
+                        <Label htmlFor="guardianId" className="text-xs font-medium text-gray-700">Voogd selecteren</Label>
+                        <Select value={formData.guardianId} onValueChange={(value) => handleSelectChange('guardianId', value)}>
+                          <SelectTrigger className="mt-1">
+                            <SelectValue placeholder="Selecteer een voogd..." />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {guardians.map((guardian) => (
+                              <SelectItem key={guardian.id} value={guardian.id.toString()}>
+                                {guardian.firstName} {guardian.lastName} - {guardian.relationship}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </div>
                     </div>
-                  )}
+
+                    {potentialSiblings.length > 0 && (
+                      <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                        <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                          <Users className="h-4 w-4 mr-2" />
+                          Broers/Zussen Koppeling
+                        </h3>
+                        <div className="space-y-2">
+                          <Label className="text-xs font-medium text-gray-700">
+                            Gevonden studenten met dezelfde achternaam:
+                          </Label>
+                          <div className="space-y-2 max-h-32 overflow-y-auto">
+                            {potentialSiblings.map((sibling) => (
+                              <div key={sibling.id} className="flex items-center space-x-2">
+                                <input
+                                  type="checkbox"
+                                  id={`sibling-${sibling.id}`}
+                                  checked={formData.selectedSiblings.includes(sibling.id)}
+                                  onChange={() => handleSiblingToggle(sibling.id)}
+                                  className="rounded border-gray-300"
+                                />
+                                <Label htmlFor={`sibling-${sibling.id}`} className="text-xs cursor-pointer">
+                                  {sibling.firstName} {sibling.lastName} ({sibling.studentId})
+                                </Label>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
 
 
                 </div>

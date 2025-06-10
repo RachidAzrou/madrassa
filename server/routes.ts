@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage/index";
 import { db, pool } from "./db";
 import * as schema from "@shared/schema";
-import { students, studentGroups, studentGroupEnrollments, programTeachers, teachers, grades, assessments, guardians, enrollments, programs, payments, tuitionRates, discounts } from "@shared/schema";
+import { students, studentGroups, studentGroupEnrollments, programTeachers, teachers, grades, assessments, guardians, enrollments, programs, payments, tuitionRates, discounts, fees, feeDiscounts, feeSettings } from "@shared/schema";
 import { eq, and, sql, inArray, desc } from "drizzle-orm";
 
 // Global storage voor calendar events
@@ -12,12 +12,16 @@ import { z } from "zod";
 import { createMollieClient } from '@mollie/api-client';
 import bcrypt from "bcryptjs";
 import multer from "multer";
+import QRCode from "qrcode";
 import { authenticateToken, requireRole, requirePermission, requireAdmin, generateToken, AuthUser } from "./middleware/auth";
 import { UserRole, RESOURCES } from "@shared/rbac";
 import { userAccounts, insertUserAccountSchema } from "@shared/schema";
 import { 
   insertStudentSchema, 
-  insertProgramSchema, 
+  insertProgramSchema,
+  insertFeeSchema,
+  insertFeeDiscountSchema,
+  insertFeeSettingsSchema, 
   insertCourseSchema, 
   insertEnrollmentSchema,
   insertPaymentSchema,
@@ -767,9 +771,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
           createdAt: new Date()
         };
         
+        // Controleer voor kortingen voordat we de betaling opslaan
+        const discountInfo = await calculateStudentDiscounts(newStudent.id, defaultTuition, academicYear);
+        
+        // Pas kortingen toe als die bestaan
+        let finalAmount = defaultTuition;
+        let appliedDiscount = null;
+        
+        if (discountInfo.hasDiscount) {
+          finalAmount = discountInfo.finalAmount;
+          appliedDiscount = discountInfo.discount;
+          feeRecord.originalAmount = defaultTuition;
+          feeRecord.amount = finalAmount;
+          feeRecord.discountId = discountInfo.discount.id;
+          feeRecord.discountAmount = discountInfo.discountAmount;
+        }
+        
         // Sla het collegegeldrecord op
         const newFee = await storage.createFee(feeRecord);
         console.log("Collegegeldrecord aangemaakt:", newFee);
+        
+        // Genereer QR-code voor betaling
+        const paymentUrl = `https://mymadrassa.nl/betaling/${newFee.invoiceNumber}`;
+        const qrCodeDataUrl = await QRCode.toDataURL(paymentUrl, {
+          width: 200,
+          margin: 2,
+          color: {
+            dark: '#1e40af',
+            light: '#ffffff'
+          }
+        });
         
         // Voeg informatie over het aangemaakte collegegeldrecord toe aan de respons
         res.status(201).json({
@@ -778,8 +809,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
           feeDetails: {
             id: newFee.id,
             invoiceNumber: newFee.invoiceNumber,
-            amount: newFee.amount,
-            dueDate: newFee.dueDate
+            amount: finalAmount,
+            originalAmount: defaultTuition,
+            dueDate: newFee.dueDate,
+            hasDiscount: discountInfo.hasDiscount,
+            discountInfo: appliedDiscount,
+            qrCode: qrCodeDataUrl,
+            paymentUrl: paymentUrl
           }
         });
       } catch (feeError) {

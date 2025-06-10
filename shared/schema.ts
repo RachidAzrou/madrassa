@@ -421,8 +421,8 @@ export const insertFeeSchema = createInsertSchema(fees).omit({
   updatedAt: true
 });
 
-
-
+export type InsertFee = z.infer<typeof insertFeeSchema>;
+export type Fee = typeof fees.$inferSelect;
 
 
 // Insert schema voor kortingen

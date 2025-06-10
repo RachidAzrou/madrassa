@@ -40,7 +40,7 @@ import {
   MessageCircle,
   Percent
 } from "lucide-react";
-import myMadrassaLogo from "@assets/myMadrassa.png";
+import myMadrassaLogo from "@/assets/mymadrassa_logo.png";
 
 interface StudentLayoutProps {
   children: React.ReactNode;

@@ -578,6 +578,8 @@ export const insertStudentGuardianSchema = createInsertSchema(studentGuardians).
 export type InsertStudentGuardian = z.infer<typeof insertStudentGuardianSchema>;
 export type StudentGuardian = typeof studentGuardians.$inferSelect;
 
+
+
 // Relatiedefinities
 // Dit zorgt ervoor dat Drizzle ORM de relaties tussen tabellen kan interpreteren
 
@@ -586,6 +588,8 @@ export const studentsRelations = relations(students, ({ many }) => ({
   studentPrograms: many(studentPrograms),
   enrollments: many(enrollments),
   studentGuardians: many(studentGuardians),
+  siblings: many(studentSiblings, { relationName: "student_siblings" }),
+  siblingOf: many(studentSiblings, { relationName: "sibling_of" }),
 }));
 
 // Student Programs relations
@@ -922,7 +926,6 @@ export const studentSiblings = pgTable("student_siblings", {
   id: serial("id").primaryKey(),
   studentId: integer("student_id").notNull().references(() => students.id),
   siblingId: integer("sibling_id").notNull().references(() => students.id),
-  relationship: text("relationship").notNull().default("sibling"), // sibling, half-sibling, step-sibling
   createdAt: timestamp("created_at").defaultNow(),
 }, (table) => {
   return {

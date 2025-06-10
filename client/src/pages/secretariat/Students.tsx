@@ -506,7 +506,7 @@ export default function Students() {
                 <TableRow>
                   <TableCell colSpan={6} className="text-center py-8">
                     <EmptyState
-                      icon={Users}
+                      icon={<Users className="h-10 w-10 opacity-30" />}
                       title="Geen studenten gevonden"
                       description="Er zijn geen studenten die voldoen aan de huidige criteria."
                     />

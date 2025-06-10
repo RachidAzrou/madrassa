@@ -25,7 +25,6 @@ import EmptyState from '@/components/ui/empty-state';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { apiRequest } from '@/lib/queryClient';
-import { PremiumHeader } from '@/components/layout/premium-header';
 
 // Types
 interface Student {
@@ -36,22 +35,22 @@ interface Student {
   email: string;
   phone: string;
   dateOfBirth: string;
+  gender: string;
   status: string;
   classId?: number;
   className?: string;
   guardianName?: string;
-  eligibleForReEnrollment?: boolean;
-  currentYear?: string;
-  nextYear?: string;
-  photoUrl?: string;
+  emergencyContact?: string;
+  createdAt: string;
+  finalGrade?: number;
+  reEnrollmentStatus: 'eligible' | 'enrolled' | 'declined' | 'pending';
 }
 
-interface ReEnrollmentStats {
-  totalEligible: number;
-  completed: number;
-  pending: number;
-  declined: number;
-  conversionRate: number;
+interface Class {
+  id: number;
+  name: string;
+  academicYearId: number;
+  academicYear: string;
 }
 
 interface AcademicYear {
@@ -59,398 +58,367 @@ interface AcademicYear {
   name: string;
   startDate: string;
   endDate: string;
-  status: string;
 }
 
-interface Class {
-  id: number;
-  name: string;
-  academicYearId: number;
-  capacity: number;
-  currentEnrollment: number;
+interface ReEnrollmentStats {
+  totalEligible: number;
+  passedStudents: number;
+  retakeStudents: number;
+  conversionRate: number;
 }
 
 export default function ReEnrollments() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('all');
-  const [selectedClass, setSelectedClass] = useState('all');
-  const [selectedStudents, setSelectedStudents] = useState<number[]>([]);
-  const [showBulkDialog, setShowBulkDialog] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Fetch eligible students
-  const { data: students = [], isLoading } = useQuery<Student[]>({
-    queryKey: ['/api/students/eligible-for-reenrollment']
+  // State
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [selectedAcademicYear, setSelectedAcademicYear] = useState('all');
+  const [selectedStudents, setSelectedStudents] = useState<number[]>([]);
+
+  // Data fetching
+  const { data: eligibleStudents = [], isLoading } = useQuery({
+    queryKey: ['/api/students/eligible-for-reenrollment'],
+    retry: false,
   });
 
-  // Fetch stats
-  const { data: stats } = useQuery<ReEnrollmentStats>({
-    queryKey: ['/api/re-enrollment/stats']
+  const { data: nextYearClasses = [] } = useQuery({
+    queryKey: ['/api/classes/next-year'],
   });
 
-  // Fetch next year classes
-  const { data: nextYearClasses = [] } = useQuery<Class[]>({
-    queryKey: ['/api/classes/next-year']
+  const { data: stats } = useQuery<{ stats: ReEnrollmentStats }>({
+    queryKey: ['/api/re-enrollment/stats'],
   });
 
-  // Bulk re-enrollment mutation
+  const { data: academicYears = [] } = useQuery({
+    queryKey: ['/api/academic-years'],
+  });
+
+  // Mutations
   const bulkReEnrollMutation = useMutation({
-    mutationFn: async (data: { studentIds: number[], classId: number, academicYearId: number }) => {
+    mutationFn: async (data: { studentIds: number[], targetAcademicYearId: number, targetClassId?: number }) => {
       return apiRequest('POST', '/api/re-enrollments/bulk', data);
     },
     onSuccess: () => {
       toast({
-        title: "Herinschrijving succesvol",
+        title: "Herinschrijvingen voltooid",
         description: "De geselecteerde leerlingen zijn succesvol heringeschreven.",
       });
       queryClient.invalidateQueries({ queryKey: ['/api/students/eligible-for-reenrollment'] });
       queryClient.invalidateQueries({ queryKey: ['/api/re-enrollment/stats'] });
       setSelectedStudents([]);
-      setShowBulkDialog(false);
     },
-    onError: () => {
+    onError: (error: any) => {
       toast({
-        title: "Fout bij herinschrijving",
-        description: "Er is een fout opgetreden bij het herinschrijven van de leerlingen.",
+        title: "Fout bij herinschrijven",
+        description: error.message || "Er is een fout opgetreden bij het herinschrijven.",
         variant: "destructive",
       });
-    }
+    },
   });
 
+  // Handlers
   const handleBulkReEnroll = () => {
-    if (selectedStudents.length === 0) {
+    if (selectedStudents.length === 0) return;
+    
+    // For now, use the first available academic year
+    const targetAcademicYear = academicYears[0];
+    if (!targetAcademicYear) {
       toast({
-        title: "Geen leerlingen geselecteerd",
-        description: "Selecteer eerst leerlingen om in te schrijven.",
+        title: "Geen academisch jaar",
+        description: "Er is geen academisch jaar beschikbaar voor herinschrijving.",
         variant: "destructive",
       });
       return;
     }
-    setShowBulkDialog(true);
+
+    bulkReEnrollMutation.mutate({
+      studentIds: selectedStudents,
+      targetAcademicYearId: targetAcademicYear.id,
+    });
   };
 
-  const filteredStudents = students.filter(student => {
-    const matchesSearch = 
+  const handleSelectStudent = (studentId: number) => {
+    if (selectedStudents.includes(studentId)) {
+      setSelectedStudents(selectedStudents.filter(id => id !== studentId));
+    } else {
+      setSelectedStudents([...selectedStudents, studentId]);
+    }
+  };
+
+  const handleSelectAll = () => {
+    if (selectedStudents.length === eligibleStudents.length) {
+      setSelectedStudents([]);
+    } else {
+      setSelectedStudents(eligibleStudents.map((student: Student) => student.id));
+    }
+  };
+
+  // Filtering
+  const filteredStudents = eligibleStudents.filter((student: Student) => {
+    const matchesSearch = searchTerm === '' || 
       student.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       student.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       student.studentId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.email?.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesStatus = selectedStatus === 'all' || 
-      (selectedStatus === 'eligible' && student.eligibleForReEnrollment) ||
-      (selectedStatus === 'not-eligible' && !student.eligibleForReEnrollment);
-    
-    const matchesClass = selectedClass === 'all' || student.className === selectedClass;
-    
-    return matchesSearch && matchesStatus && matchesClass;
+      student.email.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesStatus = statusFilter === 'all' || student.reEnrollmentStatus === statusFilter;
+
+    return matchesSearch && matchesStatus;
   });
-
-  const handleSelectAll = (checked: boolean) => {
-    if (checked) {
-      setSelectedStudents(filteredStudents.map(s => s.id));
-    } else {
-      setSelectedStudents([]);
-    }
-  };
-
-  const handleSelectStudent = (studentId: number, checked: boolean) => {
-    if (checked) {
-      setSelectedStudents([...selectedStudents, studentId]);
-    } else {
-      setSelectedStudents(selectedStudents.filter(id => id !== studentId));
-    }
-  };
 
   if (isLoading) {
     return (
-      <AdminPageLayout>
+      <div className="p-6">
         <div className="h-64 flex items-center justify-center">
           <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
         </div>
-      </AdminPageLayout>
+      </div>
     );
   }
 
   return (
-    <AdminPageLayout>
+    <div className="p-6 space-y-6">
       {/* Header */}
-      <AdminPageHeader 
-        title="Herinschrijvingen" 
-        description="Beheer herinschrijvingen voor het nieuwe schooljaar"
-      >
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Herinschrijvingen</h1>
+          <p className="text-gray-600">Beheer herinschrijvingen voor het nieuwe schooljaar</p>
+        </div>
         <div className="flex gap-2">
-          <AdminActionButton 
-            icon={<RefreshCw />}
+          <Button 
             variant="outline"
             onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/students/eligible-for-reenrollment'] })}
           >
+            <RefreshCw className="h-4 w-4 mr-2" />
             Vernieuwen
-          </AdminActionButton>
-          <AdminActionButton 
-            icon={<CheckCircle />}
+          </Button>
+          <Button 
             onClick={handleBulkReEnroll}
-            disabled={selectedStudents.length === 0}
+            disabled={selectedStudents.length === 0 || bulkReEnrollMutation.isPending}
           >
+            <CheckCircle className="h-4 w-4 mr-2" />
             Bulk Herinschrijven ({selectedStudents.length})
-          </AdminActionButton>
-          <AdminActionButton icon={<Download />}>
+          </Button>
+          <Button variant="outline">
+            <Download className="h-4 w-4 mr-2" />
             Export
-          </AdminActionButton>
+          </Button>
         </div>
-      </AdminPageHeader>
+      </div>
 
       {/* Stats Grid */}
-      <AdminStatsGrid>
-        <AdminStatCard
-          title="Totaal Geschikt"
-          value={stats?.totalEligible || 0}
-          icon={<Users className="h-4 w-4" />}
-        />
-        <AdminStatCard
-          title="Voltooid"
-          value={stats?.completed || 0}
-          icon={<CheckCircle className="h-4 w-4" />}
-          valueColor="text-green-600"
-        />
-        <AdminStatCard
-          title="In Behandeling"
-          value={stats?.pending || 0}
-          icon={<Clock className="h-4 w-4" />}
-          valueColor="text-orange-600"
-        />
-        <AdminStatCard
-          title="Conversie Rate"
-          value={`${stats?.conversionRate || 0}%`}
-          icon={<TrendingUp className="h-4 w-4" />}
-          valueColor="text-blue-600"
-        />
-      </AdminStatsGrid>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Totaal Geschikt</p>
+                <p className="text-2xl font-bold">{stats?.stats?.totalEligible || 0}</p>
+              </div>
+              <Users className="h-8 w-8 text-blue-600" />
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Geslaagd</p>
+                <p className="text-2xl font-bold text-green-600">{stats?.stats?.passedStudents || 0}</p>
+              </div>
+              <CheckCircle className="h-8 w-8 text-green-600" />
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Herexamen</p>
+                <p className="text-2xl font-bold text-orange-600">{stats?.stats?.retakeStudents || 0}</p>
+              </div>
+              <Clock className="h-8 w-8 text-orange-600" />
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Omzettingspercentage</p>
+                <p className="text-2xl font-bold text-blue-600">{stats?.stats?.conversionRate || 0}%</p>
+              </div>
+              <TrendingUp className="h-8 w-8 text-blue-600" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Search and Filters */}
-      <AdminSearchBar
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
-        placeholder="Zoeken op naam, leerlingnummer of email..."
-        filters={
-          <>
-            <AdminFilterSelect
-              value={selectedStatus}
-              onValueChange={setSelectedStatus}
-              placeholder="Status"
-              options={[
-                { value: 'all', label: 'Alle statussen' },
-                { value: 'eligible', label: 'Geschikt' },
-                { value: 'not-eligible', label: 'Niet geschikt' }
-              ]}
-            />
-            <AdminFilterSelect
-              value={selectedClass}
-              onValueChange={setSelectedClass}
-              placeholder="Huidige Klas"
-              options={[
-                { value: 'all', label: 'Alle klassen' },
-                { value: '1A', label: '1A' },
-                { value: '1B', label: '1B' },
-                { value: '2A', label: '2A' },
-                { value: '2B', label: '2B' }
-              ]}
-            />
-          </>
-        }
-      />
-
-      {/* Main Table */}
-      <AdminTableCard 
-        title="Herinschrijvingskandidaten" 
-        subtitle={`${filteredStudents.length} leerlingen gevonden`}
-      >
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-12">
-                <Checkbox 
-                  checked={selectedStudents.length === filteredStudents.length && filteredStudents.length > 0}
-                  onCheckedChange={handleSelectAll}
-                />
-              </TableHead>
-              <TableHead>Leerling</TableHead>
-              <TableHead>Leerlingnummer</TableHead>
-              <TableHead>Huidige Klas</TableHead>
-              <TableHead>Volgende Klas</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Contactgegevens</TableHead>
-              <TableHead>Voogd</TableHead>
-              <TableHead className="text-right">Acties</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredStudents.map((student) => (
-              <TableRow key={student.id}>
-                <TableCell>
-                  <Checkbox 
-                    checked={selectedStudents.includes(student.id)}
-                    onCheckedChange={(checked) => handleSelectStudent(student.id, !!checked)}
-                  />
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-3">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src={student.photoUrl} />
-                      <AvatarFallback className="text-xs">
-                        {student.firstName.charAt(0)}{student.lastName.charAt(0)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <div className="font-medium text-sm">
-                        {student.firstName} {student.lastName}
-                      </div>
-                      <div className="text-xs text-gray-500">{student.email}</div>
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <span className="font-mono text-sm">{student.studentId}</span>
-                </TableCell>
-                <TableCell>
-                  <span className="text-sm">{student.className || '-'}</span>
-                </TableCell>
-                <TableCell>
-                  <span className="text-sm text-green-600">{student.nextYear || 'Te bepalen'}</span>
-                </TableCell>
-                <TableCell>
-                  <Badge 
-                    variant={student.eligibleForReEnrollment ? 'default' : 'secondary'}
-                    className="text-xs"
-                  >
-                    {student.eligibleForReEnrollment ? (
-                      <span className="flex items-center gap-1">
-                        <CheckCircle className="h-3 w-3" />
-                        Geschikt
-                      </span>
-                    ) : (
-                      <span className="flex items-center gap-1">
-                        <XCircle className="h-3 w-3" />
-                        Niet geschikt
-                      </span>
-                    )}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <div className="text-sm">
-                    <div className="flex items-center gap-1 text-gray-600">
-                      <Phone className="h-3 w-3" />
-                      {student.phone || '-'}
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <span className="text-sm">{student.guardianName || '-'}</span>
-                </TableCell>
-                <TableCell className="text-right">
-                  <div className="flex items-center justify-end gap-1">
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="h-8 w-8 p-0"
-                            disabled={!student.eligibleForReEnrollment}
-                          >
-                            <RefreshCw className="h-4 w-4" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>Herinschrijven</TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-
-        {filteredStudents.length === 0 && (
-          <div className="p-8 text-center">
-            <EmptyState
-              icon={<RefreshCw className="h-12 w-12" />}
-              title="Geen kandidaten gevonden"
-              description="Er zijn geen leerlingen die voldoen aan de zoekfilters."
-            />
-          </div>
-        )}
-      </AdminTableCard>
-
-      {/* Bulk Re-enrollment Dialog */}
-      <Dialog open={showBulkDialog} onOpenChange={setShowBulkDialog}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Zap className="h-5 w-5" />
-              Bulk Herinschrijving
-            </DialogTitle>
-            <DialogDescription>
-              Schrijf {selectedStudents.length} geselecteerde leerlingen in voor het nieuwe schooljaar.
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="nextYearClass">Selecteer klas voor volgend jaar</Label>
-              <Select>
-                <SelectTrigger>
-                  <SelectValue placeholder="Kies een klas..." />
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex flex-col lg:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="Zoeken op naam, leerlingnummer of email..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <div className="flex gap-2">
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent>
-                  {nextYearClasses.map((cls) => (
-                    <SelectItem key={cls.id} value={cls.id.toString()}>
-                      {cls.name} ({cls.currentEnrollment}/{cls.capacity} leerlingen)
-                    </SelectItem>
+                  <SelectItem value="all">Alle statussen</SelectItem>
+                  <SelectItem value="eligible">Geschikt</SelectItem>
+                  <SelectItem value="enrolled">Ingeschreven</SelectItem>
+                  <SelectItem value="declined">Afgewezen</SelectItem>
+                  <SelectItem value="pending">In behandeling</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={selectedAcademicYear} onValueChange={setSelectedAcademicYear}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Academisch jaar" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Alle jaren</SelectItem>
+                  {academicYears.map((year: AcademicYear) => (
+                    <SelectItem key={year.id} value={year.id.toString()}>{year.name}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
-
-            <div className="bg-blue-50 p-4 rounded-lg">
-              <div className="flex items-start gap-3">
-                <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5" />
-                <div className="text-sm">
-                  <p className="font-medium text-blue-800">Let op</p>
-                  <p className="text-blue-700">
-                    Deze actie schrijft alle geselecteerde leerlingen in één keer in. 
-                    Deze actie kan niet ongedaan worden gemaakt.
-                  </p>
-                </div>
-              </div>
-            </div>
           </div>
+        </CardContent>
+      </Card>
 
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowBulkDialog(false)}>
-              Annuleren
-            </Button>
-            <Button 
-              onClick={() => {
-                // Here you would call the bulk enrollment with the selected class
-                bulkReEnrollMutation.mutate({
-                  studentIds: selectedStudents,
-                  classId: 1, // This should come from the selected class
-                  academicYearId: 2 // This should come from the next academic year
-                });
-              }}
-              disabled={bulkReEnrollMutation.isPending}
-            >
-              {bulkReEnrollMutation.isPending ? (
-                <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-              ) : (
-                <CheckCircle className="h-4 w-4 mr-2" />
-              )}
-              {bulkReEnrollMutation.isPending ? 'Bezig met inschrijven...' : 'Bevestigen'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </AdminPageLayout>
+      {/* Main Table */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Herinschrijvingen</CardTitle>
+          <CardDescription>{filteredStudents.length} leerlingen geschikt voor herinschrijving</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-12">
+                  <Checkbox
+                    checked={selectedStudents.length === filteredStudents.length && filteredStudents.length > 0}
+                    onCheckedChange={handleSelectAll}
+                  />
+                </TableHead>
+                <TableHead>Leerling</TableHead>
+                <TableHead>Leerlingnummer</TableHead>
+                <TableHead>Huidige Klas</TableHead>
+                <TableHead>Eindcijfer</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Voogd</TableHead>
+                <TableHead className="text-right">Acties</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredStudents.map((student: Student) => (
+                <TableRow key={student.id}>
+                  <TableCell>
+                    <Checkbox
+                      checked={selectedStudents.includes(student.id)}
+                      onCheckedChange={() => handleSelectStudent(student.id)}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center space-x-3">
+                      <Avatar className="h-8 w-8">
+                        <AvatarFallback>
+                          {student.firstName.charAt(0)}{student.lastName.charAt(0)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <div className="font-medium">{student.firstName} {student.lastName}</div>
+                        <div className="text-sm text-gray-500">{student.email}</div>
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <span className="font-mono text-sm">{student.studentId}</span>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline">{student.className || 'Geen klas'}</Badge>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center space-x-1">
+                      <span className={`font-medium ${
+                        (student.finalGrade || 0) >= 6 ? 'text-green-600' : 'text-red-600'
+                      }`}>
+                        {student.finalGrade || 'N/A'}
+                      </span>
+                      {(student.finalGrade || 0) >= 6 && <CheckCircle className="h-4 w-4 text-green-600" />}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={
+                      student.reEnrollmentStatus === 'eligible' ? 'default' :
+                      student.reEnrollmentStatus === 'enrolled' ? 'secondary' :
+                      student.reEnrollmentStatus === 'declined' ? 'destructive' : 'outline'
+                    }>
+                      {student.reEnrollmentStatus === 'eligible' ? 'Geschikt' :
+                       student.reEnrollmentStatus === 'enrolled' ? 'Ingeschreven' :
+                       student.reEnrollmentStatus === 'declined' ? 'Afgewezen' : 'In behandeling'}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <div className="text-sm text-gray-900">{student.guardianName || 'Niet beschikbaar'}</div>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end space-x-2">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="ghost" size="sm">
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Details bekijken</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="ghost" size="sm">
+                              <CheckCircle className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Herinschrijven</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+
+          {filteredStudents.length === 0 && (
+            <div className="p-8 text-center">
+              <EmptyState
+                icon={<GraduationCap className="h-12 w-12" />}
+                title="Geen leerlingen gevonden"
+                description="Er zijn geen leerlingen die voldoen aan de zoekfilters of geschikt zijn voor herinschrijving."
+              />
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 }

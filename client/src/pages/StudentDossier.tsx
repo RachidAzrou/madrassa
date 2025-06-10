@@ -23,7 +23,7 @@ import { useToast } from '@/hooks/use-toast';
 import EmptyState from '@/components/ui/empty-state';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { PremiumHeader } from '@/components/layout/premium-header';
+
 
 // Types
 interface Student {
@@ -117,10 +117,16 @@ export default function StudentDossier() {
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
-      <PremiumHeader 
-        title="Leerlingendossier" 
-        description="Bekijk en beheer uitgebreide leerlingendossiers"
-      />
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Leerlingendossier</h1>
+          <p className="text-gray-600">Bekijk en beheer uitgebreide leerlingendossiers</p>
+        </div>
+        <Button variant="outline">
+          <Download className="h-4 w-4 mr-2" />
+          Export
+        </Button>
+      </div>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

@@ -37,7 +37,20 @@
   
   /* Algemene UI eigenschappen */
   --ring: 214 89% 34%;
-  --radius: 0.25rem;
+  --radius: 0.75rem;
+  
+  /* myMadrassa Brand Colors */
+  --madrassa-blue: #1e40af;
+  --madrassa-blue-dark: #1d3a9e;
+  --madrassa-blue-light: #3b82f6;
+  --madrassa-gradient-start: #3a5b9a;
+  --madrassa-gradient-end: #6B8DD6;
+  
+  /* Modern UI Enhancements */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
   }
 
 /* Fix voor kalender popover z-index problemen */

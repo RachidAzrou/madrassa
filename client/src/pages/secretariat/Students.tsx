@@ -315,6 +315,8 @@ export default function Students() {
 
   // eID scanning functionality
   const handleEidScan = () => {
+    console.log('eID button clicked - starting file selection');
+    
     // Create a dynamic file input specifically for eID documents
     const input = document.createElement('input');
     input.type = 'file';
@@ -322,8 +324,11 @@ export default function Students() {
     input.style.display = 'none';
     
     input.onchange = (e) => {
+      console.log('File selected for eID processing');
       const file = (e.target as HTMLInputElement).files?.[0];
       if (file) {
+        console.log('eID file details:', { name: file.name, type: file.type, size: file.size });
+        
         // Validate file size (max 10MB for documents)
         if (file.size > 10 * 1024 * 1024) {
           toast({
@@ -345,7 +350,10 @@ export default function Students() {
           return;
         }
 
+        console.log('Starting eID document processing');
         processEidDocument(file);
+      } else {
+        console.log('No file selected');
       }
     };
     

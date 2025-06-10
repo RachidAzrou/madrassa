@@ -559,7 +559,7 @@ export default function Students() {
       />
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="border-l-4 border-l-blue-500 premium-card">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
@@ -665,10 +665,10 @@ export default function Students() {
             <TableHeader>
               <TableRow className="modern-table-header">
                 <TableHead className="font-semibold text-gray-700">Student</TableHead>
-                <TableHead className="font-semibold text-gray-700">Contact</TableHead>
-                <TableHead className="font-semibold text-gray-700">Klas</TableHead>
-                <TableHead className="font-semibold text-gray-700">Status</TableHead>
-                <TableHead className="font-semibold text-gray-700">Inschrijving</TableHead>
+                <TableHead className="font-semibold text-gray-700 hidden sm:table-cell">Contact</TableHead>
+                <TableHead className="font-semibold text-gray-700 hidden md:table-cell">Klas</TableHead>
+                <TableHead className="font-semibold text-gray-700 hidden lg:table-cell">Status</TableHead>
+                <TableHead className="font-semibold text-gray-700 hidden lg:table-cell">Inschrijving</TableHead>
                 <TableHead className="font-semibold text-gray-700 text-right">Acties</TableHead>
               </TableRow>
             </TableHeader>
@@ -689,15 +689,48 @@ export default function Students() {
                             {student.firstName.charAt(0)}{student.lastName.charAt(0)}
                           </AvatarFallback>
                         </Avatar>
-                        <div>
+                        <div className="flex-1">
                           <div className="font-medium text-gray-900">
                             {student.firstName} {student.lastName}
                           </div>
                           <div className="text-sm text-gray-500">ID: {student.studentId}</div>
+                          
+                          {/* Mobile-only additional info */}
+                          <div className="sm:hidden mt-1 space-y-1">
+                            <div className="flex items-center gap-1 text-xs text-gray-600">
+                              <Mail className="h-3 w-3" />
+                              <span>{student.email}</span>
+                            </div>
+                            <div className="flex items-center gap-1 text-xs">
+                              <Badge
+                                variant={
+                                  student.status === 'active'
+                                    ? 'default'
+                                    : student.status === 'pending'
+                                    ? 'secondary'
+                                    : 'destructive'
+                                }
+                                className={cn(
+                                  "text-xs",
+                                  student.status === 'active'
+                                    ? 'bg-green-100 text-green-800'
+                                    : student.status === 'pending'
+                                    ? 'bg-yellow-100 text-yellow-800'
+                                    : 'bg-red-100 text-red-800'
+                                )}
+                              >
+                                {student.status === 'active'
+                                  ? 'Actief'
+                                  : student.status === 'pending'
+                                  ? 'In behandeling'
+                                  : 'Inactief'}
+                              </Badge>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell className="px-4 py-3">
+                    <TableCell className="px-4 py-3 hidden sm:table-cell">
                       <div className="space-y-1">
                         <div className="flex items-center gap-2 text-sm">
                           <Mail className="h-3 w-3 text-gray-400" />
@@ -709,12 +742,12 @@ export default function Students() {
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell className="px-4 py-3">
+                    <TableCell className="px-4 py-3 hidden md:table-cell">
                       <span className="text-sm text-gray-900">
                         {student.className || 'Niet toegewezen'}
                       </span>
                     </TableCell>
-                    <TableCell className="px-4 py-3">
+                    <TableCell className="px-4 py-3 hidden lg:table-cell">
                       <Badge
                         variant={
                           student.status === 'active'
@@ -738,7 +771,7 @@ export default function Students() {
                           : 'Inactief'}
                       </Badge>
                     </TableCell>
-                    <TableCell className="px-4 py-3">
+                    <TableCell className="px-4 py-3 hidden lg:table-cell">
                       <span className="text-sm text-gray-600">
                         {new Date(student.createdAt).toLocaleDateString('nl-NL')}
                       </span>

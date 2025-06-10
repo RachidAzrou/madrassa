@@ -181,12 +181,12 @@ export default function ReEnrollments() {
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Herinschrijvingen</h1>
-          <p className="text-gray-600">Beheer herinschrijvingen voor het nieuwe schooljaar</p>
+          <h1 className="text-3xl font-bold text-gray-900">Herinschrijvingen</h1>
+          <p className="text-gray-600 mt-2">Beheer herinschrijvingen voor het nieuwe schooljaar</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex space-x-2">
           <Button 
             variant="outline"
             onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/students/eligible-for-reenrollment'] })}

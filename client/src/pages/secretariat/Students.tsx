@@ -315,37 +315,46 @@ export default function Students() {
 
   // eID scanning functionality
   const handleEidScan = () => {
-    document.getElementById('eid-upload')?.click();
+    // Create a dynamic file input specifically for eID documents
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*,.pdf';
+    input.style.display = 'none';
+    
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) {
+        // Validate file size (max 10MB for documents)
+        if (file.size > 10 * 1024 * 1024) {
+          toast({
+            title: "Bestand te groot",
+            description: "Het eID document mag maximaal 10MB zijn.",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        // Validate file type
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'application/pdf'];
+        if (!allowedTypes.includes(file.type)) {
+          toast({
+            title: "Ongeldig bestandstype",
+            description: "Alleen afbeeldingen (JPG, PNG, GIF) en PDF bestanden zijn toegestaan.",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        processEidDocument(file);
+      }
+    };
+    
+    document.body.appendChild(input);
+    input.click();
+    document.body.removeChild(input);
   };
 
-  const handleEidChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      // Validate file size (max 10MB for documents)
-      if (file.size > 10 * 1024 * 1024) {
-        toast({
-          title: "Bestand te groot",
-          description: "Het eID document mag maximaal 10MB groot zijn.",
-          variant: "destructive",
-        });
-        return;
-      }
 
-      // Validate file type
-      const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'];
-      if (!allowedTypes.includes(file.type)) {
-        toast({
-          title: "Ongeldig bestandstype",
-          description: "Alleen afbeeldingen (JPG, PNG) en PDF bestanden zijn toegestaan.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Process eID scan
-      processEidDocument(file);
-    }
-  };
 
   const processEidDocument = async (file: File) => {
     setIsProcessingEid(true);
@@ -831,13 +840,7 @@ export default function Students() {
                           className="hidden"
                           onChange={handlePhotoChange}
                         />
-                        <input
-                          id="eid-upload"
-                          type="file"
-                          accept="image/*,.pdf"
-                          className="hidden"
-                          onChange={handleEidChange}
-                        />
+
                       </div>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">

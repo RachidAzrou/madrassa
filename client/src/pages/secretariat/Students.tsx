@@ -730,7 +730,10 @@ export default function Students() {
                     <div className="space-y-3">
                       <div className="flex justify-center">
                         <div className="relative">
-                          <Avatar className="h-24 w-24">
+                          <Avatar 
+                            className="h-24 w-24 cursor-pointer hover:opacity-80 transition-opacity"
+                            onClick={() => document.getElementById('photo')?.click()}
+                          >
                             {photoPreview ? (
                               <AvatarImage src={photoPreview} alt="Preview" />
                             ) : (
@@ -739,26 +742,29 @@ export default function Students() {
                               </AvatarFallback>
                             )}
                           </Avatar>
+                          <div className="absolute -bottom-1 -right-1 bg-blue-500 rounded-full p-1">
+                            <Camera className="h-3 w-3 text-white" />
+                          </div>
                         </div>
                       </div>
-                      <div>
-                        <Label htmlFor="photo" className="text-xs font-medium text-gray-700">Upload Foto</Label>
+                      <div className="text-center">
+                        <p className="text-xs text-gray-600 mb-1">Klik op de foto om te uploaden</p>
                         <Input
                           id="photo"
                           type="file"
                           accept="image/*"
                           onChange={handlePhotoChange}
-                          className="mt-1 h-9"
+                          className="hidden"
                         />
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="text-xs text-gray-500">
                           Maximaal 5MB, JPG/PNG
                         </p>
                       </div>
                       
-                      <div className="border-t pt-3">
+                      <div className="border-t pt-3 flex justify-center">
                         <button
                           type="button"
-                          className="eid-button w-full justify-center"
+                          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                           onClick={() => {
                             // eID processing logic will be added here
                             console.log('eID scan initiated');
@@ -767,9 +773,8 @@ export default function Students() {
                           <img 
                             src={eidLogoPath} 
                             alt="eID" 
-                            className="eid-logo"
+                            className="h-8 w-auto"
                           />
-                          Scan eID
                         </button>
                       </div>
                     </div>

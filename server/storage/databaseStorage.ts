@@ -1911,17 +1911,23 @@ export class DatabaseStorage implements IStorage {
   async getTuitionFees(): Promise<any[]> {
     try {
       return await db.select({
-        id: tuitionRates.id,
-        academicYear: tuitionRates.academicYear,
-        type: tuitionRates.type,
-        baseAmount: tuitionRates.baseAmount,
-        currency: tuitionRates.currency,
-        description: tuitionRates.description,
-        isActive: tuitionRates.isActive,
-        validFrom: tuitionRates.validFrom,
-        validUntil: tuitionRates.validUntil,
-        programId: tuitionRates.programId
-      }).from(tuitionRates);
+        id: tuitionFees.id,
+        academicYearId: tuitionFees.academicYearId,
+        amount: tuitionFees.amount,
+        description: tuitionFees.description,
+        isActive: tuitionFees.isActive,
+        createdAt: tuitionFees.createdAt,
+        updatedAt: tuitionFees.updatedAt,
+        academicYear: {
+          id: academicYears.id,
+          name: academicYears.name,
+          startDate: academicYears.startDate,
+          endDate: academicYears.endDate
+        }
+      })
+      .from(tuitionFees)
+      .leftJoin(academicYears, eq(tuitionFees.academicYearId, academicYears.id))
+      .orderBy(desc(tuitionFees.createdAt));
     } catch (error) {
       console.error('Error fetching tuition fees:', error);
       throw error;
@@ -1930,7 +1936,24 @@ export class DatabaseStorage implements IStorage {
 
   async getTuitionFee(id: number): Promise<any | undefined> {
     try {
-      const [fee] = await db.select().from(tuitionRates).where(eq(tuitionRates.id, id));
+      const [fee] = await db.select({
+        id: tuitionFees.id,
+        academicYearId: tuitionFees.academicYearId,
+        amount: tuitionFees.amount,
+        description: tuitionFees.description,
+        isActive: tuitionFees.isActive,
+        createdAt: tuitionFees.createdAt,
+        updatedAt: tuitionFees.updatedAt,
+        academicYear: {
+          id: academicYears.id,
+          name: academicYears.name,
+          startDate: academicYears.startDate,
+          endDate: academicYears.endDate
+        }
+      })
+      .from(tuitionFees)
+      .leftJoin(academicYears, eq(tuitionFees.academicYearId, academicYears.id))
+      .where(eq(tuitionFees.id, id));
       return fee;
     } catch (error) {
       console.error('Error fetching tuition fee:', error);
@@ -1940,7 +1963,7 @@ export class DatabaseStorage implements IStorage {
 
   async createTuitionFee(fee: any): Promise<any> {
     try {
-      const [newFee] = await db.insert(tuitionRates).values(fee).returning();
+      const [newFee] = await db.insert(tuitionFees).values(fee).returning();
       return newFee;
     } catch (error) {
       console.error('Error creating tuition fee:', error);
@@ -1950,9 +1973,9 @@ export class DatabaseStorage implements IStorage {
 
   async updateTuitionFee(id: number, fee: any): Promise<any | undefined> {
     try {
-      const [updatedFee] = await db.update(tuitionRates)
+      const [updatedFee] = await db.update(tuitionFees)
         .set(fee)
-        .where(eq(tuitionRates.id, id))
+        .where(eq(tuitionFees.id, id))
         .returning();
       return updatedFee;
     } catch (error) {

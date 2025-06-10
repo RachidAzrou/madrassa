@@ -1248,59 +1248,88 @@ export default function Students() {
                 )}
 
                 {/* Zoek en voeg broers/zussen toe */}
-                <div className="space-y-2">
-                  <Label className="text-xs font-medium text-gray-700">
-                    Zoek student om als broer/zus toe te voegen:
-                  </Label>
-                  <div className="relative">
-                    <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 h-3 w-3" />
-                    <Input
-                      type="text"
-                      placeholder="Zoek op naam of student ID..."
-                      value={siblingSearchTerm}
-                      onChange={(e) => setSiblingSearchTerm(e.target.value)}
-                      className="pl-7 text-xs h-8"
-                    />
+                <div className="space-y-3">
+                  <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
+                    <Label className="text-sm font-medium text-blue-800 flex items-center gap-2 mb-2">
+                      <Search className="h-4 w-4" />
+                      Zoek Student
+                    </Label>
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                      <Input
+                        type="text"
+                        placeholder="Zoek op voornaam, achternaam of student ID..."
+                        value={siblingSearchTerm}
+                        onChange={(e) => setSiblingSearchTerm(e.target.value)}
+                        className="pl-10 text-sm h-9 border-blue-200 focus:border-blue-400 focus:ring-blue-200"
+                      />
+                    </div>
+                    <p className="text-xs text-blue-600 mt-1">
+                      Typ om alle studenten in het systeem te doorzoeken
+                    </p>
                   </div>
                   
-                  {searchableSiblings.length > 0 ? (
-                    <div className="space-y-1 max-h-32 overflow-y-auto">
-                      {searchableSiblings
-                        .filter(sibling => !studentSiblings.some(existing => existing.id === sibling.id))
-                        .map((sibling) => (
-                        <div key={sibling.id} className="flex items-center justify-between bg-white p-2 rounded border">
-                          <span className="text-xs">
-                            {sibling.firstName} {sibling.lastName} ({sibling.studentId})
-                          </span>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => addSiblingMutation.mutate({ 
-                              studentId: selectedStudent.id, 
-                              siblingId: sibling.id 
-                            })}
-                            disabled={addSiblingMutation.isPending}
-                            className="text-green-600 hover:text-green-800 h-6 w-6 p-0"
-                          >
-                            <Plus className="h-3 w-3" />
-                          </Button>
+                  {/* Search Results */}
+                  <div className="border border-gray-200 rounded-md bg-white">
+                    {searchableSiblings.length > 0 ? (
+                      <div className="divide-y divide-gray-100 max-h-40 overflow-y-auto">
+                        <div className="px-3 py-2 bg-gray-50 border-b">
+                          <p className="text-xs font-medium text-gray-700">
+                            {searchableSiblings.filter(sibling => !studentSiblings.some(existing => existing.id === sibling.id)).length} studenten gevonden
+                          </p>
                         </div>
-                      ))}
-                    </div>
-                  ) : siblingSearchTerm.trim() !== '' ? (
-                    <div className="text-center py-2">
-                      <p className="text-xs text-gray-500">
-                        Geen studenten gevonden voor "{siblingSearchTerm}"
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="text-center py-2">
-                      <Users className="h-6 w-6 text-gray-300 mx-auto mb-1" />
-                      <p className="text-xs text-gray-500">
-                        Zoek een student om als broer/zus toe te voegen
-                      </p>
-                    </div>
-                  )}
+                        {searchableSiblings
+                          .filter(sibling => !studentSiblings.some(existing => existing.id === sibling.id))
+                          .map((sibling) => (
+                          <div key={sibling.id} className="flex items-center justify-between p-3 hover:bg-blue-25 transition-colors">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                  <User className="h-4 w-4 text-blue-600" />
+                                </div>
+                                <div>
+                                  <p className="text-sm font-medium text-gray-900">
+                                    {sibling.firstName} {sibling.lastName}
+                                  </p>
+                                  <p className="text-xs text-gray-500">
+                                    Student ID: {sibling.studentId}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => addSiblingMutation.mutate({ 
+                                studentId: selectedStudent.id, 
+                                siblingId: sibling.id 
+                              })}
+                              disabled={addSiblingMutation.isPending}
+                              className="text-green-600 hover:text-green-800 hover:bg-green-50 h-8 w-8 p-0"
+                            >
+                              <Plus className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    ) : siblingSearchTerm.trim() !== '' ? (
+                      <div className="text-center py-6">
+                        <Users className="h-8 w-8 text-gray-300 mx-auto mb-2" />
+                        <p className="text-sm text-gray-500 mb-1">Geen resultaten gevonden</p>
+                        <p className="text-xs text-gray-400">
+                          Probeer een andere zoekterm voor "{siblingSearchTerm}"
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="text-center py-6">
+                        <Search className="h-8 w-8 text-gray-300 mx-auto mb-2" />
+                        <p className="text-sm text-gray-500 mb-1">Begin met typen om te zoeken</p>
+                        <p className="text-xs text-gray-400">
+                          Zoek op naam of student ID om studenten te vinden
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

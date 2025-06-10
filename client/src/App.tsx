@@ -146,49 +146,45 @@ function AuthenticatedRouter() {
   // Student routes
   if (user?.role === 'student') {
     return (
-      <StudentLayout>
-        <Switch>
-          <Route path="/" component={() => <AuthenticatedRoute component={StudentDashboard} />} />
-          <Route path="/student/class" component={() => <AuthenticatedRoute component={StudentClass} />} />
-          <Route path="/student/teachers" component={() => <AuthenticatedRoute component={StudentTeachers} />} />
-          <Route path="/student/subjects" component={() => <AuthenticatedRoute component={StudentSubjects} />} />
-          <Route path="/student/attendance" component={() => <AuthenticatedRoute component={StudentAttendance} />} />
-          <Route path="/student/grades" component={() => <AuthenticatedRoute component={StudentGrades} />} />
-          <Route path="/student/communications" component={() => <AuthenticatedRoute component={StudentCommunications} />} />
-          <Route path="/student/profile" component={() => <AuthenticatedRoute component={StudentProfile} />} />
-          <Route path="/notifications" component={() => <AuthenticatedRoute component={Notifications} />} />
-          <Route path="/notificaties" component={() => <AuthenticatedRoute component={Notifications} />} />
-          <Route path="/messages" component={() => <AuthenticatedRoute component={Messages} />} />
-          <Route path="/mijn-account" component={() => <AuthenticatedRoute component={MyAccount} />} />
-          <Route component={NotFound} />
-        </Switch>
-      </StudentLayout>
+      <Switch>
+        <Route path="/" component={() => <AuthenticatedRoute component={StudentDashboard} />} />
+        <Route path="/student/class" component={() => <AuthenticatedRoute component={StudentClass} />} />
+        <Route path="/student/teachers" component={() => <AuthenticatedRoute component={StudentTeachers} />} />
+        <Route path="/student/subjects" component={() => <AuthenticatedRoute component={StudentSubjects} />} />
+        <Route path="/student/attendance" component={() => <AuthenticatedRoute component={StudentAttendance} />} />
+        <Route path="/student/grades" component={() => <AuthenticatedRoute component={StudentGrades} />} />
+        <Route path="/student/communications" component={() => <AuthenticatedRoute component={StudentCommunications} />} />
+        <Route path="/student/profile" component={() => <AuthenticatedRoute component={StudentProfile} />} />
+        <Route path="/notifications" component={() => <AuthenticatedRoute component={Notifications} />} />
+        <Route path="/notificaties" component={() => <AuthenticatedRoute component={Notifications} />} />
+        <Route path="/messages" component={() => <AuthenticatedRoute component={Messages} />} />
+        <Route path="/mijn-account" component={() => <AuthenticatedRoute component={MyAccount} />} />
+        <Route component={NotFound} />
+      </Switch>
     );
   }
   
   // Teacher routes
   if (user?.role === 'teacher') {
     return (
-      <TeacherLayout>
-        <Switch>
-          <Route path="/" component={() => <AuthenticatedRoute component={TeacherDashboard} />} />
-          <Route path="/teacher" component={() => <AuthenticatedRoute component={TeacherDashboard} />} />
-          <Route path="/teacher/students" component={() => <AuthenticatedRoute component={TeacherStudents} />} />
-          <Route path="/teacher/classes" component={() => <AuthenticatedRoute component={TeacherClasses} />} />
-          <Route path="/teacher/calendar" component={() => <AuthenticatedRoute component={Calendar} />} />
-          <Route path="/teacher/subjects" component={() => <AuthenticatedRoute component={Courses} />} />
-          <Route path="/teacher/attendance" component={() => <AuthenticatedRoute component={Attendance} />} />
-          <Route path="/teacher/grades" component={() => <AuthenticatedRoute component={Cijfers} />} />
-          <Route path="/teacher/communications" component={() => <AuthenticatedRoute component={Messages} />} />
-          <Route path="/teacher/reports" component={() => <AuthenticatedRoute component={TeacherReports} />} />
-          <Route path="/teacher/profile" component={() => <AuthenticatedRoute component={Profile} />} />
-          <Route path="/notifications" component={() => <AuthenticatedRoute component={Notifications} />} />
-          <Route path="/notificaties" component={() => <AuthenticatedRoute component={Notifications} />} />
-          <Route path="/messages" component={() => <AuthenticatedRoute component={Messages} />} />
-          <Route path="/mijn-account" component={() => <AuthenticatedRoute component={MyAccount} />} />
-          <Route component={NotFound} />
-        </Switch>
-      </TeacherLayout>
+      <Switch>
+        <Route path="/" component={() => <AuthenticatedRoute component={TeacherDashboard} />} />
+        <Route path="/teacher" component={() => <AuthenticatedRoute component={TeacherDashboard} />} />
+        <Route path="/teacher/students" component={() => <AuthenticatedRoute component={TeacherStudents} />} />
+        <Route path="/teacher/classes" component={() => <AuthenticatedRoute component={TeacherClasses} />} />
+        <Route path="/teacher/calendar" component={() => <AuthenticatedRoute component={Calendar} />} />
+        <Route path="/teacher/subjects" component={() => <AuthenticatedRoute component={Courses} />} />
+        <Route path="/teacher/attendance" component={() => <AuthenticatedRoute component={Attendance} />} />
+        <Route path="/teacher/grades" component={() => <AuthenticatedRoute component={Cijfers} />} />
+        <Route path="/teacher/communications" component={() => <AuthenticatedRoute component={Messages} />} />
+        <Route path="/teacher/reports" component={() => <AuthenticatedRoute component={TeacherReports} />} />
+        <Route path="/teacher/profile" component={() => <AuthenticatedRoute component={Profile} />} />
+        <Route path="/notifications" component={() => <AuthenticatedRoute component={Notifications} />} />
+        <Route path="/notificaties" component={() => <AuthenticatedRoute component={Notifications} />} />
+        <Route path="/messages" component={() => <AuthenticatedRoute component={Messages} />} />
+        <Route path="/mijn-account" component={() => <AuthenticatedRoute component={MyAccount} />} />
+        <Route component={NotFound} />
+      </Switch>
     );
   }
   

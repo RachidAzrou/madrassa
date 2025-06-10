@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useQuery } from "@tanstack/react-query";
-import { PageHeader } from '@/components/layout/page-header';
+import UnifiedLayout from '@/components/layout/UnifiedLayout';
 import {
   BookOpen,
   User,
@@ -51,31 +51,35 @@ export default function StudentSubjects() {
 
   if (isLoading) {
     return (
-      <div className="p-6 bg-[#f7f9fc] min-h-screen">
+      <UnifiedLayout 
+        role="student"
+        title="Mijn Vakken"
+        breadcrumbs={[
+          { label: "Student", href: "/" },
+          { label: "Mijn Vakken", href: "/student/subjects" }
+        ]}
+      >
         <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/4 mb-6"></div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, i) => (
               <div key={i} className="h-64 bg-gray-200 rounded-lg"></div>
             ))}
           </div>
         </div>
-      </div>
+      </UnifiedLayout>
     );
   }
 
   return (
-    <div className="bg-[#f7f9fc] min-h-screen">
-      {/* Clean Page Header - Admin Style */}
-      <PageHeader
-        title="Mijn Vakken"
-        icon={<BookOpen className="h-5 w-5 text-white" />}
-        parent="Student"
-        current="Mijn Vakken"
-      />
-      
-      {/* Main content area */}
-      <div className="px-6 py-6 max-w-7xl mx-auto">
+    <UnifiedLayout 
+      role="student"
+      title="Mijn Vakken"
+      breadcrumbs={[
+        { label: "Student", href: "/" },
+        { label: "Mijn Vakken", href: "/student/subjects" }
+      ]}
+    >
+      <div className="space-y-6">
         
       {/* Subjects Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -288,6 +292,6 @@ export default function StudentSubjects() {
       </div>
       
       </div>
-    </div>
+    </UnifiedLayout>
   );
 }

@@ -11,6 +11,7 @@ const globalCalendarEventsStore = new Map();
 import { z } from "zod";
 import { createMollieClient } from '@mollie/api-client';
 import bcrypt from "bcryptjs";
+import multer from "multer";
 import { authenticateToken, requireRole, requirePermission, requireAdmin, generateToken, AuthUser } from "./middleware/auth";
 import { UserRole, RESOURCES } from "@shared/rbac";
 import { userAccounts, insertUserAccountSchema } from "@shared/schema";
@@ -54,6 +55,22 @@ import {
   updateRoom, 
   deleteRoom 
 } from "./handlers/rooms";
+
+// Configure multer for file uploads
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10MB limit
+  },
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'application/pdf'];
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Ongeldig bestandstype. Alleen afbeeldingen en PDF bestanden zijn toegestaan.'));
+    }
+  },
+});
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // prefix all routes with /api
@@ -7239,25 +7256,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ********************
   // eID Processing API endpoint
   // ********************
-  app.post("/api/eid/process", authenticateToken, async (req: any, res: Response) => {
+  app.post("/api/eid/process", authenticateToken, upload.single('eidDocument'), async (req: any, res: Response) => {
     try {
-      const form = new FormData();
-      
-      // Handle file upload from request
-      if (!req.body || !req.headers['content-type']?.includes('multipart/form-data')) {
+      if (!req.file) {
         return res.status(400).json({ 
           success: false, 
           message: "Geen eID document geüpload" 
         });
       }
 
-      // For now, we'll simulate eID processing with realistic Dutch data
-      // In production, this would integrate with actual eID reading services
-      
-      // Simulate processing delay
+      console.log("Processing eID document:", {
+        filename: req.file.originalname,
+        mimetype: req.file.mimetype,
+        size: req.file.size
+      });
+
+      // Simulate processing delay for realistic user experience
       await new Promise(resolve => setTimeout(resolve, 2000));
       
-      // Extract realistic Dutch personal data
+      // In production, this would integrate with actual eID reading services:
+      // - Belgian eID card reader APIs
+      // - Dutch BSN/DigiD integration
+      // - OCR services for document scanning
+      // - Machine learning models for data extraction
+      
+      // For demonstration, extract realistic Dutch personal data
       const extractedData = {
         firstName: "Ahmed",
         lastName: "Hassan",
@@ -7270,6 +7293,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         nationality: "Nederlandse",
         placeOfBirth: "Rotterdam"
       };
+
+      console.log("eID processing completed successfully");
 
       res.json({ 
         success: true, 

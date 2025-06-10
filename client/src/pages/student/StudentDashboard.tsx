@@ -31,28 +31,25 @@ export default function StudentDashboard() {
     staleTime: 60000,
   });
 
-  // Fetch upcoming lessons
-  const { data: upcomingLessons } = useQuery({
+  const { data: upcomingLessons } = useQuery<any>({
     queryKey: ['/api/student/upcoming-lessons'],
-    staleTime: 60000,
+    staleTime: 300000,
   });
 
-  // Fetch recent grades
-  const { data: recentGrades } = useQuery({
+  const { data: recentGrades } = useQuery<any>({
     queryKey: ['/api/student/recent-grades'],
-    staleTime: 60000,
+    staleTime: 300000,
   });
 
-  // Fetch recent activity
-  const { data: recentActivity } = useQuery({
+  const { data: recentActivity } = useQuery<any>({
     queryKey: ['/api/student/recent-activity'],
-    staleTime: 60000,
+    staleTime: 300000,
   });
 
-  // Mock data with safe defaults
-  const stats = {
-    myClass: statsData?.stats?.myClass || "8A",
+  const stats: StudentStats = {
+    myClass: statsData?.stats?.myClass || "3A",
     totalSubjects: statsData?.stats?.totalSubjects || 6,
+    upcomingLessons: statsData?.stats?.upcomingLessons || 3,
     attendanceRate: statsData?.stats?.attendanceRate || 95,
     recentGrades: statsData?.stats?.recentGrades || 2,
     unreadMessages: statsData?.stats?.unreadMessages || 5
@@ -61,7 +58,6 @@ export default function StudentDashboard() {
   return (
     <UnifiedLayout userRole="student">
       <div className="space-y-6">
-        {/* Clean Page Header - Admin Style */}
         <PageHeader
           title="Dashboard"
           icon={<Home className="h-5 w-5 text-white" />}
@@ -69,9 +65,8 @@ export default function StudentDashboard() {
           current="Dashboard"
         />
         
-        {/* Stats Overview - Modern Style */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          {/* Mijn Klas */}
+        {/* Stats Overview */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <Card className="premium-card border-l-4 border-l-blue-500">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
@@ -84,7 +79,6 @@ export default function StudentDashboard() {
             </CardContent>
           </Card>
 
-          {/* Vakken */}
           <Card className="premium-card border-l-4 border-l-green-500">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
@@ -97,7 +91,6 @@ export default function StudentDashboard() {
             </CardContent>
           </Card>
 
-          {/* Aanwezigheid */}
           <Card className="premium-card border-l-4 border-l-yellow-500">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
@@ -110,7 +103,6 @@ export default function StudentDashboard() {
             </CardContent>
           </Card>
 
-          {/* Berichten */}
           <Card className="premium-card border-l-4 border-l-red-500">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
@@ -124,129 +116,120 @@ export default function StudentDashboard() {
           </Card>
         </div>
 
-        {/* Main dashboard content */}
-        <div className="space-y-4">
-          {/* Two column layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            
-            {/* Komende Lessen - Admin Style */}
-            <div className="bg-white border border-[#e5e7eb] rounded-sm">
-              <div className="flex items-center justify-between px-4 py-2 border-b border-[#e5e7eb] bg-[#f9fafc]">
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-3.5 w-3.5 text-[#1e40af]" />
-                  <h3 className="text-xs font-medium text-gray-700 tracking-tight">Komende Lessen</h3>
-                </div>
-                <span className="text-xs text-gray-500">{upcomingLessons?.lessons?.length || 0}</span>
-              </div>
-              
-              <div className="p-4">
-                {upcomingLessons?.lessons?.length ? (
-                  <div className="space-y-3">
-                    {upcomingLessons.lessons.slice(0, 5).map((lesson: any) => (
-                      <div key={lesson.id} className="flex items-center justify-between p-3 bg-[#f8fafc] rounded border border-[#e5e7eb]">
-                        <div className="flex-1">
-                          <div className="font-medium text-sm text-gray-900">{lesson.subject}</div>
-                          <div className="text-xs text-gray-500 flex items-center mt-1">
-                            <User className="h-3 w-3 mr-1" />
-                            {lesson.teacher} • {lesson.room}
-                          </div>
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Aankomende Lessen */}
+          <Card className="premium-card">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center text-lg">
+                <Calendar className="h-5 w-5 mr-2 text-[#1e40af]" />
+                Aankomende Lessen
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {upcomingLessons?.lessons?.length > 0 ? 
+                  upcomingLessons.lessons.map((lesson: any, index: number) => (
+                    <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
+                      <div className="flex items-center space-x-3">
+                        <div className="h-8 w-8 bg-[#1e40af] rounded-full flex items-center justify-center">
+                          <BookOpen className="h-4 w-4 text-white" />
                         </div>
-                        <div className="text-right">
-                          <div className="text-xs font-medium text-[#1e40af]">{lesson.time}</div>
+                        <div>
+                          <h4 className="font-medium text-gray-900">{lesson.subject || 'Arabisch'}</h4>
+                          <p className="text-sm text-gray-500">{lesson.time || '09:00 - 10:30'}</p>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-8 text-gray-500">
-                    <Calendar className="h-8 w-8 text-gray-300 mx-auto mb-2" />
-                    <p className="text-sm">Geen komende lessen vandaag</p>
-                  </div>
-                )}
+                      <Badge variant="outline" className="text-xs">
+                        {lesson.status || 'Vandaag'}
+                      </Badge>
+                    </div>
+                  )) : (
+                    <div className="text-center py-8">
+                      <Calendar className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                      <h3 className="font-medium text-gray-900 mb-2">Geen lessen gepland</h3>
+                      <p className="text-gray-500">Er zijn geen aankomende lessen.</p>
+                    </div>
+                  )
+                }
               </div>
-            </div>
+            </CardContent>
+          </Card>
 
-            {/* Recente Cijfers - Admin Style */}
-            <div className="bg-white border border-[#e5e7eb] rounded-sm">
-              <div className="flex items-center justify-between px-4 py-2 border-b border-[#e5e7eb] bg-[#f9fafc]">
-                <div className="flex items-center gap-2">
-                  <GraduationCap className="h-3.5 w-3.5 text-[#1e40af]" />
-                  <h3 className="text-xs font-medium text-gray-700 tracking-tight">Recente Cijfers</h3>
-                </div>
-                <span className="text-xs text-gray-500">{recentGrades?.grades?.length || 0}</span>
-              </div>
-              
-              <div className="p-4">
-                {recentGrades?.grades?.length ? (
-                  <div className="space-y-3">
-                    {recentGrades.grades.slice(0, 5).map((grade: any) => (
-                      <div key={grade.id} className="flex items-center justify-between p-3 bg-[#f8fafc] rounded border border-[#e5e7eb]">
-                        <div className="flex-1">
-                          <div className="font-medium text-sm text-gray-900">{grade.subject}</div>
-                          <div className="text-xs text-gray-500 mt-1">{grade.description}</div>
-                          <div className="text-xs text-gray-400 mt-1">{grade.date}</div>
+          {/* Recente Cijfers */}
+          <Card className="premium-card">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center text-lg">
+                <GraduationCap className="h-5 w-5 mr-2 text-[#1e40af]" />
+                Recente Cijfers
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {recentGrades?.grades?.length > 0 ? 
+                  recentGrades.grades.map((grade: any, index: number) => (
+                    <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
+                      <div className="flex items-center space-x-3">
+                        <div className="h-8 w-8 bg-green-100 rounded-full flex items-center justify-center">
+                          <GraduationCap className="h-4 w-4 text-green-600" />
                         </div>
-                        <div className="text-right">
-                          <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${
-                            parseFloat(grade.grade) >= 7.0 
-                              ? 'bg-green-100 text-green-800'
-                              : parseFloat(grade.grade) >= 5.5
-                              ? 'bg-yellow-100 text-yellow-800'
-                              : 'bg-red-100 text-red-800'
-                          }`}>
-                            {grade.grade}
-                          </span>
+                        <div>
+                          <h4 className="font-medium text-gray-900">{grade.subject || 'Arabisch'}</h4>
+                          <p className="text-sm text-gray-500">{grade.description || 'Toets'}</p>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-8 text-gray-500">
-                    <GraduationCap className="h-8 w-8 text-gray-300 mx-auto mb-2" />
-                    <p className="text-sm">Geen recente cijfers</p>
-                  </div>
-                )}
+                      <Badge variant="outline" className="text-xs font-bold">
+                        {grade.grade || '8.5'}
+                      </Badge>
+                    </div>
+                  )) : (
+                    <div className="text-center py-8">
+                      <GraduationCap className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                      <h3 className="font-medium text-gray-900 mb-2">Geen recente cijfers</h3>
+                      <p className="text-gray-500">Er zijn nog geen cijfers beschikbaar.</p>
+                    </div>
+                  )
+                }
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
+        </div>
 
-          {/* Recent Activity - Admin Style */}
-          <div className="bg-white border border-[#e5e7eb] rounded-sm">
-            <div className="flex items-center justify-between px-4 py-2 border-b border-[#e5e7eb] bg-[#f9fafc]">
-              <div className="flex items-center gap-2">
-                <Activity className="h-3.5 w-3.5 text-[#1e40af]" />
-                <h3 className="text-xs font-medium text-gray-700 tracking-tight">Recente Activiteit</h3>
-              </div>
-            </div>
-            
-            <div className="p-4">
-              {recentActivity?.activities?.length ? (
-                <div className="space-y-3">
-                  {recentActivity.activities.slice(0, 8).map((activity: any) => (
-                    <div key={activity.id} className="flex items-start space-x-3 p-3 bg-[#f8fafc] rounded border border-[#e5e7eb]">
-                      <div className={`flex-shrink-0 w-2 h-2 rounded-full mt-2 ${
-                        activity.type === 'grade' ? 'bg-green-400' :
-                        activity.type === 'attendance' ? 'bg-blue-400' :
-                        activity.type === 'assignment' ? 'bg-yellow-400' :
-                        'bg-purple-400'
-                      }`} />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm text-gray-900">{activity.description}</p>
-                        <p className="text-xs text-gray-500 mt-1">{activity.timestamp}</p>
+        {/* Recent Activity */}
+        <Card className="premium-card">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center text-lg">
+              <Activity className="h-5 w-5 mr-2 text-[#1e40af]" />
+              Recente Activiteiten
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {recentActivity?.activities?.length > 0 ? 
+                recentActivity.activities.map((activity: any, index: number) => (
+                  <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
+                    <div className="flex items-center space-x-3">
+                      <div className="h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center">
+                        <Activity className="h-4 w-4 text-blue-600" />
+                      </div>
+                      <div>
+                        <h4 className="font-medium text-gray-900">{activity.title || 'Nieuwe activiteit'}</h4>
+                        <p className="text-sm text-gray-500">{activity.description || 'Beschrijving van activiteit'}</p>
                       </div>
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-8 text-gray-500">
-                  <Activity className="h-8 w-8 text-gray-300 mx-auto mb-2" />
-                  <p className="text-sm">Geen recente activiteit</p>
-                </div>
-              )}
+                    <span className="text-xs text-gray-400">{activity.time || '2 uur geleden'}</span>
+                  </div>
+                )) : (
+                  <div className="text-center py-8">
+                    <Activity className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                    <h3 className="font-medium text-gray-900 mb-2">Geen recente activiteiten</h3>
+                    <p className="text-gray-500">Er zijn nog geen activiteiten.</p>
+                  </div>
+                )
+              }
             </div>
-          </div>
-        </div>
-      </div>
+          </CardContent>
+        </Card>
       </div>
     </UnifiedLayout>
   );

@@ -442,7 +442,7 @@ export default function SecretariatLayout({ children }: SecretariatLayoutProps) 
       </div>
 
       {/* Main content - Admin Style */}
-      <div className="pt-12 lg:pl-52">
+      <div className="lg:pl-52">
         <main className="bg-[#f7f9fc] min-h-screen p-6">
           {children}
         </main>

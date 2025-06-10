@@ -1914,7 +1914,6 @@ export class DatabaseStorage implements IStorage {
         id: tuitionRates.id,
         academicYear: tuitionRates.academicYear,
         type: tuitionRates.type,
-        name: tuitionRates.name,
         baseAmount: tuitionRates.baseAmount,
         currency: tuitionRates.currency,
         description: tuitionRates.description,

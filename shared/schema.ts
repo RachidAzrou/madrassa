@@ -926,6 +926,7 @@ export const studentSiblings = pgTable("student_siblings", {
   id: serial("id").primaryKey(),
   studentId: integer("student_id").notNull().references(() => students.id),
   siblingId: integer("sibling_id").notNull().references(() => students.id),
+  relationship: text("relationship").default("sibling"),
   createdAt: timestamp("created_at").defaultNow(),
 }, (table) => {
   return {

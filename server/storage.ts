@@ -1060,24 +1060,30 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Student Siblings operations
-  async getStudentSiblings(studentId: number): Promise<StudentSibling[]> {
+  async getStudentSiblings(studentId: number): Promise<any[]> {
     try {
-      const siblings = await db
-        .select({
-          id: studentSiblings.id,
-          studentId: studentSiblings.studentId,
-          siblingId: studentSiblings.siblingId,
-          relationship: studentSiblings.relationship,
-          createdAt: studentSiblings.createdAt,
-          firstName: students.firstName,
-          lastName: students.lastName,
-          studentIdCode: students.studentId
-        })
+      const siblingRelations = await db
+        .select()
         .from(studentSiblings)
-        .innerJoin(students, eq(studentSiblings.siblingId, students.id))
         .where(eq(studentSiblings.studentId, studentId));
 
-      return siblings as StudentSibling[];
+      const siblingData = [];
+      for (const relation of siblingRelations) {
+        const sibling = await db
+          .select()
+          .from(students)
+          .where(eq(students.id, relation.siblingId))
+          .limit(1);
+        
+        if (sibling.length > 0) {
+          siblingData.push({
+            ...sibling[0],
+            relationship: relation.relationship
+          });
+        }
+      }
+
+      return siblingData;
     } catch (error) {
       console.error('Error getting student siblings:', error);
       return [];

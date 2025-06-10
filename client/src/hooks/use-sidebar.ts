@@ -14,7 +14,3 @@ export default function useSidebar() {
     open
   };
 }
-    throw new Error('useSidebar must be used within a SidebarProvider');
-  }
-  return context;
-}

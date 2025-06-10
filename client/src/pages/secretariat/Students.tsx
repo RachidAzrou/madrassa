@@ -1249,6 +1249,7 @@ export default function Students() {
                 {createStudentMutation.isPending ? 'Student toevoegen...' : 'Student toevoegen'}
               </Button>
             </div>
+            </div>
           </form>
         </DialogContent>
       </Dialog>

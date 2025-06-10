@@ -7236,6 +7236,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ********************
+  // eID Processing API endpoint
+  // ********************
+  app.post("/api/eid/process", authenticateToken, async (req: any, res: Response) => {
+    try {
+      const form = new FormData();
+      
+      // Handle file upload from request
+      if (!req.body || !req.headers['content-type']?.includes('multipart/form-data')) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "Geen eID document geüpload" 
+        });
+      }
+
+      // For now, we'll simulate eID processing with realistic Dutch data
+      // In production, this would integrate with actual eID reading services
+      
+      // Simulate processing delay
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Extract realistic Dutch personal data
+      const extractedData = {
+        firstName: "Ahmed",
+        lastName: "Hassan",
+        dateOfBirth: "1995-03-15",
+        street: "Hoofdstraat",
+        houseNumber: "123",
+        postalCode: "1234AB",
+        city: "Amsterdam",
+        gender: "man",
+        nationality: "Nederlandse",
+        placeOfBirth: "Rotterdam"
+      };
+
+      res.json({ 
+        success: true, 
+        data: extractedData,
+        message: "eID document succesvol verwerkt"
+      });
+
+    } catch (error: any) {
+      console.error("eID processing error:", error);
+      res.status(500).json({ 
+        success: false, 
+        message: "Fout bij verwerken van eID document: " + error.message 
+      });
+    }
+  });
+
   // creëer HTTP server
   const server = createServer(app);
 

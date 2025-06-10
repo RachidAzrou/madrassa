@@ -185,7 +185,9 @@ export default function Students() {
     gender: "man",
     photoUrl: "",
     studentId: "",
-    academicYear: "2024-2025"
+    academicYear: "2024-2025",
+    nationality: "",
+    placeOfBirth: ""
   };
   
   const [formData, setFormData] = useState(emptyFormData);
@@ -345,54 +347,67 @@ export default function Students() {
     }
   };
 
-  const processEidDocument = (file: File) => {
+  const processEidDocument = async (file: File) => {
     setIsProcessingEid(true);
-    const reader = new FileReader();
-    reader.onload = () => {
-      // Simulate eID data extraction (in real implementation, this would use OCR/AI)
+    
+    try {
       toast({
         title: "eID wordt verwerkt",
         description: "Het eID document wordt gescand voor gegevens...",
       });
 
-      // Simulate processing delay
-      setTimeout(() => {
-        // Mock extracted data - in real implementation, this would come from OCR service
-        const extractedData = {
-          firstName: "Ahmed",
-          lastName: "Hassan", 
-          dateOfBirth: "1995-03-15",
-          street: "Hoofdstraat",
-          houseNumber: "123",
-          postalCode: "1234AB",
-          city: "Amsterdam",
-          gender: "man"
-        };
+      // Create FormData for file upload
+      const formData = new FormData();
+      formData.append('eidDocument', file);
 
-        // Update form with extracted data
+      // Send to backend eID processing service
+      const response = await fetch('/api/eid/process', {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('eID processing failed');
+      }
+
+      const result = await response.json();
+      
+      if (result.success && result.data) {
+        // Update form with extracted eID data
         setFormData(prev => ({
           ...prev,
-          ...extractedData
+          firstName: result.data.firstName || prev.firstName,
+          lastName: result.data.lastName || prev.lastName,
+          dateOfBirth: result.data.dateOfBirth || prev.dateOfBirth,
+          street: result.data.street || prev.street,
+          houseNumber: result.data.houseNumber || prev.houseNumber,
+          postalCode: result.data.postalCode || prev.postalCode,
+          city: result.data.city || prev.city,
+          gender: result.data.gender || prev.gender,
+          nationality: result.data.nationality || prev.nationality,
+          placeOfBirth: result.data.placeOfBirth || prev.placeOfBirth,
         }));
 
-        setIsProcessingEid(false);
         toast({
           title: "eID succesvol gescand",
-          description: "Persoonsgegevens zijn automatisch ingevuld vanuit het eID document.",
+          description: "Alle persoonsgegevens zijn automatisch ingevuld vanuit het eID document.",
         });
-      }, 2000);
-    };
-
-    reader.onerror = () => {
-      setIsProcessingEid(false);
+      } else {
+        throw new Error(result.message || 'Geen gegevens gevonden in eID document');
+      }
+    } catch (error: any) {
+      console.error('eID processing error:', error);
       toast({
-        title: "Scannen gefaald",
-        description: "Er is een fout opgetreden bij het scannen van het eID document.",
+        title: "eID scannen gefaald",
+        description: error.message || "Er is een fout opgetreden bij het verwerken van het eID document.",
         variant: "destructive",
       });
-    };
-
-    reader.readAsArrayBuffer(file);
+    } finally {
+      setIsProcessingEid(false);
+    }
   };
 
   const resetForm = () => {

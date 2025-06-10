@@ -315,43 +315,10 @@ export default function Students() {
 
   // eID scanning functionality
   const handleEidScan = () => {
-    // Create a dynamic file input specifically for eID documents
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*,.pdf';
-    input.style.display = 'none';
-    
-    input.onchange = (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (file) {
-        // Validate file size (max 10MB for documents)
-        if (file.size > 10 * 1024 * 1024) {
-          toast({
-            title: "Bestand te groot",
-            description: "Het eID document mag maximaal 10MB zijn.",
-            variant: "destructive",
-          });
-          return;
-        }
-
-        // Validate file type
-        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'application/pdf'];
-        if (!allowedTypes.includes(file.type)) {
-          toast({
-            title: "Ongeldig bestandstype",
-            description: "Alleen afbeeldingen (JPG, PNG, GIF) en PDF bestanden zijn toegestaan.",
-            variant: "destructive",
-          });
-          return;
-        }
-
-        processEidDocument(file);
-      }
-    };
-    
-    document.body.appendChild(input);
-    input.click();
-    document.body.removeChild(input);
+    const eidInput = document.getElementById('eid-upload') as HTMLInputElement;
+    if (eidInput) {
+      eidInput.click();
+    }
   };
 
 
@@ -868,7 +835,32 @@ export default function Students() {
                       className="hidden"
                       onChange={(e) => {
                         const file = e.target?.files?.[0];
-                        if (file) processEidDocument(file);
+                        if (file) {
+                          // Validate file size (max 10MB for documents)
+                          if (file.size > 10 * 1024 * 1024) {
+                            toast({
+                              title: "Bestand te groot",
+                              description: "Het eID document mag maximaal 10MB zijn.",
+                              variant: "destructive",
+                            });
+                            return;
+                          }
+
+                          // Validate file type
+                          const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'application/pdf'];
+                          if (!allowedTypes.includes(file.type)) {
+                            toast({
+                              title: "Ongeldig bestandstype",
+                              description: "Alleen afbeeldingen (JPG, PNG, GIF) en PDF bestanden zijn toegestaan.",
+                              variant: "destructive",
+                            });
+                            return;
+                          }
+
+                          processEidDocument(file);
+                        }
+                        // Reset the input value so the same file can be selected again
+                        e.target.value = '';
                       }}
                     />
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -1256,7 +1248,6 @@ export default function Students() {
                 <User className="h-4 w-4 mr-2" />
                 {createStudentMutation.isPending ? 'Student toevoegen...' : 'Student toevoegen'}
               </Button>
-            </div>
             </div>
           </form>
         </DialogContent>

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { 
-  Search, Plus, Download, Filter, Eye, Edit, Trash2, 
+  Search, Download, Filter, Eye, Edit, Trash2, 
   User, Users, GraduationCap, Phone, Mail, Calendar,
   MapPin, FileText, AlertTriangle, Star, BookOpen,
   Settings, Save, X, Upload, UserPlus, NotebookText,
@@ -23,6 +23,16 @@ import { useToast } from '@/hooks/use-toast';
 import EmptyState from '@/components/ui/empty-state';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { 
+  AdminPageLayout, 
+  AdminPageHeader, 
+  AdminStatsGrid, 
+  AdminStatCard, 
+  AdminSearchBar, 
+  AdminTableCard,
+  AdminFilterSelect,
+  AdminActionButton
+} from '@/components/ui/admin-layout';
 
 // Types
 interface Student {
@@ -60,62 +70,6 @@ interface Attendance {
   courseName: string;
   notes?: string;
 }
-
-// Admin-style components
-const DataTableContainer = ({ children }: { children: React.ReactNode }) => (
-  <div className="bg-white border border-[#e5e7eb] rounded-lg shadow-sm overflow-hidden">
-    {children}
-  </div>
-);
-
-const SearchActionBar = ({ children }: { children: React.ReactNode }) => (
-  <div className="px-4 py-3 border-b border-[#e5e7eb] flex flex-wrap items-center justify-between gap-3">
-    {children}
-  </div>
-);
-
-const TableContainer = ({ children }: { children: React.ReactNode }) => (
-  <div className="overflow-x-auto">
-    {children}
-  </div>
-);
-
-const QuickActions = ({ onView, onEdit, onDelete }: { onView: () => void, onEdit: () => void, onDelete: () => void }) => (
-  <div className="flex items-center gap-1">
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={onView}>
-            <Eye className="h-3 w-3" />
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>Bekijken</TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
-    
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={onEdit}>
-            <Edit className="h-3 w-3" />
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>Bewerken</TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
-    
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant="ghost" size="sm" className="h-6 w-6 p-0 hover:bg-red-50 hover:text-red-600" onClick={onDelete}>
-            <Trash2 className="h-3 w-3" />
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>Verwijderen</TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
-  </div>
-);
 
 export default function StudentDossier() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -161,216 +115,189 @@ export default function StudentDossier() {
 
   if (isLoading) {
     return (
-      <div className="px-6 py-6 flex-1 overflow-visible">
+      <AdminPageLayout>
         <div className="h-64 flex items-center justify-center">
           <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
         </div>
-      </div>
+      </AdminPageLayout>
     );
   }
 
   return (
-    <div className="px-6 py-6 flex-1 overflow-visible">
+    <AdminPageLayout>
       {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Leerlingendossier</h1>
-        <p className="text-gray-600">Bekijk en beheer uitgebreide leerlingendossiers</p>
-      </div>
+      <AdminPageHeader 
+        title="Leerlingendossier" 
+        description="Bekijk en beheer uitgebreide leerlingendossiers"
+      >
+        <AdminActionButton icon={<Download />}>
+          Export
+        </AdminActionButton>
+      </AdminPageHeader>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Totaal Leerlingen</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{students.length}</div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Actieve Leerlingen</CardTitle>
-            <GraduationCap className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {students.filter(s => s.status === 'active').length}
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Uitgeschreven</CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {students.filter(s => s.status === 'inactive').length}
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Gemiddelde Cijfer</CardTitle>
-            <Award className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">7.8</div>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Stats Grid */}
+      <AdminStatsGrid>
+        <AdminStatCard
+          title="Totaal Leerlingen"
+          value={students.length}
+          icon={<Users className="h-4 w-4" />}
+        />
+        <AdminStatCard
+          title="Actieve Leerlingen"
+          value={students.filter(s => s.status === 'active').length}
+          icon={<GraduationCap className="h-4 w-4" />}
+          valueColor="text-green-600"
+        />
+        <AdminStatCard
+          title="Uitgeschreven"
+          value={students.filter(s => s.status === 'inactive').length}
+          icon={<Clock className="h-4 w-4" />}
+          valueColor="text-orange-600"
+        />
+        <AdminStatCard
+          title="Gemiddelde Cijfer"
+          value="7.8"
+          icon={<Award className="h-4 w-4" />}
+          valueColor="text-blue-600"
+        />
+      </AdminStatsGrid>
+
+      {/* Search and Filters */}
+      <AdminSearchBar
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        placeholder="Zoeken op naam, leerlingnummer of email..."
+        filters={
+          <>
+            <AdminFilterSelect
+              value={selectedStatus}
+              onValueChange={setSelectedStatus}
+              placeholder="Status"
+              options={[
+                { value: 'all', label: 'Alle statussen' },
+                { value: 'active', label: 'Actief' },
+                { value: 'inactive', label: 'Inactief' },
+                { value: 'graduated', label: 'Afgestudeerd' }
+              ]}
+            />
+            <AdminFilterSelect
+              value={selectedClass}
+              onValueChange={setSelectedClass}
+              placeholder="Klas"
+              options={[
+                { value: 'all', label: 'Alle klassen' },
+                { value: '1A', label: '1A' },
+                { value: '1B', label: '1B' },
+                { value: '2A', label: '2A' },
+                { value: '2B', label: '2B' }
+              ]}
+            />
+          </>
+        }
+      />
 
       {/* Main Table */}
-      <DataTableContainer>
-        <SearchActionBar>
-          <div className="flex flex-1 items-center gap-3">
-            <div className="relative flex-1 max-w-sm">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <Input
-                placeholder="Zoeken op naam, leerlingnummer of email..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 h-9"
-              />
-            </div>
-            
-            <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-              <SelectTrigger className="w-[140px] h-9">
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Alle statussen</SelectItem>
-                <SelectItem value="active">Actief</SelectItem>
-                <SelectItem value="inactive">Inactief</SelectItem>
-                <SelectItem value="graduated">Afgestudeerd</SelectItem>
-              </SelectContent>
-            </Select>
-            
-            <Select value={selectedClass} onValueChange={setSelectedClass}>
-              <SelectTrigger className="w-[140px] h-9">
-                <SelectValue placeholder="Klas" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Alle klassen</SelectItem>
-                <SelectItem value="1A">1A</SelectItem>
-                <SelectItem value="1B">1B</SelectItem>
-                <SelectItem value="2A">2A</SelectItem>
-                <SelectItem value="2B">2B</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" className="h-9">
-              <Download className="h-4 w-4 mr-2" />
-              Export
-            </Button>
-          </div>
-        </SearchActionBar>
-
-        <TableContainer>
-          <Table>
-            <TableHeader>
-              <TableRow className="border-b border-[#e5e7eb]">
-                <TableHead className="w-12">
+      <AdminTableCard 
+        title="Leerlingendossiers" 
+        subtitle={`${filteredStudents.length} leerlingen gevonden`}
+      >
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-12">
+                <Checkbox />
+              </TableHead>
+              <TableHead>Leerling</TableHead>
+              <TableHead>Leerlingnummer</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Klas</TableHead>
+              <TableHead>Contactgegevens</TableHead>
+              <TableHead>Voogd</TableHead>
+              <TableHead>Laatste Update</TableHead>
+              <TableHead className="text-right">Acties</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredStudents.map((student) => (
+              <TableRow key={student.id}>
+                <TableCell>
                   <Checkbox />
-                </TableHead>
-                <TableHead>Leerling</TableHead>
-                <TableHead>Leerlingnummer</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Klas</TableHead>
-                <TableHead>Contactgegevens</TableHead>
-                <TableHead>Voogd</TableHead>
-                <TableHead>Laatste Update</TableHead>
-                <TableHead className="text-right">Acties</TableHead>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-3">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={student.photoUrl} />
+                      <AvatarFallback className="text-xs">
+                        {student.firstName.charAt(0)}{student.lastName.charAt(0)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <div className="font-medium text-sm">
+                        {student.firstName} {student.lastName}
+                      </div>
+                      <div className="text-xs text-gray-500">{student.email}</div>
+                    </div>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <span className="font-mono text-sm">{student.studentId}</span>
+                </TableCell>
+                <TableCell>
+                  <Badge 
+                    variant={student.status === 'active' ? 'default' : 
+                             student.status === 'inactive' ? 'secondary' : 'outline'}
+                    className="text-xs"
+                  >
+                    {student.status === 'active' ? 'Actief' : 
+                     student.status === 'inactive' ? 'Inactief' : 
+                     student.status === 'graduated' ? 'Afgestudeerd' : student.status}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  <span className="text-sm">{student.className || '-'}</span>
+                </TableCell>
+                <TableCell>
+                  <div className="text-sm">
+                    <div className="flex items-center gap-1 text-gray-600">
+                      <Phone className="h-3 w-3" />
+                      {student.phone || '-'}
+                    </div>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <span className="text-sm">{student.guardianName || '-'}</span>
+                </TableCell>
+                <TableCell>
+                  <span className="text-sm text-gray-500">
+                    {new Date(student.createdAt).toLocaleDateString('nl-NL')}
+                  </span>
+                </TableCell>
+                <TableCell className="text-right">
+                  <div className="flex items-center justify-end gap-1">
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="h-8 w-8 p-0"
+                            onClick={() => handleViewDossier(student)}
+                          >
+                            <FileText className="h-4 w-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Dossier bekijken</TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
+                </TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredStudents.map((student) => (
-                <TableRow key={student.id} className="border-b border-[#f3f4f6] hover:bg-gray-50/50">
-                  <TableCell>
-                    <Checkbox />
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      <Avatar className="h-8 w-8">
-                        <AvatarImage src={student.photoUrl} />
-                        <AvatarFallback className="text-xs">
-                          {student.firstName.charAt(0)}{student.lastName.charAt(0)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <div className="font-medium text-sm">
-                          {student.firstName} {student.lastName}
-                        </div>
-                        <div className="text-xs text-gray-500">{student.email}</div>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <span className="font-mono text-sm">{student.studentId}</span>
-                  </TableCell>
-                  <TableCell>
-                    <Badge 
-                      variant={student.status === 'active' ? 'default' : 
-                               student.status === 'inactive' ? 'secondary' : 'outline'}
-                      className="text-xs"
-                    >
-                      {student.status === 'active' ? 'Actief' : 
-                       student.status === 'inactive' ? 'Inactief' : 
-                       student.status === 'graduated' ? 'Afgestudeerd' : student.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <span className="text-sm">{student.className || '-'}</span>
-                  </TableCell>
-                  <TableCell>
-                    <div className="text-sm">
-                      <div className="flex items-center gap-1 text-gray-600">
-                        <Phone className="h-3 w-3" />
-                        {student.phone || '-'}
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <span className="text-sm">{student.guardianName || '-'}</span>
-                  </TableCell>
-                  <TableCell>
-                    <span className="text-sm text-gray-500">
-                      {new Date(student.createdAt).toLocaleDateString('nl-NL')}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex items-center justify-end gap-1">
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              className="h-8 w-8 p-0"
-                              onClick={() => handleViewDossier(student)}
-                            >
-                              <FileText className="h-4 w-4" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>Dossier bekijken</TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+            ))}
+          </TableBody>
+        </Table>
 
         {filteredStudents.length === 0 && (
-          <div className="p-8">
+          <div className="p-8 text-center">
             <EmptyState
               icon={<FileText className="h-12 w-12" />}
               title="Geen leerlingen gevonden"
@@ -378,7 +305,7 @@ export default function StudentDossier() {
             />
           </div>
         )}
-      </DataTableContainer>
+      </AdminTableCard>
 
       {/* Student Dossier Dialog */}
       <Dialog open={showDossier} onOpenChange={setShowDossier}>
@@ -577,6 +504,6 @@ export default function StudentDossier() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </AdminPageLayout>
   );
 }

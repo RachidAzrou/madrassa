@@ -213,6 +213,8 @@ function AuthenticatedRouter() {
         <Route path="/fees" component={() => <AuthenticatedRoute component={Fees} />} />
         <Route path="/re-enrollment" component={() => <AuthenticatedRoute component={ReEnrollment} />} />
         <Route path="/student-dossier" component={() => <AuthenticatedRoute component={StudentDossier} />} />
+        <Route path="/leerlingendossier" component={() => <AuthenticatedRoute component={StudentDossier} />} />
+        <Route path="/herinschrijvingen" component={() => <AuthenticatedRoute component={ReEnrollments} />} />
         <Route path="/reports" component={() => <AuthenticatedRoute component={Reports} />} />
         <Route path="/profiel" component={() => <AuthenticatedRoute component={Profile} />} />
         <Route path="/profile" component={() => <AuthenticatedRoute component={Profile} />} />

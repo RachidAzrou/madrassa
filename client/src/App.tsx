@@ -102,7 +102,7 @@ function AuthenticatedRouter() {
           <Route path="/programs" component={() => <AuthenticatedRoute component={Programs} />} />
           <Route path="/calendar" component={() => <AuthenticatedRoute component={Calendar} />} />
           <Route path="/attendance" component={() => <AuthenticatedRoute component={Attendance} />} />
-          <Route path="/grades" component={() => <AuthenticatedRoute component={Cijfers} />} />
+          <Route path="/grading" component={() => <AuthenticatedRoute component={Cijfers} />} />
           <Route path="/reports" component={() => <AuthenticatedRoute component={Reports} />} />
           <Route path="/fees" component={() => <AuthenticatedRoute component={Fees} />} />
           <Route path="/messages" component={() => <AuthenticatedRoute component={Messages} />} />

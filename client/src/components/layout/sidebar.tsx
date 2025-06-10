@@ -221,13 +221,7 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
                   isActive={location.startsWith("/academic-year-management")}
                   onClick={handleLinkClick}
                 />
-                <SidebarLink
-                  href="/accounts"
-                  icon={<Settings className="h-4 w-4" />}
-                  label="Accounts"
-                  isActive={location.startsWith("/accounts")}
-                  onClick={handleLinkClick}
-                />
+
 
               </div>
             </div>

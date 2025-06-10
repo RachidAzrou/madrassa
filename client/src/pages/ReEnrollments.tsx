@@ -25,16 +25,7 @@ import EmptyState from '@/components/ui/empty-state';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { apiRequest } from '@/lib/queryClient';
-import { 
-  AdminPageLayout, 
-  AdminPageHeader, 
-  AdminStatsGrid, 
-  AdminStatCard, 
-  AdminSearchBar, 
-  AdminTableCard,
-  AdminFilterSelect,
-  AdminActionButton
-} from '@/components/ui/admin-layout';
+import { PremiumHeader } from '@/components/layout/premium-header';
 
 // Types
 interface Student {

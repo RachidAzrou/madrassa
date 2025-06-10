@@ -23,16 +23,7 @@ import { useToast } from '@/hooks/use-toast';
 import EmptyState from '@/components/ui/empty-state';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { 
-  AdminPageLayout, 
-  AdminPageHeader, 
-  AdminStatsGrid, 
-  AdminStatCard, 
-  AdminSearchBar, 
-  AdminTableCard,
-  AdminFilterSelect,
-  AdminActionButton
-} from '@/components/ui/admin-layout';
+import { PremiumHeader } from '@/components/layout/premium-header';
 
 // Types
 interface Student {
@@ -115,92 +106,122 @@ export default function StudentDossier() {
 
   if (isLoading) {
     return (
-      <AdminPageLayout>
+      <div className="p-6">
         <div className="h-64 flex items-center justify-center">
           <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
         </div>
-      </AdminPageLayout>
+      </div>
     );
   }
 
   return (
-    <AdminPageLayout>
+    <div className="p-6 space-y-6">
       {/* Header */}
-      <AdminPageHeader 
+      <PremiumHeader 
         title="Leerlingendossier" 
         description="Bekijk en beheer uitgebreide leerlingendossiers"
-      >
-        <AdminActionButton icon={<Download />}>
-          Export
-        </AdminActionButton>
-      </AdminPageHeader>
-
-      {/* Stats Grid */}
-      <AdminStatsGrid>
-        <AdminStatCard
-          title="Totaal Leerlingen"
-          value={students.length}
-          icon={<Users className="h-4 w-4" />}
-        />
-        <AdminStatCard
-          title="Actieve Leerlingen"
-          value={students.filter(s => s.status === 'active').length}
-          icon={<GraduationCap className="h-4 w-4" />}
-          valueColor="text-green-600"
-        />
-        <AdminStatCard
-          title="Uitgeschreven"
-          value={students.filter(s => s.status === 'inactive').length}
-          icon={<Clock className="h-4 w-4" />}
-          valueColor="text-orange-600"
-        />
-        <AdminStatCard
-          title="Gemiddelde Cijfer"
-          value="7.8"
-          icon={<Award className="h-4 w-4" />}
-          valueColor="text-blue-600"
-        />
-      </AdminStatsGrid>
-
-      {/* Search and Filters */}
-      <AdminSearchBar
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
-        placeholder="Zoeken op naam, leerlingnummer of email..."
-        filters={
-          <>
-            <AdminFilterSelect
-              value={selectedStatus}
-              onValueChange={setSelectedStatus}
-              placeholder="Status"
-              options={[
-                { value: 'all', label: 'Alle statussen' },
-                { value: 'active', label: 'Actief' },
-                { value: 'inactive', label: 'Inactief' },
-                { value: 'graduated', label: 'Afgestudeerd' }
-              ]}
-            />
-            <AdminFilterSelect
-              value={selectedClass}
-              onValueChange={setSelectedClass}
-              placeholder="Klas"
-              options={[
-                { value: 'all', label: 'Alle klassen' },
-                { value: '1A', label: '1A' },
-                { value: '1B', label: '1B' },
-                { value: '2A', label: '2A' },
-                { value: '2B', label: '2B' }
-              ]}
-            />
-          </>
-        }
       />
 
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Totaal Leerlingen</p>
+                <p className="text-2xl font-bold">{students.length}</p>
+              </div>
+              <Users className="h-8 w-8 text-blue-600" />
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Actieve Leerlingen</p>
+                <p className="text-2xl font-bold text-green-600">{students.filter(s => s.status === 'active').length}</p>
+              </div>
+              <GraduationCap className="h-8 w-8 text-green-600" />
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Uitgeschreven</p>
+                <p className="text-2xl font-bold text-orange-600">{students.filter(s => s.status === 'inactive').length}</p>
+              </div>
+              <Clock className="h-8 w-8 text-orange-600" />
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Gemiddelde Cijfer</p>
+                <p className="text-2xl font-bold text-blue-600">7.8</p>
+              </div>
+              <Award className="h-8 w-8 text-blue-600" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Search and Filters */}
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex flex-col lg:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="Zoeken op naam, leerlingnummer of email..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <div className="flex gap-2">
+              <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Alle statussen</SelectItem>
+                  <SelectItem value="active">Actief</SelectItem>
+                  <SelectItem value="inactive">Inactief</SelectItem>
+                  <SelectItem value="graduated">Afgestudeerd</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={selectedClass} onValueChange={setSelectedClass}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Klas" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Alle klassen</SelectItem>
+                  <SelectItem value="1A">1A</SelectItem>
+                  <SelectItem value="1B">1B</SelectItem>
+                  <SelectItem value="2A">2A</SelectItem>
+                  <SelectItem value="2B">2B</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button variant="outline" size="icon">
+                <Download className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Main Table */}
-      <AdminTableCard 
-        title="Leerlingendossiers" 
-        subtitle={`${filteredStudents.length} leerlingen gevonden`}
-      >
+      <Card>
+        <CardHeader>
+          <CardTitle>Leerlingendossiers</CardTitle>
+          <CardDescription>{filteredStudents.length} leerlingen gevonden</CardDescription>
+        </CardHeader>
+        <CardContent>
         <Table>
           <TableHeader>
             <TableRow>
@@ -305,7 +326,8 @@ export default function StudentDossier() {
             />
           </div>
         )}
-      </AdminTableCard>
+        </CardContent>
+      </Card>
 
       {/* Student Dossier Dialog */}
       <Dialog open={showDossier} onOpenChange={setShowDossier}>
@@ -504,6 +526,6 @@ export default function StudentDossier() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </AdminPageLayout>
+    </div>
   );
 }

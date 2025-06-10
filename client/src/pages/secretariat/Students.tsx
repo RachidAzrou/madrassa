@@ -315,8 +315,6 @@ export default function Students() {
 
   // eID scanning functionality
   const handleEidScan = () => {
-    console.log('eID button clicked - starting file selection');
-    
     // Create a dynamic file input specifically for eID documents
     const input = document.createElement('input');
     input.type = 'file';
@@ -324,11 +322,8 @@ export default function Students() {
     input.style.display = 'none';
     
     input.onchange = (e) => {
-      console.log('File selected for eID processing');
       const file = (e.target as HTMLInputElement).files?.[0];
       if (file) {
-        console.log('eID file details:', { name: file.name, type: file.type, size: file.size });
-        
         // Validate file size (max 10MB for documents)
         if (file.size > 10 * 1024 * 1024) {
           toast({
@@ -350,10 +345,7 @@ export default function Students() {
           return;
         }
 
-        console.log('Starting eID document processing');
         processEidDocument(file);
-      } else {
-        console.log('No file selected');
       }
     };
     
@@ -815,21 +807,6 @@ export default function Students() {
                               {isUploadingPhoto ? 'Uploading...' : 'Upload'}
                             </span>
                           </button>
-                          <button 
-                            type="button" 
-                            className={`flex items-center justify-center gap-1 border border-gray-300 rounded-md px-2 py-1 hover:bg-gray-50 transition-colors text-sm ${isProcessingEid ? 'opacity-50 cursor-not-allowed' : ''}`}
-                            onClick={handleEidScan}
-                            disabled={isProcessingEid}
-                          >
-                            {isProcessingEid ? (
-                              <div className="animate-spin w-4 h-4 border-2 border-gray-500 border-t-transparent rounded-full"></div>
-                            ) : (
-                              <FileText className="h-4 w-4 text-gray-500" />
-                            )}
-                            <span className="text-xs font-medium text-gray-700">
-                              {isProcessingEid ? 'Verwerking...' : 'eID'}
-                            </span>
-                          </button>
                           {formData.photoUrl && (
                             <button 
                               type="button" 
@@ -841,16 +818,59 @@ export default function Students() {
                             </button>
                           )}
                         </div>
-                        <input
-                          id="photo-upload"
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={handlePhotoChange}
-                        />
-
                       </div>
                     </div>
+                    
+                    {/* eID Sectie */}
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                            <FileText className="h-5 w-5 text-white" />
+                          </div>
+                          <div>
+                            <h3 className="text-sm font-semibold text-blue-900">eID Scan</h3>
+                            <p className="text-xs text-blue-700 leading-relaxed">
+                              Upload je elektronische identiteitskaart om<br />
+                              gegevens automatisch in te vullen
+                            </p>
+                          </div>
+                        </div>
+                        <button 
+                          type="button" 
+                          className={`px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium transition-colors ${isProcessingEid ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          onClick={handleEidScan}
+                          disabled={isProcessingEid}
+                        >
+                          {isProcessingEid ? (
+                            <div className="flex items-center gap-2">
+                              <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
+                              Verwerkt...
+                            </div>
+                          ) : (
+                            'eID Uploaden'
+                          )}
+                        </button>
+                    </div>
+                    
+                    {/* Hidden inputs */}
+                    <input
+                      id="photo-upload"
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handlePhotoChange}
+                    />
+                    <input
+                      id="eid-upload"
+                      type="file"
+                      accept="image/*,.pdf"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target?.files?.[0];
+                        if (file) processEidDocument(file);
+                      }}
+                    />
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <div>
                         <Label htmlFor="studentId" className="text-xs font-medium text-gray-700">Student ID</Label>
@@ -1236,6 +1256,7 @@ export default function Students() {
                 <User className="h-4 w-4 mr-2" />
                 {createStudentMutation.isPending ? 'Student toevoegen...' : 'Student toevoegen'}
               </Button>
+            </div>
             </div>
           </form>
         </DialogContent>

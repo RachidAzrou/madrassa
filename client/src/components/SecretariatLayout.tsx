@@ -64,74 +64,88 @@ export default function SecretariatLayout({ children }: SecretariatLayoutProps) 
   const allNavigationItems = [
     {
       name: 'Dashboard',
-      href: '/secretariat',
+      href: '/',
       icon: LayoutDashboard,
-      current: location === '/secretariat',
+      current: location === '/' || location === '/dashboard',
       resource: 'dashboard' as const
     },
     {
       name: 'Studenten',
-      href: '/secretariat/students',
+      href: '/students',
       icon: Users,
-      current: location.startsWith('/secretariat/students'),
+      current: location.startsWith('/students'),
       resource: 'student' as const
     },
     {
       name: 'Docenten',
-      href: '/secretariat/teachers',
+      href: '/teachers',
       icon: GraduationCap,
-      current: location.startsWith('/secretariat/teachers'),
+      current: location.startsWith('/teachers'),
       resource: 'teacher' as const
     },
     {
       name: 'Voogden',
-      href: '/secretariat/guardians',
-      icon: Users,
-      current: location.startsWith('/secretariat/guardians'),
+      href: '/guardians',
+      icon: UserCheck,
+      current: location.startsWith('/guardians'),
       resource: 'guardian' as const
     },
     {
-      name: 'Klassen',
-      href: '/secretariat/classes',
-      icon: School,
-      current: location.startsWith('/secretariat/classes'),
-      resource: 'class' as const
-    },
-    {
-      name: 'Cursussen',
-      href: '/secretariat/courses',
+      name: 'Vakken',
+      href: '/courses',
       icon: BookText,
-      current: location.startsWith('/secretariat/courses'),
+      current: location.startsWith('/courses'),
       resource: 'course' as const
     },
     {
-      name: 'Roosterbeheer',
-      href: '/secretariat/schedule',
+      name: 'Programma\'s',
+      href: '/programs',
+      icon: BookMarked,
+      current: location.startsWith('/programs'),
+      resource: 'program' as const
+    },
+    {
+      name: 'Kalender',
+      href: '/calendar',
       icon: Calendar,
-      current: location.startsWith('/secretariat/schedule'),
-      resource: 'schedule' as const
+      current: location.startsWith('/calendar'),
+      resource: 'calendar' as const
+    },
+    {
+      name: 'Aanwezigheid',
+      href: '/attendance',
+      icon: UserCheck,
+      current: location.startsWith('/attendance'),
+      resource: 'attendance' as const
+    },
+    {
+      name: 'Cijfers',
+      href: '/grades',
+      icon: FileText,
+      current: location.startsWith('/grades'),
+      resource: 'grade' as const
     },
     {
       name: 'Rapporten',
-      href: '/secretariat/reports',
-      icon: BookMarked,
-      current: location.startsWith('/secretariat/reports'),
+      href: '/reports',
+      icon: BarChart3,
+      current: location.startsWith('/reports'),
       resource: 'report' as const
     },
     {
-      name: 'Betalingsbeheer',
-      href: '/secretariat/payments',
+      name: 'Betalingen',
+      href: '/fees',
       icon: CreditCard,
-      current: location.startsWith('/secretariat/payments'),
+      current: location.startsWith('/fees'),
       resource: 'payment' as const
     },
     {
-      name: 'Communicatie',
-      href: '/secretariat/communications',
+      name: 'Berichten',
+      href: '/messages',
       icon: MessageCircle,
-      current: location.startsWith('/secretariat/communications'),
-      resource: 'communication' as const
-    },
+      current: location.startsWith('/messages'),
+      resource: 'message' as const
+    }
   ];
 
   // Filter ongelezen berichten en formatteer voor weergave
@@ -162,18 +176,20 @@ export default function SecretariatLayout({ children }: SecretariatLayoutProps) 
 
   // Generate user display data from profile data (preferred) or authenticated user
   const getUserDisplayData = () => {
-    const userData = profileData || user;
+    const userData: any = profileData || user || {};
     if (!userData) return { name: 'Gebruiker', role: 'Onbekend', avatar: 'G' };
     
     const name = `${userData.firstName || ''} ${userData.lastName || ''}`.trim() || userData.name || userData.email || 'Gebruiker';
     const roleMap: { [key: string]: string } = {
       'administrator': 'Beheerder',
+      'admin': 'Beheerder',
       'docent': 'Docent', 
       'teacher': 'Docent',
       'student': 'Student',
       'voogd': 'Voogd',
       'guardian': 'Voogd',
-      'secretariaat': 'Secretariaat'
+      'secretariaat': 'Secretariaat',
+      'secretariat': 'Secretariaat'
     };
     const role = roleMap[user?.role || ''] || user?.role || 'Onbekend';
     const avatar = `${userData.firstName?.[0] || ''}${userData.lastName?.[0] || ''}`.toUpperCase();
@@ -184,8 +200,8 @@ export default function SecretariatLayout({ children }: SecretariatLayoutProps) 
   const userDisplayData = getUserDisplayData();
 
   // Bereken het aantal ongelezen notificaties
-  const notifications = notificationsData?.notifications || [];
-  const unreadCount = notifications.filter((n: any) => !n.isRead).length;
+  const notifications = notificationsData || [];
+  const unreadCount = Array.isArray(notifications) ? notifications.filter((n: any) => !n.isRead).length : 0;
 
   // Show all navigation items for secretariat role
   const navigation = allNavigationItems;

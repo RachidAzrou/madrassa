@@ -28,7 +28,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import NotificationDropdown from '@/components/notifications/NotificationDropdown';
-import myMadrassaLogo from "@assets/myMadrassa.png";
+import myMadrassaLogo from "@/assets/mymadrassa_logo.png";
 
 interface TeacherLayoutProps {
   children: React.ReactNode;
@@ -145,9 +145,8 @@ export default function TeacherLayout({ children }: TeacherLayoutProps) {
             <img 
               src={myMadrassaLogo} 
               alt="myMadrassa Logo" 
-              className="w-6 h-6"
+              className="h-10 sm:h-11"
             />
-            <span className="text-lg font-bold text-[#1e40af]">myMadrassa</span>
           </div>
 
 

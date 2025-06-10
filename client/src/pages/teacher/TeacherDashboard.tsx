@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { PremiumHeader } from "@/components/layout/premium-header";
+import UnifiedLayout from "@/components/layout/UnifiedLayout";
 import {
   Users,
   BookText,

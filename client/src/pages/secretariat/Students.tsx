@@ -910,27 +910,7 @@ export default function Students() {
                     </div>
                   </div>
 
-                  <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
-                    <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
-                      <FileText className="h-4 w-4 mr-2" />
-                      Betaalstatus
-                    </h3>
-                    <div>
-                      <Label htmlFor="paymentStatus" className="text-xs font-medium text-gray-700">Status</Label>
-                      <Select 
-                        value={formData.paymentStatus} 
-                        onValueChange={(value) => handleSelectChange('paymentStatus', value)}
-                      >
-                        <SelectTrigger className="mt-1 h-9">
-                          <SelectValue placeholder="Selecteer status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="open">Open</SelectItem>
-                          <SelectItem value="paid">Betaald</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
+
                   
                   <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
                     <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
@@ -984,23 +964,7 @@ export default function Students() {
                     </div>
                   )}
 
-                  <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
-                    <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
-                      <FileText className="h-4 w-4 mr-2" />
-                      Aanvullende Informatie
-                    </h3>
-                    <div>
-                      <Label htmlFor="notes" className="text-xs font-medium text-gray-700">Opmerkingen</Label>
-                      <Textarea
-                        id="notes"
-                        name="notes"
-                        value={formData.notes}
-                        onChange={handleInputChange}
-                        className="mt-1 min-h-[80px] resize-none"
-                        placeholder="Voeg hier eventuele opmerkingen of aantekeningen toe..."
-                      />
-                    </div>
-                  </div>
+
                 </div>
                 
                 <div className="space-y-4">
@@ -1056,6 +1020,46 @@ export default function Students() {
                           />
                         </button>
                       </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                    <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                      <FileText className="h-4 w-4 mr-2" />
+                      Betaalstatus
+                    </h3>
+                    <div>
+                      <Label htmlFor="paymentStatus" className="text-xs font-medium text-gray-700">Status</Label>
+                      <Select 
+                        value={formData.paymentStatus} 
+                        onValueChange={(value) => handleSelectChange('paymentStatus', value)}
+                      >
+                        <SelectTrigger className="mt-1 h-9">
+                          <SelectValue placeholder="Selecteer status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="open">Open</SelectItem>
+                          <SelectItem value="paid">Betaald</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                    <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                      <FileText className="h-4 w-4 mr-2" />
+                      Aanvullende Informatie
+                    </h3>
+                    <div>
+                      <Label htmlFor="notes" className="text-xs font-medium text-gray-700">Opmerkingen</Label>
+                      <Textarea
+                        id="notes"
+                        name="notes"
+                        value={formData.notes}
+                        onChange={handleInputChange}
+                        className="mt-1 min-h-[80px] resize-none"
+                        placeholder="Voeg hier eventuele opmerkingen of aantekeningen toe..."
+                      />
                     </div>
                   </div>
                 </div>

@@ -133,7 +133,7 @@ export default function Students() {
     mutationFn: async (studentData: any) => {
       const formDataToSend = new FormData();
       Object.entries(studentData).forEach(([key, value]) => {
-        if (value !== null && value !== undefined) {
+        if (value !== null && value !== undefined && key !== 'selectedSiblings') {
           formDataToSend.append(key, value as string);
         }
       });
@@ -152,7 +152,30 @@ export default function Students() {
         throw new Error(errorData.message || 'Failed to create student');
       }
 
-      return response.json();
+      const newStudent = await response.json();
+
+      // Als er broers/zussen zijn geselecteerd, voeg deze toe
+      if (studentData.selectedSiblings && studentData.selectedSiblings.length > 0) {
+        try {
+          const siblingResponse = await fetch(`/api/students/${newStudent.id}/siblings`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              siblingIds: studentData.selectedSiblings
+            }),
+          });
+
+          if (!siblingResponse.ok) {
+            console.error('Failed to link siblings, but student was created');
+          }
+        } catch (error) {
+          console.error('Error linking siblings:', error);
+        }
+      }
+
+      return newStudent;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/students'] });

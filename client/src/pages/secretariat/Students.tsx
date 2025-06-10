@@ -99,8 +99,9 @@ export default function Students() {
     address: '',
     postalCode: '',
     city: '',
-    academicYear: '2024-2025',
+    academicYear: '',
     studentGroupId: '',
+    paymentStatus: 'pending',
     notes: '',
     guardianId: '',
     selectedSiblings: [] as number[]
@@ -122,6 +123,11 @@ export default function Students() {
   // Fetch guardians data
   const { data: guardians = [] } = useQuery<Guardian[]>({
     queryKey: ['/api/guardians'],
+  });
+
+  // Fetch academic years data
+  const { data: academicYears = [] } = useQuery({
+    queryKey: ['/api/academic-years'],
   });
 
   // Potential siblings (other students with same last name)
@@ -208,8 +214,9 @@ export default function Students() {
       address: '',
       postalCode: '',
       city: '',
-      academicYear: '2024-2025',
+      academicYear: '',
       studentGroupId: '',
+      paymentStatus: 'pending',
       notes: '',
       guardianId: '',
       selectedSiblings: []
@@ -862,18 +869,24 @@ export default function Students() {
                       <GraduationCap className="h-4 w-4 mr-2" />
                       Onderwijsgegevens
                     </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                       <div>
                         <Label htmlFor="academicYear" className="text-xs font-medium text-gray-700">Schooljaar *</Label>
-                        <Input
-                          id="academicYear"
-                          name="academicYear"
-                          value={formData.academicYear}
-                          onChange={handleInputChange}
-                          required
-                          placeholder="2024-2025"
-                          className="mt-1 h-9"
-                        />
+                        <Select 
+                          value={formData.academicYear} 
+                          onValueChange={(value) => handleSelectChange('academicYear', value)}
+                        >
+                          <SelectTrigger className="mt-1 h-9">
+                            <SelectValue placeholder="Selecteer schooljaar" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {academicYears.filter((year: any) => year.isActive).map((year: any) => (
+                              <SelectItem key={year.id} value={year.name}>
+                                {year.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </div>
                       
                       <div>
@@ -891,6 +904,24 @@ export default function Students() {
                                 {group.name}
                               </SelectItem>
                             ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div>
+                        <Label htmlFor="paymentStatus" className="text-xs font-medium text-gray-700">Betaalstatus</Label>
+                        <Select 
+                          value={formData.paymentStatus} 
+                          onValueChange={(value) => handleSelectChange('paymentStatus', value)}
+                        >
+                          <SelectTrigger className="mt-1 h-9">
+                            <SelectValue placeholder="Selecteer status" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="paid">Betaald</SelectItem>
+                            <SelectItem value="pending">In behandeling</SelectItem>
+                            <SelectItem value="overdue">Achterstallig</SelectItem>
+                            <SelectItem value="partial">Gedeeltelijk betaald</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>

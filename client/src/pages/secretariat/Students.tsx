@@ -101,7 +101,7 @@ export default function Students() {
     city: '',
     academicYear: '',
     studentGroupId: '',
-    paymentStatus: 'pending',
+    paymentStatus: 'open',
     notes: '',
     guardianId: '',
     selectedSiblings: [] as number[]
@@ -216,7 +216,7 @@ export default function Students() {
       city: '',
       academicYear: '',
       studentGroupId: '',
-      paymentStatus: 'pending',
+      paymentStatus: 'open',
       notes: '',
       guardianId: '',
       selectedSiblings: []
@@ -869,7 +869,7 @@ export default function Students() {
                       <GraduationCap className="h-4 w-4 mr-2" />
                       Onderwijsgegevens
                     </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <div>
                         <Label htmlFor="academicYear" className="text-xs font-medium text-gray-700">Schooljaar *</Label>
                         <Select 
@@ -907,24 +907,28 @@ export default function Students() {
                           </SelectContent>
                         </Select>
                       </div>
+                    </div>
+                  </div>
 
-                      <div>
-                        <Label htmlFor="paymentStatus" className="text-xs font-medium text-gray-700">Betaalstatus</Label>
-                        <Select 
-                          value={formData.paymentStatus} 
-                          onValueChange={(value) => handleSelectChange('paymentStatus', value)}
-                        >
-                          <SelectTrigger className="mt-1 h-9">
-                            <SelectValue placeholder="Selecteer status" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="paid">Betaald</SelectItem>
-                            <SelectItem value="pending">In behandeling</SelectItem>
-                            <SelectItem value="overdue">Achterstallig</SelectItem>
-                            <SelectItem value="partial">Gedeeltelijk betaald</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
+                  <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                    <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                      <FileText className="h-4 w-4 mr-2" />
+                      Betaalstatus
+                    </h3>
+                    <div>
+                      <Label htmlFor="paymentStatus" className="text-xs font-medium text-gray-700">Status</Label>
+                      <Select 
+                        value={formData.paymentStatus} 
+                        onValueChange={(value) => handleSelectChange('paymentStatus', value)}
+                      >
+                        <SelectTrigger className="mt-1 h-9">
+                          <SelectValue placeholder="Selecteer status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="open">Open</SelectItem>
+                          <SelectItem value="paid">Betaald</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
                   

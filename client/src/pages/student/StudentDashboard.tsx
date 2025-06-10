@@ -70,67 +70,59 @@ export default function StudentDashboard() {
       {/* Main content area */}
       <div className="px-6 py-6 max-w-7xl mx-auto">
         
-        {/* Stats Overview - Admin Style */}
+        {/* Stats Overview - Modern Style */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           {/* Mijn Klas */}
-          <div className="bg-white border border-[#e5e7eb] rounded-sm">
-            <div className="flex h-full">
-              <div className="flex items-center justify-center w-14 bg-[#f5f7fc] border-r border-[#e5e7eb]">
-                <Users className="h-5 w-5 text-[#1e40af]" />
-              </div>
-              <div className="flex-1 p-3">
-                <div className="flex flex-col">
-                  <h3 className="text-xs font-medium text-gray-500">Mijn Klas</h3>
-                  <p className="text-lg font-medium text-gray-800 mt-1">{stats.myClass}</p>
+          <Card className="premium-card border-l-4 border-l-blue-500">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">Mijn Klas</p>
+                  <p className="text-2xl font-bold text-blue-600">{stats.myClass}</p>
                 </div>
+                <Users className="h-8 w-8 text-blue-500" />
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
           {/* Vakken */}
-          <div className="bg-white border border-[#e5e7eb] rounded-sm">
-            <div className="flex h-full">
-              <div className="flex items-center justify-center w-14 bg-[#f5f7fc] border-r border-[#e5e7eb]">
-                <BookOpen className="h-5 w-5 text-[#1e40af]" />
-              </div>
-              <div className="flex-1 p-3">
-                <div className="flex flex-col">
-                  <h3 className="text-xs font-medium text-gray-500">Vakken</h3>
-                  <p className="text-lg font-medium text-gray-800 mt-1">{stats.totalSubjects}</p>
+          <Card className="premium-card border-l-4 border-l-green-500">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">Vakken</p>
+                  <p className="text-2xl font-bold text-green-600">{stats.totalSubjects}</p>
                 </div>
+                <BookOpen className="h-8 w-8 text-green-500" />
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
           {/* Aanwezigheid */}
-          <div className="bg-white border border-[#e5e7eb] rounded-sm">
-            <div className="flex h-full">
-              <div className="flex items-center justify-center w-14 bg-[#f5f7fc] border-r border-[#e5e7eb]">
-                <UserCheck className="h-5 w-5 text-[#1e40af]" />
-              </div>
-              <div className="flex-1 p-3">
-                <div className="flex flex-col">
-                  <h3 className="text-xs font-medium text-gray-500">Aanwezigheid</h3>
-                  <p className="text-lg font-medium text-gray-800 mt-1">{stats.attendanceRate}%</p>
+          <Card className="premium-card border-l-4 border-l-yellow-500">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">Aanwezigheid</p>
+                  <p className="text-2xl font-bold text-yellow-600">{stats.attendanceRate}%</p>
                 </div>
+                <UserCheck className="h-8 w-8 text-yellow-500" />
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
           {/* Berichten */}
-          <div className="bg-white border border-[#e5e7eb] rounded-sm">
-            <div className="flex h-full">
-              <div className="flex items-center justify-center w-14 bg-[#f5f7fc] border-r border-[#e5e7eb]">
-                <Mail className="h-5 w-5 text-[#1e40af]" />
-              </div>
-              <div className="flex-1 p-3">
-                <div className="flex flex-col">
-                  <h3 className="text-xs font-medium text-gray-500">Berichten</h3>
-                  <p className="text-lg font-medium text-gray-800 mt-1">{stats.unreadMessages}</p>
+          <Card className="premium-card border-l-4 border-l-red-500">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">Berichten</p>
+                  <p className="text-2xl font-bold text-red-600">{stats.unreadMessages}</p>
                 </div>
+                <Mail className="h-8 w-8 text-red-500" />
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Main dashboard content */}

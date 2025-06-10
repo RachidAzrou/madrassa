@@ -122,7 +122,7 @@ export default function TeacherDashboard() {
       <div className="px-6 py-6 space-y-6">
         {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-          <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
+          <Card className="premium-card bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
@@ -136,7 +136,7 @@ export default function TeacherDashboard() {
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
+          <Card className="premium-card bg-gradient-to-br from-green-50 to-green-100 border-green-200">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
@@ -150,7 +150,7 @@ export default function TeacherDashboard() {
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
+          <Card className="premium-card bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
@@ -164,7 +164,7 @@ export default function TeacherDashboard() {
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200">
+          <Card className="premium-card bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
@@ -178,7 +178,7 @@ export default function TeacherDashboard() {
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-200">
+          <Card className="premium-card bg-gradient-to-br from-red-50 to-red-100 border-red-200">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
@@ -192,7 +192,7 @@ export default function TeacherDashboard() {
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-indigo-50 to-indigo-100 border-indigo-200">
+          <Card className="premium-card bg-gradient-to-br from-indigo-50 to-indigo-100 border-indigo-200">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>

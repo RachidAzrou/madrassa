@@ -6201,17 +6201,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/students/:studentId/siblings", async (req: Request, res: Response) => {
     try {
       const studentId = parseInt(req.params.studentId);
-      const { siblingId, relationship = "sibling" } = req.body;
+      const { siblingIds } = req.body;
       
-      if (!siblingId) {
-        return res.status(400).json({ error: "siblingId is required" });
+      if (!Array.isArray(siblingIds) || siblingIds.length === 0) {
+        return res.status(400).json({ error: "siblingIds array is required" });
       }
 
-      await storage.addStudentSibling(studentId, parseInt(siblingId), relationship);
-      res.status(201).json({ message: "Sibling relationship created successfully" });
+      // Add all sibling relationships
+      for (const siblingId of siblingIds) {
+        if (studentId !== parseInt(siblingId)) {
+          await storage.addStudentSibling(studentId, parseInt(siblingId));
+        }
+      }
+
+      res.status(201).json({ message: "Sibling relationships created successfully" });
     } catch (error) {
-      console.error("Error adding student sibling:", error);
-      res.status(500).json({ error: "Failed to add student sibling" });
+      console.error("Error adding student siblings:", error);
+      res.status(500).json({ error: "Failed to add student siblings" });
     }
   });
 

@@ -68,4 +68,3 @@ const UnifiedLayout = ({ children, userRole }: UnifiedLayoutProps) => {
 };
 
 export default UnifiedLayout;
-export { UnifiedLayout };

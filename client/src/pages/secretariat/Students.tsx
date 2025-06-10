@@ -33,6 +33,7 @@ import {
   AlertTriangle,
   Camera
 } from 'lucide-react';
+import eidLogoPath from '@assets/e-id-logo_1749570968055.png';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { PremiumHeader } from '@/components/layout/premium-header';
 import { DataTableContainer, TableContainer } from '@/components/ui/containers';
@@ -98,12 +99,12 @@ export default function Students() {
   const queryClient = useQueryClient();
 
   // Fetch students data
-  const { data: students = [], isLoading } = useQuery({
+  const { data: students = [], isLoading } = useQuery<Student[]>({
     queryKey: ['/api/students'],
   });
 
   // Fetch classes data
-  const { data: classes = [] } = useQuery({
+  const { data: classes = [] } = useQuery<StudentClass[]>({
     queryKey: ['/api/classes'],
   });
 
@@ -234,7 +235,7 @@ export default function Students() {
     console.log('Delete student:', student);
   };
 
-  const filteredStudents = students.filter((student: Student) => {
+  const filteredStudents = (students as Student[]).filter((student: Student) => {
     const matchesSearch = student.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          student.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          student.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -291,8 +292,8 @@ export default function Students() {
     <div className="p-6 space-y-6">
       <PremiumHeader
         title="Studentenbeheer"
-        subtitle="Beheer alle studenten in het systeem"
-        icon={<Users className="h-6 w-6" />}
+        description="Beheer alle studenten in het systeem"
+        icon={Users}
       />
 
       {/* Stats Cards */}
@@ -752,6 +753,24 @@ export default function Students() {
                         <p className="text-xs text-gray-500 mt-1">
                           Maximaal 5MB, JPG/PNG
                         </p>
+                      </div>
+                      
+                      <div className="border-t pt-3">
+                        <button
+                          type="button"
+                          className="eid-button w-full justify-center"
+                          onClick={() => {
+                            // eID processing logic will be added here
+                            console.log('eID scan initiated');
+                          }}
+                        >
+                          <img 
+                            src={eidLogoPath} 
+                            alt="eID" 
+                            className="eid-logo"
+                          />
+                          Scan eID
+                        </button>
                       </div>
                     </div>
                   </div>

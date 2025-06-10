@@ -114,6 +114,106 @@
   }
 }
 
+/* Modern UI styling enhancements */
+.card-shadow {
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s ease-in-out;
+}
+
+.card-shadow-hover:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.glass-effect {
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* myMadrassa specific styling */
+.bg-madrassa-blue {
+  background-color: var(--madrassa-blue);
+}
+
+.bg-madrassa-gradient {
+  background: linear-gradient(135deg, var(--madrassa-gradient-start), var(--madrassa-gradient-end));
+}
+
+.text-madrassa-blue {
+  color: var(--madrassa-blue);
+}
+
+.border-madrassa-blue {
+  border-color: var(--madrassa-blue);
+}
+
+/* eID button styling */
+.eid-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #4ade80, #22c55e);
+  border: none;
+  border-radius: 0.5rem;
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  box-shadow: var(--shadow-sm);
+}
+
+.eid-button:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.eid-logo {
+  width: 24px;
+  height: 16px;
+  object-fit: contain;
+}
+
+/* Enhanced table styling */
+.modern-table {
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.modern-table-header {
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  border-bottom: 2px solid #e2e8f0;
+}
+
+/* Premium cards */
+.premium-card {
+  border-radius: 1rem;
+  background: white;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid #f1f5f9;
+  transition: all 0.2s ease-in-out;
+}
+
+.premium-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+/* Modern buttons */
+.btn-modern {
+  border-radius: 0.75rem;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-modern:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
 /* Globale dialoogvenster verbeteringen voor de hele app */
 
 /* Maak het dialoogvenster groter */

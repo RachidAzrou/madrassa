@@ -201,6 +201,55 @@ export default function Students() {
     }
   };
 
+  const handleEidScan = async () => {
+    try {
+      toast({
+        title: "eID Scanner",
+        description: "Bezig met scannen van identiteitskaart...",
+      });
+
+      // Call backend API to process eID
+      const response = await apiRequest('POST', '/api/eid/process', {});
+      
+      if (response.success && response.data) {
+        const eidData = response.data;
+        
+        // Auto-fill form with eID data
+        setFormData(prev => ({
+          ...prev,
+          firstName: eidData.firstName || prev.firstName,
+          lastName: eidData.lastName || prev.lastName,
+          dateOfBirth: eidData.dateOfBirth || prev.dateOfBirth,
+          gender: eidData.gender || prev.gender,
+          address: eidData.address || prev.address,
+          postalCode: eidData.postalCode || prev.postalCode,
+          city: eidData.city || prev.city,
+        }));
+
+        // Set photo if available
+        if (eidData.photo) {
+          setPhotoPreview(eidData.photo);
+          // Convert base64 to file if needed for upload
+          const photoBlob = await fetch(eidData.photo).then(r => r.blob());
+          const photoFile = new File([photoBlob], 'eid-photo.jpg', { type: 'image/jpeg' });
+          setPhotoFile(photoFile);
+        }
+
+        toast({
+          title: "eID Succesvol Gescand",
+          description: "Gegevens zijn automatisch ingevuld vanuit de identiteitskaart.",
+        });
+      }
+    } catch (error: any) {
+      console.error('eID scan error:', error);
+      toast({
+        title: "eID Scan Mislukt",
+        description: error.message || "Er is een fout opgetreden bij het scannen van de identiteitskaart.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleCreateStudent = (e: React.FormEvent) => {
     e.preventDefault();
     createStudentMutation.mutate(formData);
@@ -765,10 +814,7 @@ export default function Students() {
                         <button
                           type="button"
                           className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                          onClick={() => {
-                            // eID processing logic will be added here
-                            console.log('eID scan initiated');
-                          }}
+                          onClick={handleEidScan}
                         >
                           <img 
                             src={eidLogoPath} 

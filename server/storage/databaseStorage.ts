@@ -1910,7 +1910,19 @@ export class DatabaseStorage implements IStorage {
   // Tuition Fee operations
   async getTuitionFees(): Promise<any[]> {
     try {
-      return await db.select().from(tuitionRates);
+      return await db.select({
+        id: tuitionRates.id,
+        academicYear: tuitionRates.academicYear,
+        type: tuitionRates.type,
+        name: tuitionRates.name,
+        baseAmount: tuitionRates.baseAmount,
+        currency: tuitionRates.currency,
+        description: tuitionRates.description,
+        isActive: tuitionRates.isActive,
+        validFrom: tuitionRates.validFrom,
+        validUntil: tuitionRates.validUntil,
+        programId: tuitionRates.programId
+      }).from(tuitionRates);
     } catch (error) {
       console.error('Error fetching tuition fees:', error);
       throw error;

@@ -28,6 +28,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
+import NotificationDropdown from '@/components/notifications/NotificationDropdown';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -312,6 +313,9 @@ export default function SecretariatLayout({ children }: SecretariatLayoutProps) 
                 </div>
               </PopoverContent>
             </Popover>
+
+            {/* Notifications */}
+            <NotificationDropdown />
 
             {/* Profile dropdown */}
             <DropdownMenu>

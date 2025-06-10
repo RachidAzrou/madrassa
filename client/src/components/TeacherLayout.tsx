@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import NotificationDropdown from '@/components/notifications/NotificationDropdown';
 import myMadrassaLogo from "@assets/myMadrassa.png";
 
 interface TeacherLayoutProps {

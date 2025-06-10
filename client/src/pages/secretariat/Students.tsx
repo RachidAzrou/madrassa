@@ -37,6 +37,7 @@ import eidLogoPath from '@assets/e-id-logo_1749570968055.png';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { PremiumHeader } from '@/components/layout/premium-header';
 import { DataTableContainer, TableContainer } from '@/components/ui/containers';
+import { InvoicePopup } from '@/components/InvoicePopup';
 
 interface Student {
   id: number;
@@ -106,6 +107,11 @@ export default function Students() {
     guardianId: '',
     selectedSiblings: [] as number[]
   });
+  
+  // Invoice popup state
+  const [isInvoicePopupOpen, setIsInvoicePopupOpen] = useState(false);
+  const [invoiceDetails, setInvoiceDetails] = useState<any>(null);
+  const [createdStudent, setCreatedStudent] = useState<any>(null);
 
   const { toast } = useToast();
   const queryClient = useQueryClient();

@@ -80,6 +80,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // prefix all routes with /api
   const apiRouter = app;
   
+  // Function to calculate applicable discounts for a student
+  async function calculateStudentDiscounts(studentId: number, baseAmount: number, academicYear: string) {
+    try {
+      // For now, return no discount until we implement the discount system properly
+      return {
+        hasDiscount: false,
+        discount: null,
+        discountAmount: 0,
+        originalAmount: baseAmount,
+        finalAmount: baseAmount
+      };
+    } catch (error) {
+      console.error('Error calculating discounts:', error);
+      return {
+        hasDiscount: false,
+        discount: null,
+        discountAmount: 0,
+        originalAmount: baseAmount,
+        finalAmount: baseAmount
+      };
+    }
+  }
+  
   // ********************
   // RBAC Authentication Endpoints
   // ********************

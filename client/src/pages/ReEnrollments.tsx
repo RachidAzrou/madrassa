@@ -29,7 +29,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { queryClient, apiRequest } from '@/lib/queryClient';
-import PremiumHeader from '@/components/ui/premium-header';
+
 
 interface Student {
   id: number;
@@ -164,15 +164,15 @@ export default function ReEnrollments() {
 
   return (
     <div className="bg-[#f7f9fc] min-h-screen">
-      <PremiumHeader 
-        title="Herinschrijvingen" 
-        description="Beheer herinschrijvingen voor het nieuwe schooljaar en bekijk de voortgang van studenten"
-        icon={RefreshCw}
-        breadcrumbs={{
-          parent: "Secretariaat",
-          current: "Herinschrijvingen"
-        }}
-      />
+      <div className="bg-white border-b border-gray-200 px-6 py-4">
+        <div className="flex items-center gap-3">
+          <RefreshCw className="h-6 w-6 text-blue-600" />
+          <div>
+            <h1 className="text-xl font-semibold text-gray-900">Herinschrijvingen</h1>
+            <p className="text-sm text-gray-600">Beheer herinschrijvingen voor het nieuwe schooljaar en bekijk de voortgang van studenten</p>
+          </div>
+        </div>
+      </div>
 
       <div className="p-6 space-y-6">
         {/* Statistics Cards */}

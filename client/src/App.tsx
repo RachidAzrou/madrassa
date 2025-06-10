@@ -32,6 +32,7 @@ import Fees from "@/pages/Fees";
 import StudentDossier from "@/pages/StudentDossier";
 import Profile from "@/pages/Profile";
 import ReEnrollment from "@/pages/ReEnrollment";
+import ReEnrollments from "@/pages/ReEnrollments";
 import AcademicYearManagement from "@/pages/AcademicYearManagement";
 
 import TeacherLayout from "@/components/TeacherLayout";
@@ -107,6 +108,8 @@ function AuthenticatedRouter() {
           <Route path="/grading" component={() => <AuthenticatedRoute component={Cijfers} />} />
           <Route path="/reports" component={() => <AuthenticatedRoute component={Reports} />} />
           <Route path="/fees" component={() => <AuthenticatedRoute component={Fees} />} />
+          <Route path="/leerlingendossier" component={() => <AuthenticatedRoute component={StudentDossier} />} />
+          <Route path="/herinschrijvingen" component={() => <AuthenticatedRoute component={ReEnrollments} />} />
           <Route path="/messages" component={() => <AuthenticatedRoute component={Messages} />} />
           <Route path="/notifications" component={() => <AuthenticatedRoute component={Notifications} />} />
           <Route path="/mijn-account" component={() => <AuthenticatedRoute component={MyAccount} />} />

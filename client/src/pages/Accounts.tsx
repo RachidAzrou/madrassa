@@ -330,17 +330,15 @@ export default function Accounts() {
 
   return (
     <div className="flex-1 flex flex-col h-full">
-      <div className="fixed top-0 left-64 right-0 z-30">
-        <PremiumHeader 
-          title="Accounts" 
-          icon={Key}
-          breadcrumbs={{
-            parent: "Beheer",
-            current: "Accounts"
-          }}
-        />
-      </div>
-      <div className="mt-[73px] flex-1 overflow-auto p-6 space-y-6">
+      <PremiumHeader 
+        title="Accounts" 
+        icon={Key}
+        breadcrumbs={{
+          parent: "Beheer",
+          current: "Accounts"
+        }}
+      />
+      <div className="flex-1 overflow-auto p-6 space-y-6">
       
       <div className="space-y-6">
         {/* Stats Cards */}

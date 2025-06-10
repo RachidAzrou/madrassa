@@ -218,64 +218,56 @@ export default function SecretariatDashboard() {
       {/* Main content area */}
       <div className="px-6 py-6 max-w-7xl mx-auto">{/* Start main content wrapper */}
 
-      {/* Stats Overview - Desktop-applicatie stijl */}
+      {/* Stats Overview - Modern Premium Style */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {/* Studenten kaart */}
-        <div className="bg-white border border-[#e5e7eb] rounded-sm">
-          <div className="flex h-full">
-            <div className="flex items-center justify-center w-14 bg-[#f5f7fc] border-r border-[#e5e7eb]">
-              <Users className="h-5 w-5 text-[#1e40af]" />
-            </div>
-            <div className="flex-1 p-3">
-              <div className="flex flex-col">
-                <h3 className="text-xs font-medium text-gray-500">Studenten</h3>
-                <p className="text-lg font-medium text-gray-800 mt-1">{stats.totalStudents}</p>
+        <div className="premium-card border-l-4 border-l-blue-500">
+          <div className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">Studenten</p>
+                <p className="text-2xl font-bold text-blue-600">{stats.totalStudents}</p>
               </div>
+              <Users className="h-8 w-8 text-blue-500" />
             </div>
           </div>
         </div>
         
         {/* Klassen kaart */}
-        <div className="bg-white border border-[#e5e7eb] rounded-sm">
-          <div className="flex h-full">
-            <div className="flex items-center justify-center w-14 bg-[#f5f7fc] border-r border-[#e5e7eb]">
-              <ChalkBoard className="h-5 w-5 text-[#1e40af]" />
-            </div>
-            <div className="flex-1 p-3">
-              <div className="flex flex-col">
-                <h3 className="text-xs font-medium text-gray-500">Klassen</h3>
-                <p className="text-lg font-medium text-gray-800 mt-1">{stats.studentGroups}</p>
+        <div className="premium-card border-l-4 border-l-green-500">
+          <div className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">Klassen</p>
+                <p className="text-2xl font-bold text-green-600">{stats.studentGroups}</p>
               </div>
+              <ChalkBoard className="h-8 w-8 text-green-500" />
             </div>
           </div>
         </div>
         
         {/* Docenten kaart */}
-        <div className="bg-white border border-[#e5e7eb] rounded-sm">
-          <div className="flex h-full">
-            <div className="flex items-center justify-center w-14 bg-[#f5f7fc] border-r border-[#e5e7eb]">
-              <GraduationCap className="h-5 w-5 text-[#1e40af]" />
-            </div>
-            <div className="flex-1 p-3">
-              <div className="flex flex-col">
-                <h3 className="text-xs font-medium text-gray-500">Docenten</h3>
-                <p className="text-lg font-medium text-gray-800 mt-1">{stats.totalTeachers}</p>
+        <div className="premium-card border-l-4 border-l-purple-500">
+          <div className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">Docenten</p>
+                <p className="text-2xl font-bold text-purple-600">{stats.totalTeachers}</p>
               </div>
+              <GraduationCap className="h-8 w-8 text-purple-500" />
             </div>
           </div>
         </div>
         
         {/* Vakken kaart */}
-        <div className="bg-white border border-[#e5e7eb] rounded-sm">
-          <div className="flex h-full">
-            <div className="flex items-center justify-center w-14 bg-[#f5f7fc] border-r border-[#e5e7eb]">
-              <BookOpen className="h-5 w-5 text-[#1e40af]" />
-            </div>
-            <div className="flex-1 p-3">
-              <div className="flex flex-col">
-                <h3 className="text-xs font-medium text-gray-500">Vakken</h3>
-                <p className="text-lg font-medium text-gray-800 mt-1">{stats.activeCourses}</p>
+        <div className="premium-card border-l-4 border-l-orange-500">
+          <div className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">Vakken</p>
+                <p className="text-2xl font-bold text-orange-600">{stats.activeCourses}</p>
               </div>
+              <BookOpen className="h-8 w-8 text-orange-500" />
             </div>
           </div>
         </div>

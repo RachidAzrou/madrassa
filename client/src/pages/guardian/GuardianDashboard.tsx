@@ -124,7 +124,7 @@ export default function GuardianDashboard() {
         {/* Enhanced Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           {/* Children Card */}
-          <Card className="group relative overflow-hidden bg-gradient-to-br from-white to-blue-50/30 border border-blue-100 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+          <Card className="premium-card group relative overflow-hidden bg-gradient-to-br from-white to-blue-50/30 border border-blue-100 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
             <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-blue-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 relative z-10">
               <div>
@@ -147,7 +147,7 @@ export default function GuardianDashboard() {
           </Card>
 
           {/* Attendance Card */}
-          <Card className="group relative overflow-hidden bg-gradient-to-br from-white to-green-50/30 border border-green-100 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+          <Card className="premium-card group relative overflow-hidden bg-gradient-to-br from-white to-green-50/30 border border-green-100 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
             <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-green-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 relative z-10">
               <div>
@@ -170,7 +170,7 @@ export default function GuardianDashboard() {
           </Card>
 
           {/* Events Card */}
-          <Card className="group relative overflow-hidden bg-gradient-to-br from-white to-amber-50/30 border border-amber-100 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+          <Card className="premium-card group relative overflow-hidden bg-gradient-to-br from-white to-amber-50/30 border border-amber-100 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
             <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-amber-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 relative z-10">
               <div>
@@ -193,7 +193,7 @@ export default function GuardianDashboard() {
           </Card>
 
           {/* Payments Card */}
-          <Card className="group relative overflow-hidden bg-gradient-to-br from-white to-pink-50/30 border border-pink-100 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+          <Card className="premium-card group relative overflow-hidden bg-gradient-to-br from-white to-pink-50/30 border border-pink-100 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
             <div className="absolute inset-0 bg-gradient-to-br from-pink-500/5 to-pink-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 relative z-10">
               <div>

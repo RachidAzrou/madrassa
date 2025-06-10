@@ -770,19 +770,33 @@ export default function Students() {
                         <div className="flex flex-col gap-2 justify-center items-end">
                           <button 
                             type="button" 
-                            className="flex items-center justify-center gap-1 border border-gray-300 rounded-md px-2 py-1 hover:bg-gray-50 transition-colors text-sm"
+                            className={`flex items-center justify-center gap-1 border border-gray-300 rounded-md px-2 py-1 hover:bg-gray-50 transition-colors text-sm ${isUploadingPhoto ? 'opacity-50 cursor-not-allowed' : ''}`}
                             onClick={handlePhotoUpload}
+                            disabled={isUploadingPhoto}
                           >
-                            <Upload className="h-4 w-4 text-gray-500" />
-                            <span className="text-xs font-medium text-gray-700">Upload</span>
+                            {isUploadingPhoto ? (
+                              <div className="animate-spin w-4 h-4 border-2 border-gray-500 border-t-transparent rounded-full"></div>
+                            ) : (
+                              <Upload className="h-4 w-4 text-gray-500" />
+                            )}
+                            <span className="text-xs font-medium text-gray-700">
+                              {isUploadingPhoto ? 'Uploading...' : 'Upload'}
+                            </span>
                           </button>
                           <button 
                             type="button" 
-                            className="flex items-center justify-center gap-1 border border-gray-300 rounded-md px-2 py-1 hover:bg-gray-50 transition-colors text-sm"
+                            className={`flex items-center justify-center gap-1 border border-gray-300 rounded-md px-2 py-1 hover:bg-gray-50 transition-colors text-sm ${isProcessingEid ? 'opacity-50 cursor-not-allowed' : ''}`}
                             onClick={handleEidScan}
+                            disabled={isProcessingEid}
                           >
-                            <FileText className="h-4 w-4 text-gray-500" />
-                            <span className="text-xs font-medium text-gray-700">eID</span>
+                            {isProcessingEid ? (
+                              <div className="animate-spin w-4 h-4 border-2 border-gray-500 border-t-transparent rounded-full"></div>
+                            ) : (
+                              <FileText className="h-4 w-4 text-gray-500" />
+                            )}
+                            <span className="text-xs font-medium text-gray-700">
+                              {isProcessingEid ? 'Verwerking...' : 'eID'}
+                            </span>
                           </button>
                           {formData.photoUrl && (
                             <button 

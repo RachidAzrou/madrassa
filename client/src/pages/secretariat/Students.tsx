@@ -112,6 +112,9 @@ export default function Students() {
   const [isInvoicePopupOpen, setIsInvoicePopupOpen] = useState(false);
   const [invoiceDetails, setInvoiceDetails] = useState<any>(null);
   const [createdStudent, setCreatedStudent] = useState<any>(null);
+  
+  // Sibling search state
+  const [siblingSearchTerm, setSiblingSearchTerm] = useState('');
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -141,6 +144,25 @@ export default function Students() {
     student.lastName.toLowerCase() === formData.lastName.toLowerCase() && 
     formData.lastName.trim() !== ''
   );
+
+  // Calculate searchable siblings for view dialog
+  const searchableSiblings = (students as Student[]).filter(student => {
+    if (!selectedStudent) return false;
+    if (student.id === selectedStudent.id) return false; // Exclude the student themselves
+    
+    const searchTerm = siblingSearchTerm.toLowerCase();
+    if (searchTerm === '') {
+      // If no search term, show students with same last name
+      return student.lastName.toLowerCase() === selectedStudent.lastName.toLowerCase();
+    }
+    
+    // Search by first name, last name, or student ID
+    return (
+      student.firstName.toLowerCase().includes(searchTerm) ||
+      student.lastName.toLowerCase().includes(searchTerm) ||
+      student.studentId.toLowerCase().includes(searchTerm)
+    );
+  });
 
   // Create student mutation
   const createStudentMutation = useMutation({
@@ -1225,14 +1247,25 @@ export default function Students() {
                   <p className="text-xs text-gray-500 mb-3">Geen broers/zussen gekoppeld</p>
                 )}
 
-                {/* Beschikbare broers/zussen toevoegen */}
-                {availableSiblings.length > 0 && (
-                  <div className="space-y-2">
-                    <Label className="text-xs font-medium text-gray-700">
-                      Beschikbare broers/zussen (zelfde achternaam):
-                    </Label>
-                    <div className="space-y-1 max-h-24 overflow-y-auto">
-                      {availableSiblings
+                {/* Zoek en voeg broers/zussen toe */}
+                <div className="space-y-2">
+                  <Label className="text-xs font-medium text-gray-700">
+                    Zoek student om als broer/zus toe te voegen:
+                  </Label>
+                  <div className="relative">
+                    <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 h-3 w-3" />
+                    <Input
+                      type="text"
+                      placeholder="Zoek op naam of student ID..."
+                      value={siblingSearchTerm}
+                      onChange={(e) => setSiblingSearchTerm(e.target.value)}
+                      className="pl-7 text-xs h-8"
+                    />
+                  </div>
+                  
+                  {searchableSiblings.length > 0 ? (
+                    <div className="space-y-1 max-h-32 overflow-y-auto">
+                      {searchableSiblings
                         .filter(sibling => !studentSiblings.some(existing => existing.id === sibling.id))
                         .map((sibling) => (
                         <div key={sibling.id} className="flex items-center justify-between bg-white p-2 rounded border">
@@ -1254,8 +1287,21 @@ export default function Students() {
                         </div>
                       ))}
                     </div>
-                  </div>
-                )}
+                  ) : siblingSearchTerm.trim() !== '' ? (
+                    <div className="text-center py-2">
+                      <p className="text-xs text-gray-500">
+                        Geen studenten gevonden voor "{siblingSearchTerm}"
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="text-center py-2">
+                      <Users className="h-6 w-6 text-gray-300 mx-auto mb-1" />
+                      <p className="text-xs text-gray-500">
+                        Zoek een student om als broer/zus toe te voegen
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           )}

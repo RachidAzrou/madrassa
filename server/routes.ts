@@ -5162,11 +5162,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   apiRouter.delete("/api/rooms/:id", deleteRoom);
 
   // ****************
-  // Berichten (Messages)
+  // Berichten (Messages) - Met RBAC
   // ****************
 
-  // Haal alle berichten op
-  apiRouter.get("/api/messages", async (_req, res) => {
+  // Haal alle berichten op (alleen admin/secretariat)
+  apiRouter.get("/api/messages", authenticateToken, requirePermission(RESOURCES.COMMUNICATIONS, 'read'), async (req: any, res) => {
     try {
       const messages = await storage.getMessages();
       res.json(messages);
@@ -5176,8 +5176,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Haal een specifiek bericht op
-  apiRouter.get("/api/messages/:id", async (req, res) => {
+  // Haal een specifiek bericht op (met toegangscontrole)
+  apiRouter.get("/api/messages/:id", authenticateToken, async (req: any, res) => {
     try {
       const messageId = parseInt(req.params.id);
       if (isNaN(messageId)) {
@@ -5189,6 +5189,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Bericht niet gevonden" });
       }
 
+      // Controleer of de gebruiker toegang heeft tot dit bericht
+      const user = req.user;
+      if (message.senderId !== user.id && message.receiverId !== user.id) {
+        if (!hasPermission(user.role, RESOURCES.COMMUNICATIONS, 'manage')) {
+          return res.status(403).json({ error: "Geen toegang tot dit bericht" });
+        }
+      }
+
       res.json(message);
     } catch (error) {
       console.error("Fout bij ophalen bericht:", error);
@@ -5196,14 +5204,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Haal berichten op voor een specifieke afzender
-  apiRouter.get("/api/messages/sender/:id/:role", async (req, res) => {
+  // Haal berichten op voor een specifieke afzender (met RBAC)
+  apiRouter.get("/api/messages/sender/:id/:role", authenticateToken, async (req: any, res) => {
     try {
       const senderId = parseInt(req.params.id);
       const senderRole = req.params.role;
+      const user = req.user;
       
       if (isNaN(senderId)) {
         return res.status(400).json({ error: "Ongeldig afzender ID" });
+      }
+
+      // Controleer toegang: gebruiker kan alleen eigen berichten of als admin/secretariat alle berichten zien
+      if (user.id !== senderId && !hasPermission(user.role, RESOURCES.COMMUNICATIONS, 'manage')) {
+        return res.status(403).json({ error: "Geen toegang tot deze berichten" });
       }
 
       const messages = await storage.getMessagesBySender(senderId, senderRole);
@@ -5214,14 +5228,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Haal berichten op voor een specifieke ontvanger
-  apiRouter.get("/api/messages/receiver/:id/:role", async (req, res) => {
+  // Haal berichten op voor een specifieke ontvanger (met RBAC)
+  apiRouter.get("/api/messages/receiver/:id/:role", authenticateToken, async (req: any, res) => {
     try {
       const receiverId = parseInt(req.params.id);
       const receiverRole = req.params.role;
+      const user = req.user;
       
       if (isNaN(receiverId)) {
         return res.status(400).json({ error: "Ongeldig ontvanger ID" });
+      }
+
+      // Controleer toegang: gebruiker kan alleen eigen berichten of als admin/secretariat alle berichten zien
+      if (user.id !== receiverId && !hasPermission(user.role, RESOURCES.COMMUNICATIONS, 'manage')) {
+        return res.status(403).json({ error: "Geen toegang tot deze berichten" });
       }
 
       const messages = await storage.getMessagesByReceiver(receiverId, receiverRole);
@@ -5249,14 +5269,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Haal het aantal ongelezen berichten op
-  apiRouter.get("/api/messages/unread/:id/:role", async (req, res) => {
+  // Haal het aantal ongelezen berichten op (met RBAC)
+  apiRouter.get("/api/messages/unread/:id/:role", authenticateToken, async (req: any, res) => {
     try {
       const userId = parseInt(req.params.id);
       const userRole = req.params.role;
+      const user = req.user;
       
       if (isNaN(userId)) {
         return res.status(400).json({ error: "Ongeldig gebruiker ID" });
+      }
+
+      // Controleer toegang: gebruiker kan alleen eigen ongelezen berichten of als admin/secretariat alle berichten zien
+      if (user.id !== userId && !hasPermission(user.role, RESOURCES.COMMUNICATIONS, 'manage')) {
+        return res.status(403).json({ error: "Geen toegang tot deze berichten" });
       }
 
       const count = await storage.getUnreadMessagesCount(userId, userRole);

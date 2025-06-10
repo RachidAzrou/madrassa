@@ -5252,13 +5252,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Haal een thread van berichten op
-  apiRouter.get("/api/messages/thread/:id", async (req, res) => {
+  // Haal een thread van berichten op (met RBAC)
+  apiRouter.get("/api/messages/thread/:id", authenticateToken, async (req: any, res) => {
     try {
       const parentMessageId = parseInt(req.params.id);
+      const user = req.user;
       
       if (isNaN(parentMessageId)) {
         return res.status(400).json({ error: "Ongeldig parent bericht ID" });
+      }
+
+      // Eerst het parent bericht ophalen om toegang te controleren
+      const parentMessage = await storage.getMessage(parentMessageId);
+      if (!parentMessage) {
+        return res.status(404).json({ error: "Parent bericht niet gevonden" });
+      }
+
+      // Controleer of de gebruiker toegang heeft tot deze thread
+      if (parentMessage.senderId !== user.id && parentMessage.receiverId !== user.id && !hasPermission(user.role, RESOURCES.COMMUNICATIONS, 'manage')) {
+        return res.status(403).json({ error: "Geen toegang tot deze berichtenthread" });
       }
 
       const messages = await storage.getMessageThread(parentMessageId);
@@ -5293,14 +5305,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Haal de geautoriseerde ontvangers op voor een afzender
-  apiRouter.get("/api/messages/receivers/:id/:role", async (req, res) => {
+  // Haal de geautoriseerde ontvangers op voor een afzender (met RBAC)
+  apiRouter.get("/api/messages/receivers/:id/:role", authenticateToken, async (req: any, res) => {
     try {
       const senderId = parseInt(req.params.id);
       const senderRole = req.params.role;
+      const user = req.user;
       
       if (isNaN(senderId)) {
         return res.status(400).json({ error: "Ongeldig afzender ID" });
+      }
+
+      // Controleer toegang: gebruiker kan alleen eigen geautoriseerde ontvangers opvragen
+      if (user.id !== senderId && !hasPermission(user.role, RESOURCES.COMMUNICATIONS, 'manage')) {
+        return res.status(403).json({ error: "Geen toegang tot deze gegevens" });
       }
 
       const receivers = await storage.getAuthorizedReceivers(senderId, senderRole);
@@ -5311,10 +5329,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Maak een nieuw bericht aan
-  apiRouter.post("/api/messages", async (req, res) => {
+  // Maak een nieuw bericht aan (met RBAC)
+  apiRouter.post("/api/messages", authenticateToken, async (req: any, res) => {
     try {
       const messageData = insertMessageSchema.parse(req.body);
+      const user = req.user;
+      
+      // Controleer of de afzender overeenkomt met de ingelogde gebruiker
+      if (messageData.senderId !== user.id) {
+        return res.status(403).json({ error: "U kunt alleen berichten verzenden onder uw eigen naam" });
+      }
+
       const newMessage = await storage.createMessage(messageData);
       res.status(201).json(newMessage);
     } catch (error) {
@@ -5326,21 +5351,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Markeer een bericht als gelezen
-  apiRouter.patch("/api/messages/:id/read", async (req, res) => {
+  // Markeer een bericht als gelezen (met RBAC)
+  apiRouter.patch("/api/messages/:id/read", authenticateToken, async (req: any, res) => {
     try {
       const messageId = parseInt(req.params.id);
+      const user = req.user;
       
       if (isNaN(messageId)) {
         return res.status(400).json({ error: "Ongeldig bericht ID" });
       }
 
-      const updatedMessage = await storage.markMessageAsRead(messageId);
-      
-      if (!updatedMessage) {
+      // Eerst het bericht ophalen om toegang te controleren
+      const message = await storage.getMessage(messageId);
+      if (!message) {
         return res.status(404).json({ error: "Bericht niet gevonden" });
       }
-      
+
+      // Controleer of de gebruiker toegang heeft tot dit bericht (alleen ontvanger kan markeren als gelezen)
+      if (message.receiverId !== user.id && !hasPermission(user.role, RESOURCES.COMMUNICATIONS, 'manage')) {
+        return res.status(403).json({ error: "Geen toegang tot dit bericht" });
+      }
+
+      const updatedMessage = await storage.markMessageAsRead(messageId);
       res.json(updatedMessage);
     } catch (error) {
       console.error("Fout bij markeren bericht als gelezen:", error);
@@ -5348,13 +5380,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Verwijder een bericht
-  apiRouter.delete("/api/messages/:id", async (req, res) => {
+  // Verwijder een bericht (met RBAC)
+  apiRouter.delete("/api/messages/:id", authenticateToken, async (req: any, res) => {
     try {
       const messageId = parseInt(req.params.id);
+      const user = req.user;
       
       if (isNaN(messageId)) {
         return res.status(400).json({ error: "Ongeldig bericht ID" });
+      }
+
+      // Eerst het bericht ophalen om toegang te controleren
+      const message = await storage.getMessage(messageId);
+      if (!message) {
+        return res.status(404).json({ error: "Bericht niet gevonden" });
+      }
+
+      // Controleer of de gebruiker toegang heeft tot dit bericht (alleen afzender of admin/secretariat)
+      if (message.senderId !== user.id && !hasPermission(user.role, RESOURCES.COMMUNICATIONS, 'manage')) {
+        return res.status(403).json({ error: "Geen toegang tot dit bericht" });
       }
 
       const success = await storage.deleteMessage(messageId);

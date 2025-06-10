@@ -1220,6 +1220,7 @@ export default function Students() {
                 </div>
               </div>
             </div>
+            </div>
             
             <div className="bg-gray-50 px-6 py-3 flex justify-end gap-2 border-t">
               <Button 

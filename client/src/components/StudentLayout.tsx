@@ -16,6 +16,7 @@ import {
   PopoverContent, 
   PopoverTrigger 
 } from '@/components/ui/popover';
+import NotificationDropdown from '@/components/notifications/NotificationDropdown';
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -293,79 +294,7 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
           </Popover>
 
           {/* Notificaties */}
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="ghost" size="icon" className="relative h-10 w-10 touch-manipulation">
-                <Bell className="h-5 w-5 text-gray-600" />
-                {unreadCount > 0 && (
-                  <Badge 
-                    className="absolute -top-1 -right-1 w-4 h-4 p-0 flex items-center justify-center bg-[#1e40af] text-xs"
-                    variant="default"
-                  >
-                    {unreadCount}
-                  </Badge>
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent align="end" className="w-80 max-w-[85vw] p-0 mx-2">
-              <div className="p-4 border-b border-gray-200">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-medium text-base">Notificaties</h3>
-                  <button 
-                    className="text-sm text-[#1e40af] hover:underline touch-manipulation"
-                    onClick={() => window.location.href = "/notificaties"}
-                  >
-                    Alle notificaties
-                  </button>
-                </div>
-              </div>
-              <div className="max-h-80 overflow-y-auto">
-                {!notifications || notifications.length === 0 ? (
-                  <div className="py-8 text-center">
-                    <p className="text-base text-gray-500">Geen notificaties</p>
-                  </div>
-                ) : (
-                  notifications.slice(0, 5).map((notification: any) => (
-                    <div 
-                      key={notification.id} 
-                      className={`py-4 px-4 hover:bg-gray-50 active:bg-gray-100 cursor-pointer border-b border-gray-100 touch-manipulation ${!notification.isRead ? 'bg-blue-50' : ''}`}
-                    >
-                      <div className="flex items-start gap-3">
-                        <div className={`h-3 w-3 mt-2 rounded-full ${
-                          notification.type === 'info' ? 'bg-blue-500' : 
-                          notification.type === 'warning' ? 'bg-amber-500' : 
-                          notification.type === 'success' ? 'bg-green-500' : 
-                          'bg-red-500'
-                        }`}></div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between">
-                            <p className="font-medium text-sm truncate">{notification.title}</p>
-                            <span className="text-xs text-gray-500 ml-2">
-                              {new Date(notification.timestamp).toLocaleTimeString([], {
-                                hour: '2-digit', 
-                                minute: '2-digit'
-                              })}
-                            </span>
-                          </div>
-                          <p className="text-sm text-gray-600 mt-1">{notification.message}</p>
-                        </div>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-              <div className="p-4 border-t border-gray-200 bg-gray-50">
-                <Button 
-                  variant="outline" 
-                  className="w-full text-base h-10 touch-manipulation"
-                  onClick={handleMarkAllNotificationsRead}
-                  disabled={unreadCount === 0}
-                >
-                  Markeer alles als gelezen
-                </Button>
-              </div>
-            </PopoverContent>
-          </Popover>
+          <NotificationDropdown />
 
           {/* Gebruiker profiel */}
           <DropdownMenu>

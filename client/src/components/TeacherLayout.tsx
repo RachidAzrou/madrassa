@@ -191,36 +191,7 @@ export default function TeacherLayout({ children }: TeacherLayoutProps) {
             </Popover>
 
             {/* Notifications */}
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="ghost" size="icon" className="relative">
-                  <Bell className="h-5 w-5 text-gray-600" />
-                  {notifications.length > 0 && (
-                    <Badge 
-                      className="absolute -top-1 -right-1 w-4 h-4 p-0 flex items-center justify-center bg-[#1e40af]"
-                      variant="default"
-                    >
-                      {notifications.length}
-                    </Badge>
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent align="end" className="w-80 p-0">
-                <div className="p-4 border-b border-gray-200">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-medium text-sm">Notificaties</h3>
-                    <button className="text-xs text-[#1e40af] hover:underline">
-                      Alle notificaties
-                    </button>
-                  </div>
-                </div>
-                <div className="max-h-72 overflow-y-auto">
-                  <div className="py-6 text-center">
-                    <p className="text-sm text-gray-500">Geen notificaties</p>
-                  </div>
-                </div>
-              </PopoverContent>
-            </Popover>
+            <NotificationDropdown />
 
             {/* User profile */}
             <DropdownMenu>

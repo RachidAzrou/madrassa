@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 import { useNotifications, type Notification } from '@/contexts/NotificationContext';
 import { format } from 'date-fns';
 import { nl } from 'date-fns/locale';
@@ -23,6 +24,7 @@ import {
 
 const NotificationsPage: React.FC = () => {
   const { notifications, markAsRead, markAllAsRead, deleteNotification, toggleReadStatus } = useNotifications();
+  const { user } = useAuth();
   const { toast } = useToast();
   
   const [searchTerm, setSearchTerm] = useState('');
@@ -30,6 +32,28 @@ const NotificationsPage: React.FC = () => {
   const [selectMode, setSelectMode] = useState(false);
   const [selectedNotifications, setSelectedNotifications] = useState<number[]>([]);
   const [activeTab, setActiveTab] = useState('all');
+
+  // Get parent breadcrumb based on user role
+  const getParentBreadcrumb = () => {
+    switch (user?.role) {
+      case 'admin':
+      case 'administrator':
+        return 'Admin';
+      case 'secretariat':
+      case 'secretariaat':
+        return 'Secretariaat';
+      case 'teacher':
+      case 'docent':
+        return 'Docent';
+      case 'guardian':
+      case 'voogd':
+        return 'Voogd';
+      case 'student':
+        return 'Student';
+      default:
+        return 'Dashboard';
+    }
+  };
 
   // Filter notifications based on search term and category
   const filteredNotifications = notifications.filter(notification => {
@@ -236,7 +260,7 @@ const NotificationsPage: React.FC = () => {
       <PageHeader
         title="Notificaties"
         icon={<Bell className="h-5 w-5 text-white" />}
-        parent="Student"
+        parent={getParentBreadcrumb()}
         current="Notificaties"
       />
       

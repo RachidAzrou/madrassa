@@ -85,6 +85,8 @@ export default function Students() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+  const [studentSiblings, setStudentSiblings] = useState<Student[]>([]);
+  const [availableSiblings, setAvailableSiblings] = useState<Student[]>([]);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string>('');
   const [formData, setFormData] = useState({
@@ -300,9 +302,27 @@ export default function Students() {
     createStudentMutation.mutate(formData);
   };
 
-  const handleViewStudent = (student: Student) => {
+  const handleViewStudent = async (student: Student) => {
     setSelectedStudent(student);
     setIsViewDialogOpen(true);
+    
+    // Load siblings for this student
+    try {
+      const response = await fetch(`/api/students/${student.id}/siblings`);
+      if (response.ok) {
+        const siblings = await response.json();
+        setStudentSiblings(siblings);
+      }
+    } catch (error) {
+      console.error('Error loading siblings:', error);
+    }
+
+    // Load available siblings (other students with same last name, excluding current student and existing siblings)
+    const potential = (students as Student[]).filter(s => 
+      s.id !== student.id && 
+      s.lastName.toLowerCase() === student.lastName.toLowerCase()
+    );
+    setAvailableSiblings(potential);
   };
 
   const handleEditStudent = (student: Student) => {
@@ -339,6 +359,76 @@ export default function Students() {
     // Implementation for delete student
     console.log('Delete student:', student);
   };
+
+  // Add sibling to current student
+  const addSiblingMutation = useMutation({
+    mutationFn: async ({ studentId, siblingId }: { studentId: number; siblingId: number }) => {
+      const response = await fetch(`/api/students/${studentId}/siblings`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          siblingIds: [siblingId]
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to add sibling');
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Succes",
+        description: "Broer/zus succesvol toegevoegd.",
+      });
+      // Reload siblings for current student
+      if (selectedStudent) {
+        handleViewStudent(selectedStudent);
+      }
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Fout",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Remove sibling from current student
+  const removeSiblingMutation = useMutation({
+    mutationFn: async ({ studentId, siblingId }: { studentId: number; siblingId: number }) => {
+      const response = await fetch(`/api/students/${studentId}/siblings/${siblingId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to remove sibling');
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Succes", 
+        description: "Broer/zus koppeling verwijderd.",
+      });
+      // Reload siblings for current student
+      if (selectedStudent) {
+        handleViewStudent(selectedStudent);
+      }
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Fout",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
 
   const filteredStudents = (students as Student[]).filter((student: Student) => {
     const matchesSearch = student.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -1010,6 +1100,78 @@ export default function Students() {
                   <span className="font-medium text-gray-700">Klas:</span>
                   <p className="text-gray-600">{selectedStudent.className || 'Niet toegewezen'}</p>
                 </div>
+              </div>
+
+              {/* Broers/Zussen Sectie */}
+              <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                  <Users className="h-4 w-4 mr-2" />
+                  Broers/Zussen
+                </h3>
+                
+                {/* Bestaande broers/zussen */}
+                {studentSiblings.length > 0 ? (
+                  <div className="space-y-2 mb-3">
+                    <Label className="text-xs font-medium text-gray-700">
+                      Huidige broers/zussen:
+                    </Label>
+                    <div className="space-y-1">
+                      {studentSiblings.map((sibling) => (
+                        <div key={sibling.id} className="flex items-center justify-between bg-white p-2 rounded border">
+                          <span className="text-xs">
+                            {sibling.firstName} {sibling.lastName} ({sibling.studentId})
+                          </span>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeSiblingMutation.mutate({ 
+                              studentId: selectedStudent.id, 
+                              siblingId: sibling.id 
+                            })}
+                            disabled={removeSiblingMutation.isPending}
+                            className="text-red-600 hover:text-red-800 h-6 w-6 p-0"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-xs text-gray-500 mb-3">Geen broers/zussen gekoppeld</p>
+                )}
+
+                {/* Beschikbare broers/zussen toevoegen */}
+                {availableSiblings.length > 0 && (
+                  <div className="space-y-2">
+                    <Label className="text-xs font-medium text-gray-700">
+                      Beschikbare broers/zussen (zelfde achternaam):
+                    </Label>
+                    <div className="space-y-1 max-h-24 overflow-y-auto">
+                      {availableSiblings
+                        .filter(sibling => !studentSiblings.some(existing => existing.id === sibling.id))
+                        .map((sibling) => (
+                        <div key={sibling.id} className="flex items-center justify-between bg-white p-2 rounded border">
+                          <span className="text-xs">
+                            {sibling.firstName} {sibling.lastName} ({sibling.studentId})
+                          </span>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => addSiblingMutation.mutate({ 
+                              studentId: selectedStudent.id, 
+                              siblingId: sibling.id 
+                            })}
+                            disabled={addSiblingMutation.isPending}
+                            className="text-green-600 hover:text-green-800 h-6 w-6 p-0"
+                          >
+                            <Plus className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )}

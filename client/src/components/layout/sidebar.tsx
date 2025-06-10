@@ -97,33 +97,7 @@ type SidebarProps = {
 const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) => {
   const [location] = useLocation();
   const [expanded, setExpanded] = useState(!isMobile);
-  const [userData, setUserData] = useState<any>(null);
-  
-  // Gebruiker data uit localStorage ophalen of standaard data gebruiken
-  useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      try {
-        const parsedUser = JSON.parse(storedUser);
-        setUserData(parsedUser);
-      } catch (error) {
-        console.error('Fout bij het parsen van gebruikersdata:', error);
-        // Fallback naar demo data als er een fout is
-        setUserData({
-          firstName: "Ahmed",
-          lastName: "Hassan",
-          role: "Administrator"
-        });
-      }
-    } else {
-      // Demo data als er geen gebruiker is opgeslagen
-      setUserData({
-        firstName: "Ahmed",
-        lastName: "Hassan",
-        role: "Administrator"
-      });
-    }
-  }, []);
+  const { user } = useAuth();
 
   // Sidebar is always expanded, no need to adjust on resize
   useEffect(() => {
@@ -224,6 +198,16 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
                   onClick={handleLinkClick}
                 />
 
+                {/* Accounts link - alleen voor admin gebruikers */}
+                {user?.role === 'admin' && (
+                  <SidebarLink
+                    href="/accounts"
+                    icon={<Key className="h-4 w-4" />}
+                    label="Accounts"
+                    isActive={location.startsWith("/accounts")}
+                    onClick={handleLinkClick}
+                  />
+                )}
 
               </div>
             </div>

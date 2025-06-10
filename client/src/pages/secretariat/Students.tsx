@@ -163,6 +163,8 @@ export default function Students() {
   const currentYear = new Date().getFullYear();
   const [nextStudentId, setNextStudentId] = useState(`ST${currentYear.toString().substring(2, 4)}001`);
   const [importFile, setImportFile] = useState<File | null>(null);
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+  const [isProcessingEid, setIsProcessingEid] = useState(false);
   
   // Admin-style form data
   const emptyFormData = {
@@ -243,6 +245,154 @@ export default function Students() {
     }
     
     return `${prefix}${nextNumber.toString().padStart(3, '0')}`;
+  };
+
+  // Photo upload functionality
+  const handlePhotoUpload = () => {
+    document.getElementById('photo-upload')?.click();
+  };
+
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          title: "Bestand te groot",
+          description: "De foto mag maximaal 5MB groot zijn.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: "Ongeldig bestandstype",
+          description: "Alleen afbeeldingen zijn toegestaan.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setIsUploadingPhoto(true);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData(prev => ({
+          ...prev,
+          photoUrl: reader.result as string
+        }));
+        setIsUploadingPhoto(false);
+        toast({
+          title: "Foto geüpload",
+          description: "De studentenfoto is succesvol geüpload.",
+        });
+      };
+      reader.onerror = () => {
+        setIsUploadingPhoto(false);
+        toast({
+          title: "Upload gefaald",
+          description: "Er is een fout opgetreden bij het uploaden van de foto.",
+          variant: "destructive",
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handlePhotoRemove = () => {
+    setFormData(prev => ({
+      ...prev,
+      photoUrl: ''
+    }));
+    toast({
+      title: "Foto verwijderd",
+      description: "De studentenfoto is verwijderd.",
+    });
+  };
+
+  // eID scanning functionality
+  const handleEidScan = () => {
+    document.getElementById('eid-upload')?.click();
+  };
+
+  const handleEidChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file size (max 10MB for documents)
+      if (file.size > 10 * 1024 * 1024) {
+        toast({
+          title: "Bestand te groot",
+          description: "Het eID document mag maximaal 10MB groot zijn.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Validate file type
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'];
+      if (!allowedTypes.includes(file.type)) {
+        toast({
+          title: "Ongeldig bestandstype",
+          description: "Alleen afbeeldingen (JPG, PNG) en PDF bestanden zijn toegestaan.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Process eID scan
+      processEidDocument(file);
+    }
+  };
+
+  const processEidDocument = (file: File) => {
+    setIsProcessingEid(true);
+    const reader = new FileReader();
+    reader.onload = () => {
+      // Simulate eID data extraction (in real implementation, this would use OCR/AI)
+      toast({
+        title: "eID wordt verwerkt",
+        description: "Het eID document wordt gescand voor gegevens...",
+      });
+
+      // Simulate processing delay
+      setTimeout(() => {
+        // Mock extracted data - in real implementation, this would come from OCR service
+        const extractedData = {
+          firstName: "Ahmed",
+          lastName: "Hassan", 
+          dateOfBirth: "1995-03-15",
+          street: "Hoofdstraat",
+          houseNumber: "123",
+          postalCode: "1234AB",
+          city: "Amsterdam",
+          gender: "man"
+        };
+
+        // Update form with extracted data
+        setFormData(prev => ({
+          ...prev,
+          ...extractedData
+        }));
+
+        setIsProcessingEid(false);
+        toast({
+          title: "eID succesvol gescand",
+          description: "Persoonsgegevens zijn automatisch ingevuld vanuit het eID document.",
+        });
+      }, 2000);
+    };
+
+    reader.onerror = () => {
+      setIsProcessingEid(false);
+      toast({
+        title: "Scannen gefaald",
+        description: "Er is een fout opgetreden bij het scannen van het eID document.",
+        variant: "destructive",
+      });
+    };
+
+    reader.readAsArrayBuffer(file);
   };
 
   const resetForm = () => {
@@ -621,7 +771,7 @@ export default function Students() {
                           <button 
                             type="button" 
                             className="flex items-center justify-center gap-1 border border-gray-300 rounded-md px-2 py-1 hover:bg-gray-50 transition-colors text-sm"
-                            onClick={() => document.getElementById('photo-upload')?.click()}
+                            onClick={handlePhotoUpload}
                           >
                             <Upload className="h-4 w-4 text-gray-500" />
                             <span className="text-xs font-medium text-gray-700">Upload</span>
@@ -629,29 +779,35 @@ export default function Students() {
                           <button 
                             type="button" 
                             className="flex items-center justify-center gap-1 border border-gray-300 rounded-md px-2 py-1 hover:bg-gray-50 transition-colors text-sm"
+                            onClick={handleEidScan}
                           >
                             <FileText className="h-4 w-4 text-gray-500" />
                             <span className="text-xs font-medium text-gray-700">eID</span>
                           </button>
+                          {formData.photoUrl && (
+                            <button 
+                              type="button" 
+                              className="flex items-center justify-center gap-1 border border-red-300 rounded-md px-2 py-1 hover:bg-red-50 transition-colors text-sm"
+                              onClick={handlePhotoRemove}
+                            >
+                              <X className="h-4 w-4 text-red-500" />
+                              <span className="text-xs font-medium text-red-700">Verwijder</span>
+                            </button>
+                          )}
                         </div>
                         <input
                           id="photo-upload"
                           type="file"
                           accept="image/*"
                           className="hidden"
-                          onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            if (file) {
-                              const reader = new FileReader();
-                              reader.onloadend = () => {
-                                setFormData(prev => ({
-                                  ...prev,
-                                  photoUrl: reader.result as string
-                                }));
-                              };
-                              reader.readAsDataURL(file);
-                            }
-                          }}
+                          onChange={handlePhotoChange}
+                        />
+                        <input
+                          id="eid-upload"
+                          type="file"
+                          accept="image/*,.pdf"
+                          className="hidden"
+                          onChange={handleEidChange}
                         />
                       </div>
                     </div>

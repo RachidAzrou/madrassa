@@ -216,7 +216,7 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
         
         {/* Logo sectie - links */}
         <Link href="/student" className="flex items-center h-full">
-          <img src={myMadrassaLogo} alt="myMadrassa Logo" className="h-8 sm:h-10 lg:h-11" />
+          <img src={myMadrassaLogo} alt="myMadrassa Logo" className="h-10 sm:h-11" />
         </Link>
 
 

@@ -93,7 +93,7 @@
   }
 
   html, body {
-    @apply h-full font-sans antialiased bg-gray-50 text-foreground;
+    @apply h-full font-sans antialiased bg-gradient-to-br from-slate-50 to-blue-50 text-foreground;
   }
   
   #root {

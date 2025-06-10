@@ -298,50 +298,50 @@ export default function Students() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="border-l-4 border-l-blue-500">
+        <Card className="border-l-4 border-l-blue-500 premium-card">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Totaal Studenten</p>
-                <p className="text-2xl font-bold text-blue-600">{students.length}</p>
+                <p className="text-2xl font-bold text-blue-600">{(students as Student[]).length}</p>
               </div>
               <Users className="h-8 w-8 text-blue-500" />
             </div>
           </CardContent>
         </Card>
-        <Card className="border-l-4 border-l-green-500">
+        <Card className="border-l-4 border-l-green-500 premium-card">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Actieve Studenten</p>
                 <p className="text-2xl font-bold text-green-600">
-                  {students.filter((s: Student) => s.status === 'active').length}
+                  {(students as Student[]).filter((s: Student) => s.status === 'active').length}
                 </p>
               </div>
               <User className="h-8 w-8 text-green-500" />
             </div>
           </CardContent>
         </Card>
-        <Card className="border-l-4 border-l-yellow-500">
+        <Card className="border-l-4 border-l-yellow-500 premium-card">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Nieuwe Studenten</p>
                 <p className="text-2xl font-bold text-yellow-600">
-                  {students.filter((s: Student) => s.status === 'pending').length}
+                  {(students as Student[]).filter((s: Student) => s.status === 'pending').length}
                 </p>
               </div>
               <UserPlus className="h-8 w-8 text-yellow-500" />
             </div>
           </CardContent>
         </Card>
-        <Card className="border-l-4 border-l-red-500">
+        <Card className="border-l-4 border-l-red-500 premium-card">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Inactieve Studenten</p>
                 <p className="text-2xl font-bold text-red-600">
-                  {students.filter((s: Student) => s.status === 'inactive').length}
+                  {(students as Student[]).filter((s: Student) => s.status === 'inactive').length}
                 </p>
               </div>
               <AlertTriangle className="h-8 w-8 text-red-500" />
@@ -379,7 +379,7 @@ export default function Students() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Alle klassen</SelectItem>
-              {classes.map((cls: StudentClass) => (
+              {(classes as StudentClass[]).map((cls: StudentClass) => (
                 <SelectItem key={cls.id} value={cls.id.toString()}>
                   {cls.name}
                 </SelectItem>
@@ -397,11 +397,11 @@ export default function Students() {
       </div>
 
       {/* Students Table */}
-      <DataTableContainer>
+      <DataTableContainer className="modern-table">
         <TableContainer>
           <Table>
             <TableHeader>
-              <TableRow className="bg-gray-50">
+              <TableRow className="modern-table-header">
                 <TableHead className="font-semibold text-gray-700">Student</TableHead>
                 <TableHead className="font-semibold text-gray-700">Contact</TableHead>
                 <TableHead className="font-semibold text-gray-700">Klas</TableHead>
@@ -691,7 +691,7 @@ export default function Students() {
                             <SelectValue placeholder="Selecteer klas" />
                           </SelectTrigger>
                           <SelectContent>
-                            {classes?.map?.((group: any) => (
+                            {(classes as StudentClass[]).map((group: StudentClass) => (
                               <SelectItem key={group.id} value={group.id.toString()}>
                                 {group.name}
                               </SelectItem>

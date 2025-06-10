@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useQuery } from "@tanstack/react-query";
 import { PageHeader } from '@/components/layout/page-header';
+import UnifiedLayout from "@/components/layout/UnifiedLayout";
 import {
   BookOpen,
   User,
@@ -51,7 +52,7 @@ export default function StudentSubjects() {
 
   if (isLoading) {
     return (
-      <div className="p-6 bg-[#f7f9fc] min-h-screen">
+      <UnifiedLayout userRole="student">
         <div className="animate-pulse">
           <div className="h-8 bg-gray-200 rounded w-1/4 mb-6"></div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -60,22 +61,20 @@ export default function StudentSubjects() {
             ))}
           </div>
         </div>
-      </div>
+      </UnifiedLayout>
     );
   }
 
   return (
-    <div className="bg-[#f7f9fc] min-h-screen">
-      {/* Clean Page Header - Admin Style */}
-      <PageHeader
-        title="Mijn Vakken"
-        icon={<BookOpen className="h-5 w-5 text-white" />}
-        parent="Student"
-        current="Mijn Vakken"
-      />
-      
-      {/* Main content area */}
-      <div className="px-6 py-6 max-w-7xl mx-auto">
+    <UnifiedLayout userRole="student">
+      <div className="space-y-6">
+        {/* Clean Page Header - Admin Style */}
+        <PageHeader
+          title="Mijn Vakken"
+          icon={<BookOpen className="h-5 w-5 text-white" />}
+          parent="Student"
+          current="Mijn Vakken"
+        />
         
       {/* Subjects Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -86,12 +85,12 @@ export default function StudentSubjects() {
               <BookOpen className="h-5 w-5 text-white" />
             </div>
           </CardHeader>
-          <CardContent>
+          <div className="px-6 pb-6">
             <div className="text-2xl font-bold text-blue-900">{subjects?.subjects?.length || 0}</div>
             <p className="text-xs text-blue-600 mt-1">
               Dit schooljaar
             </p>
-          </CardContent>
+          </div>
         </Card>
 
         <Card className="bg-white border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
@@ -147,14 +146,7 @@ export default function StudentSubjects() {
               <Clock className="h-4 w-4 text-[#be185d]" />
             </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-lg font-bold text-[#be185d]">
-              {subjects?.subjects?.find(s => s.nextLesson)?.nextLesson?.time || 'Geen'}
-            </div>
-            <p className="text-xs text-gray-600 mt-1">
-              Vandaag
-            </p>
-          </CardContent>
+
         </Card>
       </div>
 
@@ -286,8 +278,7 @@ export default function StudentSubjects() {
           </div>
         )}
       </div>
-      
       </div>
-    </div>
+    </UnifiedLayout>
   );
 }

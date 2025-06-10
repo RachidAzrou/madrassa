@@ -123,8 +123,7 @@ function AuthenticatedRouter() {
   // Guardian routes
   if (user?.role === 'guardian') {
     return (
-      <GuardianLayout>
-        <Switch>
+      <Switch>
           <Route path="/" component={() => <AuthenticatedRoute component={GuardianDashboard} />} />
           <Route path="/guardian/dashboard" component={() => <AuthenticatedRoute component={GuardianDashboard} />} />
           <Route path="/guardian/profile" component={() => <AuthenticatedRoute component={GuardianProfile} />} />
@@ -139,15 +138,13 @@ function AuthenticatedRouter() {
           <Route path="/mijn-account" component={() => <AuthenticatedRoute component={MyAccount} />} />
           <Route component={NotFound} />
         </Switch>
-      </GuardianLayout>
     );
   }
 
   // Student routes
   if (user?.role === 'student') {
     return (
-      <StudentLayout>
-        <Switch>
+      <Switch>
           <Route path="/" component={() => <AuthenticatedRoute component={StudentDashboard} />} />
           <Route path="/student/class" component={() => <AuthenticatedRoute component={StudentClass} />} />
           <Route path="/student/teachers" component={() => <AuthenticatedRoute component={StudentTeachers} />} />
@@ -162,15 +159,13 @@ function AuthenticatedRouter() {
           <Route path="/mijn-account" component={() => <AuthenticatedRoute component={MyAccount} />} />
           <Route component={NotFound} />
         </Switch>
-      </StudentLayout>
     );
   }
   
   // Teacher routes
   if (user?.role === 'teacher') {
     return (
-      <TeacherLayout>
-        <Switch>
+      <Switch>
           <Route path="/" component={() => <AuthenticatedRoute component={TeacherDashboard} />} />
           <Route path="/teacher" component={() => <AuthenticatedRoute component={TeacherDashboard} />} />
           <Route path="/teacher/students" component={() => <AuthenticatedRoute component={TeacherStudents} />} />
@@ -188,7 +183,6 @@ function AuthenticatedRouter() {
           <Route path="/mijn-account" component={() => <AuthenticatedRoute component={MyAccount} />} />
           <Route component={NotFound} />
         </Switch>
-      </TeacherLayout>
     );
   }
   

@@ -1,22 +1,8 @@
+import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { useQuery } from "@tanstack/react-query";
-import { useAuth } from "@/contexts/AuthContext";
-import {
-  Users,
-  BookOpen,
-  Calendar,
-  UserCheck,
-  Clock,
-  Bell,
-  ChevronRight,
-  CreditCard,
-  FileText,
-  GraduationCap,
-  User
-} from "lucide-react";
-import { Link } from "wouter";
+import { Users, Calendar, MessageSquare, CreditCard, TrendingUp, BookOpen, Clock, Bell } from "lucide-react";
+import UnifiedLayout from "@/components/layout/UnifiedLayout";
 
 interface GuardianStats {
   totalChildren: number;
@@ -46,311 +32,206 @@ interface RecentActivity {
 }
 
 export default function GuardianDashboard() {
-  const { user } = useAuth();
-
   const { data: stats, isLoading: statsLoading } = useQuery<{ stats: GuardianStats }>({
-    queryKey: ['/api/guardian/dashboard/stats'],
+    queryKey: ["/api/guardian/dashboard/stats"],
     retry: false,
   });
 
-  const { data: childrenOverview } = useQuery<{ children: ChildOverview[] }>({
-    queryKey: ['/api/guardian/children-overview'],
+  const { data: children, isLoading: childrenLoading } = useQuery<{ children: ChildOverview[] }>({
+    queryKey: ["/api/guardian/children"],
     retry: false,
   });
 
-  const { data: recentActivity } = useQuery<{ activities: RecentActivity[] }>({
-    queryKey: ['/api/guardian/recent-activity'],
+  const { data: activities, isLoading: activitiesLoading } = useQuery<{ activities: RecentActivity[] }>({
+    queryKey: ["/api/guardian/recent-activities"],
     retry: false,
   });
 
-  if (statsLoading) {
+  const isLoading = statsLoading || childrenLoading || activitiesLoading;
+
+  if (isLoading) {
     return (
-      <div className="p-6 bg-[#f7f9fc] min-h-screen">
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/4 mb-6"></div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[...Array(6)].map((_, i) => (
-              <div key={i} className="h-32 bg-gray-200 rounded-lg"></div>
-            ))}
-          </div>
+      <UnifiedLayout userRole="guardian">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1e40af]"></div>
         </div>
-      </div>
+      </UnifiedLayout>
     );
   }
 
-  const dashboardStats = stats?.stats || {
-    totalChildren: 0,
-    upcomingEvents: 0,
-    unreadMessages: 0,
-    pendingPayments: 0,
-    attendanceRate: 0,
-    recentGrades: 0
-  };
-
   return (
-    <div className="bg-gradient-to-br from-[#f7f9fc] to-[#e7f3ff] min-h-screen">
-      {/* Hero Header */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-[#1e40af] via-[#3b82f6] to-[#1e40af] p-8 mb-8">
-        <div className="absolute inset-0 bg-black/5"></div>
-        <div className="relative z-10">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
-            <div className="mb-6 lg:mb-0">
-              <div className="flex items-center mb-3">
-                <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center mr-4">
-                  <User className="h-6 w-6 text-white" />
+    <UnifiedLayout userRole="guardian">
+      <div className="space-y-6">
+        {/* Hero Header - Admin Style */}
+        <div className="relative overflow-hidden bg-gradient-to-r from-[#1e40af] via-[#3b82f6] to-[#1e40af] p-8 rounded-lg">
+          <div className="absolute inset-0 bg-black/5"></div>
+          <div className="relative z-10">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+              <div className="mb-6 lg:mb-0">
+                <div className="flex items-center mb-3">
+                  <Users className="h-8 w-8 text-white mr-3" />
+                  <h1 className="text-3xl font-bold text-white">Voogd Dashboard</h1>
                 </div>
-                <div>
-                  <h1 className="text-3xl font-bold text-white mb-1">
-                    Assalamu alaikum, {user?.firstName}!
-                  </h1>
-                  <p className="text-blue-100 text-lg">
-                    Welkom bij uw voogd dashboard
-                  </p>
+                <p className="text-blue-100 text-lg">
+                  Volg de voortgang van uw kinderen en blijf op de hoogte van schoolactiviteiten
+                </p>
+              </div>
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                <div className="flex items-center space-x-4">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-white">{stats?.stats?.totalChildren || 0}</div>
+                    <div className="text-sm text-blue-100">Kinderen</div>
+                  </div>
+                  <div className="w-px h-12 bg-white/20"></div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-white">{stats?.stats?.attendanceRate || 0}%</div>
+                    <div className="text-sm text-blue-100">Aanwezigheid</div>
+                  </div>
                 </div>
               </div>
-              <p className="text-blue-50 max-w-2xl">
-                Volg de voortgang van uw kinderen, bekijk belangrijke updates en blijf verbonden met hun islamitische onderwijs
-              </p>
             </div>
-            
           </div>
+          {/* Decorative elements */}
+          <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-16 translate-x-16"></div>
+          <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-12 -translate-x-12"></div>
         </div>
-        {/* Decorative elements */}
-        <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-16 translate-x-16"></div>
-        <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-12 -translate-x-12"></div>
-      </div>
 
-      <div className="px-6 pb-8">
-        {/* Enhanced Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        {/* Enhanced Stats Grid - Admin Style */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {/* Children Card */}
-          <Card className="premium-card group relative overflow-hidden bg-gradient-to-br from-white to-blue-50/30 border border-blue-100 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-blue-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <Card className="relative overflow-hidden bg-gradient-to-br from-white to-blue-50/30 border border-blue-100 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-blue-600/10 opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 relative z-10">
               <div>
-                <CardTitle className="text-sm font-semibold text-gray-700 group-hover:text-blue-700 transition-colors">Mijn Kinderen</CardTitle>
-                <p className="text-xs text-gray-500 mt-1">Ingeschreven leerlingen</p>
+                <CardTitle className="text-sm font-medium text-gray-600">Mijn Kinderen</CardTitle>
+                <div className="text-2xl font-bold text-[#1e40af] mt-1">{stats?.stats?.totalChildren || 0}</div>
               </div>
-              <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
-                <Users className="h-5 w-5 text-white" />
-              </div>
-            </CardHeader>
-            <CardContent className="relative z-10">
-              <div className="text-3xl font-bold text-blue-600 group-hover:text-blue-700 transition-colors">
-                {dashboardStats.totalChildren}
-              </div>
-              <div className="mt-2 flex items-center text-xs text-green-600">
-                <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-                Actief ingeschreven
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Attendance Card */}
-          <Card className="premium-card group relative overflow-hidden bg-gradient-to-br from-white to-green-50/30 border border-green-100 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-            <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-green-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 relative z-10">
-              <div>
-                <CardTitle className="text-sm font-semibold text-gray-700 group-hover:text-green-700 transition-colors">Aanwezigheid</CardTitle>
-                <p className="text-xs text-gray-500 mt-1">Gemiddelde score</p>
-              </div>
-              <div className="p-3 bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
-                <UserCheck className="h-5 w-5 text-white" />
+              <div className="p-2 bg-[#1e40af]/10 rounded-lg">
+                <Users className="h-4 w-4 text-[#1e40af]" />
               </div>
             </CardHeader>
-            <CardContent className="relative z-10">
-              <div className="text-3xl font-bold text-green-600 group-hover:text-green-700 transition-colors">
-                {dashboardStats.attendanceRate}%
-              </div>
-              <div className="mt-2 flex items-center text-xs text-green-600">
-                <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-                Uitstekende aanwezigheid
-              </div>
-            </CardContent>
           </Card>
 
           {/* Events Card */}
-          <Card className="premium-card group relative overflow-hidden bg-gradient-to-br from-white to-amber-50/30 border border-amber-100 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-            <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-amber-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <Card className="relative overflow-hidden bg-gradient-to-br from-white to-green-50/30 border border-green-100 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-green-600/10 opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 relative z-10">
               <div>
-                <CardTitle className="text-sm font-semibold text-gray-700 group-hover:text-amber-700 transition-colors">Komende Events</CardTitle>
-                <p className="text-xs text-gray-500 mt-1">Deze week</p>
+                <CardTitle className="text-sm font-medium text-gray-600">Komende Evenementen</CardTitle>
+                <div className="text-2xl font-bold text-green-600 mt-1">{stats?.stats?.upcomingEvents || 0}</div>
               </div>
-              <div className="p-3 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
-                <Calendar className="h-5 w-5 text-white" />
-              </div>
-            </CardHeader>
-            <CardContent className="relative z-10">
-              <div className="text-3xl font-bold text-amber-600 group-hover:text-amber-700 transition-colors">
-                {dashboardStats.upcomingEvents}
-              </div>
-              <div className="mt-2 flex items-center text-xs text-amber-600">
-                <div className="w-2 h-2 bg-amber-500 rounded-full mr-2"></div>
-                Geplande activiteiten
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Payments Card */}
-          <Card className="premium-card group relative overflow-hidden bg-gradient-to-br from-white to-pink-50/30 border border-pink-100 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-            <div className="absolute inset-0 bg-gradient-to-br from-pink-500/5 to-pink-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 relative z-10">
-              <div>
-                <CardTitle className="text-sm font-semibold text-gray-700 group-hover:text-pink-700 transition-colors">Openstaande Betalingen</CardTitle>
-                <p className="text-xs text-gray-500 mt-1">Te betalen facturen</p>
-              </div>
-              <div className="p-3 bg-gradient-to-br from-pink-500 to-pink-600 rounded-xl shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
-                <CreditCard className="h-5 w-5 text-white" />
+              <div className="p-2 bg-green-600/10 rounded-lg">
+                <Calendar className="h-4 w-4 text-green-600" />
               </div>
             </CardHeader>
-            <CardContent className="relative z-10">
-              <div className="text-3xl font-bold text-pink-600 group-hover:text-pink-700 transition-colors">
-                {dashboardStats.pendingPayments}
-              </div>
-              <div className="mt-2 flex items-center text-xs text-pink-600">
-                <div className="w-2 h-2 bg-pink-500 rounded-full mr-2"></div>
-                {dashboardStats.pendingPayments > 0 ? 'Actie vereist' : 'Alles betaald'}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Grades Card */}
-          <Card className="group relative overflow-hidden bg-gradient-to-br from-white to-purple-50/30 border border-purple-100 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-purple-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 relative z-10">
-              <div>
-                <CardTitle className="text-sm font-semibold text-gray-700 group-hover:text-purple-700 transition-colors">Nieuwe Cijfers</CardTitle>
-                <p className="text-xs text-gray-500 mt-1">Afgelopen week</p>
-              </div>
-              <div className="p-3 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
-                <GraduationCap className="h-5 w-5 text-white" />
-              </div>
-            </CardHeader>
-            <CardContent className="relative z-10">
-              <div className="text-3xl font-bold text-purple-600 group-hover:text-purple-700 transition-colors">
-                {dashboardStats.recentGrades}
-              </div>
-              <div className="mt-2 flex items-center text-xs text-purple-600">
-                <div className="w-2 h-2 bg-purple-500 rounded-full mr-2"></div>
-                Recente beoordelingen
-              </div>
-            </CardContent>
           </Card>
 
           {/* Messages Card */}
-          <Card className="group relative overflow-hidden bg-gradient-to-br from-white to-red-50/30 border border-red-100 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-            <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 to-red-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <Card className="relative overflow-hidden bg-gradient-to-br from-white to-orange-50/30 border border-orange-100 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-orange-600/10 opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 relative z-10">
               <div>
-                <CardTitle className="text-sm font-semibold text-gray-700 group-hover:text-red-700 transition-colors">Berichten</CardTitle>
-                <p className="text-xs text-gray-500 mt-1">Ongelezen berichten</p>
+                <CardTitle className="text-sm font-medium text-gray-600">Ongelezen Berichten</CardTitle>
+                <div className="text-2xl font-bold text-orange-600 mt-1">{stats?.stats?.unreadMessages || 0}</div>
               </div>
-              <div className="p-3 bg-gradient-to-br from-red-500 to-red-600 rounded-xl shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
-                <Bell className="h-5 w-5 text-white" />
+              <div className="p-2 bg-orange-600/10 rounded-lg">
+                <MessageSquare className="h-4 w-4 text-orange-600" />
               </div>
             </CardHeader>
-            <CardContent className="relative z-10">
-              <div className="text-3xl font-bold text-red-600 group-hover:text-red-700 transition-colors">
-                {dashboardStats.unreadMessages}
+          </Card>
+
+          {/* Payments Card */}
+          <Card className="relative overflow-hidden bg-gradient-to-br from-white to-red-50/30 border border-red-100 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 to-red-600/10 opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 relative z-10">
+              <div>
+                <CardTitle className="text-sm font-medium text-gray-600">Openstaande Betalingen</CardTitle>
+                <div className="text-2xl font-bold text-red-600 mt-1">{stats?.stats?.pendingPayments || 0}</div>
               </div>
-              <div className="mt-2 flex items-center text-xs text-red-600">
-                <div className="w-2 h-2 bg-red-500 rounded-full mr-2"></div>
-                {dashboardStats.unreadMessages > 0 ? 'Nieuwe berichten' : 'Alle berichten gelezen'}
+              <div className="p-2 bg-red-600/10 rounded-lg">
+                <CreditCard className="h-4 w-4 text-red-600" />
+              </div>
+            </CardHeader>
+          </Card>
+        </div>
+
+        {/* Children Overview - Admin Style */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card className="shadow-lg border-gray-200">
+            <CardHeader className="bg-gradient-to-r from-[#1e40af] to-[#3b82f6] text-white">
+              <CardTitle className="flex items-center">
+                <BookOpen className="h-5 w-5 mr-2" />
+                Mijn Kinderen
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="space-y-4">
+                {children?.children?.map((child) => (
+                  <div key={child.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                    <div>
+                      <h3 className="font-semibold text-gray-900">{child.firstName} {child.lastName}</h3>
+                      <p className="text-sm text-gray-600">Klas: {child.class}</p>
+                      <div className="flex items-center mt-2 space-x-4">
+                        <div className="flex items-center text-sm">
+                          <TrendingUp className="h-4 w-4 text-green-600 mr-1" />
+                          <span className="text-gray-600">Aanwezigheid: {child.attendanceRate}%</span>
+                        </div>
+                        <Badge variant="outline" className="text-xs">
+                          Laatste cijfer: {child.recentGrade}
+                        </Badge>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm text-gray-600">{child.upcomingEvents} evenementen</div>
+                    </div>
+                  </div>
+                )) || (
+                  <div className="text-center py-8 text-gray-500">
+                    <BookOpen className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                    <p>Geen kinderen gevonden</p>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Recent Activities - Admin Style */}
+          <Card className="shadow-lg border-gray-200">
+            <CardHeader className="bg-gradient-to-r from-[#1e40af] to-[#3b82f6] text-white">
+              <CardTitle className="flex items-center">
+                <Clock className="h-5 w-5 mr-2" />
+                Recente Activiteiten
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="space-y-4">
+                {activities?.activities?.map((activity) => (
+                  <div key={activity.id} className="flex items-start space-x-3 p-3 hover:bg-gray-50 rounded-lg transition-colors">
+                    <div className="flex-shrink-0">
+                      {activity.type === 'grade' && <TrendingUp className="h-5 w-5 text-green-600" />}
+                      {activity.type === 'attendance' && <Users className="h-5 w-5 text-blue-600" />}
+                      {activity.type === 'payment' && <CreditCard className="h-5 w-5 text-red-600" />}
+                      {activity.type === 'message' && <MessageSquare className="h-5 w-5 text-orange-600" />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-gray-900">{activity.description}</p>
+                      {activity.childName && (
+                        <p className="text-xs text-gray-500 mt-1">Kind: {activity.childName}</p>
+                      )}
+                      <p className="text-xs text-gray-400 mt-1">{activity.timestamp}</p>
+                    </div>
+                  </div>
+                )) || (
+                  <div className="text-center py-8 text-gray-500">
+                    <Bell className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                    <p>Geen recente activiteiten</p>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
         </div>
-
-      {/* Content Grid - Admin Style */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Children Overview - Admin Style */}
-        <Card className="bg-white border border-[#e5e7eb] shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between border-b border-[#e5e7eb] pb-4">
-            <CardTitle className="flex items-center text-[#1e40af] font-semibold">
-              <Users className="h-5 w-5 mr-2 text-[#1e40af]" />
-              Mijn Kinderen
-            </CardTitle>
-            <Link href="/guardian/children">
-              <Button variant="ghost" size="sm" className="text-[#1e40af] hover:bg-[#eff6ff]">
-                Alles bekijken <ChevronRight className="h-4 w-4 ml-1" />
-              </Button>
-            </Link>
-          </CardHeader>
-          <CardContent className="pt-4">
-            {childrenOverview?.children?.length ? (
-              <div className="space-y-4">
-                {childrenOverview.children.map((child) => (
-                  <div key={child.id} className="p-4 bg-[#f8fafc] rounded-lg border border-[#e5e7eb]">
-                    <div className="flex items-center justify-between mb-3">
-                      <div>
-                        <p className="font-semibold text-gray-900">{child.firstName} {child.lastName}</p>
-                        <p className="text-sm text-gray-600">Klas {child.class}</p>
-                      </div>
-                      <Badge className="bg-[#eff6ff] text-[#1e40af] border-[#1e40af]">
-                        {child.attendanceRate}% aanwezig
-                      </Badge>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <span className="text-gray-500">Laatste cijfer:</span>
-                        <span className="ml-2 font-medium">{child.recentGrade || 'Geen'}</span>
-                      </div>
-                      <div>
-                        <span className="text-gray-500">Events:</span>
-                        <span className="ml-2 font-medium">{child.upcomingEvents}</span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-gray-500 text-center py-8">
-                Geen kinderen gevonden
-              </p>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Recent Activity - Admin Style */}
-        <Card className="bg-white border border-[#e5e7eb] shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between border-b border-[#e5e7eb] pb-4">
-            <CardTitle className="flex items-center text-[#1e40af] font-semibold">
-              <Bell className="h-5 w-5 mr-2 text-[#1e40af]" />
-              Recente Activiteit
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pt-4">
-            {recentActivity?.activities?.length ? (
-              <div className="space-y-3">
-                {recentActivity.activities.slice(0, 5).map((activity) => (
-                  <div key={activity.id} className="flex items-start space-x-3 p-3 bg-[#f8fafc] rounded-lg border border-[#e5e7eb]">
-                    <div className={`w-2 h-2 rounded-full mt-2 ${
-                      activity.type === 'grade' ? 'bg-[#1e40af]' :
-                      activity.type === 'attendance' ? 'bg-[#16a34a]' :
-                      activity.type === 'payment' ? 'bg-[#be185d]' : 'bg-[#7c3aed]'
-                    }`} />
-                    <div className="flex-1">
-                      <p className="text-sm text-gray-900">{activity.description}</p>
-                      {activity.childName && (
-                        <p className="text-xs text-gray-600">{activity.childName}</p>
-                      )}
-                      <p className="text-xs text-gray-500">{activity.timestamp}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-gray-500 text-center py-8">
-                Geen recente activiteit
-              </p>
-            )}
-          </CardContent>
-        </Card>
       </div>
-
-      
-      </div>
-    </div>
+    </UnifiedLayout>
   );
 }

@@ -416,7 +416,7 @@ export default function ReEnrollments() {
               </Table>
             ) : (
               <EmptyState
-                icon={GraduationCap}
+                icon={<GraduationCap className="h-12 w-12" />}
                 title="Geen leerlingen gevonden"
                 description="Er zijn geen leerlingen die voldoen aan de zoekfilters of geschikt zijn voor herinschrijving."
               />

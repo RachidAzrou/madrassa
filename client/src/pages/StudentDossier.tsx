@@ -274,7 +274,7 @@ export default function StudentDossier() {
               </Table>
             ) : (
               <EmptyState
-                icon={FileText}
+                icon={<FileText className="h-12 w-12" />}
                 title="Geen leerlingen gevonden"
                 description="Er zijn geen leerlingen die voldoen aan de zoekfilters."
               />
@@ -406,7 +406,7 @@ export default function StudentDossier() {
                         </Table>
                       ) : (
                         <EmptyState
-                          icon={BookOpen}
+                          icon={<BookOpen className="h-12 w-12" />}
                           title="Geen cijfers beschikbaar"
                           description="Er zijn nog geen cijfers geregistreerd voor deze leerling."
                         />
@@ -457,7 +457,7 @@ export default function StudentDossier() {
                         </Table>
                       ) : (
                         <EmptyState
-                          icon={Calendar}
+                          icon={<Calendar className="h-12 w-12" />}
                           title="Geen aanwezigheidsgegevens"
                           description="Er zijn nog geen aanwezigheidsgegevens beschikbaar voor deze leerling."
                         />

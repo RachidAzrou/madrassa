@@ -33,7 +33,7 @@ import StudentDossier from "@/pages/StudentDossier";
 import Profile from "@/pages/Profile";
 import ReEnrollment from "@/pages/ReEnrollment";
 import AcademicYearManagement from "@/pages/AcademicYearManagement";
-import Accounts from "@/pages/Accounts";
+
 import TeacherLayout from "@/components/TeacherLayout";
 import TeacherDashboard from "@/pages/teacher/TeacherDashboard";
 import TeacherStudents from "@/pages/teacher/TeacherStudents";
@@ -100,6 +100,8 @@ function AuthenticatedRouter() {
           <Route path="/teachers" component={() => <AuthenticatedRoute component={Teachers} />} />
           <Route path="/courses" component={() => <AuthenticatedRoute component={Courses} />} />
           <Route path="/programs" component={() => <AuthenticatedRoute component={Programs} />} />
+          <Route path="/student-groups" component={() => <AuthenticatedRoute component={StudentGroups} />} />
+          <Route path="/academic-year-management" component={() => <AuthenticatedRoute component={AcademicYearManagement} />} />
           <Route path="/calendar" component={() => <AuthenticatedRoute component={Calendar} />} />
           <Route path="/attendance" component={() => <AuthenticatedRoute component={Attendance} />} />
           <Route path="/grading" component={() => <AuthenticatedRoute component={Cijfers} />} />
@@ -197,7 +199,6 @@ function AuthenticatedRouter() {
         <Route path="/teachers" component={() => <AuthenticatedRoute component={Teachers} />} />
 
         <Route path="/academic-year-management" component={() => <AuthenticatedRoute component={AcademicYearManagement} />} />
-        <Route path="/accounts" component={() => <AuthenticatedRoute component={Accounts} />} />
         <Route path="/student-groups" component={() => <AuthenticatedRoute component={StudentGroups} />} />
         <Route path="/courses" component={() => <AuthenticatedRoute component={Courses} />} />
         <Route path="/programs" component={() => <AuthenticatedRoute component={Programs} />} />

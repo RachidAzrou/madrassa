@@ -4,7 +4,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
-import { PremiumHeader } from "@/components/layout/premium-header";
 import UnifiedLayout from "@/components/layout/UnifiedLayout";
 import {
   Users,
@@ -24,7 +23,9 @@ import {
   Award,
   Target,
   Activity,
-  Percent
+  Percent,
+  BookOpen,
+  GraduationCap
 } from "lucide-react";
 import { Link } from "wouter";
 
@@ -43,6 +44,7 @@ interface UpcomingLesson {
   subject: string;
   time: string;
   room: string;
+  date: string;
 }
 
 interface RecentActivity {
@@ -50,279 +52,289 @@ interface RecentActivity {
   type: 'grade' | 'attendance' | 'message';
   description: string;
   timestamp: string;
+  className?: string;
+}
+
+interface PendingTask {
+  id: number;
+  type: 'grading' | 'attendance' | 'report';
+  description: string;
+  dueDate: string;
+  priority: 'high' | 'medium' | 'low';
 }
 
 export default function TeacherDashboard() {
   const { user } = useAuth();
 
-  const { data: stats, isLoading: statsLoading } = useQuery<{ stats: TeacherStats }>({
+  const { data: statsData } = useQuery<{ stats: TeacherStats }>({
     queryKey: ['/api/teacher/dashboard/stats'],
-    retry: false,
+    staleTime: 60000,
   });
 
   const { data: upcomingLessons } = useQuery<{ lessons: UpcomingLesson[] }>({
     queryKey: ['/api/teacher/upcoming-lessons'],
-    retry: false,
+    staleTime: 60000,
   });
 
   const { data: recentActivity } = useQuery<{ activities: RecentActivity[] }>({
     queryKey: ['/api/teacher/recent-activity'],
-    retry: false,
+    staleTime: 60000,
   });
 
-  const teacherStats = stats?.stats || {
-    myClasses: 0,
-    totalStudents: 0,
-    mySubjects: 0,
-    upcomingLessons: 0,
-    pendingGrades: 0,
-    unreadMessages: 0
-  };
+  const { data: pendingTasks } = useQuery<{ tasks: PendingTask[] }>({
+    queryKey: ['/api/teacher/pending-tasks'],
+    staleTime: 60000,
+  });
 
-  const lessons = upcomingLessons?.lessons || [];
-  const activities = recentActivity?.activities || [];
-
-  const getActivityIcon = (type: string) => {
-    switch (type) {
-      case 'grade':
-        return <Percent className="h-4 w-4 text-blue-600" />;
-      case 'attendance':
-        return <ClipboardCheck className="h-4 w-4 text-green-600" />;
-      case 'message':
-        return <MessageCircle className="h-4 w-4 text-purple-600" />;
-      default:
-        return <Activity className="h-4 w-4 text-gray-600" />;
-    }
-  };
-
-  const getActivityColor = (type: string) => {
-    switch (type) {
-      case 'grade':
-        return 'bg-blue-50 border-blue-200';
-      case 'attendance':
-        return 'bg-green-50 border-green-200';
-      case 'message':
-        return 'bg-purple-50 border-purple-200';
-      default:
-        return 'bg-gray-50 border-gray-200';
-    }
-  };
+  const stats = statsData?.stats;
 
   return (
     <UnifiedLayout userRole="teacher">
       <div className="space-y-6">
-        <PremiumHeader 
-          title="Docent Dashboard" 
-          icon={School}
-          description={`Welkom terug, ${user?.firstName || 'Docent'}! Hier is uw overzicht voor vandaag.`}
-          breadcrumbs={{
-            parent: "Docent",
-            current: "Dashboard"
-          }}
-        />
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-          <Card className="premium-card bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-blue-600 text-sm font-medium">Mijn Klassen</p>
-                  <p className="text-2xl font-bold text-blue-900">{teacherStats.myClasses}</p>
+        {/* Hero Header - Admin Style */}
+        <div className="relative overflow-hidden bg-gradient-to-r from-[#1e40af] via-[#3b82f6] to-[#1e40af] p-8 rounded-lg">
+          <div className="absolute inset-0 bg-black/5"></div>
+          <div className="relative z-10">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+              <div className="mb-6 lg:mb-0">
+                <div className="flex items-center mb-3">
+                  <GraduationCap className="h-8 w-8 text-white mr-3" />
+                  <h1 className="text-3xl font-bold text-white">Docent Dashboard</h1>
                 </div>
-                <div className="h-12 w-12 bg-blue-500 rounded-lg flex items-center justify-center">
-                  <School className="h-6 w-6 text-white" />
+                <p className="text-blue-100 text-lg">
+                  Welkom, {user?.firstName}! Beheer uw klassen, studenten en lessen
+                </p>
+              </div>
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                <div className="flex items-center space-x-4">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-white">{stats?.myClasses || 0}</div>
+                    <div className="text-sm text-blue-100">Klassen</div>
+                  </div>
+                  <div className="w-px h-12 bg-white/20"></div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-white">{stats?.totalStudents || 0}</div>
+                    <div className="text-sm text-blue-100">Studenten</div>
+                  </div>
                 </div>
               </div>
-            </CardContent>
+            </div>
+          </div>
+          {/* Decorative elements */}
+          <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-16 translate-x-16"></div>
+          <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-12 -translate-x-12"></div>
+        </div>
+
+        {/* Enhanced Stats Grid - Admin Style */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Classes Card */}
+          <Card className="relative overflow-hidden bg-gradient-to-br from-white to-blue-50/30 border border-blue-100 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-blue-600/10 opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 relative z-10">
+              <div>
+                <CardTitle className="text-sm font-medium text-gray-600">Mijn Klassen</CardTitle>
+                <div className="text-2xl font-bold text-[#1e40af] mt-1">{stats?.myClasses || 0}</div>
+              </div>
+              <div className="p-2 bg-[#1e40af]/10 rounded-lg">
+                <School className="h-4 w-4 text-[#1e40af]" />
+              </div>
+            </CardHeader>
           </Card>
 
-          <Card className="premium-card bg-gradient-to-br from-green-50 to-green-100 border-green-200">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-green-600 text-sm font-medium">Studenten</p>
-                  <p className="text-2xl font-bold text-green-900">{teacherStats.totalStudents}</p>
-                </div>
-                <div className="h-12 w-12 bg-green-500 rounded-lg flex items-center justify-center">
-                  <Users className="h-6 w-6 text-white" />
-                </div>
+          {/* Students Card */}
+          <Card className="relative overflow-hidden bg-gradient-to-br from-white to-green-50/30 border border-green-100 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-green-600/10 opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 relative z-10">
+              <div>
+                <CardTitle className="text-sm font-medium text-gray-600">Totaal Studenten</CardTitle>
+                <div className="text-2xl font-bold text-green-600 mt-1">{stats?.totalStudents || 0}</div>
               </div>
-            </CardContent>
+              <div className="p-2 bg-green-600/10 rounded-lg">
+                <Users className="h-4 w-4 text-green-600" />
+              </div>
+            </CardHeader>
           </Card>
 
-          <Card className="premium-card bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-purple-600 text-sm font-medium">Vakken</p>
-                  <p className="text-2xl font-bold text-purple-900">{teacherStats.mySubjects}</p>
-                </div>
-                <div className="h-12 w-12 bg-purple-500 rounded-lg flex items-center justify-center">
-                  <BookText className="h-6 w-6 text-white" />
-                </div>
+          {/* Upcoming Lessons Card */}
+          <Card className="relative overflow-hidden bg-gradient-to-br from-white to-orange-50/30 border border-orange-100 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-orange-600/10 opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 relative z-10">
+              <div>
+                <CardTitle className="text-sm font-medium text-gray-600">Komende Lessen</CardTitle>
+                <div className="text-2xl font-bold text-orange-600 mt-1">{stats?.upcomingLessons || 0}</div>
               </div>
-            </CardContent>
+              <div className="p-2 bg-orange-600/10 rounded-lg">
+                <Calendar className="h-4 w-4 text-orange-600" />
+              </div>
+            </CardHeader>
           </Card>
 
-          <Card className="premium-card bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-orange-600 text-sm font-medium">Komende Lessen</p>
-                  <p className="text-2xl font-bold text-orange-900">{teacherStats.upcomingLessons}</p>
-                </div>
-                <div className="h-12 w-12 bg-orange-500 rounded-lg flex items-center justify-center">
-                  <Calendar className="h-6 w-6 text-white" />
-                </div>
+          {/* Pending Grades Card */}
+          <Card className="relative overflow-hidden bg-gradient-to-br from-white to-red-50/30 border border-red-100 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 to-red-600/10 opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 relative z-10">
+              <div>
+                <CardTitle className="text-sm font-medium text-gray-600">Te Beoordelen</CardTitle>
+                <div className="text-2xl font-bold text-red-600 mt-1">{stats?.pendingGrades || 0}</div>
               </div>
-            </CardContent>
-          </Card>
-
-          <Card className="premium-card bg-gradient-to-br from-red-50 to-red-100 border-red-200">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-red-600 text-sm font-medium">Te Beoordelen</p>
-                  <p className="text-2xl font-bold text-red-900">{teacherStats.pendingGrades}</p>
-                </div>
-                <div className="h-12 w-12 bg-red-500 rounded-lg flex items-center justify-center">
-                  <Percent className="h-6 w-6 text-white" />
-                </div>
+              <div className="p-2 bg-red-600/10 rounded-lg">
+                <ClipboardCheck className="h-4 w-4 text-red-600" />
               </div>
-            </CardContent>
-          </Card>
-
-          <Card className="premium-card bg-gradient-to-br from-indigo-50 to-indigo-100 border-indigo-200">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-indigo-600 text-sm font-medium">Berichten</p>
-                  <p className="text-2xl font-bold text-indigo-900">{teacherStats.unreadMessages}</p>
-                </div>
-                <div className="h-12 w-12 bg-indigo-500 rounded-lg flex items-center justify-center">
-                  <MessageCircle className="h-6 w-6 text-white" />
-                </div>
-              </div>
-            </CardContent>
+            </CardHeader>
           </Card>
         </div>
 
-        {/* Performance Overview and Recent Activity - Side by Side */}
+        {/* Main Content Grid - Admin Style */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Performance Overview */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-blue-600" />
-                Prestatie Overzicht
+          {/* Upcoming Lessons - Admin Style */}
+          <Card className="shadow-lg border-gray-200">
+            <CardHeader className="bg-gradient-to-r from-[#1e40af] to-[#3b82f6] text-white">
+              <CardTitle className="flex items-center">
+                <Clock className="h-5 w-5 mr-2" />
+                Komende Lessen
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Klassen beheerd</span>
-                <Badge variant="secondary">{teacherStats.myClasses}</Badge>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Totaal studenten</span>
-                <Badge variant="secondary">{teacherStats.totalStudents}</Badge>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Vakken onderwezen</span>
-                <Badge variant="secondary">{teacherStats.mySubjects}</Badge>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Aanwezigheidspercentage</span>
-                <Badge className="bg-green-100 text-green-800">85%</Badge>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Recent Activity */}
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                <Activity className="h-5 w-5 text-purple-600" />
-                Recente Activiteit
-              </CardTitle>
-              <Button variant="ghost" size="sm">
-                Alles bekijken
-                <ChevronRight className="h-4 w-4 ml-1" />
-              </Button>
-            </CardHeader>
-            <CardContent>
-              {activities.length > 0 ? (
-                <div className="space-y-3">
-                  {activities.slice(0, 6).map((activity) => (
-                    <div key={activity.id} className={`p-3 rounded-lg border ${getActivityColor(activity.type)}`}>
-                      <div className="flex items-start space-x-3">
-                        <div className="mt-0.5">
-                          {getActivityIcon(activity.type)}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm text-gray-900 mb-1">{activity.description}</p>
-                          <p className="text-xs text-gray-500">{activity.timestamp}</p>
+            <CardContent className="p-6">
+              <div className="space-y-4">
+                {upcomingLessons?.lessons?.map((lesson) => (
+                  <div key={lesson.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                    <div className="flex items-center space-x-3">
+                      <div className="p-2 bg-[#1e40af]/10 rounded-lg">
+                        <BookOpen className="h-4 w-4 text-[#1e40af]" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-gray-900">{lesson.subject}</h3>
+                        <p className="text-sm text-gray-600">{lesson.className}</p>
+                        <div className="flex items-center mt-1 space-x-2">
+                          <Badge variant="outline" className="text-xs">
+                            {lesson.room}
+                          </Badge>
+                          <span className="text-xs text-gray-500">{lesson.date}</span>
                         </div>
                       </div>
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-6">
-                  <Activity className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                  <p className="text-sm text-gray-500">Geen recente activiteit</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Full Width Agenda Section */}
-        <Card className="mt-6">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-green-600" />
-              Mijn Agenda
-            </CardTitle>
-            <Link href="/teacher/calendar">
-              <Button variant="ghost" size="sm">
-                Alle lessen
-                <ChevronRight className="h-4 w-4 ml-1" />
-              </Button>
-            </Link>
-          </CardHeader>
-          <CardContent>
-            {lessons.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {lessons.map((lesson) => (
-                  <div key={lesson.id} className="p-4 bg-gray-50 rounded-lg border hover:shadow-md transition-shadow">
-                    <div className="flex items-start space-x-4">
-                      <div className="h-12 w-12 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <BookText className="h-6 w-6 text-green-600" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-gray-900 mb-1">{lesson.subject}</h4>
-                        <p className="text-sm text-gray-600 mb-2">{lesson.className}</p>
-                        <div className="flex items-center justify-between text-xs text-gray-500">
-                          <span className="flex items-center gap-1">
-                            <Clock className="h-3 w-3" />
-                            {lesson.time}
-                          </span>
-                          <span>{lesson.room}</span>
-                        </div>
-                      </div>
+                    <div className="text-right">
+                      <div className="text-sm font-semibold text-[#1e40af]">{lesson.time}</div>
                     </div>
                   </div>
-                ))}
+                )) || (
+                  <div className="text-center py-8 text-gray-500">
+                    <Calendar className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                    <p>Geen komende lessen</p>
+                  </div>
+                )}
               </div>
-            ) : (
-              <div className="text-center py-12">
-                <Calendar className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="font-medium text-gray-900 mb-2">Geen lessen gepland</h3>
-                <p className="text-gray-500">Er zijn vandaag geen lessen ingepland.</p>
+            </CardContent>
+          </Card>
+
+          {/* Pending Tasks - Admin Style */}
+          <Card className="shadow-lg border-gray-200">
+            <CardHeader className="bg-gradient-to-r from-[#1e40af] to-[#3b82f6] text-white">
+              <CardTitle className="flex items-center">
+                <ClipboardCheck className="h-5 w-5 mr-2" />
+                Openstaande Taken
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="space-y-4">
+                {pendingTasks?.tasks?.map((task) => (
+                  <div key={task.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                    <div className="flex items-center space-x-3">
+                      <div className="p-2 bg-orange-600/10 rounded-lg">
+                        {task.type === 'grading' && <Award className="h-4 w-4 text-orange-600" />}
+                        {task.type === 'attendance' && <Users className="h-4 w-4 text-orange-600" />}
+                        {task.type === 'report' && <BarChart3 className="h-4 w-4 text-orange-600" />}
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-gray-900">{task.description}</h3>
+                        <p className="text-sm text-gray-600">Deadline: {task.dueDate}</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <Badge 
+                        variant={task.priority === 'high' ? 'destructive' : task.priority === 'medium' ? 'default' : 'secondary'}
+                        className="text-xs"
+                      >
+                        {task.priority}
+                      </Badge>
+                    </div>
+                  </div>
+                )) || (
+                  <div className="text-center py-8 text-gray-500">
+                    <CheckCircle className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                    <p>Alle taken voltooid</p>
+                  </div>
+                )}
               </div>
-            )}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Recent Activity - Admin Style */}
+        <Card className="shadow-lg border-gray-200">
+          <CardHeader className="bg-gradient-to-r from-[#1e40af] to-[#3b82f6] text-white">
+            <CardTitle className="flex items-center">
+              <Activity className="h-5 w-5 mr-2" />
+              Recente Activiteiten
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-6">
+            <div className="space-y-4">
+              {recentActivity?.activities?.map((activity) => (
+                <div key={activity.id} className="flex items-start space-x-3 p-3 hover:bg-gray-50 rounded-lg transition-colors">
+                  <div className="flex-shrink-0">
+                    {activity.type === 'grade' && <Award className="h-5 w-5 text-green-600" />}
+                    {activity.type === 'attendance' && <Users className="h-5 w-5 text-blue-600" />}
+                    {activity.type === 'message' && <MessageCircle className="h-5 w-5 text-purple-600" />}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-gray-900">{activity.description}</p>
+                    {activity.className && (
+                      <p className="text-xs text-gray-500 mt-1">Klas: {activity.className}</p>
+                    )}
+                    <p className="text-xs text-gray-400 mt-1">{activity.timestamp}</p>
+                  </div>
+                </div>
+              )) || (
+                <div className="text-center py-8 text-gray-500">
+                  <Bell className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                  <p>Geen recente activiteiten</p>
+                </div>
+              )}
+            </div>
           </CardContent>
         </Card>
+
+        {/* Quick Actions - Admin Style */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Link href="/teacher/students">
+            <Button variant="outline" className="w-full h-20 flex flex-col items-center justify-center space-y-2 hover:bg-blue-50 hover:border-blue-300 transition-colors">
+              <Users className="h-6 w-6 text-[#1e40af]" />
+              <span className="text-sm font-medium">Studenten</span>
+            </Button>
+          </Link>
+          
+          <Link href="/teacher/classes">
+            <Button variant="outline" className="w-full h-20 flex flex-col items-center justify-center space-y-2 hover:bg-green-50 hover:border-green-300 transition-colors">
+              <School className="h-6 w-6 text-green-600" />
+              <span className="text-sm font-medium">Klassen</span>
+            </Button>
+          </Link>
+          
+          <Link href="/teacher/grades">
+            <Button variant="outline" className="w-full h-20 flex flex-col items-center justify-center space-y-2 hover:bg-orange-50 hover:border-orange-300 transition-colors">
+              <Award className="h-6 w-6 text-orange-600" />
+              <span className="text-sm font-medium">Cijfers</span>
+            </Button>
+          </Link>
+          
+          <Link href="/teacher/reports">
+            <Button variant="outline" className="w-full h-20 flex flex-col items-center justify-center space-y-2 hover:bg-purple-50 hover:border-purple-300 transition-colors">
+              <BarChart3 className="h-6 w-6 text-purple-600" />
+              <span className="text-sm font-medium">Rapporten</span>
+            </Button>
+          </Link>
+        </div>
       </div>
     </UnifiedLayout>
   );

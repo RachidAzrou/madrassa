@@ -1,452 +1,105 @@
-import React, { useState } from 'react';
-import { useLocation } from 'wouter';
-import { Link } from 'wouter';
-import { useQuery } from '@tanstack/react-query';
-import { 
-  Users, 
-  UserCheck, 
-  GraduationCap, 
-  School,
-  MessageCircle, 
-  CreditCard, 
-  BarChart3, 
-  Calendar, 
-  BookOpen, 
-  BookText,
-  BookMarked,
-  FileText,
-  Settings, 
-  LogOut, 
-  X, 
-  LayoutDashboard,
-  Menu,
-  Search,
-  Bell,
-  Mail,
-  User,
-  ChevronDown
-} from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
-import { Button } from '@/components/ui/button';
-import NotificationDropdown from '@/components/notifications/NotificationDropdown';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import myMadrassaLogo from '@assets/myMadrassa.png';
+import { useState, useEffect } from "react";
+import { useLocation, Link } from "wouter";
+import Sidebar from "./layout/sidebar";
+import Header from "./layout/header";
+import TestBanner from "./layout/test-banner";
+import { Topbar } from "./layout/topbar";
+import { useMobile } from "@/hooks/use-mobile";
 
-interface SecretariatLayoutProps {
+type SecretariatLayoutProps = {
   children: React.ReactNode;
-}
+};
 
-export default function SecretariatLayout({ children }: SecretariatLayoutProps) {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+const getPageTitle = (path: string): string => {
+  switch (path) {
+    case "/":
+      return "Dashboard";
+    case "/students":
+      return "Student Management";
+    case "/courses":
+      return "Course Management";
+    case "/programs":
+      return "Program Management";
+    case "/calendar":
+      return "Academic Calendar";
+    case "/attendance":
+      return "Attendance Tracking";
+    case "/grading":
+      return "Grading System";
+    case "/reports":
+      return "Reports";
+    case "/teachers":
+      return "Teacher Management";
+    case "/guardians":
+      return "Guardian Management";
+    case "/fees":
+      return "Fee Management";
+    case "/messages":
+      return "Messages";
+    case "/notifications":
+      return "Notifications";
+    default:
+      return "myMadrassa";
+  }
+};
+
+const SecretariatLayout = ({ children }: SecretariatLayoutProps) => {
   const [location] = useLocation();
-  const [, setLocation] = useLocation();
-  const { user, logout } = useAuth();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const isMobile = useMobile();
+  const pageTitle = getPageTitle(location);
 
-  // Data fetching - admin interface copy
-  const { data: profileData } = useQuery({
-    queryKey: ['/api/profile'],
-    retry: 1
-  });
+  // Toggle sidebar based on mobile or desktop
+  useEffect(() => {
+    setSidebarOpen(!isMobile);
+  }, [isMobile]);
 
-  const { data: notificationsData } = useQuery({
-    queryKey: ['/api/notifications'],
-    staleTime: 30000,
-  });
-
-  const { data: inboxMessages } = useQuery({
-    queryKey: ['/api/messages/inbox'],
-    staleTime: 30000,
-  });
-
-  const allNavigationItems = [
-    {
-      name: 'Dashboard',
-      href: '/',
-      icon: LayoutDashboard,
-      current: location === '/' || location === '/dashboard',
-      resource: 'dashboard' as const
-    },
-    {
-      name: 'Studenten',
-      href: '/students',
-      icon: Users,
-      current: location.startsWith('/students'),
-      resource: 'student' as const
-    },
-    {
-      name: 'Docenten',
-      href: '/teachers',
-      icon: GraduationCap,
-      current: location.startsWith('/teachers'),
-      resource: 'teacher' as const
-    },
-    {
-      name: 'Voogden',
-      href: '/guardians',
-      icon: UserCheck,
-      current: location.startsWith('/guardians'),
-      resource: 'guardian' as const
-    },
-    {
-      name: 'Vakken',
-      href: '/courses',
-      icon: BookText,
-      current: location.startsWith('/courses'),
-      resource: 'course' as const
-    },
-    {
-      name: 'Programma\'s',
-      href: '/programs',
-      icon: BookMarked,
-      current: location.startsWith('/programs'),
-      resource: 'program' as const
-    },
-    {
-      name: 'Kalender',
-      href: '/calendar',
-      icon: Calendar,
-      current: location.startsWith('/calendar'),
-      resource: 'calendar' as const
-    },
-    {
-      name: 'Aanwezigheid',
-      href: '/attendance',
-      icon: UserCheck,
-      current: location.startsWith('/attendance'),
-      resource: 'attendance' as const
-    },
-    {
-      name: 'Cijfers',
-      href: '/grades',
-      icon: FileText,
-      current: location.startsWith('/grades'),
-      resource: 'grade' as const
-    },
-    {
-      name: 'Rapporten',
-      href: '/reports',
-      icon: BarChart3,
-      current: location.startsWith('/reports'),
-      resource: 'report' as const
-    },
-    {
-      name: 'Betalingen',
-      href: '/fees',
-      icon: CreditCard,
-      current: location.startsWith('/fees'),
-      resource: 'payment' as const
-    },
-    {
-      name: 'Berichten',
-      href: '/messages',
-      icon: MessageCircle,
-      current: location.startsWith('/messages'),
-      resource: 'message' as const
-    }
-  ];
-
-  // Filter ongelezen berichten en formatteer voor weergave
-  const unreadMessages = Array.isArray(inboxMessages) 
-    ? inboxMessages
-        .filter((msg: any) => !msg.isRead)
-        .slice(0, 5)
-        .map((msg: any) => ({
-          id: msg.id,
-          sender: `${msg.senderFirstName || ''} ${msg.senderLastName || ''}`.trim(),
-          initials: `${msg.senderFirstName?.[0] || ''}${msg.senderLastName?.[0] || ''}`,
-          time: new Date(msg.createdAt).toLocaleDateString(),
-          preview: msg.content?.substring(0, 60) + (msg.content?.length > 60 ? '...' : ''),
-          bgColor: msg.senderRole === 'admin' ? 'bg-red-100' : 
-                   msg.senderRole === 'secretariaat' ? 'bg-orange-100' :
-                   msg.senderRole === 'docent' ? 'bg-green-100' :
-                   msg.senderRole === 'voogd' ? 'bg-purple-100' : 'bg-blue-100',
-          textColor: msg.senderRole === 'admin' ? 'text-red-800' : 
-                     msg.senderRole === 'secretariaat' ? 'text-orange-800' :
-                     msg.senderRole === 'docent' ? 'text-green-800' :
-                     msg.senderRole === 'voogd' ? 'text-purple-800' : 'text-blue-800'
-        }))
-    : [];
-
-  const handleMessageClick = (messageId: number) => {
-    setLocation(`/messages?messageId=${messageId}`);
-  };
-
-  // Generate user display data from profile data (preferred) or authenticated user
-  const getUserDisplayData = () => {
-    const userData: any = profileData || user || {};
-    if (!userData) return { name: 'Gebruiker', role: 'Onbekend', avatar: 'G' };
-    
-    const name = `${userData.firstName || ''} ${userData.lastName || ''}`.trim() || userData.name || userData.email || 'Gebruiker';
-    const roleMap: { [key: string]: string } = {
-      'administrator': 'Beheerder',
-      'admin': 'Beheerder',
-      'docent': 'Docent', 
-      'teacher': 'Docent',
-      'student': 'Student',
-      'voogd': 'Voogd',
-      'guardian': 'Voogd',
-      'secretariaat': 'Secretariaat',
-      'secretariat': 'Secretariaat'
-    };
-    const role = roleMap[user?.role || ''] || user?.role || 'Onbekend';
-    const avatar = `${userData.firstName?.[0] || ''}${userData.lastName?.[0] || ''}`.toUpperCase();
-    
-    return { name, role, avatar };
-  };
-
-  const userDisplayData = getUserDisplayData();
-
-  // Bereken het aantal ongelezen notificaties
-  const notifications = notificationsData || [];
-  const unreadCount = Array.isArray(notifications) ? notifications.filter((n: any) => !n.isRead).length : 0;
-
-  // Show all navigation items for secretariat role
-  const navigation = allNavigationItems;
-
-  const handleLogout = () => {
-    logout();
-    window.location.href = "/login";
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
   };
 
   return (
-    <div className="min-h-screen bg-[#f7f9fc]">
-      {/* Mobile sidebar backdrop */}
-      {sidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-gray-600 bg-opacity-75 z-40 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
-      {/* Top bar - Admin Style - Above everything */}
-      <div className="bg-white shadow-sm border-b border-[#e5e7eb] fixed top-0 left-0 right-0 z-50 h-12">
-        <div className="flex items-center justify-between h-12 px-4 lg:px-6">
-          {/* Logo section - Left */}
-          <div className="flex items-center space-x-3">
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="lg:hidden text-gray-500 hover:text-gray-700 mr-3"
-            >
-              <Menu className="w-5 h-5" />
-            </button>
-            <img 
-              src={myMadrassaLogo} 
-              alt="myMadrassa Logo" 
-              className="w-6 h-6"
-            />
-            <span className="text-lg font-bold text-[#1e40af]">myMadrassa</span>
-          </div>
-
-
-
-          {/* Top bar actions - Right */}
-          <div className="flex items-center space-x-3">
-            {/* Notifications */}
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="ghost" size="sm" className="relative h-8 w-8 p-0">
-                  <Bell className="h-4 w-4 text-gray-600" />
-                  {unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
-                      {unreadCount}
-                    </span>
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-80 p-0 bg-white border border-[#e5e7eb]">
-                <div className="p-3 border-b border-[#e5e7eb]">
-                  <h3 className="font-semibold text-gray-900">Meldingen</h3>
-                </div>
-                <div className="max-h-80 overflow-y-auto">
-                  {notifications.length === 0 ? (
-                    <div className="p-4 text-center text-gray-500">
-                      Geen nieuwe meldingen
-                    </div>
-                  ) : (
-                    notifications.slice(0, 5).map((notification: any) => (
-                      <div key={notification.id} className="p-3 border-b border-gray-100 hover:bg-gray-50">
-                        <p className="text-sm text-gray-900">{notification.title}</p>
-                        <p className="text-xs text-gray-500 mt-1">{notification.message}</p>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </PopoverContent>
-            </Popover>
-
-            {/* Messages */}
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="ghost" size="sm" className="relative h-8 w-8 p-0">
-                  <Mail className="h-4 w-4 text-gray-600" />
-                  {unreadMessages.length > 0 && (
-                    <span className="absolute -top-1 -right-1 h-3 w-3 bg-blue-500 text-white text-xs rounded-full flex items-center justify-center">
-                      {unreadMessages.length}
-                    </span>
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-80 p-0 bg-white border border-[#e5e7eb]">
-                <div className="p-3 border-b border-[#e5e7eb]">
-                  <h3 className="font-semibold text-gray-900">Berichten</h3>
-                </div>
-                <div className="max-h-80 overflow-y-auto">
-                  {unreadMessages.length === 0 ? (
-                    <div className="p-4 text-center text-gray-500">
-                      Geen nieuwe berichten
-                    </div>
-                  ) : (
-                    unreadMessages.map((message) => (
-                      <div 
-                        key={message.id} 
-                        className="p-3 border-b border-gray-100 hover:bg-gray-50 cursor-pointer"
-                        onClick={() => handleMessageClick(message.id)}
-                      >
-                        <div className="flex items-start space-x-3">
-                          <div className={`w-8 h-8 rounded-full ${message.bgColor} flex items-center justify-center`}>
-                            <span className={`text-xs font-medium ${message.textColor}`}>
-                              {message.initials}
-                            </span>
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-gray-900 truncate">
-                              {message.sender}
-                            </p>
-                            <p className="text-xs text-gray-500 truncate">
-                              {message.preview}
-                            </p>
-                            <p className="text-xs text-gray-400 mt-1">
-                              {message.time}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </PopoverContent>
-            </Popover>
-
-            {/* Notifications */}
-            <NotificationDropdown />
-
-            {/* Profile dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-8 w-8 rounded-full p-0">
-                  <Avatar className="h-7 w-7">
-                    <AvatarFallback className="bg-[#1e40af] text-white text-xs">
-                      {userDisplayData.avatar}
-                    </AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56 bg-white border border-[#e5e7eb]" align="end" forceMount>
-                <div className="flex items-center justify-start gap-2 p-2">
-                  <div className="flex flex-col space-y-1 leading-none">
-                    <p className="font-medium">{userDisplayData.name}</p>
-                    <p className="w-[200px] truncate text-sm text-muted-foreground">
-                      {userDisplayData.role}
-                    </p>
-                  </div>
-                </div>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => setLocation('/profile')}>
-                  <User className="mr-2 h-4 w-4" />
-                  <span>Profiel</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setLocation('/settings')}>
-                  <Settings className="mr-2 h-4 w-4" />
-                  <span>Instellingen</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout}>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Uitloggen</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </div>
+    <div className="flex flex-col h-full min-h-screen">
+      {/* Topbar - volledig boven alles */}
+      <div className="w-full z-40">
+        <Topbar onMenuClick={toggleSidebar} />
       </div>
-
-      {/* Sidebar - Admin Interface Copy */}
-      <div className={`fixed inset-y-0 left-0 z-40 w-52 bg-white shadow-lg transform ${
-        sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      } transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 border-r border-[#e5e7eb] pt-12`}>
-        
-        {/* Close button for mobile - Only visible on mobile */}
-        <div className="lg:hidden flex justify-end p-3 border-b border-[#e5e7eb]">
-          <button
+      
+      <div className="flex flex-1 overflow-hidden">
+        {/* Mobile sidebar overlay */}
+        {isMobile && sidebarOpen && (
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
             onClick={() => setSidebarOpen(false)}
-            className="text-gray-500 hover:text-gray-700"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          />
+        )}
+
+        {/* Sidebar - conditionally visible on mobile */}
+        <div className={`${
+          isMobile 
+            ? `fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 ease-in-out ${
+                sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+              }`
+            : 'static z-30 h-[calc(100vh-3rem)] flex-shrink-0'
+        }`}>
+          <Sidebar 
+            className="h-full" 
+            isMobile={isMobile} 
+            onClose={() => setSidebarOpen(false)} 
+          />
         </div>
 
-        {/* User info - Admin Style */}
-        <div className="px-6 py-4 border-b border-[#e5e7eb] bg-[#f8fafc]">
-          <div className="flex items-center space-x-3">
-            <Avatar className="h-10 w-10">
-              <AvatarFallback className="bg-[#1e40af] text-white">
-                {userDisplayData.avatar}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-gray-900 truncate">
-                {userDisplayData.name}
-              </p>
-              <div className="flex items-center space-x-2 mt-1">
-                <Badge className="bg-[#3b82f6] text-white text-xs px-2 py-0.5">
-                  {userDisplayData.role}
-                </Badge>
-              </div>
+        {/* Main content */}
+        <div className="flex flex-col flex-1 overflow-hidden bg-gray-50">
+          <main className="flex-1 p-2 sm:p-4 md:p-6 pt-10 overflow-x-auto overflow-y-auto border-l border-gray-200">
+            <div className="max-w-7xl mx-auto w-full min-h-full pb-12">
+              {children}
             </div>
-          </div>
+          </main>
         </div>
-
-        {/* Navigation - Admin Style */}
-        <nav className="flex-1 px-3 py-4 space-y-1">
-          {navigation.map((item) => {
-            const Icon = item.icon;
-            return (
-              <Link key={item.name} href={item.href} className={`group flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 ${
-                item.current
-                  ? 'bg-[#1e40af] text-white shadow-sm'
-                  : 'text-gray-700 hover:bg-[#f1f5f9] hover:text-[#1e40af]'
-              }`}>
-                <Icon className={`mr-3 h-4 w-4 ${
-                  item.current ? 'text-white' : 'text-gray-500 group-hover:text-[#1e40af]'
-                }`} />
-                {item.name}
-              </Link>
-            );
-          })}
-        </nav>
-
-        {/* Logout button - Admin Style */}
-        <div className="p-3 border-t border-[#e5e7eb]">
-          <Button
-            onClick={handleLogout}
-            variant="ghost"
-            className="w-full justify-start text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg"
-          >
-            <LogOut className="mr-3 h-4 w-4" />
-            Afmelden
-          </Button>
-        </div>
-      </div>
-
-      {/* Main content - Admin Style */}
-      <div className="lg:pl-52">
-        <main className="bg-[#f7f9fc] min-h-screen p-6">
-          {children}
-        </main>
       </div>
     </div>
   );
-}
+};
+
+export default SecretariatLayout;

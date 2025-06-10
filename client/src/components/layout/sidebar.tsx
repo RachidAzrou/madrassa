@@ -30,7 +30,9 @@ import {
   BookMarked,
   RefreshCw,
   MessageSquare,
+  Key,
 } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 // Aangepast ChalkboardTeacher icoon
 const ChalkBoard = (props: any) => (

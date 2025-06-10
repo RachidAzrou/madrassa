@@ -25,6 +25,7 @@ import Notifications from "@/pages/Notifications";
 import MyAccount from "@/pages/MyAccount";
 import Login from "@/pages/Login";
 import Messages from "@/pages/Messages";
+import Accounts from "@/pages/Accounts";
 
 
 import Planning from "@/pages/Planning";
@@ -218,6 +219,7 @@ function AuthenticatedRouter() {
         <Route path="/reports" component={() => <AuthenticatedRoute component={Reports} />} />
         <Route path="/profiel" component={() => <AuthenticatedRoute component={Profile} />} />
         <Route path="/profile" component={() => <AuthenticatedRoute component={Profile} />} />
+        <Route path="/accounts" component={() => <AuthenticatedRoute component={Accounts} />} />
         <Route path="/notifications" component={() => <AuthenticatedRoute component={Notifications} />} />
         <Route path="/notificaties" component={() => <AuthenticatedRoute component={Notifications} />} />
         <Route path="/messages" component={() => <AuthenticatedRoute component={Messages} />} />

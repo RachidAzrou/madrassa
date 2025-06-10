@@ -51,14 +51,7 @@ export default function StudentSubjects() {
 
   if (isLoading) {
     return (
-      <UnifiedLayout 
-        role="student"
-        title="Mijn Vakken"
-        breadcrumbs={[
-          { label: "Student", href: "/" },
-          { label: "Mijn Vakken", href: "/student/subjects" }
-        ]}
-      >
+      <UnifiedLayout userRole="student">
         <div className="animate-pulse">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, i) => (
@@ -71,14 +64,7 @@ export default function StudentSubjects() {
   }
 
   return (
-    <UnifiedLayout 
-      role="student"
-      title="Mijn Vakken"
-      breadcrumbs={[
-        { label: "Student", href: "/" },
-        { label: "Mijn Vakken", href: "/student/subjects" }
-      ]}
-    >
+    <UnifiedLayout userRole="student">
       <div className="space-y-6">
         
       {/* Subjects Grid */}

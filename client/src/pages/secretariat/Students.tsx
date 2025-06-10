@@ -788,36 +788,28 @@ export default function Students() {
                       </div>
                     </div>
                     
-                    {/* eID Sectie */}
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                            <FileText className="h-5 w-5 text-white" />
-                          </div>
-                          <div>
-                            <h3 className="text-sm font-semibold text-blue-900">eID Scan</h3>
-                            <p className="text-xs text-blue-700 leading-relaxed">
-                              Upload je elektronische identiteitskaart om<br />
-                              gegevens automatisch in te vullen
-                            </p>
-                          </div>
-                        </div>
-                        <button 
-                          type="button" 
-                          className={`px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium transition-colors ${isProcessingEid ? 'opacity-50 cursor-not-allowed' : ''}`}
-                          onClick={handleEidScan}
-                          disabled={isProcessingEid}
-                        >
-                          {isProcessingEid ? (
-                            <div className="flex items-center gap-2">
-                              <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
-                              Verwerkt...
-                            </div>
-                          ) : (
-                            'eID Uploaden'
-                          )}
-                        </button>
+                    {/* eID Knop */}
+                    <div className="flex items-center gap-2 mb-4">
+                      <button
+                        type="button"
+                        className={`inline-flex items-center justify-center rounded border border-gray-300 bg-white hover:bg-gray-50 transition-colors p-1.5 ${isProcessingEid ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        onClick={handleEidScan}
+                        disabled={isProcessingEid}
+                        title="Klik om eID gegevens automatisch in te vullen"
+                      >
+                        {isProcessingEid ? (
+                          <div className="animate-spin w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full"></div>
+                        ) : (
+                          <img 
+                            src="/attached_assets/e-id-logo_1749570968055.png" 
+                            alt="eID logo" 
+                            className="h-6 w-auto"
+                          />
+                        )}
+                      </button>
+                      <p className="text-xs text-gray-600">
+                        Klik op het logo om met je elektronische identiteitskaart gegevens automatisch op te laden
+                      </p>
                     </div>
                     
                     {/* Hidden inputs */}
@@ -1228,6 +1220,7 @@ export default function Students() {
                 </div>
               </div>
             </div>
+            </div>
             
             <div className="bg-gray-50 px-6 py-3 flex justify-end gap-2 border-t">
               <Button 
@@ -1248,7 +1241,6 @@ export default function Students() {
                 <User className="h-4 w-4 mr-2" />
                 {createStudentMutation.isPending ? 'Student toevoegen...' : 'Student toevoegen'}
               </Button>
-            </div>
             </div>
           </form>
         </DialogContent>

@@ -71,6 +71,13 @@ interface StudentClass {
   studentCount: number;
 }
 
+interface Sibling {
+  id: number;
+  firstName: string;
+  lastName: string;
+  studentId: string;
+}
+
 export default function Students() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -92,7 +99,9 @@ export default function Students() {
     city: '',
     academicYear: '2024-2025',
     studentGroupId: '',
-    notes: ''
+    notes: '',
+    guardianId: '',
+    selectedSiblings: [] as number[]
   });
 
   const { toast } = useToast();
@@ -107,6 +116,17 @@ export default function Students() {
   const { data: classes = [] } = useQuery<StudentClass[]>({
     queryKey: ['/api/classes'],
   });
+
+  // Fetch guardians data
+  const { data: guardians = [] } = useQuery<Guardian[]>({
+    queryKey: ['/api/guardians'],
+  });
+
+  // Potential siblings (other students with same last name)
+  const potentialSiblings = (students as Student[]).filter(student => 
+    student.lastName.toLowerCase() === formData.lastName.toLowerCase() && 
+    formData.lastName.trim() !== ''
+  );
 
   // Create student mutation
   const createStudentMutation = useMutation({
@@ -165,7 +185,9 @@ export default function Students() {
       city: '',
       academicYear: '2024-2025',
       studentGroupId: '',
-      notes: ''
+      notes: '',
+      guardianId: '',
+      selectedSiblings: []
     });
     setPhotoFile(null);
     setPhotoPreview('');
@@ -274,9 +296,20 @@ export default function Students() {
       city: '',
       academicYear: '2024-2025',
       studentGroupId: student.classId?.toString() || '',
-      notes: ''
+      notes: '',
+      guardianId: '',
+      selectedSiblings: []
     });
     setIsCreateDialogOpen(true);
+  };
+
+  const handleSiblingToggle = (studentId: number) => {
+    setFormData(prev => ({
+      ...prev,
+      selectedSiblings: prev.selectedSiblings.includes(studentId)
+        ? prev.selectedSiblings.filter(id => id !== studentId)
+        : [...prev.selectedSiblings, studentId]
+    }));
   };
 
   const handleDeleteStudent = (student: Student) => {
@@ -751,6 +784,58 @@ export default function Students() {
                     </div>
                   </div>
                   
+                  <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                    <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                      <User className="h-4 w-4 mr-2" />
+                      Voogd Koppeling
+                    </h3>
+                    <div>
+                      <Label htmlFor="guardianId" className="text-xs font-medium text-gray-700">Voogd selecteren</Label>
+                      <Select value={formData.guardianId} onValueChange={(value) => handleSelectChange('guardianId', value)}>
+                        <SelectTrigger className="mt-1">
+                          <SelectValue placeholder="Selecteer een voogd..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {guardians.map((guardian) => (
+                            <SelectItem key={guardian.id} value={guardian.id.toString()}>
+                              {guardian.firstName} {guardian.lastName} - {guardian.relationship}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  {potentialSiblings.length > 0 && (
+                    <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                      <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                        <Users className="h-4 w-4 mr-2" />
+                        Broers/Zussen Koppeling
+                      </h3>
+                      <div className="space-y-2">
+                        <Label className="text-xs font-medium text-gray-700">
+                          Gevonden studenten met dezelfde achternaam:
+                        </Label>
+                        <div className="space-y-2 max-h-32 overflow-y-auto">
+                          {potentialSiblings.map((sibling) => (
+                            <div key={sibling.id} className="flex items-center space-x-2">
+                              <input
+                                type="checkbox"
+                                id={`sibling-${sibling.id}`}
+                                checked={formData.selectedSiblings.includes(sibling.id)}
+                                onChange={() => handleSiblingToggle(sibling.id)}
+                                className="rounded border-gray-300"
+                              />
+                              <Label htmlFor={`sibling-${sibling.id}`} className="text-xs cursor-pointer">
+                                {sibling.firstName} {sibling.lastName} ({sibling.studentId})
+                              </Label>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
                     <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
                       <FileText className="h-4 w-4 mr-2" />

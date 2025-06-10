@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { PageHeader } from '@/components/layout/page-header';
+import UnifiedLayout from "@/components/layout/UnifiedLayout";
 
 interface StudentStats {
   myClass: string;
@@ -58,17 +59,15 @@ export default function StudentDashboard() {
   };
 
   return (
-    <div className="bg-[#f7f9fc] min-h-screen">
-      {/* Clean Page Header - Admin Style */}
-      <PageHeader
-        title="Dashboard"
-        icon={<Home className="h-5 w-5 text-white" />}
-        parent="Student"
-        current="Dashboard"
-      />
-      
-      {/* Main content area */}
-      <div className="px-6 py-6 max-w-7xl mx-auto">
+    <UnifiedLayout userRole="student">
+      <div className="space-y-6">
+        {/* Clean Page Header - Admin Style */}
+        <PageHeader
+          title="Dashboard"
+          icon={<Home className="h-5 w-5 text-white" />}
+          parent="Student"
+          current="Dashboard"
+        />
         
         {/* Stats Overview - Modern Style */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -248,6 +247,7 @@ export default function StudentDashboard() {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </UnifiedLayout>
   );
 }

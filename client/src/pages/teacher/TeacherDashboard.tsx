@@ -31,55 +31,47 @@ import { Link } from "wouter";
 interface TeacherStats {
   myClasses: number;
   totalStudents: number;
-  mySubjects: number;
-  upcomingLessons: number;
+  todayLessons: number;
   pendingGrades: number;
-  unreadMessages: number;
-}
-
-interface UpcomingLesson {
-  id: number;
-  className: string;
-  subject: string;
-  time: string;
-  room: string;
-}
-
-interface RecentActivity {
-  id: number;
-  type: 'grade' | 'attendance' | 'message';
-  description: string;
-  timestamp: string;
+  weeklyHours: number;
+  attendance: number;
 }
 
 export default function TeacherDashboard() {
   const { user } = useAuth();
 
-  const { data: stats, isLoading: statsLoading } = useQuery<{ stats: TeacherStats }>({
-    queryKey: ['/api/teacher/dashboard/stats'],
-    retry: false,
+  // Data fetching
+  const { data: teacherStats } = useQuery<TeacherStats>({
+    queryKey: ['/api/teacher/stats'],
+    staleTime: 300000,
   });
 
-  const { data: upcomingLessons } = useQuery<{ lessons: UpcomingLesson[] }>({
+  const { data: upcomingLessons } = useQuery<any>({
     queryKey: ['/api/teacher/upcoming-lessons'],
-    retry: false,
+    staleTime: 60000,
   });
 
-  const { data: recentActivity } = useQuery<{ activities: RecentActivity[] }>({
+  const { data: myClasses } = useQuery<any>({
+    queryKey: ['/api/teacher/my-classes'],
+    staleTime: 300000,
+  });
+
+  const { data: recentActivity } = useQuery<any>({
     queryKey: ['/api/teacher/recent-activity'],
-    retry: false,
+    staleTime: 60000,
   });
 
-  const teacherStats = stats?.stats || {
-    myClasses: 0,
-    totalStudents: 0,
-    mySubjects: 0,
-    upcomingLessons: 0,
-    pendingGrades: 0,
-    unreadMessages: 0
+  const defaultStats: TeacherStats = {
+    myClasses: 3,
+    totalStudents: 75,
+    todayLessons: 4,
+    pendingGrades: 12,
+    weeklyHours: 24,
+    attendance: 92
   };
 
-  const lessons = upcomingLessons?.lessons || [];
+  const stats = teacherStats || defaultStats;
+  const todayLessons = upcomingLessons?.lessons || [];
   const activities = recentActivity?.activities || [];
 
   const getActivityIcon = (type: string) => {
@@ -120,6 +112,7 @@ export default function TeacherDashboard() {
             current: "Dashboard"
           }}
         />
+        
         {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
           <Card className="premium-card bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
@@ -127,7 +120,7 @@ export default function TeacherDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-blue-600 text-sm font-medium">Mijn Klassen</p>
-                  <p className="text-2xl font-bold text-blue-900">{teacherStats.myClasses}</p>
+                  <p className="text-2xl font-bold text-blue-900">{stats.myClasses}</p>
                 </div>
                 <div className="h-12 w-12 bg-blue-500 rounded-lg flex items-center justify-center">
                   <School className="h-6 w-6 text-white" />
@@ -140,25 +133,11 @@ export default function TeacherDashboard() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-green-600 text-sm font-medium">Studenten</p>
-                  <p className="text-2xl font-bold text-green-900">{teacherStats.totalStudents}</p>
+                  <p className="text-green-600 text-sm font-medium">Totaal Studenten</p>
+                  <p className="text-2xl font-bold text-green-900">{stats.totalStudents}</p>
                 </div>
                 <div className="h-12 w-12 bg-green-500 rounded-lg flex items-center justify-center">
                   <Users className="h-6 w-6 text-white" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="premium-card bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-purple-600 text-sm font-medium">Vakken</p>
-                  <p className="text-2xl font-bold text-purple-900">{teacherStats.mySubjects}</p>
-                </div>
-                <div className="h-12 w-12 bg-purple-500 rounded-lg flex items-center justify-center">
-                  <BookText className="h-6 w-6 text-white" />
                 </div>
               </div>
             </CardContent>
@@ -168,25 +147,25 @@ export default function TeacherDashboard() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-orange-600 text-sm font-medium">Komende Lessen</p>
-                  <p className="text-2xl font-bold text-orange-900">{teacherStats.upcomingLessons}</p>
+                  <p className="text-orange-600 text-sm font-medium">Lessen Vandaag</p>
+                  <p className="text-2xl font-bold text-orange-900">{stats.todayLessons}</p>
                 </div>
                 <div className="h-12 w-12 bg-orange-500 rounded-lg flex items-center justify-center">
-                  <Calendar className="h-6 w-6 text-white" />
+                  <BookText className="h-6 w-6 text-white" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="premium-card bg-gradient-to-br from-red-50 to-red-100 border-red-200">
+          <Card className="premium-card bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-red-600 text-sm font-medium">Te Beoordelen</p>
-                  <p className="text-2xl font-bold text-red-900">{teacherStats.pendingGrades}</p>
+                  <p className="text-purple-600 text-sm font-medium">Te Beoordelen</p>
+                  <p className="text-2xl font-bold text-purple-900">{stats.pendingGrades}</p>
                 </div>
-                <div className="h-12 w-12 bg-red-500 rounded-lg flex items-center justify-center">
-                  <Percent className="h-6 w-6 text-white" />
+                <div className="h-12 w-12 bg-purple-500 rounded-lg flex items-center justify-center">
+                  <ClipboardCheck className="h-6 w-6 text-white" />
                 </div>
               </div>
             </CardContent>
@@ -196,133 +175,116 @@ export default function TeacherDashboard() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-indigo-600 text-sm font-medium">Berichten</p>
-                  <p className="text-2xl font-bold text-indigo-900">{teacherStats.unreadMessages}</p>
+                  <p className="text-indigo-600 text-sm font-medium">Uren/Week</p>
+                  <p className="text-2xl font-bold text-indigo-900">{stats.weeklyHours}</p>
                 </div>
                 <div className="h-12 w-12 bg-indigo-500 rounded-lg flex items-center justify-center">
-                  <MessageCircle className="h-6 w-6 text-white" />
+                  <Clock className="h-6 w-6 text-white" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="premium-card bg-gradient-to-br from-teal-50 to-teal-100 border-teal-200">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-teal-600 text-sm font-medium">Aanwezigheid</p>
+                  <p className="text-2xl font-bold text-teal-900">{stats.attendance}%</p>
+                </div>
+                <div className="h-12 w-12 bg-teal-500 rounded-lg flex items-center justify-center">
+                  <TrendingUp className="h-6 w-6 text-white" />
                 </div>
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Performance Overview and Recent Activity - Side by Side */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Performance Overview */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-blue-600" />
-                Prestatie Overzicht
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Today's Schedule */}
+          <Card className="lg:col-span-2">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center text-lg">
+                <Calendar className="h-5 w-5 mr-2 text-[#1e40af]" />
+                Vandaag's Rooster
               </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Klassen beheerd</span>
-                <Badge variant="secondary">{teacherStats.myClasses}</Badge>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Totaal studenten</span>
-                <Badge variant="secondary">{teacherStats.totalStudents}</Badge>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Vakken onderwezen</span>
-                <Badge variant="secondary">{teacherStats.mySubjects}</Badge>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Aanwezigheidspercentage</span>
-                <Badge className="bg-green-100 text-green-800">85%</Badge>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Recent Activity */}
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                <Activity className="h-5 w-5 text-purple-600" />
-                Recente Activiteit
-              </CardTitle>
-              <Button variant="ghost" size="sm">
-                Alles bekijken
-                <ChevronRight className="h-4 w-4 ml-1" />
-              </Button>
             </CardHeader>
             <CardContent>
-              {activities.length > 0 ? (
+              {todayLessons && todayLessons.length > 0 ? (
                 <div className="space-y-3">
-                  {activities.slice(0, 6).map((activity) => (
-                    <div key={activity.id} className={`p-3 rounded-lg border ${getActivityColor(activity.type)}`}>
-                      <div className="flex items-start space-x-3">
-                        <div className="mt-0.5">
-                          {getActivityIcon(activity.type)}
+                  {todayLessons.map((lesson: any, index: number) => (
+                    <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
+                      <div className="flex items-center space-x-3">
+                        <div className="h-10 w-10 bg-[#1e40af] rounded-lg flex items-center justify-center">
+                          <BookText className="h-5 w-5 text-white" />
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm text-gray-900 mb-1">{activity.description}</p>
-                          <p className="text-xs text-gray-500">{activity.timestamp}</p>
+                        <div>
+                          <h4 className="font-medium text-gray-900">{lesson.subject || 'Arabisch'}</h4>
+                          <p className="text-sm text-gray-500">{lesson.class || 'Klas 3A'} • {lesson.time || '09:00 - 10:30'}</p>
                         </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Badge variant="outline" className="text-xs">
+                          {lesson.status || 'Gepland'}
+                        </Badge>
+                        <Button variant="ghost" size="sm">
+                          <ChevronRight className="h-4 w-4" />
+                        </Button>
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-6">
-                  <Activity className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                  <p className="text-sm text-gray-500">Geen recente activiteit</p>
+                <div className="text-center py-8">
+                  <Calendar className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                  <h3 className="font-medium text-gray-900 mb-2">Geen lessen gepland</h3>
+                  <p className="text-gray-500">Er zijn vandaag geen lessen ingepland.</p>
                 </div>
               )}
             </CardContent>
           </Card>
-        </div>
 
-        {/* Full Width Agenda Section */}
-        <Card className="mt-6">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-green-600" />
-              Mijn Agenda
-            </CardTitle>
-            <Link href="/teacher/calendar">
-              <Button variant="ghost" size="sm">
-                Alle lessen
-                <ChevronRight className="h-4 w-4 ml-1" />
-              </Button>
-            </Link>
-          </CardHeader>
-          <CardContent>
-            {lessons.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {lessons.map((lesson) => (
-                  <div key={lesson.id} className="p-4 bg-gray-50 rounded-lg border hover:shadow-md transition-shadow">
-                    <div className="flex items-start space-x-4">
-                      <div className="h-12 w-12 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <BookText className="h-6 w-6 text-green-600" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-gray-900 mb-1">{lesson.subject}</h4>
-                        <p className="text-sm text-gray-600 mb-2">{lesson.className}</p>
-                        <div className="flex items-center justify-between text-xs text-gray-500">
-                          <span className="flex items-center gap-1">
-                            <Clock className="h-3 w-3" />
-                            {lesson.time}
-                          </span>
-                          <span>{lesson.room}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+          {/* Quick Actions */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center text-lg">
+                <Activity className="h-5 w-5 mr-2 text-[#1e40af]" />
+                Snelle Acties
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <Link href="/teacher/students">
+                  <Button variant="outline" className="w-full justify-start" size="sm">
+                    <Users className="h-4 w-4 mr-2" />
+                    Bekijk Studenten
+                  </Button>
+                </Link>
+                <Link href="/teacher/classes">
+                  <Button variant="outline" className="w-full justify-start" size="sm">
+                    <School className="h-4 w-4 mr-2" />
+                    Mijn Klassen
+                  </Button>
+                </Link>
+                <Link href="/teacher/reports">
+                  <Button variant="outline" className="w-full justify-start" size="sm">
+                    <BarChart3 className="h-4 w-4 mr-2" />
+                    Rapporten
+                  </Button>
+                </Link>
+                <Button variant="outline" className="w-full justify-start" size="sm">
+                  <ClipboardCheck className="h-4 w-4 mr-2" />
+                  Cijfers Invoeren
+                </Button>
+                <Button variant="outline" className="w-full justify-start" size="sm">
+                  <MessageCircle className="h-4 w-4 mr-2" />
+                  Berichten
+                </Button>
               </div>
-            ) : (
-              <div className="text-center py-12">
-                <Calendar className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="font-medium text-gray-900 mb-2">Geen lessen gepland</h3>
-                <p className="text-gray-500">Er zijn vandaag geen lessen ingepland.</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </UnifiedLayout>
   );

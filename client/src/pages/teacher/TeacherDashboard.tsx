@@ -109,18 +109,17 @@ export default function TeacherDashboard() {
   };
 
   return (
-    <div className="bg-[#f7f9fc] min-h-screen">
-      <PremiumHeader 
-        title="Docent Dashboard" 
-        icon={School}
-        description={`Welkom terug, ${user?.firstName || 'Docent'}! Hier is uw overzicht voor vandaag.`}
-        breadcrumbs={{
-          parent: "Docent",
-          current: "Dashboard"
-        }}
-      />
-      
-      <div className="px-6 py-6 space-y-6">
+    <UnifiedLayout userRole="teacher">
+      <div className="space-y-6">
+        <PremiumHeader 
+          title="Docent Dashboard" 
+          icon={School}
+          description={`Welkom terug, ${user?.firstName || 'Docent'}! Hier is uw overzicht voor vandaag.`}
+          breadcrumbs={{
+            parent: "Docent",
+            current: "Dashboard"
+          }}
+        />
         {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
           <Card className="premium-card bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
@@ -325,6 +324,6 @@ export default function TeacherDashboard() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </UnifiedLayout>
   );
 }

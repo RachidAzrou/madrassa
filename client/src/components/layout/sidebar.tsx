@@ -1,310 +1,121 @@
-import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import { cn } from "@/lib/utils";
-// Import nieuw logo
-import myMadrassaLogo from "../../assets/mymadrassa-new.png";
-import {
-  GraduationCap,
-  LayoutDashboard,
-  Users,
-  UserRound,
-  UserCheck,
-  BookOpen,
-  BookText,
-  Calendar,
-  ClipboardCheck,
-  Percent,
-  BarChart3,
-  LogOut,
-  Menu,
-  X,
-  Building,
-  CreditCard,
-  UserPlus,
-  Settings,
-  School,
-  Glasses,
-  FileText,
-  Clock,
-  Coins,
-  BookMarked,
-  RefreshCw,
-  MessageSquare,
-  Key,
-} from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
+import useSidebar from "@/hooks/use-sidebar";
 
-// Aangepast ChalkboardTeacher icoon
-const ChalkBoard = (props: any) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg" 
-    width="20" 
-    height="20" 
-    viewBox="0 0 24 24" 
-    fill="none" 
-    stroke="currentColor" 
-    strokeWidth="2" 
-    strokeLinecap="round" 
-    strokeLinejoin="round"
-    {...props}
-  >
-    <rect x="2" y="2" width="20" height="14" rx="2" />
-    <line x1="2" y1="12" x2="22" y2="12" />
-    <line x1="6" y1="12" x2="6" y2="20" />
-    <line x1="18" y1="12" x2="18" y2="20" />
-    <ellipse cx="12" cy="18" rx="3" ry="2" />
-    <path d="M10 4h4" />
-    <path d="M8 8h8" />
-  </svg>
-);
-// Logo import already at the top
-
-type SidebarLinkProps = {
-  href: string;
-  icon: React.ReactNode;
+interface NavItemProps {
+  to: string;
+  icon: string;
   label: string;
   isActive: boolean;
-  onClick?: () => void;
-};
+}
 
-const SidebarLink = ({ href, icon, label, isActive, onClick }: SidebarLinkProps) => {
+const NavItem = ({ to, icon, label, isActive }: NavItemProps) => {
   return (
-    <Link href={href}>
-      <div
-        onClick={onClick}
-        className={cn(
-          "flex items-center gap-2 px-2 py-1.5 text-xs rounded-md transition-colors cursor-pointer",
+    <Link href={to}>
+      <a
+        className={`flex items-center px-4 py-3 text-sm font-medium rounded-md cursor-pointer ${
           isActive
-            ? "bg-primary text-white font-medium"
-            : "text-gray-600 hover:text-primary hover:bg-gray-100"
-        )}
+            ? "bg-primary-700 text-white"
+            : "text-white/70 hover:bg-primary-700 hover:text-white"
+        }`}
       >
-        <div className="flex-shrink-0">
-          {icon}
-        </div>
-        <span className="truncate whitespace-nowrap">{label}</span>
-      </div>
+        <i className={`${icon} mr-3 text-lg`}></i>
+        {label}
+      </a>
     </Link>
   );
 };
 
-type SidebarProps = {
-  isMobile?: boolean;
-  onClose?: () => void;
-  className?: string;
-};
-
-const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) => {
+export default function Sidebar() {
+  const { isOpen, toggle } = useSidebar();
   const [location] = useLocation();
-  const [expanded, setExpanded] = useState(!isMobile);
-  const { user } = useAuth();
-
-  // Sidebar is always expanded, no need to adjust on resize
-  useEffect(() => {
-    setExpanded(true); // Always keep the sidebar expanded
-  }, []);
-
-  // Handle click on mobile
-  const handleLinkClick = () => {
-    if (isMobile && onClose) {
-      onClose();
-    }
-  };
 
   return (
-    <aside
-      className={cn(
-        "h-screen bg-white border-r border-gray-200",
-        "w-64 flex flex-col", /* Slightly increased width */
-        isMobile ? "shadow-xl" : "", /* Add shadow on mobile */
-        className
-      )}
+    <div
+      className={`fixed inset-y-0 left-0 z-50 w-64 bg-primary-600 text-white transform lg:relative transition-transform duration-300 ${
+        isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+      }`}
     >
-      {/* Mobile header with close button */}
-      {isMobile && (
-        <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-          <div className="flex items-center">
-            <img src={myMadrassaLogo} alt="myMadrassa Logo" className="h-12" />
+      <div className="flex flex-col h-full">
+        {/* Logo */}
+        <div className="px-4 py-6 flex items-center justify-between border-b border-primary-700">
+          <div className="flex items-center space-x-2">
+            <i className="ri-graduation-cap-fill text-2xl"></i>
+            <span className="text-xl font-semibold">EduManage</span>
           </div>
-          <button 
-            onClick={onClose}
-            className="p-1 rounded-full hover:bg-gray-100"
+          <button
+            onClick={toggle}
+            className="lg:hidden text-white"
+            aria-label="Close sidebar"
           >
-            <X className="h-5 w-5 text-gray-500" />
+            <i className="ri-close-line text-xl"></i>
           </button>
         </div>
-      )}
 
-      
-      {/* Dashboard link */}
-      <div className="px-3 pt-3 pb-2 border-b border-gray-100">
-        <div className="bg-gray-50 rounded-md overflow-hidden">
-          <Link href="/">
-            <div
-              onClick={handleLinkClick}
-              className={cn(
-                "flex items-center gap-2 px-2 py-1.5 text-xs rounded-md transition-colors cursor-pointer",
-                location === "/"
-                  ? "bg-primary/10 text-primary font-medium"
-                  : "text-gray-700 hover:text-primary hover:bg-gray-100"
-              )}
-            >
-              <div className="flex-shrink-0">
-                <LayoutDashboard className="h-4 w-4" />
-              </div>
-              <span className="truncate whitespace-nowrap">Dashboard</span>
+        {/* Navigation */}
+        <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
+          <NavItem
+            to="/"
+            icon="ri-dashboard-line"
+            label="Dashboard"
+            isActive={location === "/" || location === ""}
+          />
+          <NavItem
+            to="/students"
+            icon="ri-user-line"
+            label="Students"
+            isActive={location === "/students"}
+          />
+          <NavItem
+            to="/courses"
+            icon="ri-book-open-line"
+            label="Courses"
+            isActive={location === "/courses"}
+          />
+          <NavItem
+            to="/programs"
+            icon="ri-building-line"
+            label="Programs"
+            isActive={location === "/programs"}
+          />
+          <NavItem
+            to="/calendar"
+            icon="ri-calendar-line"
+            label="Calendar"
+            isActive={location === "/calendar"}
+          />
+          <NavItem
+            to="/attendance"
+            icon="ri-checkbox-circle-line"
+            label="Attendance"
+            isActive={location === "/attendance"}
+          />
+          <NavItem
+            to="/grading"
+            icon="ri-medal-line"
+            label="Grading"
+            isActive={location === "/grading"}
+          />
+          <NavItem
+            to="/reports"
+            icon="ri-bar-chart-line"
+            label="Reports"
+            isActive={location === "/reports"}
+          />
+        </nav>
+
+        {/* User Profile */}
+        <div className="p-4 border-t border-primary-700">
+          <div className="flex items-center">
+            <div className="w-10 h-10 rounded-full bg-primary-700 flex items-center justify-center">
+              <span className="text-white font-semibold">JD</span>
             </div>
-          </Link>
-        </div>
-      </div>
-      
-      {/* Navigation links */}
-      <nav className="flex flex-col flex-1">
-        <div className="flex-1 py-2 px-3 overflow-y-auto">
-          <div className="space-y-4">
-            <div className="pt-2">
-              <p className="mb-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                Beheer
-              </p>
-              <div className="space-y-1.5">
-                <SidebarLink
-                  href="/students"
-                  icon={<Users className="h-4 w-4" />}
-                  label="Studenten"
-                  isActive={location.startsWith("/students")}
-                  onClick={handleLinkClick}
-                />
-                <SidebarLink
-                  href="/guardians"
-                  icon={<UserCheck className="h-4 w-4" />}
-                  label="Voogden"
-                  isActive={location.startsWith("/guardians")}
-                  onClick={handleLinkClick}
-                />
-                <SidebarLink
-                  href="/teachers"
-                  icon={<GraduationCap className="h-4 w-4" />}
-                  label="Docenten"
-                  isActive={location.startsWith("/teachers")}
-                  onClick={handleLinkClick}
-                />
-
-
-                <SidebarLink
-                  href="/academic-year-management"
-                  icon={<Calendar className="h-4 w-4" />}
-                  label="Schooljaar Beheer"
-                  isActive={location.startsWith("/academic-year-management")}
-                  onClick={handleLinkClick}
-                />
-
-                {/* Accounts link - alleen voor admin gebruikers */}
-                {user?.role === 'admin' && (
-                  <SidebarLink
-                    href="/accounts"
-                    icon={<Key className="h-4 w-4" />}
-                    label="Accounts"
-                    isActive={location.startsWith("/accounts")}
-                    onClick={handleLinkClick}
-                  />
-                )}
-
-              </div>
-            </div>
-
-            <div className="pt-2">
-              <p className="mb-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                Onderwijs
-              </p>
-              <div className="space-y-1.5">
-                <SidebarLink
-                  href="/student-groups"
-                  icon={<School className="h-4 w-4" />}
-                  label="Klassen"
-                  isActive={location.startsWith("/student-groups")}
-                  onClick={handleLinkClick}
-                />
-                <SidebarLink
-                  href="/programs"
-                  icon={<BookText className="h-4 w-4" />}
-                  label="Vakken"
-                  isActive={location.startsWith("/programs")}
-                  onClick={handleLinkClick}
-                />
-
-                <SidebarLink
-                  href="/calendar"
-                  icon={<Calendar className="h-4 w-4" />}
-                  label="Rooster"
-                  isActive={location.startsWith("/calendar")}
-                  onClick={handleLinkClick}
-                />
-              </div>
-            </div>
-
-            <div className="pt-2">
-              <p className="mb-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                Evaluatie
-              </p>
-              <div className="space-y-1.5">
-                <SidebarLink
-                  href="/attendance"
-                  icon={<ClipboardCheck className="h-4 w-4" />}
-                  label="Aanwezigheid"
-                  isActive={location.startsWith("/attendance")}
-                  onClick={handleLinkClick}
-                />
-                <SidebarLink
-                  href="/grading"
-                  icon={<Percent className="h-4 w-4" />}
-                  label="Cijfers"
-                  isActive={location.startsWith("/grading")}
-                  onClick={handleLinkClick}
-                />
-                <SidebarLink
-                  href="/reports"
-                  icon={<BookMarked className="h-4 w-4" />}
-                  label="Rapport"
-                  isActive={location.startsWith("/reports")}
-                  onClick={handleLinkClick}
-                />
-                <SidebarLink
-                  href="/leerlingendossier"
-                  icon={<UserRound className="h-4 w-4" />}
-                  label="Leerlingendossier"
-                  isActive={location.startsWith("/leerlingendossier")}
-                  onClick={handleLinkClick}
-                />
-                <SidebarLink
-                  href="/herinschrijvingen"
-                  icon={<RefreshCw className="h-4 w-4" />}
-                  label="Herinschrijvingen"
-                  isActive={location.startsWith("/herinschrijvingen")}
-                  onClick={handleLinkClick}
-                />
-              </div>
-            </div>
-
-            <div className="pt-2">
-              <p className="mb-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                Financiën
-              </p>
-              <div className="space-y-1.5">
-                <SidebarLink
-                  href="/fees"
-                  icon={<Coins className="h-4 w-4" />}
-                  label="Betalingsbeheer"
-                  isActive={location.startsWith("/fees")}
-                  onClick={handleLinkClick}
-                />
-              </div>
+            <div className="ml-3">
+              <p className="text-sm font-medium text-white">John Doe</p>
+              <p className="text-xs text-white/70">Administrator</p>
             </div>
           </div>
         </div>
-
-      </nav>
-    </aside>
+      </div>
+    </div>
   );
-};
-
-export default Sidebar;
+}

@@ -360,4 +360,12 @@ export interface IStorage {
   deleteStudentDiscount(id: number): Promise<boolean>;
   calculateFamilyDiscount(studentId: number, academicYear: string): Promise<{ percentage: number; siblingCount: number }>;
   applyAutomaticDiscounts(studentId: number, academicYear: string): Promise<void>;
+
+  // User Account Management operations
+  getUserAccounts(): Promise<any[]>;
+  getUserById(id: number): Promise<any | undefined>;
+  getUserByEmail(email: string): Promise<any | undefined>;
+  createUserAccount(account: any): Promise<any>;
+  updateUserAccount(id: number, account: Partial<any>): Promise<any | undefined>;
+  deleteUserAccount(id: number): Promise<boolean>;
 }

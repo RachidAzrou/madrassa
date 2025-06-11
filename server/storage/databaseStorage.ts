@@ -8,7 +8,7 @@ import {
   teacherAvailability, teacherLanguages, teacherCourseAssignments,
   teacherAttendance, notifications, messages, payments, invoices, tuitionRates,
   discountTypes, studentDiscounts, tuitionFees, discounts, discountApplications,
-  academicYears
+  academicYears, userAccounts
 } from "@shared/schema";
 import type { 
   InsertUser, User, InsertStudent, Student, InsertProgram,
@@ -667,36 +667,7 @@ export class DatabaseStorage implements IStorage {
     return outstandingFees;
   }
 
-  // Basic operations for compatibility
-  async getStudents(): Promise<any[]> {
-    try {
-      const { students } = await import("@shared/schema");
-      return await db.select().from(students);
-    } catch (error) {
-      console.error('Error getting students:', error);
-      return [];
-    }
-  }
 
-  async getTeachers(): Promise<any[]> {
-    try {
-      const { teachers } = await import("@shared/schema");
-      return await db.select().from(teachers);
-    } catch (error) {
-      console.error('Error getting teachers:', error);
-      return [];
-    }
-  }
-
-  async getPrograms(): Promise<any[]> {
-    try {
-      const { programs } = await import("@shared/schema");
-      return await db.select().from(programs);
-    } catch (error) {
-      console.error('Error getting programs:', error);
-      return [];
-    }
-  }
 
   // Student Siblings operations
   async getStudentSiblings(studentId: number): Promise<any[]> {
@@ -1876,36 +1847,7 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  // Missing delete methods for payments, tuition fees, and discounts
-  async deletePayment(id: number): Promise<boolean> {
-    try {
-      const result = await db.delete(payments).where(eq(payments.id, id));
-      return result.rowCount ? result.rowCount > 0 : false;
-    } catch (error) {
-      console.error('Error deleting payment:', error);
-      throw error;
-    }
-  }
 
-  async deleteTuitionFee(id: number): Promise<boolean> {
-    try {
-      const result = await db.delete(tuitionRates).where(eq(tuitionRates.id, id));
-      return result.rowCount ? result.rowCount > 0 : false;
-    } catch (error) {
-      console.error('Error deleting tuition fee:', error);
-      throw error;
-    }
-  }
-
-  async deleteDiscount(id: number): Promise<boolean> {
-    try {
-      const result = await db.delete(discounts).where(eq(discounts.id, id));
-      return result.rowCount ? result.rowCount > 0 : false;
-    } catch (error) {
-      console.error('Error deleting discount:', error);
-      throw error;
-    }
-  }
 
   // Tuition Fee operations
   async getTuitionFees(): Promise<any[]> {
@@ -2023,6 +1965,69 @@ export class DatabaseStorage implements IStorage {
       return updatedDiscount;
     } catch (error) {
       console.error('Error updating discount:', error);
+      throw error;
+    }
+  }
+
+  // User Account Management operations
+  async getUserAccounts(): Promise<any[]> {
+    try {
+      return await db.select().from(userAccounts);
+    } catch (error) {
+      console.error('Error fetching user accounts:', error);
+      return [];
+    }
+  }
+
+  async getUserById(id: number): Promise<any | undefined> {
+    try {
+      const [user] = await db.select().from(userAccounts).where(eq(userAccounts.id, id));
+      return user;
+    } catch (error) {
+      console.error('Error fetching user by ID:', error);
+      return undefined;
+    }
+  }
+
+  async getUserByEmail(email: string): Promise<any | undefined> {
+    try {
+      const [user] = await db.select().from(userAccounts).where(eq(userAccounts.email, email));
+      return user;
+    } catch (error) {
+      console.error('Error fetching user by email:', error);
+      return undefined;
+    }
+  }
+
+  async createUserAccount(account: any): Promise<any> {
+    try {
+      const [newAccount] = await db.insert(userAccounts).values(account).returning();
+      return newAccount;
+    } catch (error) {
+      console.error('Error creating user account:', error);
+      throw error;
+    }
+  }
+
+  async updateUserAccount(id: number, account: Partial<any>): Promise<any | undefined> {
+    try {
+      const [updatedAccount] = await db.update(userAccounts)
+        .set(account)
+        .where(eq(userAccounts.id, id))
+        .returning();
+      return updatedAccount;
+    } catch (error) {
+      console.error('Error updating user account:', error);
+      throw error;
+    }
+  }
+
+  async deleteUserAccount(id: number): Promise<boolean> {
+    try {
+      const result = await db.delete(userAccounts).where(eq(userAccounts.id, id));
+      return result.rowCount ? result.rowCount > 0 : false;
+    } catch (error) {
+      console.error('Error deleting user account:', error);
       throw error;
     }
   }

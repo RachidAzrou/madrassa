@@ -1,5 +1,4 @@
-import { DatabaseStorage } from './databaseStorage';
-import { IStorage } from './IStorage';
+import { MinimalStorage } from './minimalStorage';
 
-// Exporteer de DatabaseStorage instantie als storage
-export const storage: IStorage = new DatabaseStorage();
+// Exporteer de MinimalStorage instantie als storage
+export const storage = new MinimalStorage();

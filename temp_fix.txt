@@ -1,6 +1,0 @@
-Het verplaatsen van de noodcontactinformatie naar het tabblad "Studenten" in de Guardians.tsx pagina:
-
-* Verwijder noodcontactinformatie uit tabblad "persoonlijk" of "contact"
-* Voeg verbeterde noodcontactweergave toe aan het begin van tabblad "studenten"
-* Maak een mooie rode waarschuwingsbox met de AlertTriangle icon
-* Zorg voor consistente styling

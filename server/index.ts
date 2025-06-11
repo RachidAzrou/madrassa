@@ -86,10 +86,18 @@ if (process.env.NODE_ENV === "development") {
 let appPromise: Promise<express.Application> | null = null;
 
 export default async function handler(req: any, res: any) {
-  if (!appPromise) {
-    appPromise = initApp();
+  try {
+    if (!appPromise) {
+      appPromise = initApp();
+    }
+    
+    const app = await appPromise;
+    return app(req, res);
+  } catch (error) {
+    console.error('Serverless handler error:', error);
+    res.status(500).json({ 
+      message: 'Internal Server Error',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
   }
-  
-  const app = await appPromise;
-  return app(req, res);
 }

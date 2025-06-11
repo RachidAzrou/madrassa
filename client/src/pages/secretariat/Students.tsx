@@ -1070,11 +1070,10 @@ export default function Students() {
                           className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                           onClick={handleEidScan}
                         >
-                          <img 
-                            src={eidLogoPath} 
-                            alt="eID" 
-                            className="h-8 w-auto"
-                          />
+                          <div className="flex flex-col items-center space-y-1">
+                            <Camera className="h-5 w-5 text-blue-600" />
+                            <span className="text-xs text-blue-600">eID</span>
+                          </div>
                         </button>
                       </div>
                     </div>

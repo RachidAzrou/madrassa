@@ -288,7 +288,7 @@ export class MinimalStorage implements Partial<IStorage> {
   async getUnreadNotifications(): Promise<any[]> { return []; }
   async createNotification(): Promise<any> { return undefined; }
   async markNotificationAsRead(): Promise<any> { return undefined; }
-  async deleteNotification(): Promise<boolean> { return false; }
+  async deleteNotification(id: number): Promise<void> { }
   async getMessages(): Promise<any[]> { return []; }
   async getMessage(): Promise<any> { return undefined; }
   async getMessagesByUser(): Promise<any[]> { return []; }

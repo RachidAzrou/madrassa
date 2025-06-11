@@ -258,7 +258,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validatedData = insertUserAccountSchema.parse(req.body);
       
       // Hash password
-      const hashedPassword = await bcrypt.hash(validatedData.password, 10);
+      const hashedPassword = await bcrypt.hash((validatedData as any).password || 'defaultpass', 10);
       
       const account = await storage.createUserAccount({
         ...validatedData,

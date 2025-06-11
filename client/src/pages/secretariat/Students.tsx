@@ -35,7 +35,7 @@ import {
   AlertTriangle,
   Camera
 } from 'lucide-react';
-import eidLogoPath from '../../assets/eid-logo.png';
+import eidLogoPath from '@assets/e-id-logo_1749570968055.png';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { PremiumHeader } from '@/components/layout/premium-header';
 import { DataTableContainer, TableContainer } from '@/components/ui/containers';

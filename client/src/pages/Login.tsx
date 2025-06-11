@@ -7,9 +7,9 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Eye, EyeOff, LogIn, GraduationCap, Users, UserCheck, Shield, BookOpen, School, Building2, CreditCard } from 'lucide-react';
-import logoPath from '@assets/myMadrassa.png';
-import schoolDoodlesBg from '@assets/2592039_1749463804244.jpg';
-import logoTextPath from '@assets/Naamloos.png';
+import logoPath from '../assets/mymadrassa_logo.png';
+import schoolDoodlesBg from '../assets/school_doodles.png';
+import logoTextPath from '../assets/mymadrassa_logo.png';
 
 export default function Login() {
   const { login } = useAuth();

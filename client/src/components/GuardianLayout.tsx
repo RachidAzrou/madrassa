@@ -31,7 +31,7 @@ import {
 import NotificationDropdown from '@/components/notifications/NotificationDropdown';
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import myMadrassaLogo from "../assets/mymadrassa_logo.png";
+import myMadrassaLogo from "../assets/myMadrassa.png";
 
 interface GuardianLayoutProps {
   children: React.ReactNode;
